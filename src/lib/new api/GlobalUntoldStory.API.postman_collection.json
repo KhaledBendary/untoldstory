@@ -1,0 +1,963 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Global Untold Story API",
+		"description": "REST API collection for Global Untold Story (Laravel 12).\n\n**Base path:** `/api/v1`\n\n**Auth:** Public endpoints need no auth. Admin endpoints use Sanctum Bearer token from `POST /admin/login`.\n\n**Locale:** Pass `?locale=` (en, ar, de, es, fr, it, pt, tr, ru), `Accept-Language`, or body `locale`.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://127.0.0.1:8000/api/v1"
+		},
+		{
+			"key": "adminToken",
+			"value": ""
+		},
+		{
+			"key": "locale",
+			"value": "en"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{adminToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Public",
+			"description": "Public content and form endpoints — no authentication required.",
+			"auth": {
+				"type": "noauth"
+			},
+			"item": [
+				{
+					"name": "Content",
+					"item": [
+						{
+							"name": "Get Home",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{locale}}",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/home?locale={{locale}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["home"],
+									"query": [
+										{
+											"key": "locale",
+											"value": "{{locale}}",
+											"description": "en | ar | de | es | fr | it | pt | tr | ru"
+										}
+									]
+								},
+								"description": "Full home page payload."
+							}
+						},
+						{
+							"name": "Get Layout",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/layout?locale={{locale}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["layout"],
+									"query": [
+										{
+											"key": "locale",
+											"value": "{{locale}}"
+										}
+									]
+								},
+								"description": "Navbar, footer, site config, and announcement."
+							}
+						},
+						{
+							"name": "Get Page by Slug",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/pages/:slug?locale={{locale}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["pages", ":slug"],
+									"variable": [
+										{
+											"key": "slug",
+											"value": "about",
+											"description": "CMS page slug (e.g. about, services, contact)"
+										}
+									],
+									"query": [
+										{
+											"key": "locale",
+											"value": "{{locale}}"
+										}
+									]
+								},
+								"description": "CMS page by slug."
+							}
+						},
+						{
+							"name": "List Services",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/services?locale={{locale}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["services"],
+									"query": [
+										{
+											"key": "locale",
+											"value": "{{locale}}"
+										}
+									]
+								},
+								"description": "List all services."
+							}
+						},
+						{
+							"name": "Get Service by Slug",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/services/:slug?locale={{locale}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["services", ":slug"],
+									"variable": [
+										{
+											"key": "slug",
+											"value": "web-development"
+										}
+									],
+									"query": [
+										{
+											"key": "locale",
+											"value": "{{locale}}"
+										}
+									]
+								},
+								"description": "Single service by slug."
+							}
+						},
+						{
+							"name": "List Portfolio",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/portfolio?locale={{locale}}&page=1&per_page=12",
+									"host": ["{{baseUrl}}"],
+									"path": ["portfolio"],
+									"query": [
+										{
+											"key": "locale",
+											"value": "{{locale}}"
+										},
+										{
+											"key": "category",
+											"value": "",
+											"description": "Filter by category slug",
+											"disabled": true
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "per_page",
+											"value": "12"
+										}
+									]
+								},
+								"description": "Paginated portfolio listing."
+							}
+						},
+						{
+							"name": "Get Portfolio by Slug",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/portfolio/:slug?locale={{locale}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["portfolio", ":slug"],
+									"variable": [
+										{
+											"key": "slug",
+											"value": "project-slug"
+										}
+									],
+									"query": [
+										{
+											"key": "locale",
+											"value": "{{locale}}"
+										}
+									]
+								},
+								"description": "Single portfolio item by slug."
+							}
+						},
+						{
+							"name": "List Blog Posts",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/blog?locale={{locale}}&page=1&per_page=12",
+									"host": ["{{baseUrl}}"],
+									"path": ["blog"],
+									"query": [
+										{
+											"key": "locale",
+											"value": "{{locale}}"
+										},
+										{
+											"key": "category",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "tag",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "search",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "per_page",
+											"value": "12"
+										}
+									]
+								},
+								"description": "Paginated blog listing. Optional filters: category, tag, search."
+							}
+						},
+						{
+							"name": "Get Blog Post by Slug",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/blog/:slug?locale={{locale}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["blog", ":slug"],
+									"variable": [
+										{
+											"key": "slug",
+											"value": "post-slug"
+										}
+									],
+									"query": [
+										{
+											"key": "locale",
+											"value": "{{locale}}"
+										}
+									]
+								},
+								"description": "Full blog post by slug."
+							}
+						},
+						{
+							"name": "Get About",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/about?locale={{locale}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["about"],
+									"query": [
+										{
+											"key": "locale",
+											"value": "{{locale}}"
+										}
+									]
+								},
+								"description": "About page composite (team, timeline, skills, values, stats, partners, expertise videos)."
+							}
+						},
+						{
+							"name": "List Testimonials",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/testimonials?locale={{locale}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["testimonials"],
+									"query": [
+										{
+											"key": "locale",
+											"value": "{{locale}}"
+										}
+									]
+								},
+								"description": "Active testimonials."
+							}
+						},
+						{
+							"name": "List FAQs",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/faqs?locale={{locale}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["faqs"],
+									"query": [
+										{
+											"key": "locale",
+											"value": "{{locale}}"
+										}
+									]
+								},
+								"description": "Active FAQs."
+							}
+						},
+						{
+							"name": "Get SEO Meta",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/seo/:type/:slug?locale={{locale}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["seo", ":type", ":slug"],
+									"variable": [
+										{
+											"key": "type",
+											"value": "page",
+											"description": "page | blog | service"
+										},
+										{
+											"key": "slug",
+											"value": "about",
+											"description": "Optional for some types"
+										}
+									],
+									"query": [
+										{
+											"key": "locale",
+											"value": "{{locale}}"
+										}
+									]
+								},
+								"description": "SEO meta. Type: page, blog, or service. Slug is optional depending on type."
+							}
+						},
+						{
+							"name": "Get Sitemap XML",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/xml"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/sitemap.xml",
+									"host": ["{{baseUrl}}"],
+									"path": ["sitemap.xml"]
+								},
+								"description": "XML sitemap (returns application/xml)."
+							}
+						}
+					]
+				},
+				{
+					"name": "Forms",
+					"item": [
+						{
+							"name": "Submit Contact Form",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"+1234567890\",\n  \"service\": \"Web Development\",\n  \"budget\": \"$5,000 - $10,000\",\n  \"message\": \"I would like to discuss a project.\",\n  \"locale\": \"en\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/contact",
+									"host": ["{{baseUrl}}"],
+									"path": ["contact"]
+								},
+								"description": "Submit contact form.\n\n**Required:** name, email, message\n**Optional:** phone, service, budget, locale"
+							}
+						},
+						{
+							"name": "Submit Quote / Lead",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Jane Smith\",\n  \"email\": \"jane@example.com\",\n  \"phone\": \"+1234567890\",\n  \"service\": \"Branding\",\n  \"service_id\": 1,\n  \"message\": \"Looking for a quote.\",\n  \"budget\": \"$10,000+\",\n  \"locale\": \"en\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/leads/quote",
+									"host": ["{{baseUrl}}"],
+									"path": ["leads", "quote"]
+								},
+								"description": "Submit quote / lead.\n\n**Required:** name, email\n**Optional:** phone, service, service_id, message, budget, locale"
+							}
+						},
+						{
+							"name": "Newsletter Subscribe",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"subscriber@example.com\",\n  \"locale\": \"en\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/newsletter/subscribe",
+									"host": ["{{baseUrl}}"],
+									"path": ["newsletter", "subscribe"]
+								},
+								"description": "Newsletter signup.\n\n**Required:** email\n**Optional:** locale"
+							}
+						},
+						{
+							"name": "Newsletter Unsubscribe",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"token\": \"unsubscribe-token-here\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/newsletter/unsubscribe",
+									"host": ["{{baseUrl}}"],
+									"path": ["newsletter", "unsubscribe"]
+								},
+								"description": "Unsubscribe by token.\n\n**Required:** token"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"description": "Admin JSON API. Login first, then use the Bearer token (auto-saved to `adminToken` by the Login request test script).",
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{adminToken}}",
+						"type": "string"
+					}
+				]
+			},
+			"item": [
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const json = pm.response.json();",
+											"    const token = json.token || json.data?.token || json.access_token;",
+											"    if (token) {",
+											"        pm.collectionVariables.set('adminToken', token);",
+											"        pm.environment.set('adminToken', token);",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/login",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "login"]
+								},
+								"description": "Admin login. Returns Sanctum token + user.\n\nRequires role: super-admin, admin, editor, or viewer.\n\nOn success, the test script saves the token to `adminToken`."
+							}
+						},
+						{
+							"name": "Logout",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/logout",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "logout"]
+								},
+								"description": "Revoke current Sanctum token."
+							}
+						},
+						{
+							"name": "Me",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/me",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "me"]
+								},
+								"description": "Current admin user (id, name, email, roles)."
+							}
+						}
+					]
+				},
+				{
+					"name": "Dashboard",
+					"item": [
+						{
+							"name": "Get Dashboard",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/dashboard",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "dashboard"]
+								},
+								"description": "Counts: contact requests, leads, newsletter, published posts."
+							}
+						}
+					]
+				},
+				{
+					"name": "Contact Requests",
+					"item": [
+						{
+							"name": "List Contact Requests",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/contact-requests?per_page=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "contact-requests"],
+									"query": [
+										{
+											"key": "status",
+											"value": "new",
+											"description": "new | read | replied | archived",
+											"disabled": true
+										},
+										{
+											"key": "per_page",
+											"value": "20"
+										}
+									]
+								},
+								"description": "Paginated contact requests."
+							}
+						},
+						{
+							"name": "Get Contact Request",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/contact-requests/:contact_request",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "contact-requests", ":contact_request"],
+									"variable": [
+										{
+											"key": "contact_request",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Show one contact request; marks as read if unread."
+							}
+						},
+						{
+							"name": "Update Contact Request (PATCH)",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"status\": \"replied\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/contact-requests/:contact_request",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "contact-requests", ":contact_request"],
+									"variable": [
+										{
+											"key": "contact_request",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Update status: new | read | replied | archived"
+							}
+						},
+						{
+							"name": "Update Contact Request (PUT)",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"status\": \"archived\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/contact-requests/:contact_request",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "contact-requests", ":contact_request"],
+									"variable": [
+										{
+											"key": "contact_request",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Same as PATCH. Status: new | read | replied | archived"
+							}
+						}
+					]
+				},
+				{
+					"name": "Leads",
+					"item": [
+						{
+							"name": "List Leads",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/leads?per_page=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "leads"],
+									"query": [
+										{
+											"key": "status",
+											"value": "new",
+											"description": "new | contacted | proposal | won | lost | archived",
+											"disabled": true
+										},
+										{
+											"key": "per_page",
+											"value": "20"
+										}
+									]
+								},
+								"description": "Paginated leads (includes service)."
+							}
+						},
+						{
+							"name": "Get Lead",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/leads/:lead",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "leads", ":lead"],
+									"variable": [
+										{
+											"key": "lead",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Show lead with service and assignee."
+							}
+						},
+						{
+							"name": "Update Lead (PATCH)",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"status\": \"contacted\",\n  \"assigned_to\": 1\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/leads/:lead",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "leads", ":lead"],
+									"variable": [
+										{
+											"key": "lead",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Update lead.\n\n**Required:** status (new | contacted | proposal | won | lost | archived)\n**Optional:** assigned_to (user id)"
+							}
+						},
+						{
+							"name": "Update Lead (PUT)",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"status\": \"won\",\n  \"assigned_to\": null\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/leads/:lead",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "leads", ":lead"],
+									"variable": [
+										{
+											"key": "lead",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Same as PATCH."
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Health",
+			"auth": {
+				"type": "noauth"
+			},
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/up",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8000",
+							"path": ["up"]
+						},
+						"description": "Laravel health check endpoint (outside /api/v1)."
+					}
+				}
+			]
+		}
+	]
+}

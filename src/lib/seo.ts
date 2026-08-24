@@ -1,0 +1,194 @@
+/**
+ * Shared SEO helpers.
+ *
+ * The CMS stores headlines as a single all-caps string that merges the service
+ * name with its tagline ("PRODUCTION SERVICES IN EGYPT FOR INTERNATIONAL CREWS
+ * LOCAL KNOWLEDGE. INTERNATIONAL PRODUCTION STANDARDS."), and mirrors the body
+ * copy straight into seo.metaDescription. Both overflow what search engines
+ * display, so everything that reaches <title> or <meta name="description">
+ * goes through here first.
+ */
+
+export const SITE_URL = "https://globaluntoldstory.com";
+export const BRAND = "Global Untold Story";
+
+const TITLE_MAX = 60;
+const DESCRIPTION_MAX = 155;
+
+/** Words that stay uppercase when we de-shout a headline. */
+const ACRONYMS = new Set([
+  "TV", "CGI", "VFX", "AI", "IP", "UAE", "KSA", "MENA", "EMPC", "UGC",
+  "HD", "4K", "8K", "VR", "AR", "OTT", "B2B", "B2C", "PR", "CEO", "DOP",
+  "ADR", "VO", "SEO", "ROI", "ILO", "ADNOC", "USA", "UK", "EU",
+]);
+
+/** Lowercase inside a title unless they land first. */
+const MINOR_WORDS = new Set([
+  "a", "an", "and", "as", "at", "but", "by", "for", "from", "in", "into",
+  "nor", "of", "on", "or", "the", "to", "with",
+]);
+
+/**
+ * Words allowed to trail the last slug match — "COMMERCIAL PHOTOGRAPHY" is the
+ * name, but "COMMERCIAL PHOTOGRAPHY SERVICES" is the name as people write it.
+ */
+const NAME_SUFFIXES = new Set([
+  "services", "service", "production", "productions", "film", "films",
+  "video", "content", "studio", "agency", "development", "coverage",
+]);
+
+/** Slug words that carry no signal when locating the end of a name. */
+const SLUG_STOPWORDS = new Set(["and", "the", "for", "of", "in", "on", "a", "an"]);
+
+const wordKey = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+function isAllCaps(value: string) {
+  const letters = value.replace(/[^A-Za-z]/g, "");
+  return letters.length > 3 && letters === letters.toUpperCase();
+}
+
+function toTitleCase(value: string) {
+  const parts = value.toLowerCase().split(/(\s+|[/–—-])/);
+  return parts
+    .map((token, index) => {
+      if (!/[a-z]/i.test(token)) return token;
+      const key = wordKey(token);
+      if (ACRONYMS.has(key.toUpperCase())) return token.replace(/[a-z]+/i, key.toUpperCase());
+      if (index > 0 && MINOR_WORDS.has(key)) return token;
+      return token.charAt(0).toUpperCase() + token.slice(1);
+    })
+    .join("");
+}
+
+/**
+ * The CMS glues the tagline onto the name with no delimiter, but every word of
+ * the slug lives in the name — so the last word matching a slug token marks
+ * where the name ends and the tagline begins.
+ */
+function trimTagline(value: string, slug?: string) {
+  if (!slug) return value;
+
+  const slugTokens = slug
+    .split(/[-_/]/)
+    .map(wordKey)
+    .filter((token) => token.length > 1 && !SLUG_STOPWORDS.has(token));
+  if (!slugTokens.length) return value;
+
+  const words = value.split(/\s+/);
+  let lastMatch = -1;
+  words.forEach((word, index) => {
+    const key = wordKey(word);
+    if (!key) return;
+    const hit = slugTokens.some((token) => {
+      if (key === token) return true;
+      // Allow a short stem gap so "SHOWS" answers to "show", but keep tokens
+      // of three characters or fewer exact — "AI" must not match "AIRPORT".
+      if (token.length <= 3 || key.length <= 3) return false;
+      const [long, short] = key.length >= token.length ? [key, token] : [token, key];
+      return long.startsWith(short) && long.length - short.length <= 2;
+    });
+    if (hit) lastMatch = index;
+  });
+  if (lastMatch < 0) return value;
+
+  let end = lastMatch;
+  while (end + 1 < words.length && NAME_SUFFIXES.has(wordKey(words[end + 1]))) end += 1;
+  return words.slice(0, end + 1).join(" ");
+}
+
+/** Cut at the last whole word that fits, so nothing ends mid-word. */
+function clampWords(value: string, max: number) {
+  if (value.length <= max) return value;
+  const cut = value.slice(0, max);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > max * 0.5 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:—–-]+$/, "");
+}
+
+/** Strip HTML, markdown leftovers and collapse whitespace. */
+export function plainText(value?: string | null) {
+  if (!value) return "";
+  return value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\*\*|__|[*_`>#]/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Turn a CMS headline into something that fits a SERP: drop the tagline the
+ * CMS glued on after the first sentence, de-shout it, and keep it short.
+ */
+export function cleanHeadline(raw?: string | null, slug?: string) {
+  let value = plainText(raw);
+  if (!value) return "";
+
+  const shouted = isAllCaps(value);
+
+  // A full stop always ends the name; cut there before hunting for the
+  // tagline, so words repeated later in the tagline can't drag the cut right.
+  const firstStop = value.indexOf(". ");
+  if (firstStop > 12) value = value.slice(0, firstStop);
+  value = value.replace(/\.+$/, "").trim();
+
+  if (shouted) value = trimTagline(value, slug);
+
+  if (shouted) value = toTitleCase(value);
+  return value;
+}
+
+/**
+ * Page title, brand suffix included only when it still fits inside the
+ * ~60 characters Google renders.
+ */
+export function buildTitle(raw?: string | null, slug?: string, fallback = BRAND) {
+  const name = cleanHeadline(raw, slug) || fallback;
+  const suffix = ` | ${BRAND}`;
+  if (name === BRAND) return name;
+  if (name.length + suffix.length <= TITLE_MAX) return name + suffix;
+  return clampWords(name, TITLE_MAX);
+}
+
+/**
+ * Meta description clamped to 155 characters, preferring a sentence boundary
+ * so a trimmed description still reads as a finished thought.
+ */
+export function buildDescription(raw?: string | null, fallback = "") {
+  const value = plainText(raw) || plainText(fallback);
+  if (!value) return "";
+  if (value.length <= DESCRIPTION_MAX) return value;
+
+  const window = value.slice(0, DESCRIPTION_MAX);
+  const lastStop = Math.max(window.lastIndexOf(". "), window.lastIndexOf("! "), window.lastIndexOf("? "));
+  if (lastStop > DESCRIPTION_MAX * 0.6) return window.slice(0, lastStop + 1);
+  return `${clampWords(value, DESCRIPTION_MAX - 1)}…`;
+}
+
+/** The CMS ships an untyped `seo` bag on most records. Read it safely. */
+export function cmsSeo(seo?: Record<string, unknown> | null) {
+  const read = (key: string) => (typeof seo?.[key] === "string" ? (seo[key] as string) : undefined);
+  return {
+    metaTitle: read("metaTitle"),
+    metaDescription: read("metaDescription"),
+    ogImageUrl: read("ogImageUrl"),
+  };
+}
+
+export function absoluteUrl(path: string) {
+  return path.startsWith("http") ? path : `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+/** Breadcrumb trail for a detail page, e.g. Home › Services › Post Production. */
+export function breadcrumbSchema(trail: Array<{ name: string; path: string }>) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [{ name: "Home", path: "/" }, ...trail].map((crumb, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: crumb.name,
+      item: absoluteUrl(crumb.path),
+    })),
+  };
+}

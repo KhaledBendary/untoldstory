@@ -1,0 +1,80 @@
+import type { MetadataRoute } from "next";
+import { api } from "@/lib/api";
+import { POSTS as FALLBACK_POSTS, PROJECTS as FALLBACK_PROJECTS, SERVICES as FALLBACK_SERVICES } from "@/data/content";
+import type { BlogPost, PortfolioItem, Service } from "@/types/api";
+import { SITE_URL } from "@/lib/seo";
+
+/**
+ * Only emit lastModified when the CMS actually knows when something changed.
+ * Stamping every URL with the build time makes the whole field worthless —
+ * Google ignores a lastmod that moves in lockstep across an entire sitemap.
+ */
+function entry(
+  path: string,
+  options: { lastModified?: Date; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]; priority: number },
+): MetadataRoute.Sitemap[number] {
+  const { lastModified, ...rest } = options;
+  return { url: `${SITE_URL}${path}`, ...rest, ...(lastModified ? { lastModified } : {}) };
+}
+
+function parseDate(value?: string | null) {
+  if (!value) return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  let services: (Service | { slug: string })[] = [];
+  let projects: (PortfolioItem | { slug: string })[] = [];
+  let posts: (BlogPost | { slug: string; date?: string; publishedAt?: string })[] = [];
+
+  try {
+    services = await api.getServices();
+  } catch (e) {
+    console.error("Error fetching services for sitemap:", e);
+    services = FALLBACK_SERVICES;
+  }
+
+  try {
+    const portfolioData = await api.getPortfolio({ page: 1, per_page: 50 });
+    projects = portfolioData.items;
+  } catch (e) {
+    console.error("Error fetching portfolio for sitemap:", e);
+    projects = FALLBACK_PROJECTS;
+  }
+
+  try {
+    const blogData = await api.getBlogPosts({ page: 1, per_page: 50 });
+    posts = blogData.items;
+  } catch (e) {
+    console.error("Error fetching blog posts for sitemap:", e);
+    posts = FALLBACK_POSTS;
+  }
+
+  const newestPost = posts
+    .map((post) => parseDate("publishedAt" in post ? post.publishedAt : undefined) ?? parseDate("date" in post ? post.date : undefined))
+    .filter((date): date is Date => Boolean(date))
+    .sort((a, b) => b.getTime() - a.getTime())[0];
+
+  return [
+    entry("", { changeFrequency: "weekly", priority: 1 }),
+    entry("/services", { changeFrequency: "monthly", priority: 0.8 }),
+    entry("/work", { changeFrequency: "monthly", priority: 0.8 }),
+    // The index genuinely changes when its newest article does.
+    entry("/insights", { lastModified: newestPost, changeFrequency: "monthly", priority: 0.8 }),
+    entry("/about", { changeFrequency: "monthly", priority: 0.8 }),
+    entry("/contact", { changeFrequency: "monthly", priority: 0.8 }),
+
+    ...services.map((service) => entry(`/services/${service.slug}`, { changeFrequency: "monthly", priority: 0.8 })),
+    ...projects.map((project) => entry(`/work/${project.slug}`, { changeFrequency: "monthly", priority: 0.7 })),
+    ...posts.map((post) =>
+      entry(`/insights/${post.slug}`, {
+        lastModified:
+          parseDate("publishedAt" in post ? post.publishedAt : undefined) ??
+          parseDate("date" in post ? post.date : undefined),
+        changeFrequency: "yearly",
+        priority: 0.6,
+      }),
+    ),
+  ];
+}
