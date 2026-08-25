@@ -1,6 +1,6 @@
 "use client";
 
-import Link from 'next/link';
+import Link from '@/components/LocaleLink';
 import Magnetic from './Magnetic';
 import { useLanguage } from './LanguageContext';
 

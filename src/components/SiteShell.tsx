@@ -13,18 +13,27 @@ import WhatsAppButton from "./WhatsAppButton";
 import DomSafetyPatch from "./DomSafetyPatch";
 import { SiteReadyProvider } from "./SiteContext";
 import { LanguageProvider, useLanguage } from "./LanguageContext";
+import type { ShellData } from "@/lib/page-data";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function SiteShell({ children }: { children: React.ReactNode }) {
+export default function SiteShell({
+  children,
+  shell,
+  locale,
+}: {
+  children: React.ReactNode;
+  shell: ShellData | null;
+  locale: string;
+}) {
   return (
     <LanguageProvider>
-      <SiteShellInner>{children}</SiteShellInner>
+      <SiteShellInner shell={shell} locale={locale}>{children}</SiteShellInner>
     </LanguageProvider>
   );
 }
 
-function SiteShellInner({ children }: { children: React.ReactNode }) {
+function SiteShellInner({ children, shell, locale: initialLocale }: { children: React.ReactNode; shell: ShellData | null; locale: string }) {
   const [loaded, setLoaded] = useState(false);
   const pathname = usePathname();
   const { locale } = useLanguage();
@@ -66,9 +75,9 @@ function SiteShellInner({ children }: { children: React.ReactNode }) {
       <div className="grain bg-[#0a0a0a] min-h-screen text-[#fafafa]">
         {!loaded && <Preloader onDone={() => setLoaded(true)} />}
         <Cursor />
-        <Navbar />
+        <Navbar initialData={shell} initialLocale={initialLocale} />
         <main>{children}</main>
-        <Footer />
+        <Footer initialData={shell} initialLocale={initialLocale} />
         <WhatsAppButton />
       </div>
     </SiteReadyProvider>

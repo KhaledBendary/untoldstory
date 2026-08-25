@@ -20,8 +20,20 @@ function isRetryable(status?: number): boolean {
   return status === undefined || status >= 500 || status === 429;
 }
 
-const RETRY_ATTEMPTS = 4;
-const RETRY_DELAYS_MS = [300, 800, 2000];
+/**
+ * The upstream API is a shared-host Laravel app that intermittently 500s while
+ * a build walks every page — the same URLs return 200 the moment the burst
+ * passes. Retrying patiently is what keeps prerendered pages from shipping
+ * their empty retry state, so back off far enough to outlast a bad window.
+ */
+const RETRY_ATTEMPTS = 6;
+const RETRY_DELAYS_MS = [500, 1500, 3000, 6000, 10000];
+
+/** Spread simultaneous retries so they don't re-collide on the same tick. */
+function backoffFor(attempt: number): number {
+  const base = RETRY_DELAYS_MS[attempt] ?? RETRY_DELAYS_MS[RETRY_DELAYS_MS.length - 1];
+  return base + Math.floor(Math.random() * 400);
+}
 
 /**
  * Seconds Next.js may serve a cached API response before refetching.
@@ -49,20 +61,64 @@ function wait(ms: number): Promise<void> {
  */
 const MAX_SERVER_CONCURRENCY = 4;
 
-let inFlight = 0;
-const waiting: Array<() => void> = [];
+
+/**
+ * In-process response cache for server reads.
+ *
+ * A build renders 490 pages and every page of a locale asks for that locale's
+ * list endpoints, so the same URL was being fetched hundreds of times. Next's
+ * data cache does not span build workers, and the upstream API collapses well
+ * before that volume — pages then rendered their empty retry state with no
+ * <h1>. Caching the in-flight promise per URL collapses all of it into one
+ * request, and the TTL matches the revalidate window so a long-running server
+ * still picks up CMS edits.
+ */
+/**
+ * Bundlers hand each route graph its own copy of this module, so a plain
+ * module-scope counter would give every copy its own budget and the real
+ * concurrency would be a multiple of the limit. Anchoring the state on
+ * globalThis makes all copies inside one process share a single gate.
+ */
+type ApiRuntimeState = {
+  cache: Map<string, { at: number; value: Promise<unknown> }>;
+  inFlight: number;
+  waiting: Array<() => void>;
+};
+
+const RUNTIME_KEY = Symbol.for("globaluntoldstory.api-client.runtime");
+const globalScope = globalThis as unknown as Record<symbol, ApiRuntimeState | undefined>;
+
+const runtime: ApiRuntimeState =
+  globalScope[RUNTIME_KEY] ??
+  (globalScope[RUNTIME_KEY] = { cache: new Map(), inFlight: 0, waiting: [] });
+
+const responseCache = runtime.cache;
+
+function cachedRead<T>(url: string, load: () => Promise<T>): Promise<T> {
+  const hit = responseCache.get(url);
+  const now = Date.now();
+  if (hit && now - hit.at < SERVER_REVALIDATE_SECONDS * 1000) return hit.value as Promise<T>;
+
+  const value = load().catch((error) => {
+    // A failure must not be cached, or one blip poisons the whole build.
+    responseCache.delete(url);
+    throw error;
+  });
+  responseCache.set(url, { at: now, value });
+  return value;
+}
 
 async function acquireSlot(): Promise<() => void> {
-  if (inFlight >= MAX_SERVER_CONCURRENCY) {
-    await new Promise<void>(resolve => waiting.push(resolve));
+  while (runtime.inFlight >= MAX_SERVER_CONCURRENCY) {
+    await new Promise<void>(resolve => runtime.waiting.push(resolve));
   }
-  inFlight++;
+  runtime.inFlight++;
   let released = false;
   return () => {
     if (released) return;
     released = true;
-    inFlight--;
-    waiting.shift()?.();
+    runtime.inFlight--;
+    runtime.waiting.shift()?.();
   };
 }
 
@@ -132,6 +188,21 @@ class ApiClient {
       requestOptions?.locale || queryParams?.locale || this.defaultLocale;
     const url = this.buildUrl(endpoint, { ...queryParams, locale });
 
+    const isServerRead =
+      typeof window === 'undefined' && (options.method ?? 'GET') === 'GET' && !options.body;
+    if (isServerRead) {
+      return cachedRead<T>(url, () => this.fetchWithRetry<T>(url, options, requestOptions, true));
+    }
+    return this.fetchWithRetry<T>(url, options, requestOptions, false);
+  }
+
+  private async fetchWithRetry<T>(
+    url: string,
+    options: RequestInit,
+    requestOptions: ApiRequestOptions | undefined,
+    isCacheableServerRead: boolean,
+  ): Promise<T> {
+
     const headers: Record<string, string> = {
       Accept: 'application/json',
       ...requestOptions?.headers,
@@ -143,10 +214,8 @@ class ApiClient {
 
     let lastError: ApiError = new ApiError('API request failed: no attempts made');
 
-    // Server-side reads go through Next's data cache so concurrent renders of
-    // the same URL share a single upstream request. The browser is left alone.
-    const isCacheableServerRead =
-      typeof window === 'undefined' && (options.method ?? 'GET') === 'GET' && !options.body;
+    // Server-side reads also go through Next's data cache, so a rebuilt page
+    // can reuse a response across processes. The browser is left alone.
     const cacheInit: RequestInit & { next?: { revalidate: number } } = isCacheableServerRead
       ? { next: { revalidate: SERVER_REVALIDATE_SECONDS } }
       : {};
@@ -182,10 +251,12 @@ class ApiClient {
 
       const isLastAttempt = attempt === RETRY_ATTEMPTS - 1;
       if (isLastAttempt || !isRetryable(lastError.status)) break;
-      await wait(RETRY_DELAYS_MS[attempt] ?? RETRY_DELAYS_MS[RETRY_DELAYS_MS.length - 1]);
+      await wait(backoffFor(attempt));
     }
 
-    console.error('API request error:', lastError);
+    // Name the URL: "API request failed: 500" alone gives no way to tell which
+    // endpoint, locale or slug actually broke.
+    console.error(`API request error [${url}]:`, lastError.message);
     throw lastError;
   }
 

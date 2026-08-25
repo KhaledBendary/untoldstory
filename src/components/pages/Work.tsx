@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
+import Image from 'next/image';
+import Link from '@/components/LocaleLink';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, Play } from 'lucide-react';
 import { SplitWords, Reveal, EASE } from '../Reveal';
@@ -51,7 +52,7 @@ function WorkCard({ project }: { project: PortfolioItem }) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <img src={getProjectImage(project)} alt={project.title} className="w-full h-full object-cover" loading="lazy" />
+          <Image src={getProjectImage(project)} alt={project.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
         <div className="absolute top-4 left-4 flex gap-2">
@@ -132,7 +133,7 @@ export default function Work({ initialData, initialLocale }: { initialData: Port
               }`}
             >
               {c === 'All' ? (t('Home') === 'الرئيسية' ? 'الكل' : 'All') : c}
-              <span className="ms-2 opacity-50">{c === 'All' ? projects.length : projects.filter(p => p.category === c).length}</span>
+              <span className="ms-2 opacity-70">{c === 'All' ? projects.length : projects.filter(p => p.category === c).length}</span>
             </button>
           ))}
         </div>
@@ -168,9 +169,11 @@ export default function Work({ initialData, initialLocale }: { initialData: Port
             {t('Get in touch')} <ArrowUpRight className="w-4 h-4 rtl:-scale-x-100" />
           </Link>
         </div>
-        <img
+        <Image
           src="/images/logo-white.png"
           alt="Global Untold Story"
+          width={348}
+          height={191}
           className="h-14 md:h-20 w-auto self-end md:ms-auto"
         />
       </section>

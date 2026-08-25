@@ -4,10 +4,6 @@
 
 @layer base {
   :root {
-    --font-inter: 'Inter';
-    --font-archivo: 'Archivo';
-    --font-jetbrains: 'JetBrains Mono';
-    --font-alexandria: 'Alexandria';
     --background: 0 0% 4%;
     --foreground: 0 0% 98%;
     --card: 0 0% 6%;

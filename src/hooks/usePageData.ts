@@ -19,8 +19,12 @@ export function usePageData<T>(
 ) {
   const { locale } = useLanguage();
   const [data, setData] = useState<T | null>(initialData);
-  const [loading, setLoading] = useState(!initialData);
-  const [failed, setFailed] = useState(false);
+  // When the server rendered without data it had already exhausted its
+  // retries, so the honest server-side state is "failed", not "loading" — and
+  // the failed view is a real page with an <h1>, where the spinner was markup
+  // with no heading at all. The client then retries and replaces it.
+  const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState(!initialData);
   const [retryToken, setRetryToken] = useState(0);
 
   // Held in a ref so callers can pass an inline closure over `slug` without

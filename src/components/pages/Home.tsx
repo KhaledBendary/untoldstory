@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/LocaleLink';
 import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import gsap from 'gsap';
@@ -17,6 +17,10 @@ import { useLanguage } from '../LanguageContext';
 import { getHomeData, type HomeData } from '@/lib/home-data';
 import { getServiceImage, getProjectImage, getPostImage } from '@/lib/utils';
 import type { Service, PortfolioItem, BlogPost } from '@/types/api';
+
+/** Animating next/image directly keeps one optimized asset across both
+ *  branches — a plain motion.img would refetch the raw file on hydration. */
+const MotionImage = motion.create(Image);
 
 /* ---------------- HERO (from API) ---------------- */
 function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headline1?: string; headline2?: string; headline3?: string; subtext?: string; cta1?: { label: string; href: string }; cta2?: { label: string; href: string }; image?: string } | null }) {
@@ -53,23 +57,29 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
     <section ref={ref} className="relative h-[100svh] overflow-hidden">
       <motion.div className="absolute inset-0" style={hydrated ? { y: imgY, scale: imgScale } : undefined}>
         {hydrated ? (
-          <motion.img
+          <MotionImage
             src={heroImage}
             alt={hero?.subtext || 'Global Untold Story production team'}
-            className="w-full h-full object-cover"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
             initial={{ scale: 1.25, filter: 'grayscale(1) brightness(0.4)' }}
             animate={ready ? { scale: 1, filter: 'grayscale(1) brightness(0.75)' } : {}}
             transition={{ duration: 1.8, ease: EASE }}
           />
         ) : (
-          <img
+          <Image
             src={heroImage}
             alt={hero?.subtext || 'Global Untold Story production team'}
-            className="w-full h-full object-cover"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
           />
         )}
       </motion.div>
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-[#0a0a0a]/40" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-[#0a0a0a]/65" />
 
       <motion.div className="relative z-10 h-full flex flex-col justify-end px-5 md:px-10 pb-10 md:pb-14" style={hydrated ? { opacity: fade } : undefined}>
         {hydrated ? (
@@ -80,13 +90,13 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
             transition={{ duration: 0.9, delay: 0.7, ease: EASE }}
           >
             <span>( {hero?.badge || t('Film & Video Production')} )</span>
-            <span className="hidden md:inline text-white/30">/</span>
+            <span className="hidden md:inline text-white/55">/</span>
             <span className="hidden md:inline">{t('Egypt — MENA — Worldwide')}</span>
           </motion.div>
         ) : (
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-5 font-mono2 text-[10px] md:text-[11px] tracking-[0.3em] uppercase text-white/70">
             <span>( {hero?.badge || t('Film & Video Production')} )</span>
-            <span className="hidden md:inline text-white/30">/</span>
+            <span className="hidden md:inline text-white/55">/</span>
             <span className="hidden md:inline">{t('Egypt — MENA — Worldwide')}</span>
           </div>
         )}
@@ -204,7 +214,7 @@ function ServicesList({ services }: { services: Service[] }) {
                 onMouseEnter={() => setActive(i)}
                 onMouseLeave={() => setActive(null)}
               >
-                <span className="font-mono2 text-[11px] text-white/40 w-8 shrink-0">{String(i + 1).padStart(2, '0')}</span>
+                <span className="font-mono2 text-[11px] text-white/55 w-8 shrink-0">{String(i + 1).padStart(2, '0')}</span>
                 <span className={`font-display font-bold uppercase tracking-tight leading-none text-[6.4vw] md:text-[3.4vw] transition-all duration-500 ${active === i ? 'text-white rtl:-translate-x-3 md:rtl:-translate-x-6 translate-x-3 md:translate-x-6' : 'text-white/55'}`}>
                   {s.title}
                 </span>
@@ -437,7 +447,7 @@ function Process({ process }: { process: { badge?: string; title?: string; steps
     <section className="px-5 md:px-10 py-24 md:py-36 bg-[#fafafa] text-[#0a0a0a]">
       <div className="flex items-end justify-between mb-12 md:mb-20">
         <div>
-          <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-[#0a0a0a]/50 mb-4">( {process?.badge || t('Services')} )</p>
+          <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-[#0a0a0a]/65 mb-4">( {process?.badge || t('Services')} )</p>
           <SplitWords
             text={process?.title || t('ENTER AT ANY STAGE LEAVE WITH ONE EPIC RESULT')}
             className="font-display font-extrabold uppercase tracking-tight leading-[0.95] text-[8vw] md:text-[4.2vw]"
@@ -497,7 +507,7 @@ function InsightsTeaser({ posts }: { posts: BlogPost[] }) {
                   loading="lazy"
                 />
               </div>
-              <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/40 mb-3">
+              <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 mb-3">
                 {p.category} — {new Date(p.date).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
               </p>
               <h3 className="font-display font-bold text-xl md:text-2xl leading-snug group-hover:opacity-70 transition-opacity">{p.title}</h3>
@@ -527,7 +537,7 @@ function Awards({ awards }: { awards: Array<{ icon: string; color: string; title
               {/* <span className="text-3xl md:text-4xl">{a.icon}</span> */}
               <h3 className="font-display font-bold uppercase text-xl md:text-2xl mt-4">{a.title}</h3>
               <p className="text-white/50 text-sm mt-2">{a.organization}</p>
-              <span className="inline-block mt-3 font-mono2 text-[10px] tracking-[0.2em] uppercase text-white/40 border border-white/15 px-3 py-1">{a.yearLabel}</span>
+              <span className="inline-block mt-3 font-mono2 text-[10px] tracking-[0.2em] uppercase text-white/55 border border-white/15 px-3 py-1">{a.yearLabel}</span>
             </div>
           </Reveal>
         ))}
@@ -587,7 +597,8 @@ export default function Home({ initialData, initialLocale }: { initialData: Home
   const [data, setData] = useState<HomeData | null>(initialData);
   // Server-rendered content is already on screen for the initial locale; only a
   // language switch (or a failed server fetch) needs a client round trip.
-  const [loading, setLoading] = useState(!initialData);
+  // See usePageData: a dataless server render is a failure, not a load.
+  const [loading, setLoading] = useState(false);
   const [retryToken, setRetryToken] = useState(0);
 
   useEffect(() => {
@@ -636,7 +647,7 @@ export default function Home({ initialData, initialLocale }: { initialData: Home
       <Marquee duration={36} className="border-y border-white/10 py-5 md:py-6 bg-[#0a0a0a]">
         {['Film', 'Commercials', 'Documentaries', 'Corporate', 'Event Coverage', 'TV & Live', 'Podcast', 'Post-Production', 'Motion · CGI · AI', 'Localization', 'Photography'].map(label => (
           <span key={label} className="font-display font-extrabold uppercase tracking-tight text-3xl md:text-5xl mx-6 whitespace-nowrap">
-            {t(label)} <span className="text-white/25 mx-2">—</span>
+            {t(label)} <span className="text-white/50 mx-2">—</span>
           </span>
         ))}
       </Marquee>

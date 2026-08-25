@@ -3,13 +3,12 @@ import ProjectDetail from "@/components/pages/ProjectDetail";
 import StructuredData from "@/components/StructuredData";
 import { applySeoOverrides } from "@/data/seo-overrides";
 import { api } from "@/lib/api";
-import { getProjectDetailData, safeFetch } from "@/lib/page-data";
+import { alternatesFor, isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
+import { getProjectDetailData, findProjectAnyLocale, safeFetch, projectDetailWithFallback } from "@/lib/page-data";
 import { PROJECTS as FALLBACK_PROJECTS } from "@/data/content";
 import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline } from "@/lib/seo";
 
-const DEFAULT_LOCALE = process.env.NEXT_PUBLIC_API_LOCALE || "en";
-
-type Props = { params: Promise<{ slug: string }> };
+type Props = { params: Promise<{ locale: string; slug: string }> };
 
 /** "Huawei Commercial — Huawei" reads badly; keep the client only when it adds something. */
 function projectHeadline(title: string, client?: string | null, slug?: string) {
@@ -19,6 +18,11 @@ function projectHeadline(title: string, client?: string | null, slug?: string) {
 }
 
 export async function generateStaticParams() {
+  const slugs = await slugList();
+  return PRERENDER_LOCALES.flatMap((locale) => slugs.map(({ slug }) => ({ locale, slug })));
+}
+
+async function slugList() {
   try {
     const portfolioData = await api.getPortfolio({ page: 1, per_page: 50 });
     return portfolioData.items.map((project) => ({ slug: project.slug }));
@@ -29,12 +33,13 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug, locale: raw } = await params;
+  const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   // Never return {} — that inherits the root canonical ("/") and deindexes the page.
-  const canonical = { alternates: { canonical: `/work/${slug}` } };
+  const canonical = { alternates: alternatesFor(`/work/${slug}`, locale) };
 
   try {
-    const project = await api.getPortfolioBySlug(slug);
+    const project = await api.getPortfolioBySlug(slug, locale);
     const headline = projectHeadline(project.title, project.client, slug);
     const title = buildTitle(headline, slug);
     // `results` is the full case-study body — buildDescription clamps it to 155.
@@ -44,12 +49,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: { absolute: title },
       description,
       ...canonical,
-      openGraph: { title, description, images: image ? [image] : [], type: "article", url: absoluteUrl(`/work/${slug}`) },
-    });
+      openGraph: { title, description, images: image ? [image] : [], type: "article", url: absoluteUrl(localizedPath(`/work/${slug}`, locale)) },
+    }, locale);
   } catch (e) {
     console.error("Error fetching project for metadata:", e);
+    const live = await findProjectAnyLocale(slug, locale);
+    if (live) {
+      const headline = projectHeadline(live.title, live.client, slug);
+      const title = buildTitle(headline, slug);
+      const description = buildDescription(live.results, headline);
+      return applySeoOverrides(`/work/${slug}`, {
+        title: { absolute: title },
+        description,
+        ...canonical,
+        openGraph: { title, description, images: live.image ? [live.image] : [], type: "article", url: absoluteUrl(localizedPath(`/work/${slug}`, locale)) },
+      }, locale);
+    }
+
     const project = FALLBACK_PROJECTS.find((item) => item.slug === slug);
-    if (!project) return applySeoOverrides(`/work/${slug}`, canonical);
+    if (!project) return applySeoOverrides(`/work/${slug}`, canonical, locale);
 
     const headline = projectHeadline(project.title, project.client, slug);
     const title = buildTitle(headline, slug);
@@ -58,18 +76,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: { absolute: title },
       description,
       ...canonical,
-      openGraph: { title, description, images: [project.image], type: "article", url: absoluteUrl(`/work/${slug}`) },
-    });
+      openGraph: { title, description, images: [project.image], type: "article", url: absoluteUrl(localizedPath(`/work/${slug}`, locale)) },
+    }, locale);
   }
 }
 
 export default async function Page({ params }: Props) {
-  const { slug } = await params;
+  const { slug, locale: raw } = await params;
+  const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   let name = "";
   let schema;
 
   try {
-    const project = await api.getPortfolioBySlug(slug);
+    const project = await api.getPortfolioBySlug(slug, locale);
     name = cleanHeadline(project.title, slug);
     schema = {
       "@context": "https://schema.org",
@@ -81,29 +100,30 @@ export default async function Page({ params }: Props) {
     };
   } catch (e) {
     console.error("Error fetching project for page:", e);
-    const project = FALLBACK_PROJECTS.find((item) => item.slug === slug);
+    const live = await findProjectAnyLocale(slug, locale);
+    const project = live ?? FALLBACK_PROJECTS.find((item) => item.slug === slug);
     if (project) {
       name = cleanHeadline(project.title, slug);
       schema = {
         "@context": "https://schema.org",
         "@type": "CreativeWork",
         name,
-        description: buildDescription(project.description, name),
+        description: buildDescription(live ? live.results : (project as { description: string }).description, name),
         creator: { "@type": "Organization", name: "Global Untold Story" },
-        image: absoluteUrl(project.image),
+        image: project.image ? absoluteUrl(project.image) : undefined,
       };
     }
   }
 
-  const initialData = await safeFetch(() => getProjectDetailData(slug, DEFAULT_LOCALE), "project:" + slug);
+  const initialData = await projectDetailWithFallback(slug, locale);
 
   const crumbs = breadcrumbSchema([
-    { name: "Work", path: "/work" },
-    ...(name ? [{ name, path: `/work/${slug}` }] : []),
+    { name: "Work", path: localizedPath("/work", locale) },
+    ...(name ? [{ name, path: localizedPath(`/work/${slug}`, locale) }] : []),
   ]);
 
   return <>
     <StructuredData data={schema ? [schema, crumbs] : [crumbs]} />
-    <ProjectDetail slug={slug} initialData={initialData} initialLocale={DEFAULT_LOCALE} />
+    <ProjectDetail slug={slug} initialData={initialData} initialLocale={locale} />
   </>;
 }

@@ -84,11 +84,11 @@ export interface About {
     subtitle: string;
     badge: string;
   };
-  team: any[];
-  timeline: any[];
-  skills: any[];
-  values: any[];
-  stats: any[];
+  team: CmsRecord[];
+  timeline: CmsRecord[];
+  skills: CmsRecord[];
+  values: CmsRecord[];
+  stats: CmsRecord[];
   partnerLabels: string[];
 }
 
@@ -185,9 +185,15 @@ export interface LayoutData {
   }>;
 }
 
+/**
+ * A CMS record whose fields vary by content type. `unknown` values force a
+ * check at the point of use, which `any` silently skipped.
+ */
+export type CmsRecord = Record<string, unknown>;
+
 // Home Page Types
 export interface HomeData {
-  hero_slides: any[];
+  hero_slides: CmsRecord[];
   hero: {
     badge: string;
     headline1: string;
@@ -199,7 +205,7 @@ export interface HomeData {
     image: string;
     quoteBadge: string;
   };
-  hero_split: any;
+  hero_split: CmsRecord | null;
   stats: Array<{
     value: string;
     label: string;

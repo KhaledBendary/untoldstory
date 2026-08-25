@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/LocaleLink';
 import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
 import { SplitWords, Reveal } from '../Reveal';
@@ -48,7 +48,7 @@ export default function Insights({ initialData, initialLocale }: { initialData: 
                 <Image src={getPostImage(featured)} alt={featured.title} fill className="object-cover" />
               </div>
               <div className="p-8 md:p-12 flex flex-col justify-center">
-                <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/40 mb-4">
+                <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 mb-4">
                   {t('Home') === 'الرئيسية' ? 'مميز' : 'Featured'} — {featured.category}
                 </p>
                 <h2 className="font-display font-extrabold text-2xl md:text-4xl leading-tight mb-4 group-hover:opacity-70 transition-opacity">
@@ -71,7 +71,7 @@ export default function Insights({ initialData, initialLocale }: { initialData: 
                   <Image src={getPostImage(p)} alt={p.title} fill className="object-cover" loading="lazy" />
                 </div>
                 <div className="p-6">
-                  <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/40 mb-3">
+                  <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 mb-3">
                     {p.category} — {new Date(p.date).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                   </p>
                   <h2 className="font-display font-bold text-lg leading-snug group-hover:opacity-70 transition-opacity">{p.title}</h2>

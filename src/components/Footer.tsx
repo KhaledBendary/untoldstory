@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import Image from 'next/image';
+import Link from '@/components/LocaleLink';
 import { ArrowUpRight, ArrowUp } from 'lucide-react';
 import Marquee from './Marquee';
 import Magnetic from './Magnetic';
 import { Reveal, SplitWords } from './Reveal';
-import { api } from '@/lib/api';
 import type { Service, LayoutData } from '@/types/api';
 import { useLanguage } from './LanguageContext';
+import { usePageData } from '@/hooks/usePageData';
+import { getShellData, type ShellData } from '@/lib/page-data';
 
 const DEFAULT_SOCIAL = {
   instagram: 'https://www.instagram.com/globaluntoldstory',
@@ -17,26 +19,11 @@ const DEFAULT_SOCIAL = {
   vimeo: 'https://vimeo.com/user252566067',
 };
 
-export default function Footer() {
-  const [services, setServices] = useState<Service[]>([]);
-  const [layout, setLayout] = useState<LayoutData | null>(null);
+export default function Footer({ initialData, initialLocale }: { initialData: ShellData | null; initialLocale: string }) {
   const { locale, t } = useLanguage();
-
-  useEffect(() => {
-    async function fetchServices() {
-      try {
-        const [servicesData, layoutData] = await Promise.all([
-          api.getServices(locale),
-          api.getLayout(locale),
-        ]);
-        setServices(servicesData || []);
-        setLayout(layoutData);
-      } catch (err) {
-        console.error('Failed to fetch footer data:', err);
-      }
-    }
-    fetchServices();
-  }, [locale]);
+  const { data } = usePageData(initialData, initialLocale, getShellData);
+  const services = data?.services ?? [];
+  const layout = data?.layout ?? null;
 
   const footer = layout?.footer;
   const siteConfig = layout?.site_config;
@@ -46,8 +33,8 @@ export default function Footer() {
     <footer className="bg-[#fafafa] text-[#0a0a0a] relative">
       {/* CTA */}
       <div className="px-5 md:px-10 pt-20 md:pt-32 pb-14 md:pb-20">
-        <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-[#0a0a0a]/50 mb-6">( {t('Start a project')} )</p>
-        <Link href="/contact" className="group block" aria-label="Start a project with Global Untold Story">
+        <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-[#0a0a0a]/65 mb-6">( {t('Start a project')} )</p>
+        <Link href="/contact" className="group block">
           <SplitWords
             as="h2"
             text={footer?.contactUs || t("Let's tell your untold story")}
@@ -86,29 +73,29 @@ export default function Footer() {
           </p>
         </div>
         <div className="md:col-span-2">
-          <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#0a0a0a]/40 mb-5">{footer?.aboutTitle || t('Menu')}</p>
+          <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#0a0a0a]/65 mb-5">{footer?.aboutTitle || t('Menu')}</p>
           <ul className="space-y-2.5 text-sm">
-            {(footer?.aboutLinks || [['/', 'Home'], ['/work', 'Work'], ['/services', 'Services'], ['/about', 'About'], ['/insights', 'Insights'], ['/contact', 'Contact']].map(([to, label]) => ({ href: to, label }))).map((l: any) => (
+            {(footer?.aboutLinks || [['/', 'Home'], ['/work', 'Work'], ['/services', 'Services'], ['/about', 'About'], ['/insights', 'Insights'], ['/contact', 'Contact']].map(([to, label]) => ({ href: to, label }))).map((l: { href: string; label: string }) => (
               <li key={l.href}><Link href={l.href} className="link-line">{t(l.label)}</Link></li>
             ))}
           </ul>
         </div>
         <div className="md:col-span-3">
-          <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#0a0a0a]/40 mb-5">{footer?.servicesTitle || t('Services')}</p>
+          <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#0a0a0a]/65 mb-5">{footer?.servicesTitle || t('Services')}</p>
           <ul className="space-y-2.5 text-sm">
             {services.slice(0, 7).map(s => (
               <li key={s.slug}><Link href={`/services/${s.slug}`} className="link-line">{s.title}</Link></li>
             ))}
-            <li><Link href="/services" className="link-line text-[#0a0a0a]/50">{t('All services')} →</Link></li>
+            <li><Link href="/services" className="link-line text-[#0a0a0a]/65">{t('All services')} →</Link></li>
           </ul>
         </div>
         <div className="col-span-2 md:col-span-3">
-          <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#0a0a0a]/40 mb-5">{t('Offices')}</p>
+          <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#0a0a0a]/65 mb-5">{t('Offices')}</p>
           <ul className="space-y-4 text-sm">
-            {(footer?.offices || []).map((o: any, i: number) => (
+            {(footer?.offices || []).map((o: { region?: string; address?: string; phone?: string }, i: number) => (
               <li key={o.region || i}>
                 <p className="font-medium">{o.region}</p>
-                <p className="text-[#0a0a0a]/50 text-[13px]">{o.address}</p>
+                <p className="text-[#0a0a0a]/65 text-[13px]">{o.address}</p>
                 {o.phone && (
                   <a href={`tel:${o.phone}`} className="text-[#0a0a0a]/70 link-line text-[13px]">{o.phone}</a>
                 )}
@@ -120,11 +107,11 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="px-5 md:px-10 py-6 border-t border-[#0a0a0a]/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <p className="font-mono2 text-[10px] tracking-[0.2em] uppercase text-[#0a0a0a]/40">
+        <p className="font-mono2 text-[10px] tracking-[0.2em] uppercase text-[#0a0a0a]/65">
           © {new Date().getFullYear()} {siteConfig?.name || 'Global Untold Story'}. {footer?.allRights || t('All rights reserved.')}
         </p>
         <div className="flex flex-wrap items-center gap-6 md:gap-8">
-          <img src="/images/logo-black.png" alt="Global Untold Story" className="h-6 w-auto" />
+          <Image src="/images/logo-black.png" alt="Global Untold Story" width={348} height={191} className="h-6 w-auto" />
           <div className="flex gap-5 font-mono2 text-[10px] tracking-[0.2em] uppercase">
             <a href={socialLinks?.instagram || DEFAULT_SOCIAL.instagram} target="_blank" rel="noopener noreferrer" className="link-line">Instagram</a>
             <a href={socialLinks?.facebook || DEFAULT_SOCIAL.facebook} target="_blank" rel="noopener noreferrer" className="link-line">Facebook</a>

@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
-import Link from 'next/link';
+import Image from 'next/image';
+import Link from '@/components/LocaleLink';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUpRight, Globe, ChevronDown } from 'lucide-react';
 import Magnetic from './Magnetic';
 import { EASE } from './Reveal';
-import { api } from '@/lib/api';
 import type { LayoutData } from '@/types/api';
 import { useLanguage, LANGUAGES } from './LanguageContext';
+import { usePageData } from '@/hooks/usePageData';
+import { getShellData, type ShellData } from '@/lib/page-data';
 
 const DEFAULT_SOCIAL = {
   instagram: 'https://www.instagram.com/globaluntoldstory',
@@ -27,14 +29,15 @@ const LINKS = [
   { to: '/contact', label: 'Contact', index: '06' },
 ];
 
-export default function Navbar() {
+export default function Navbar({ initialData, initialLocale }: { initialData: ShellData | null; initialLocale: string }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [layout, setLayout] = useState<LayoutData | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const { locale, changeLocale, t } = useLanguage();
+  const { data } = usePageData(initialData, initialLocale, getShellData);
+  const layout = data?.layout ?? null;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -47,17 +50,6 @@ export default function Navbar() {
     return () => { document.body.style.overflow = ''; };
   }, [open]);
 
-  useEffect(() => {
-    async function fetchLayout() {
-      try {
-        const data = await api.getLayout(locale);
-        setLayout(data);
-      } catch (err) {
-        console.error('Failed to fetch layout data:', err);
-      }
-    }
-    fetchLayout();
-  }, [locale]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -86,7 +78,7 @@ export default function Navbar() {
         )}
         <div className="flex items-center justify-between px-5 md:px-10 py-4 md:py-5">
           <Link href="/" onClick={() => setOpen(false)} aria-label="Global Untold Story — Home" className="relative z-[110]">
-            <img src="/images/logo-white.png" alt="Global Untold Story logo" className="h-7 md:h-9 w-auto" />
+            <Image src="/images/logo-white.png" alt="Global Untold Story logo" width={348} height={191} priority className="h-7 md:h-9 w-auto" />
           </Link>
           <div className="flex items-center gap-4 md:gap-8">
             <Link href="/contact" onClick={() => setOpen(false)} className="hidden lg:inline-block font-mono2 text-[11px] tracking-[0.25em] uppercase link-line relative z-[110]">
@@ -125,7 +117,7 @@ export default function Navbar() {
                             setDropdownOpen(false);
                           }}
                           className={`flex items-center justify-between font-mono2 text-[10px] tracking-widest py-2 px-2 hover:bg-white/5 transition-colors text-left ${
-                            locale === lang.code ? 'text-white bg-white/10' : 'text-white/40'
+                            locale === lang.code ? 'text-white bg-white/10' : 'text-white/55'
                           }`}
                         >
                           <span className="uppercase font-bold">{lang.code}</span>
@@ -181,7 +173,7 @@ export default function Navbar() {
                         onClick={() => setOpen(false)}
                         className={`group flex items-baseline gap-4 md:gap-8 py-2 md:py-3 transition-colors ${pathname === l.to ? 'text-white' : 'text-white/60 hover:text-white'}`}
                       >
-                        <span className="font-mono2 text-[11px] tracking-[0.2em] text-white/40">{l.index}</span>
+                        <span className="font-mono2 text-[11px] tracking-[0.2em] text-white/55">{l.index}</span>
                         <span className="font-display menu-title-3rem font-extrabold uppercase tracking-tight leading-[0.95] text-[8vw] sm:text-6xl md:text-7xl lg:text-8xl group-hover:translate-x-3 rtl:group-hover:-translate-x-3 transition-transform duration-500">
                           {t(l.label)}
                         </span>

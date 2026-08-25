@@ -1,7 +1,23 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "../globals.css";
+import { Alexandria, Archivo, Inter, JetBrains_Mono } from "next/font/google";
 import SiteShell from "@/components/SiteShell";
 import StructuredData from "@/components/StructuredData";
+import { DEFAULT_LOCALE, PRERENDER_LOCALES, LOCALE_TAGS, isLocale, localeDir } from "@/lib/i18n";
+import { getCommandCenterSchemas } from "@/data/seo-command-schema";
+import { getShellData } from "@/lib/page-data";
+
+/**
+ * Self-hosted through next/font rather than a <link> to fonts.googleapis.com.
+ * The stylesheet request was render-blocking on every page, and the browser
+ * had to reach a second origin before any text could paint.
+ */
+const alexandria = Alexandria({ subsets: ["arabic", "latin"], weight: ["300", "400", "500", "600", "700", "800"], variable: "--font-alexandria", display: "swap" });
+const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo", display: "swap" });
+const inter = Inter({ subsets: ["latin"], weight: ["300", "400", "500", "600"], variable: "--font-inter", display: "swap" });
+const jetbrains = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-jetbrains", display: "swap" });
+
+const fontClass = [alexandria.variable, archivo.variable, inter.variable, jetbrains.variable].join(" ");
 
 const siteUrl = "https://globaluntoldstory.com";
 
@@ -139,17 +155,26 @@ const offices = [
   ],
 }));
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export function generateStaticParams() {
+  return PRERENDER_LOCALES.map((locale) => ({ locale }));
+}
+
+export default async function RootLayout({
+  children,
+  params,
+}: Readonly<{ children: React.ReactNode; params: Promise<{ locale: string }> }>) {
+  // The locale comes from the route segment, so <html lang>/<dir> are correct
+  // in the static HTML — no headers() call, which would force every page to
+  // render on demand and give up static generation entirely.
+  const { locale: raw } = await params;
+  const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
+  const shell = await getShellData(locale);
+
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@100..900&family=Archivo:ital,wght@0,100..900;1,100..900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-      </head>
+    <html lang={LOCALE_TAGS[locale]} dir={localeDir(locale)} className={fontClass} suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <StructuredData data={[organization, website, ...offices]} />
-        <SiteShell>{children}</SiteShell>
+        <StructuredData data={[organization, website, ...offices, ...getCommandCenterSchemas()]} />
+        <SiteShell shell={shell} locale={locale}>{children}</SiteShell>
       </body>
     </html>
   );

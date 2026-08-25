@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/LocaleLink';
 import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
 import { SplitWords, Reveal } from '../Reveal';
@@ -66,7 +66,7 @@ export default function Services({ initialData, initialLocale }: { initialData: 
                 loading="lazy"
               />
               <div className="relative z-10 flex items-start justify-between">
-                <span className="font-mono2 text-[11px] text-white/40">{String(i + 1).padStart(2, '0')}</span>
+                <span className="font-mono2 text-[11px] text-white/55">{String(i + 1).padStart(2, '0')}</span>
                 <ArrowUpRight className="w-6 h-6 opacity-25 group-hover:opacity-100 group-hover:rotate-45 transition-all duration-500 rtl:-scale-x-100" />
               </div>
               <div className="relative z-10 mt-auto">
@@ -75,7 +75,7 @@ export default function Services({ initialData, initialLocale }: { initialData: 
                 </h2>
                 <p className="text-sm text-white/55 leading-relaxed max-w-md">{s.shortDesc}</p>
                 <Reveal className="mt-6">
-                  <span className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/40 group-hover:text-white transition-colors">
+                  <span className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 group-hover:text-white transition-colors">
                     {t('Learn more →')}
                   </span>
                 </Reveal>

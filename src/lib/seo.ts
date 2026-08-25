@@ -130,7 +130,14 @@ export function cleanHeadline(raw?: string | null, slug?: string) {
   // tagline, so words repeated later in the tagline can't drag the cut right.
   const firstStop = value.indexOf(". ");
   if (firstStop > 12) value = value.slice(0, firstStop);
-  value = value.replace(/\.+$/, "").trim();
+
+  // Translated records separate name from tagline with a colon rather than
+  // running them together ("مرحلة ما بعد الإنتاج: التصوير يلتقط…"), so the
+  // slug heuristic below — which only sees English words — never fires there.
+  const colon = value.search(/[:：]/);
+  if (colon > 10) value = value.slice(0, colon);
+
+  value = value.replace(/[\s.:،,—–-]+$/, "").trim();
 
   if (shouted) value = trimTagline(value, slug);
 
@@ -191,4 +198,56 @@ export function breadcrumbSchema(trail: Array<{ name: string; path: string }>) {
       item: absoluteUrl(crumb.path),
     })),
   };
+}
+
+/**
+ * Prepare CMS rich text for rendering inside a page that already has an <h1>.
+ *
+ * Editors paste content whose headings start at h1 — one German service body
+ * carried thirty-two of them, so that page shipped thirty-three <h1> elements
+ * and no clear main heading at all. Shift every heading down one level so the
+ * page title stays the single h1 and the body keeps its own hierarchy.
+ */
+export function demoteHeadings(html?: string | null) {
+  if (!html) return "";
+  return html.replace(/<(\/?)h([1-5])\b/gi, (_match, slash: string, level: string) => {
+    return `<${slash}h${Math.min(Number(level) + 1, 6)}`;
+  });
+}
+
+/**
+ * Strip anything executable out of CMS rich text.
+ *
+ * `service.fullDesc` and `post.body` are rendered with
+ * `dangerouslySetInnerHTML`, so whatever an editor pastes — or whatever an
+ * attacker stores if the CMS is ever compromised — runs on this origin. The
+ * page CSP cannot save us here, because a statically prerendered Next app has
+ * to allow inline script for its own hydration payload. So the markup is
+ * cleaned at the point it enters the page.
+ *
+ * Allowlisting tags would be safer still, but that needs a real parser; this
+ * removes the vectors that actually execute: script/style/embed elements,
+ * inline event handlers, and javascript: / data: URLs on links.
+ */
+export function sanitizeCmsHtml(html?: string | null) {
+  if (!html) return "";
+  return html
+    // Elements that execute or load code, with their contents.
+    .replace(/<(script|style|iframe|object|embed|applet|link|meta|form|base)\b[\s\S]*?<\/\1\s*>/gi, "")
+    // …and the self-closing or unterminated versions of the same.
+    .replace(/<(script|style|iframe|object|embed|applet|link|meta|form|base)\b[^>]*>/gi, "")
+    // onclick=, onerror=, onload= … in quoted or bare form.
+    .replace(/\son[a-z]+\s*=\s*"[^"]*"/gi, "")
+    .replace(/\son[a-z]+\s*=\s*'[^']*'/gi, "")
+    .replace(/\son[a-z]+\s*=\s*[^\s>]+/gi, "")
+    // javascript:, vbscript: and data: URLs in href/src/action.
+    .replace(/\s(href|src|action|formaction)\s*=\s*"\s*(?:javascript|vbscript|data)\s*:[^"]*"/gi, "")
+    .replace(/\s(href|src|action|formaction)\s*=\s*'\s*(?:javascript|vbscript|data)\s*:[^']*'/gi, "")
+    // srcdoc smuggles a whole document into an element.
+    .replace(/\ssrcdoc\s*=\s*("[^"]*"|'[^']*')/gi, "");
+}
+
+/** Sanitise CMS rich text and demote its headings in one pass. */
+export function renderCmsHtml(html?: string | null) {
+  return demoteHeadings(sanitizeCmsHtml(html));
 }

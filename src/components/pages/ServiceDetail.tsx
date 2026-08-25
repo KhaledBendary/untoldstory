@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/LocaleLink';
 import Image from 'next/image';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { SplitWords, Reveal } from '../Reveal';
@@ -10,6 +10,7 @@ import RetryState from '../RetryState';
 import { getServiceImage, getProjectImage } from '@/lib/utils';
 import type { Service, PortfolioItem } from '@/types/api';
 import { useLanguage } from '../LanguageContext';
+import { renderCmsHtml } from '@/lib/seo';
 import { usePageData } from '@/hooks/usePageData';
 import { getServiceDetailData, type ServiceDetailData, type DetailResult } from '@/lib/page-data';
 
@@ -105,7 +106,7 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
       <section className="px-5 md:px-10 py-14 md:py-20 border-t border-white/10">
         <div className="grid md:grid-cols-12 gap-10">
           <div className="md:col-span-12">
-            <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40 mb-6">( {t('Overview')} )</p>
+            <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-6">( {t('Overview')} )</p>
             <SplitWords
               as="h2"
               text={service.shortDesc}
@@ -113,19 +114,19 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
             />
             {service.fullDesc && (
               <Reveal className="mt-8 border-s-2 border-white/20 ps-6">
-                <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40 mb-2">{t('Full Description')}</p>
-                <p className="text-white/70 leading-relaxed" dangerouslySetInnerHTML={{ __html: service.fullDesc }} />
+                <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-2">{t('Full Description')}</p>
+                <div className="text-white/70 leading-relaxed" dangerouslySetInnerHTML={{ __html: renderCmsHtml(service.fullDesc) }} />
               </Reveal>
             )}
           </div>
           <div className="md:col-span-7">
-            <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40 mb-6">( {t('Capabilities')} )</p>
+            <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-6">( {t('Capabilities')} )</p>
             <ul className="border-t border-white/10">
               {(service.features || []).map((c: string, i: number) => (
                 <Reveal key={c} delay={Math.min(i * 0.04, 0.4)}>
                   <li className="flex items-center gap-4 py-4 border-b border-white/10 group">
-                    <span className="font-mono2 text-[10px] text-white/30 w-8 shrink-0">{String(i + 1).padStart(2, '0')}</span>
-                    <Check className="w-4 h-4 text-white/40 shrink-0" />
+                    <span className="font-mono2 text-[10px] text-white/55 w-8 shrink-0">{String(i + 1).padStart(2, '0')}</span>
+                    <Check className="w-4 h-4 text-white/55 shrink-0" />
                     <span className="font-display font-medium text-base md:text-lg group-hover:translate-x-2 rtl:group-hover:-translate-x-2 transition-transform duration-400">{c}</span>
                   </li>
                 </Reveal>
@@ -145,7 +146,7 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
                 <div className="img-zoom relative aspect-[16/11] mb-4 bg-[#111]">
                   <Image src={getProjectImage(p)} alt={p.title} fill className="object-cover" loading="lazy" />
                 </div>
-                <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/40 mb-2">{p.client} — {p.category}</p>
+                <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 mb-2">{p.client} — {p.category}</p>
                 <h3 className="font-display font-bold uppercase leading-tight group-hover:opacity-70 transition-opacity">{p.title}</h3>
               </Link>
             ))}
@@ -157,7 +158,7 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
       <Link href={`/services/${next.slug}`} className="group block border-t border-white/10">
         <div className="px-5 md:px-10 py-16 md:py-24 flex items-center justify-between gap-6">
           <div>
-            <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40 mb-4">( {t('Next service')} )</p>
+            <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-4">( {t('Next service')} )</p>
             <h2 className="font-display font-black uppercase tracking-tight leading-[0.95] text-[7.5vw] md:text-[4.5vw] group-hover:translate-x-3 rtl:group-hover:-translate-x-3 transition-transform duration-500">
               {next.title}
             </h2>

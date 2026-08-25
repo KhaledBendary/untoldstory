@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import Image from 'next/image';
+import Link from '@/components/LocaleLink';
 import { ArrowRight } from 'lucide-react';
 import { SplitWords, Reveal } from '../Reveal';
 import Marquee from '../Marquee';
@@ -30,6 +31,15 @@ const FALLBACK_TEAM_AR = [
   { name: 'يوسف عادل', role: 'كبير المحررين', slug: 'youssef-adel' },
 ];
 
+/** Shape shared by the API's team records and the editorial fallback list. */
+type TeamMember = {
+  slug?: string;
+  name?: string;
+  role?: string;
+  bio?: string;
+  image?: string;
+};
+
 export default function About({ initialData, initialLocale }: { initialData: AboutType | null; initialLocale: string }) {
   const { locale, t } = useLanguage();
   const { data: aboutData, loading } = usePageData(initialData, initialLocale, getAboutData);
@@ -46,14 +56,14 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
   const fallbackTeam = locale === 'ar' ? FALLBACK_TEAM_AR : FALLBACK_TEAM;
   // If the API's team member role/bio came back as mojibake (????), prefer
   // the clean fallback role while keeping the API's photo when available.
-  const cleanRole = (m: any, fb: any) => {
-    const role = m?.role || fb.role;
-    return /^\?+$/.test(role) || role.includes('?') ? fb.role : role;
+  const cleanRole = (m: TeamMember | undefined, fb: TeamMember) => {
+    const role = m?.role || fb.role || '';
+    return !role || /^\?+$/.test(role) || role.includes('?') ? fb.role : role;
   };
   const team = apiTeam.length >= 5
     ? apiTeam
     : fallbackTeam.map((fb) => {
-        const match = apiTeam.find((m: any) => m.slug === fb.slug);
+        const match = apiTeam.find((m: TeamMember) => m.slug === fb.slug);
         if (match) {
           return { ...match, role: cleanRole(match, fb) };
         }
@@ -75,7 +85,7 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
       <section className="px-5 md:px-10 pb-20 md:pb-28">
         <div className="grid md:grid-cols-12 gap-10 border-t border-white/10 pt-14">
           <div className="md:col-span-4">
-            <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40">( {t('About')} )</p>
+            <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">( {t('About')} )</p>
           </div>
           <div className="md:col-span-8 space-y-8">
             <SplitWords
@@ -94,11 +104,11 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
 
       {/* Image strip */}
       <section className="grid md:grid-cols-2 border-y border-white/10">
-        <div className="img-zoom aspect-[4/3] md:aspect-auto md:h-[70vh]">
-          <img src="/images/film-crew-pyramids-production.jpg" alt="Global Untold Story crew filming at the Giza pyramids" className="w-full h-full object-cover" loading="lazy" />
+        <div className="img-zoom relative aspect-[4/3] md:aspect-auto md:h-[70vh]">
+          <Image src="/images/film-crew-pyramids-production.jpg" alt="Global Untold Story crew filming at the Giza pyramids" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
         </div>
-        <div className="img-zoom aspect-[4/3] md:aspect-auto md:h-[70vh] border-t md:border-t-0 md:border-s border-white/10">
-          <img src="/images/hero-giza-pyramids.jpg" alt="Global Untold Story team at the pyramids of Giza, Egypt" className="w-full h-full object-cover" loading="lazy" />
+        <div className="img-zoom relative aspect-[4/3] md:aspect-auto md:h-[70vh] border-t md:border-t-0 md:border-s border-white/10">
+          <Image src="/images/hero-giza-pyramids.jpg" alt="Global Untold Story team at the pyramids of Giza, Egypt" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
         </div>
       </section>
 
@@ -114,27 +124,27 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
           </div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-px bg-white/10 border border-white/10">
-          {team.map((member: any, i: number) => (
+          {team.map((member: TeamMember, i: number) => (
             <Reveal key={member.slug || member.name || i} delay={i * 0.05} className="bg-[#0a0a0a]">
               <div className="aspect-square flex flex-col justify-between p-6 group hover:bg-[#141414] transition-colors">
-                <span className="font-mono2 text-[10px] text-white/30">{String(i + 1).padStart(2, '0')}</span>
+                <span className="font-mono2 text-[10px] text-white/55">{String(i + 1).padStart(2, '0')}</span>
                 <div>
-                  <div className="w-12 h-12 rounded-full border border-white/20 mb-4 flex items-center justify-center font-display font-extrabold text-lg group-hover:bg-[#fafafa] group-hover:text-[#0a0a0a] transition-colors duration-500 overflow-hidden">
+                  <div className="relative w-12 h-12 rounded-full border border-white/20 mb-4 flex items-center justify-center font-display font-extrabold text-lg group-hover:bg-[#fafafa] group-hover:text-[#0a0a0a] transition-colors duration-500 overflow-hidden">
                     {member.image ? (
-                      <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                      <Image src={member.image} alt={member.name || t('Team Member')} fill sizes="48px" className="object-cover" />
                     ) : (
                       member.name?.[0] || '?'
                     )}
                   </div>
                   <p className="font-display font-bold uppercase text-xl">{member.name || t('Team Member')}</p>
-                  <p className="font-mono2 text-[9px] tracking-[0.2em] uppercase text-white/40 mt-1">{member.role || t('Production')}</p>
+                  <p className="font-mono2 text-[9px] tracking-[0.2em] uppercase text-white/55 mt-1">{member.role || t('Production')}</p>
                 </div>
               </div>
             </Reveal>
           ))}
         </div>
         <Reveal className="mt-6">
-          <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/40">{t('Led by Khaled Bendary — CEO')}</p>
+          <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55">{t('Led by Khaled Bendary — CEO')}</p>
         </Reveal>
       </section>
 

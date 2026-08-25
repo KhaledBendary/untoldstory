@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import Image from 'next/image';
+import Link from '@/components/LocaleLink';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SplitWords, Reveal } from '../Reveal';
 import Magnetic from '../Magnetic';
@@ -63,8 +64,8 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
 
       {/* Hero */}
       <section className="relative h-[78svh] overflow-hidden">
-        <img src={getProjectImage(project)} alt={`${project.title} — ${project.category || ''} for ${project.client || ''}`} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/20 to-[#0a0a0a]/40" />
+        <Image src={getProjectImage(project)} alt={`${project.title} — ${project.category || ''} for ${project.client || ''}`} fill priority sizes="100vw" className="object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/20 to-[#0a0a0a]/65" />
         <div className="absolute bottom-0 left-0 right-0 px-5 md:px-10 pb-10 md:pb-14">
           <Reveal>
             <Link href="/work" className="inline-flex items-center gap-2 font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/60 hover:text-white transition-colors mb-6">
@@ -89,7 +90,7 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
             [t('Duration'), project.duration || 'N/A'],
           ].map(([k, v]) => (
             <Reveal key={k as string}>
-              <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40 mb-3">{k}</p>
+              <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-3">{k}</p>
               <p className="font-display font-bold text-lg md:text-xl uppercase">{v}</p>
             </Reveal>
           ))}
@@ -97,7 +98,7 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
 
         <div className="grid md:grid-cols-12 gap-10">
           <div className="md:col-span-4">
-            <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40">( {t('The brief & the build')} )</p>
+            <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">( {t('The brief & the build')} )</p>
           </div>
           <div className="md:col-span-8">
             <SplitWords
@@ -121,10 +122,10 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {related.map(p => (
               <Link key={p.slug} href={`/work/${p.slug}`} className="group block">
-                <div className="img-zoom aspect-[16/11] mb-4 bg-[#111]">
-                  <img src={getProjectImage(p)} alt={p.title} className="w-full h-full object-cover" loading="lazy" />
+                <div className="img-zoom relative aspect-[16/11] mb-4 bg-[#111]">
+                  <Image src={getProjectImage(p)} alt={p.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" />
                 </div>
-                <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/40 mb-2">{p.client}</p>
+                <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 mb-2">{p.client}</p>
                 <h3 className="font-display font-bold uppercase leading-tight group-hover:opacity-70 transition-opacity">{p.title}</h3>
               </Link>
             ))}
@@ -136,7 +137,7 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
       <Link href={`/work/${next.slug}`} className="group block border-t border-white/10">
         <div className="px-5 md:px-10 py-16 md:py-24 flex items-center justify-between gap-6">
           <div>
-            <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40 mb-4">( {t('Next project')} )</p>
+            <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-4">( {t('Next project')} )</p>
             <h2 className="font-display font-black uppercase tracking-tight leading-[0.95] text-[8vw] md:text-[5vw] group-hover:translate-x-3 rtl:group-hover:-translate-x-3 transition-transform duration-500">
               {next.title}
             </h2>

@@ -1,6 +1,8 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useMemo } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { DEFAULT_LOCALE, isLocale, localeDir, localizedPath } from '@/lib/i18n';
 
 export interface Language {
   code: string;
@@ -521,6 +523,7 @@ export const translations: Record<string, Record<string, string>> = {
 
 interface LanguageContextProps {
   locale: string;
+  dir: 'ltr' | 'rtl';
   changeLocale: (code: string) => void;
   t: (key: string) => string;
 }
@@ -528,38 +531,30 @@ interface LanguageContextProps {
 const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocale] = useState('en');
+  const pathname = usePathname() || '/';
+  const router = useRouter();
 
-  useEffect(() => {
-    const saved = localStorage.getItem('site_locale');
-    if (saved && translations[saved]) {
-      setLocale(saved);
+  // The URL is the single source of truth. Reading it here (instead of
+  // localStorage) means the server and the client agree on the language, so
+  // the rendered HTML is the language the URL promises — which is what makes
+  // the translated pages indexable at all.
+  const { locale, bare } = useMemo(() => {
+    const [, first, ...rest] = pathname.split('/');
+    if (isLocale(first) && first !== DEFAULT_LOCALE) {
+      return { locale: first, bare: `/${rest.join('/')}`.replace(/\/$/, '') || '/' };
     }
-  }, []);
-
-  useEffect(() => {
-    const activeLang = LANGUAGES.find(l => l.code === locale) || LANGUAGES[0];
-    
-    // Update HTML attributes
-    document.documentElement.lang = activeLang.code;
-    document.documentElement.dir = activeLang.dir;
-    
-    // Save to localStorage
-    localStorage.setItem('site_locale', locale);
-  }, [locale]);
+    return { locale: DEFAULT_LOCALE, bare: pathname };
+  }, [pathname]);
 
   const changeLocale = (code: string) => {
-    if (translations[code]) {
-      setLocale(code);
-    }
+    if (!isLocale(code) || code === locale) return;
+    router.push(localizedPath(bare, code));
   };
 
-  const t = (key: string) => {
-    return translations[locale]?.[key] || translations['en']?.[key] || key;
-  };
+  const t = (key: string) => translations[locale]?.[key] || translations['en']?.[key] || key;
 
   return (
-    <LanguageContext.Provider value={{ locale, changeLocale, t }}>
+    <LanguageContext.Provider value={{ locale, dir: localeDir(locale), changeLocale, t }}>
       {children}
     </LanguageContext.Provider>
   );

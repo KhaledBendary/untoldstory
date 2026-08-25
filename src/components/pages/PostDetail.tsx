@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import Image from 'next/image';
+import Link from '@/components/LocaleLink';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SplitWords, Reveal } from '../Reveal';
 import Magnetic from '../Magnetic';
@@ -9,6 +10,7 @@ import RetryState from '../RetryState';
 import { getPostImage } from '@/lib/utils';
 import type { BlogPost } from '@/types/api';
 import { useLanguage } from '../LanguageContext';
+import { renderCmsHtml } from '@/lib/seo';
 import { usePageData } from '@/hooks/usePageData';
 import { getPostDetailData, type PostDetailData, type DetailResult } from '@/lib/page-data';
 
@@ -68,7 +70,7 @@ export default function PostDetail({ slug, initialData, initialLocale }: { slug:
             </Link>
           </Reveal>
           <Reveal>
-            <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/40 mb-5">
+            <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 mb-5">
               {post.category} — {new Date(post.date).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </Reveal>
@@ -81,8 +83,8 @@ export default function PostDetail({ slug, initialData, initialLocale }: { slug:
 
         <div className="px-5 md:px-10 max-w-5xl mx-auto pb-12">
           <Reveal>
-            <div className="aspect-[16/8] overflow-hidden">
-              <img src={postImage} alt={post.title} className="w-full h-full object-cover" />
+            <div className="relative aspect-[16/8] overflow-hidden">
+              <Image src={postImage} alt={post.title} fill priority sizes="(max-width: 1024px) 100vw, 1024px" className="object-cover" />
             </div>
           </Reveal>
         </div>
@@ -97,11 +99,11 @@ export default function PostDetail({ slug, initialData, initialLocale }: { slug:
                 prose-a:text-white prose-a:underline prose-a:decoration-white/30 hover:prose-a:decoration-white
                 prose-strong:text-white prose-strong:font-bold
                 prose-li:text-white/65"
-              dangerouslySetInnerHTML={{ __html: post.body }}
+              dangerouslySetInnerHTML={{ __html: renderCmsHtml(post.body) }}
             />
           </Reveal>
           <Reveal className="pt-6 mt-10 border-t border-white/10">
-            <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/40">
+            <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55">
               {t('Written by Global Untold Story — Film Production Services, Egypt · UAE · KSA')}
             </p>
           </Reveal>
@@ -111,7 +113,7 @@ export default function PostDetail({ slug, initialData, initialLocale }: { slug:
       <Link href={`/insights/${next.slug}`} className="group block border-t border-white/10">
         <div className="px-5 md:px-10 py-16 md:py-20 flex items-center justify-between gap-6 max-w-none">
           <div>
-            <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40 mb-4">( {t('Next article')} )</p>
+            <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-4">( {t('Next article')} )</p>
             <h2 className="font-display font-black tracking-tight leading-[1] text-[6.5vw] md:text-[3.2vw] group-hover:translate-x-3 rtl:group-hover:-translate-x-3 transition-transform duration-500">
               {next.title}
             </h2>

@@ -3,6 +3,7 @@ import { api } from "@/lib/api";
 import { POSTS as FALLBACK_POSTS, PROJECTS as FALLBACK_PROJECTS, SERVICES as FALLBACK_SERVICES } from "@/data/content";
 import type { BlogPost, PortfolioItem, Service } from "@/types/api";
 import { SITE_URL } from "@/lib/seo";
+import { LOCALE_CODES, LOCALE_TAGS, DEFAULT_LOCALE, localizedPath } from "@/lib/i18n";
 
 /**
  * Only emit lastModified when the CMS actually knows when something changed.
@@ -14,7 +15,21 @@ function entry(
   options: { lastModified?: Date; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]; priority: number },
 ): MetadataRoute.Sitemap[number] {
   const { lastModified, ...rest } = options;
-  return { url: `${SITE_URL}${path}`, ...rest, ...(lastModified ? { lastModified } : {}) };
+
+  // One <url> per route listing every language as an alternate, so Google can
+  // see the whole cluster instead of treating the translations as strays.
+  const languages: Record<string, string> = {};
+  for (const code of LOCALE_CODES) {
+    languages[LOCALE_TAGS[code]] = `${SITE_URL}${localizedPath(path, code)}`;
+  }
+  languages["x-default"] = `${SITE_URL}${localizedPath(path, DEFAULT_LOCALE)}`;
+
+  return {
+    url: `${SITE_URL}${localizedPath(path, DEFAULT_LOCALE)}`,
+    ...rest,
+    ...(lastModified ? { lastModified } : {}),
+    alternates: { languages },
+  };
 }
 
 function parseDate(value?: string | null) {

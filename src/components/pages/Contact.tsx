@@ -73,7 +73,7 @@ export default function ContactPage({ initialData, initialLocale }: { initialDat
   };
 
   const inputCls =
-    'w-full bg-transparent border-b border-white/20 focus:border-white outline-none py-4 font-display text-lg placeholder:text-white/30 transition-colors';
+    'w-full bg-transparent border-b border-white/20 focus:border-white outline-none py-4 font-display text-lg placeholder:text-white/55 transition-colors';
 
   return (
     <>
@@ -122,21 +122,21 @@ export default function ContactPage({ initialData, initialLocale }: { initialDat
               )}
               <div className="grid sm:grid-cols-2 gap-10">
                 <div>
-                  <label htmlFor="name" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40">{t('Home') === 'الرئيسية' ? 'الاسم الكامل *' : 'Full name *'}</label>
+                  <label htmlFor="name" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">{t('Home') === 'الرئيسية' ? 'الاسم الكامل *' : 'Full name *'}</label>
                   <input id="name" name="name" required placeholder={t('Home') === 'الرئيسية' ? 'اسمك' : 'Your name'} className={inputCls} />
                 </div>
                 <div>
-                  <label htmlFor="email" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40">{t('Home') === 'الرئيسية' ? 'البريد الإلكتروني *' : 'Email address *'}</label>
+                  <label htmlFor="email" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">{t('Home') === 'الرئيسية' ? 'البريد الإلكتروني *' : 'Email address *'}</label>
                   <input id="email" name="email" type="email" required placeholder="you@company.com" className={inputCls} />
                 </div>
               </div>
               <div className="grid sm:grid-cols-2 gap-10">
                 <div>
-                  <label htmlFor="phone" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40">{t('Home') === 'الرئيسية' ? 'رقم الهاتف' : 'Phone number'}</label>
+                  <label htmlFor="phone" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">{t('Home') === 'الرئيسية' ? 'رقم الهاتف' : 'Phone number'}</label>
                   <input id="phone" name="phone" type="tel" placeholder="+20 ..." className={inputCls} />
                 </div>
                 <div>
-                  <label htmlFor="service" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40">{t('Home') === 'الرئيسية' ? 'الخدمة المطلوبة *' : 'Interested service *'}</label>
+                  <label htmlFor="service" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">{t('Home') === 'الرئيسية' ? 'الخدمة المطلوبة *' : 'Interested service *'}</label>
                   <select id="service" name="service" required defaultValue="" className={`${inputCls} bg-[#0a0a0a] cursor-pointer`} disabled={loading}>
                     <option value="" disabled>{t('Home') === 'الرئيسية' ? 'اختر خدمة' : 'Select a service'}</option>
                     {services.map(s => (
@@ -147,7 +147,7 @@ export default function ContactPage({ initialData, initialLocale }: { initialDat
                 </div>
               </div>
               <div>
-                <label htmlFor="message" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40">{t('Home') === 'الرئيسية' ? 'تفاصيل مشروعك *' : 'Your project *'}</label>
+                <label htmlFor="message" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">{t('Home') === 'الرئيسية' ? 'تفاصيل مشروعك *' : 'Your project *'}</label>
                 <textarea id="message" name="message" required rows={4} placeholder={t('Home') === 'الرئيسية' ? 'التفاصيل، الموقع، الجدول الزمني...' : 'Format, locations, timeline, ambition — tell us everything.'} className={`${inputCls} resize-none`} />
               </div>
               <Magnetic>
@@ -163,13 +163,13 @@ export default function ContactPage({ initialData, initialLocale }: { initialDat
         <aside className="lg:col-span-5 space-y-12">
           <Reveal>
             <div className="border border-white/15 p-8 md:p-10">
-              <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40 mb-6">{t('Contact')}</p>
+              <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-6">{t('Contact')}</p>
               <a href={`mailto:${email}`} className="flex items-center gap-3 font-display font-bold text-lg md:text-xl mb-4 hover:opacity-70 transition-opacity break-all">
                 <Mail className="w-5 h-5 shrink-0" /> {email}
               </a>
               {offices.filter(o => o.phone).map(o => (
                 <a key={o.region} href={`tel:${o.phone}`} className="flex items-center gap-3 text-white/70 mb-2 hover:text-white transition-colors">
-                  <Phone className="w-4 h-4 shrink-0" /> {o.phone} <span className="font-mono2 text-[10px] text-white/40 uppercase tracking-widest">({o.region})</span>
+                  <Phone className="w-4 h-4 shrink-0" /> {o.phone} <span className="font-mono2 text-[10px] text-white/55 uppercase tracking-widest">({o.region})</span>
                 </a>
               ))}
             </div>
@@ -179,7 +179,7 @@ export default function ContactPage({ initialData, initialLocale }: { initialDat
             <div className="space-y-0 border border-white/15">
               {offices.map(o => (
                 <div key={o.region} className="p-8 md:p-10 border-b border-white/15 last:border-b-0">
-                  <p className="flex items-center gap-2 font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/40 mb-3">
+                  <p className="flex items-center gap-2 font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-3">
                     <MapPin className="w-3.5 h-3.5" /> {o.region}
                   </p>
                   <h3 className="font-display font-extrabold uppercase text-2xl mb-1">{o.region}</h3>
