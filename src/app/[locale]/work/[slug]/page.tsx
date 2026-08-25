@@ -4,10 +4,10 @@ import ProjectDetail from "@/components/pages/ProjectDetail";
 import StructuredData from "@/components/StructuredData";
 import { applySeoOverrides } from "@/data/seo-overrides";
 import { api } from "@/lib/api";
-import { alternatesFor, isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
-import { getProjectDetailData, findProjectAnyLocale, safeFetch, projectDetailWithFallback } from "@/lib/page-data";
+import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
+import { findProjectAnyLocale, projectDetailWithFallback } from "@/lib/page-data";
 import { PROJECTS as FALLBACK_PROJECTS } from "@/data/content";
-import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline } from "@/lib/seo";
+import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, pageSeo } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -36,52 +36,33 @@ async function slugList() {
   }
 }
 
+function projectMeta(path: string, locale: string, title: string, description: string, image?: string | null) {
+  return applySeoOverrides(path, pageSeo({ path, locale, title, description, image, type: "article" }), locale);
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale: raw } = await params;
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
-  // Never return {} — that inherits the root canonical ("/") and deindexes the page.
-  const canonical = { alternates: alternatesFor(`/work/${slug}`, locale) };
+  const path = `/work/${slug}`;
+  const fallbackTitle = buildTitle(slug.replace(/-/g, " "), slug);
 
   try {
     const project = await api.getPortfolioBySlug(slug, locale);
     const headline = projectHeadline(project.title, project.client, slug);
-    const title = buildTitle(headline, slug);
-    // `results` is the full case-study body — buildDescription clamps it to 155.
-    const description = buildDescription(project.results, headline);
-    const image = project.image;
-    return applySeoOverrides(`/work/${slug}`, {
-      title: { absolute: title },
-      description,
-      ...canonical,
-      openGraph: { title, description, images: image ? [image] : [], type: "article", url: absoluteUrl(localizedPath(`/work/${slug}`, locale)) },
-    }, locale);
+    return projectMeta(path, locale, buildTitle(headline, slug), buildDescription(project.results, headline), project.image);
   } catch (e) {
     console.error("Error fetching project for metadata:", e);
     const live = await findProjectAnyLocale(slug, locale);
     if (live) {
       const headline = projectHeadline(live.title, live.client, slug);
-      const title = buildTitle(headline, slug);
-      const description = buildDescription(live.results, headline);
-      return applySeoOverrides(`/work/${slug}`, {
-        title: { absolute: title },
-        description,
-        ...canonical,
-        openGraph: { title, description, images: live.image ? [live.image] : [], type: "article", url: absoluteUrl(localizedPath(`/work/${slug}`, locale)) },
-      }, locale);
+      return projectMeta(path, locale, buildTitle(headline, slug), buildDescription(live.results, headline), live.image);
     }
 
     const project = FALLBACK_PROJECTS.find((item) => item.slug === slug);
-    if (!project) return applySeoOverrides(`/work/${slug}`, canonical, locale);
+    if (!project) return projectMeta(path, locale, fallbackTitle, fallbackTitle);
 
     const headline = projectHeadline(project.title, project.client, slug);
-    const title = buildTitle(headline, slug);
-    const description = buildDescription(project.description, headline);
-    return applySeoOverrides(`/work/${slug}`, {
-      title: { absolute: title },
-      description,
-      ...canonical,
-      openGraph: { title, description, images: [project.image], type: "article", url: absoluteUrl(localizedPath(`/work/${slug}`, locale)) },
-    }, locale);
+    return projectMeta(path, locale, buildTitle(headline, slug), buildDescription(project.description, headline), project.image);
   }
 }
 

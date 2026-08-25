@@ -4,10 +4,11 @@ import PostDetail from "@/components/pages/PostDetail";
 import StructuredData from "@/components/StructuredData";
 import { applySeoOverrides } from "@/data/seo-overrides";
 import { api } from "@/lib/api";
-import { alternatesFor, isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
-import { getPostDetailData, findPostAnyLocale, safeFetch, postDetailWithFallback } from "@/lib/page-data";
+import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
+import { findPostAnyLocale, mappedFallbackPosts, postDetailWithFallback } from "@/lib/page-data";
 import { POSTS as FALLBACK_POSTS } from "@/data/content";
-import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo } from "@/lib/seo";
+import { POST_SLUGS_THAT_REDIRECT } from "@/lib/legacy-redirects";
+import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -20,76 +21,44 @@ export async function generateStaticParams() {
 }
 
 async function slugList() {
+  const extras = mappedFallbackPosts()
+    .filter((post) => !POST_SLUGS_THAT_REDIRECT.has(post.slug))
+    .map((post) => ({ slug: post.slug }));
   try {
     const blogData = await api.getBlogPosts({ page: 1, per_page: 50 });
-    return blogData.items.map((post) => ({ slug: post.slug }));
+    const seen = new Set(blogData.items.map((post) => post.slug));
+    return [...blogData.items.map((post) => ({ slug: post.slug })), ...extras.filter((item) => !seen.has(item.slug))];
   } catch (e) {
     console.error("Error fetching blog posts for generateStaticParams:", e);
-    return FALLBACK_POSTS.map(({ slug }) => ({ slug }));
+    return extras.length ? extras : FALLBACK_POSTS.filter((p) => !POST_SLUGS_THAT_REDIRECT.has(p.slug)).map(({ slug }) => ({ slug }));
   }
+}
+
+function postMeta(path: string, locale: string, title: string, description: string, image?: string | null, publishedTime?: string) {
+  return applySeoOverrides(path, pageSeo({ path, locale, title, description, image, type: "article", publishedTime }), locale);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale: raw } = await params;
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
-  // Never return {} — that inherits the root canonical ("/") and deindexes the page.
-  const canonical = { alternates: alternatesFor(`/insights/${slug}`, locale) };
+  const path = `/insights/${slug}`;
+  const fallbackTitle = buildTitle(slug.replace(/-/g, " "), slug);
 
   try {
     const post = await api.getBlogPostBySlug(slug, locale);
     const meta = cmsSeo(post.seo as Record<string, unknown> | undefined);
-    const title = buildTitle(meta.metaTitle || post.title, slug);
-    const description = buildDescription(meta.metaDescription || post.excerpt, post.title);
-    const image = meta.ogImageUrl || post.featuredImage;
-    return applySeoOverrides(`/insights/${slug}`, {
-      title: { absolute: title },
-      description,
-      ...canonical,
-      openGraph: {
-        title, description,
-        images: image ? [image] : [],
-        type: "article",
-        url: absoluteUrl(localizedPath(`/insights/${slug}`, locale)),
-        publishedTime: post.publishedAt,
-      },
-    }, locale);
+    return postMeta(path, locale, buildTitle(meta.metaTitle || post.title, slug), buildDescription(meta.metaDescription || post.excerpt, post.title), meta.ogImageUrl || post.featuredImage, post.publishedAt);
   } catch (e) {
     console.error("Error fetching post for metadata:", e);
     const live = await findPostAnyLocale(slug, locale);
     if (live) {
-      const title = buildTitle(live.title, slug);
-      const description = buildDescription(live.excerpt, live.title);
-      return applySeoOverrides(`/insights/${slug}`, {
-        title: { absolute: title },
-        description,
-        ...canonical,
-        openGraph: {
-          title, description,
-          images: live.featuredImage ? [live.featuredImage] : [],
-          type: "article",
-          url: absoluteUrl(localizedPath(`/insights/${slug}`, locale)),
-          publishedTime: live.publishedAt,
-        },
-      }, locale);
+      return postMeta(path, locale, buildTitle(live.title, slug), buildDescription(live.excerpt, live.title), live.featuredImage, live.publishedAt);
     }
 
     const post = FALLBACK_POSTS.find((item) => item.slug === slug);
-    if (!post) return applySeoOverrides(`/insights/${slug}`, canonical, locale);
+    if (!post) return postMeta(path, locale, fallbackTitle, fallbackTitle);
 
-    const title = buildTitle(post.title, slug);
-    const description = buildDescription(post.excerpt, post.title);
-    return applySeoOverrides(`/insights/${slug}`, {
-      title: { absolute: title },
-      description,
-      ...canonical,
-      openGraph: {
-        title, description,
-        images: [post.image],
-        type: "article",
-        url: absoluteUrl(localizedPath(`/insights/${slug}`, locale)),
-        publishedTime: post.date,
-      },
-    }, locale);
+    return postMeta(path, locale, buildTitle(post.title, slug), buildDescription(post.excerpt, post.title), post.image, post.date);
   }
 }
 

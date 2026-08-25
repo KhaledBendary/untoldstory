@@ -77,7 +77,7 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
         <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-6">( {aboutData?.page?.badge || t('About')} )</p>
         <SplitWords
           as="h1"
-          text={aboutData?.page?.title || t("Where story meets execution. Predictable budgets. Premium results.")}
+          text={t("About Global Untold Story")}
           className="font-display font-black uppercase tracking-tight leading-[0.9] text-[12vw] md:text-[7.5vw] max-w-6xl"
         />
       </section>

@@ -4,10 +4,10 @@ import ServiceDetail from "@/components/pages/ServiceDetail";
 import StructuredData from "@/components/StructuredData";
 import { applySeoOverrides } from "@/data/seo-overrides";
 import { api } from "@/lib/api";
-import { alternatesFor, isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
+import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
 import { getServiceDetailData, findServiceAnyLocale, safeFetch, serviceDetailWithFallback } from "@/lib/page-data";
 import { SERVICES as FALLBACK_SERVICES } from "@/data/content";
-import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo } from "@/lib/seo";
+import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -29,54 +29,45 @@ async function slugList() {
   }
 }
 
+function serviceMeta(path: string, locale: string, title: string, description: string, image?: string | null) {
+  return applySeoOverrides(path, pageSeo({ path, locale, title, description, image }), locale);
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale: raw } = await params;
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
-  // Every branch below keeps its own canonical. Returning {} here would inherit
-  // the root layout's canonical ("/") and tell Google the page duplicates home.
-  const canonical = { alternates: alternatesFor(`/services/${slug}`, locale) };
+  const path = `/services/${slug}`;
+  const fallbackTitle = buildTitle(slug.replace(/-/g, " "), slug);
 
   try {
     const service = await api.getServiceBySlug(slug, locale);
     const meta = cmsSeo(service.seo);
-    const title = buildTitle(meta.metaTitle || service.title, slug);
-    const description = buildDescription(meta.metaDescription || service.shortDesc);
-    const image = meta.ogImageUrl || service.imageUrl;
-    return applySeoOverrides(`/services/${slug}`, {
-      title: { absolute: title },
-      description,
-      ...canonical,
-      openGraph: { title, description, images: image ? [image] : [], type: "website", url: absoluteUrl(localizedPath(`/services/${slug}`, locale)) },
-    }, locale);
+    return serviceMeta(
+      path, locale,
+      buildTitle(meta.metaTitle || service.title, slug),
+      buildDescription(meta.metaDescription || service.shortDesc),
+      meta.ogImageUrl || service.imageUrl,
+    );
   } catch (e) {
     console.error("Error fetching service for metadata:", e);
-    // The list endpoint is cached and its slugs are current, so try it before
-    // the editorial snapshot, whose slugs no longer match the CMS.
     const live = await findServiceAnyLocale(slug, locale);
     if (live) {
       const meta = cmsSeo(live.seo);
-      const title = buildTitle(meta.metaTitle || live.title, slug);
-      const description = buildDescription(meta.metaDescription || live.shortDesc);
-      return applySeoOverrides(`/services/${slug}`, {
-        title: { absolute: title },
-        description,
-        ...canonical,
-        openGraph: { title, description, images: live.imageUrl ? [live.imageUrl] : [], type: "website", url: absoluteUrl(localizedPath(`/services/${slug}`, locale)) },
-      }, locale);
+      return serviceMeta(
+        path, locale,
+        buildTitle(meta.metaTitle || live.title, slug),
+        buildDescription(meta.metaDescription || live.shortDesc),
+        meta.ogImageUrl || live.imageUrl,
+      );
     }
 
     const service = FALLBACK_SERVICES.find((item) => item.slug === slug);
-    if (!service) return applySeoOverrides(`/services/${slug}`, canonical, locale);
+    if (!service) return serviceMeta(path, locale, fallbackTitle, fallbackTitle);
 
-    const title = buildTitle(service.title, slug);
-    const description = buildDescription(`${service.description} ${service.whoFor}`);
-    return applySeoOverrides(`/services/${slug}`, {
-      title: { absolute: title },
-      description,
+    return {
+      ...serviceMeta(path, locale, buildTitle(service.title, slug), buildDescription(`${service.description} ${service.whoFor}`), service.image),
       keywords: service.keywords.split(",").map((item) => item.trim()),
-      ...canonical,
-      openGraph: { title, description, images: [service.image], type: "website", url: absoluteUrl(localizedPath(`/services/${slug}`, locale)) },
-    }, locale);
+    };
   }
 }
 
@@ -94,7 +85,10 @@ export default async function Page({ params }: Props) {
       "@type": "Service",
       name,
       description: buildDescription(service.shortDesc),
+      url: absoluteUrl(localizedPath(`/services/${slug}`, locale)),
+      image: service.imageUrl || undefined,
       provider: { "@type": "Organization", name: "Global Untold Story", url: "https://globaluntoldstory.com/" },
+      brand: { "@type": "Organization", name: "Global Untold Story" },
       areaServed: ["Egypt", "UAE", "Saudi Arabia", "MENA"],
     };
   } catch (e) {

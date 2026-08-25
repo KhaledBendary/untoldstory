@@ -1,5 +1,6 @@
 import { api } from "@/lib/api";
 import type { BlogPost, PortfolioItem, Service } from "@/types/api";
+import { mappedFallbackPosts, mappedFallbackProjects, mappedFallbackServices } from "@/lib/page-data";
 
 /**
  * Home page payload, assembled from four endpoints.
@@ -45,21 +46,36 @@ export function parseStatValue(value: string | number) {
   return { num: 0, suffix: value };
 }
 
+function valueOf<T>(result: PromiseSettledResult<T>): T | undefined {
+  return result.status === "fulfilled" ? result.value : undefined;
+}
+
 export async function getHomeData(locale?: string): Promise<HomeData> {
-  const [homeData, servicesData, layoutData, portfolioData] = await Promise.all([
+  const [homeResult, servicesResult, layoutResult, portfolioResult] = await Promise.allSettled([
     api.getHome(locale),
     api.getServices(locale),
     api.getLayout(locale),
-    // /home's work_showcase.projects is a stripped-down shape with no client
-    // name — the "Projects that speak" strip needs the full /portfolio record.
     api.getPortfolio({ per_page: 100, locale }),
   ]);
 
-  const home = homeData as typeof homeData & {
+  const homeData = valueOf(homeResult);
+  const servicesData = valueOf(servicesResult);
+  const layoutData = valueOf(layoutResult);
+  const portfolioData = valueOf(portfolioResult);
+
+  if (!homeData && !servicesData && !layoutData && !portfolioData) {
+    throw new Error("All homepage API endpoints failed");
+  }
+
+  const home = (homeData || {}) as NonNullable<typeof homeData> & {
     manifesto?: HomeData["manifesto"];
     studio?: HomeData["manifesto"];
     home_data?: HomeData["manifesto"];
     stats?: Array<{ value: string | number; label: string }>;
+    blog_preview?: HomeData["posts"];
+    hero?: HomeData["hero"];
+    process?: HomeData["process"];
+    awards?: HomeData["awards"];
   };
 
   const stats = (home.stats || []).map((stat) => {
@@ -69,23 +85,52 @@ export async function getHomeData(locale?: string): Promise<HomeData> {
 
   return {
     services: servicesData || [],
-    projects: portfolioData.items || [],
-    posts: homeData.blog_preview || [],
+    projects: portfolioData?.items || [],
+    posts: home.blog_preview || [],
     stats,
     clients: layoutData?.client_logos || [],
-    hero: homeData.hero || null,
+    hero: home.hero || null,
     manifesto: home.manifesto || home.studio || home.home_data || null,
-    process: homeData.process || null,
-    awards: homeData.awards || [],
+    process: home.process || null,
+    awards: home.awards || [],
   };
 }
 
 /** Server render must never take the whole page down over an API blip. */
-export async function getHomeDataSafe(locale?: string): Promise<HomeData | null> {
+export function fallbackHomeData(): HomeData {
+  return {
+    services: mappedFallbackServices(),
+    projects: mappedFallbackProjects(),
+    posts: mappedFallbackPosts(),
+    stats: [
+      { value: 3, suffix: "+", label: "Offices" },
+      { value: 90, suffix: "%", label: "Repeat business" },
+    ],
+    clients: [],
+    hero: {
+      badge: "Film & Video Production",
+      headline1: "Film & Video Production",
+      headline2: "Egypt & MENA",
+      subtext: "Full-service film, video and content production across Egypt, UAE and Saudi Arabia.",
+      cta1: { label: "Our Work", href: "/work" },
+      cta2: { label: "Get a Quote", href: "/contact" },
+      image: "/images/on-ground-production-giza.jpg",
+    },
+    manifesto: null,
+    process: null,
+    awards: [],
+  };
+}
+
+export async function getHomeDataSafe(locale?: string): Promise<HomeData> {
   try {
-    return await getHomeData(locale);
+    const data = await getHomeData(locale);
+    if (!data.services.length) data.services = mappedFallbackServices();
+    if (!data.projects.length) data.projects = mappedFallbackProjects();
+    if (!data.posts.length) data.posts = mappedFallbackPosts();
+    return data;
   } catch (e) {
     console.error("Failed to fetch home data on the server:", e);
-    return null;
+    return fallbackHomeData();
   }
 }

@@ -40,7 +40,7 @@ export default function Services({ initialData, initialLocale }: { initialData: 
         <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-6">( {t('Services')} )</p>
         <SplitWords
           as="h1"
-          text={t('One idea and everything it needs')}
+          text={t('Production Services in Egypt & MENA')}
           className="font-display font-black uppercase tracking-tight leading-[0.9] text-[12vw] md:text-[7.5vw] max-w-6xl"
         />
         <Reveal className="mt-8 max-w-xl">

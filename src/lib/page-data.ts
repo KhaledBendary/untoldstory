@@ -1,7 +1,8 @@
 import { api } from "@/lib/api";
 import { ApiError } from "@/lib/api-client";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
-import { SERVICES as FALLBACK_SERVICES } from "@/data/content";
+import { POSTS as FALLBACK_POSTS, PROJECTS as FALLBACK_PROJECTS, SERVICES as FALLBACK_SERVICES } from "@/data/content";
+import { POST_SLUGS_THAT_REDIRECT } from "@/lib/legacy-redirects";
 import type { About, BlogPost, LayoutData, PortfolioItem, Service } from "@/types/api";
 
 /**
@@ -28,9 +29,44 @@ export function mappedFallbackServices(): Service[] {
   } as unknown as Service));
 }
 
+export function mappedFallbackProjects(): PortfolioItem[] {
+  return FALLBACK_PROJECTS.map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    client: p.client,
+    image: p.image,
+    category: p.categories[0],
+    results: p.description,
+    isFeatured: false,
+  }));
+}
+
+export function mappedFallbackPosts(): BlogPost[] {
+  return FALLBACK_POSTS
+    .filter((p) => !POST_SLUGS_THAT_REDIRECT.has(p.slug))
+    .map((p) => ({
+      id: p.slug,
+      slug: p.slug,
+      title: p.title,
+      excerpt: p.excerpt,
+      date: p.date,
+      publishedAt: p.date,
+      category: p.category,
+      categorySlug: p.category.toLowerCase().replace(/\s+/g, "-"),
+      authorName: "Global Untold Story",
+      authorImage: null,
+      featuredImage: p.image,
+      body: Array.isArray(p.body) ? p.body.map((block) => `<p>${block}</p>`).join("") : String(p.body || ""),
+      readTimeMinutes: 6,
+      tags: [],
+      isFeatured: false,
+    }));
+}
+
 export async function getServicesData(locale?: string): Promise<Service[]> {
   try {
-    return (await api.getServices(locale)) || [];
+    const list = await api.getServices(locale);
+    return list?.length ? list : mappedFallbackServices();
   } catch (e) {
     console.error("Failed to fetch services:", e);
     return mappedFallbackServices();
@@ -42,22 +78,38 @@ export async function getAboutData(locale?: string): Promise<About> {
 }
 
 export async function getInsightsData(locale?: string): Promise<BlogPost[]> {
-  const data = await api.getBlogPosts({ page: 1, per_page: 20, locale });
-  return data?.items || [];
+  const extras = mappedFallbackPosts();
+  try {
+    const data = await api.getBlogPosts({ page: 1, per_page: 50, locale });
+    const items = data?.items || [];
+    const seen = new Set(items.map((p) => p.slug));
+    return [...items, ...extras.filter((p) => !seen.has(p.slug))];
+  } catch (e) {
+    console.error("Failed to fetch insights:", e);
+    return extras;
+  }
 }
 
 export async function getWorkData(locale?: string): Promise<PortfolioItem[]> {
-  // /home's work_showcase.projects is a stripped-down shape (no client, video,
-  // results, categorySlug). /portfolio carries the fields this grid filters by.
-  const { items } = await api.getPortfolio({ per_page: 100, locale });
-  return items || [];
+  try {
+    const { items } = await api.getPortfolio({ per_page: 100, locale });
+    return items?.length ? items : mappedFallbackProjects();
+  } catch (e) {
+    console.error("Failed to fetch work:", e);
+    return mappedFallbackProjects();
+  }
 }
 
 export type ContactData = { services: Service[]; layout: LayoutData | null };
 
 export async function getContactData(locale?: string): Promise<ContactData> {
-  const [services, layout] = await Promise.all([api.getServices(locale), api.getLayout(locale)]);
-  return { services: services || [], layout: layout ?? null };
+  try {
+    const [services, layout] = await Promise.all([getServicesData(locale), api.getLayout(locale)]);
+    return { services: services || [], layout: layout ?? null };
+  } catch (e) {
+    console.error("Failed to fetch contact data:", e);
+    return { services: mappedFallbackServices(), layout: null };
+  }
 }
 
 /** Server render must degrade to a client fetch, never crash the page. */
@@ -200,7 +252,7 @@ export async function serviceDetailWithFallback(
   locale?: string,
 ): Promise<DetailResult<ServiceDetailData> | null> {
   const direct = await safeFetch(() => getServiceDetailData(slug, locale), `service:${slug}`);
-  if (direct) return direct;
+  if (direct?.status === "ok") return direct;
 
   for (const attempt of localeChain(locale)) {
     const [service, allServices] = await Promise.all([
@@ -209,7 +261,11 @@ export async function serviceDetailWithFallback(
     ]);
     if (service) return { status: "ok", data: { service, allServices, relatedProjects: [] } };
   }
-  return null;
+  const fallback = mappedFallbackServices().find((s) => s.slug === slug);
+  if (fallback) {
+    return { status: "ok", data: { service: fallback, allServices: mappedFallbackServices(), relatedProjects: [] } };
+  }
+  return direct ?? null;
 }
 
 export async function projectDetailWithFallback(
@@ -217,7 +273,7 @@ export async function projectDetailWithFallback(
   locale?: string,
 ): Promise<DetailResult<ProjectDetailData> | null> {
   const direct = await safeFetch(() => getProjectDetailData(slug, locale), `project:${slug}`);
-  if (direct) return direct;
+  if (direct?.status === "ok") return direct;
 
   for (const attempt of localeChain(locale)) {
     const project = await findProjectInList(slug, attempt);
@@ -225,7 +281,11 @@ export async function projectDetailWithFallback(
     const allProjects = await safeFetch(() => getWorkData(attempt), "work-list");
     return { status: "ok", data: { project, allProjects: allProjects ?? [project] } };
   }
-  return null;
+  const fallback = mappedFallbackProjects().find((p) => p.slug === slug);
+  if (fallback) {
+    return { status: "ok", data: { project: fallback, allProjects: mappedFallbackProjects() } };
+  }
+  return direct ?? null;
 }
 
 export async function postDetailWithFallback(
@@ -233,7 +293,7 @@ export async function postDetailWithFallback(
   locale?: string,
 ): Promise<DetailResult<PostDetailData> | null> {
   const direct = await safeFetch(() => getPostDetailData(slug, locale), `post:${slug}`);
-  if (direct) return direct;
+  if (direct?.status === "ok") return direct;
 
   for (const attempt of localeChain(locale)) {
     const post = await findPostInList(slug, attempt);
@@ -241,7 +301,9 @@ export async function postDetailWithFallback(
     const allPosts = await safeFetch(() => getInsightsData(attempt), "insights-list");
     return { status: "ok", data: { post, allPosts: allPosts ?? [post] } };
   }
-  return null;
+  const fallback = mappedFallbackPosts().find((p) => p.slug === slug);
+  if (fallback) return { status: "ok", data: { post: fallback, allPosts: mappedFallbackPosts() } };
+  return direct ?? null;
 }
 
 /* Same locale chain the page bodies use, so metadata degrades identically
@@ -268,7 +330,7 @@ export async function findPostAnyLocale(slug: string, locale?: string) {
     const found = await findPostInList(slug, attempt);
     if (found) return found;
   }
-  return null;
+  return mappedFallbackPosts().find((p) => p.slug === slug) ?? null;
 }
 
 /**

@@ -1,6 +1,13 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import "./globals.css";
 import { LOCALE_CODES, localeDir, localizedPath, type Locale } from "@/lib/i18n";
+
+export const metadata: Metadata = {
+  title: "Page not found | Global Untold Story",
+  description: "This page is not available. Return to Global Untold Story for film and video production in Egypt and MENA.",
+  robots: { index: false, follow: true },
+};
 
 /**
  * Rendered on every 404, in every language.

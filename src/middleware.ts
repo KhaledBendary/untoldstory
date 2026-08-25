@@ -1,23 +1,21 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n";
+import { legacyDestination } from "@/lib/legacy-redirects";
 
 /** Header the root layout reads to set <html lang> and dir on the server. */
 export const LOCALE_HEADER = "x-site-locale";
 
-/**
- * Hosts that are not the real site.
- *
- * Every page canonicalises to globaluntoldstory.com, so a preview host serves
- * pages that point elsewhere — the exact "canonicalization" complaint a
- * scanner raises, and a genuine risk of the staging copy being crawled. Tell
- * robots to leave any non-production host alone.
- */
 const PRODUCTION_HOST = "globaluntoldstory.com";
+const WWW_HOST = `www.${PRODUCTION_HOST}`;
+const WP_QUERY_KEYS = ["page_id", "p", "attachment_id", "cat", "tag", "paged"];
+
+function hostname(host: string | null) {
+  return (host || "").split(":")[0].toLowerCase();
+}
 
 function isProductionHost(host: string | null) {
-  if (!host) return false;
-  const name = host.split(":")[0].toLowerCase();
-  return name === PRODUCTION_HOST || name === `www.${PRODUCTION_HOST}` || name === "localhost";
+  const name = hostname(host);
+  return name === PRODUCTION_HOST || name === WWW_HOST || name === "localhost";
 }
 
 function markNonProduction(response: NextResponse, request: NextRequest) {
@@ -28,7 +26,30 @@ function markNonProduction(response: NextResponse, request: NextRequest) {
 }
 
 export function middleware(request: NextRequest) {
+  const host = hostname(request.headers.get("host"));
   const { pathname } = request.nextUrl;
+  const params = request.nextUrl.searchParams;
+
+  const dropWww = host === WWW_HOST;
+  const legacy = legacyDestination(pathname);
+  const stripWpQuery = WP_QUERY_KEYS.some((key) => params.has(key));
+  const indexPhp = pathname === "/index.php" || pathname === "/index.html";
+
+  if (dropWww || legacy || stripWpQuery || indexPhp) {
+    const url = request.nextUrl.clone();
+    if (dropWww) {
+      url.hostname = PRODUCTION_HOST;
+      url.protocol = "https:";
+      url.port = "";
+    }
+    url.pathname = legacy || (indexPhp ? "/" : pathname);
+    if (stripWpQuery) {
+      for (const key of WP_QUERY_KEYS) url.searchParams.delete(key);
+      if (url.pathname === "/index.php" || url.pathname === "/index.html") url.pathname = "/";
+    }
+    return markNonProduction(NextResponse.redirect(url, 301), request);
+  }
+
   const [, first, ...rest] = pathname.split("/");
 
   // /en/services is a duplicate of /services — send it to the canonical form.
@@ -44,8 +65,6 @@ export function middleware(request: NextRequest) {
     return markNonProduction(NextResponse.next({ request: { headers } }), request);
   }
 
-  // Unprefixed: serve the English tree without changing the visible URL, so
-  // already-indexed addresses keep working exactly as they are.
   const url = request.nextUrl.clone();
   url.pathname = `/${DEFAULT_LOCALE}${pathname === "/" ? "" : pathname}`;
 
@@ -56,7 +75,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Everything except Next internals, the API proxy, and public files.
     "/((?!_next/|api/|images/|favicon|robots.txt|sitemap.xml|.*\\.[\\w]+$).*)",
   ],
 };

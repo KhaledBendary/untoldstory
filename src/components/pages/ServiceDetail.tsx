@@ -10,7 +10,7 @@ import RetryState from '../RetryState';
 import { getServiceImage, getProjectImage } from '@/lib/utils';
 import type { Service, PortfolioItem } from '@/types/api';
 import { useLanguage } from '../LanguageContext';
-import { renderCmsHtml } from '@/lib/seo';
+import { cleanHeadline, renderCmsHtml } from '@/lib/seo';
 import { usePageData } from '@/hooks/usePageData';
 import { getServiceDetailData, type ServiceDetailData, type DetailResult } from '@/lib/page-data';
 
@@ -77,7 +77,7 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
             </p>
             <SplitWords
               as="h1"
-              text={service.title}
+              text={cleanHeadline(service.title, slug) || service.title}
               className="font-display font-black uppercase tracking-tight leading-[0.9] text-[10.5vw] md:text-[6.5vw]"
             />
           </div>

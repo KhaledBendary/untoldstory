@@ -1,8 +1,7 @@
 import type { MetadataRoute } from "next";
-import { api } from "@/lib/api";
-import { POSTS as FALLBACK_POSTS, PROJECTS as FALLBACK_PROJECTS, SERVICES as FALLBACK_SERVICES } from "@/data/content";
 import type { BlogPost, PortfolioItem, Service } from "@/types/api";
 import { SITE_URL } from "@/lib/seo";
+import { getInsightsData, getWorkData, getServicesData } from "@/lib/page-data";
 import { LOCALE_CODES, LOCALE_TAGS, DEFAULT_LOCALE, localizedPath } from "@/lib/i18n";
 
 /**
@@ -39,32 +38,9 @@ function parseDate(value?: string | null) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  let services: (Service | { slug: string })[] = [];
-  let projects: (PortfolioItem | { slug: string })[] = [];
-  let posts: (BlogPost | { slug: string; date?: string; publishedAt?: string })[] = [];
-
-  try {
-    services = await api.getServices();
-  } catch (e) {
-    console.error("Error fetching services for sitemap:", e);
-    services = FALLBACK_SERVICES;
-  }
-
-  try {
-    const portfolioData = await api.getPortfolio({ page: 1, per_page: 50 });
-    projects = portfolioData.items;
-  } catch (e) {
-    console.error("Error fetching portfolio for sitemap:", e);
-    projects = FALLBACK_PROJECTS;
-  }
-
-  try {
-    const blogData = await api.getBlogPosts({ page: 1, per_page: 50 });
-    posts = blogData.items;
-  } catch (e) {
-    console.error("Error fetching blog posts for sitemap:", e);
-    posts = FALLBACK_POSTS;
-  }
+  const services: (Service | { slug: string })[] = await getServicesData();
+  const projects: (PortfolioItem | { slug: string })[] = await getWorkData();
+  const posts: (BlogPost | { slug: string; date?: string; publishedAt?: string })[] = await getInsightsData();
 
   const newestPost = posts
     .map((post) => parseDate("publishedAt" in post ? post.publishedAt : undefined) ?? parseDate("date" in post ? post.date : undefined))

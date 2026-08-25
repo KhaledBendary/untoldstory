@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { ArrowUpRight, Mail, Phone, MapPin, Check } from 'lucide-react';
 import { SplitWords, Reveal } from '../Reveal';
 import Magnetic from '../Magnetic';
-import { api, formsApi } from '@/lib/api';
-import type { Service, ContactForm, LayoutData } from '@/types/api';
+import type { ContactForm } from '@/types/api';
 import { useLanguage } from '../LanguageContext';
 import { usePageData } from '@/hooks/usePageData';
 import { getContactData, type ContactData } from '@/lib/page-data';
@@ -49,7 +48,17 @@ export default function ContactPage({ initialData, initialLocale }: { initialDat
     };
 
     try {
-      await formsApi.submitContact(formData);
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          website: String(data.get('website') || ''),
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Contact submit failed: ${response.status}`);
+      }
       setSent(true);
     } catch (err) {
       // The submission genuinely failed (network error, proxy/API down, or a
@@ -81,7 +90,7 @@ export default function ContactPage({ initialData, initialLocale }: { initialDat
         <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-6">( {t('Contact')} )</p>
         <SplitWords
           as="h1"
-          text={t('Your next story starts here')}
+          text={t('Contact a Production Studio in Egypt')}
           className="font-display font-black uppercase tracking-tight leading-[0.9] text-[12vw] md:text-[7.5vw] max-w-6xl"
         />
         <Reveal className="mt-8">
@@ -107,6 +116,7 @@ export default function ContactPage({ initialData, initialLocale }: { initialDat
             </div>
           ) : (
             <form onSubmit={onSubmit} className="space-y-10">
+              <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
               {error && (
                 <div className="border border-red-500/30 bg-red-500/10 p-4 text-red-200 text-sm space-y-3">
                   <p>{error}</p>

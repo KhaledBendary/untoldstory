@@ -2,20 +2,16 @@ import type { Metadata } from "next";
 import About from "@/components/pages/About";
 import { applySeoOverrides } from "@/data/seo-overrides";
 import { pageMeta } from "@/data/page-meta";
-import { alternatesFor, isLocale, DEFAULT_LOCALE, localizedPath } from "@/lib/i18n";
+import { isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 import { getAboutData, safeFetch } from "@/lib/page-data";
+import { pageSeo } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
-
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const meta = pageMeta("about", locale);
-  return applySeoOverrides("/about", {
-    title: { absolute: meta.title },
-    description: meta.description,
-    alternates: alternatesFor("/about", locale),
-  }, locale);
+  return applySeoOverrides("/about", pageSeo({ path: "/about", locale, title: meta.title, description: meta.description }), locale);
 }
 
 export default async function Page({ params }: Props) {

@@ -9,12 +9,11 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowUpRight, ArrowDown, ArrowRight } from 'lucide-react';
 import Marquee from '../Marquee';
 import Magnetic from '../Magnetic';
-import RetryState from '../RetryState';
 import { SplitWords, Reveal, LineReveal, EASE } from '../Reveal';
 import { useSiteReady } from '../SiteContext';
 import { useHydrated } from '@/hooks/useHydrated';
 import { useLanguage } from '../LanguageContext';
-import { getHomeData, type HomeData } from '@/lib/home-data';
+import { getHomeDataSafe, fallbackHomeData, type HomeData } from '@/lib/home-data';
 import { getServiceImage, getProjectImage, getPostImage } from '@/lib/utils';
 import type { Service, PortfolioItem, BlogPost } from '@/types/api';
 
@@ -32,8 +31,8 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
   const imgScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
   const fade = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
-  const headline = hero?.headline1 || t('The Complete');
-  const headline2 = hero?.headline2 || t('Production Cycle');
+  const headline = t('Film & Video Production');
+  const headline2 = t('Egypt & MENA');
   const heroImage = hero?.image || '/images/on-ground-production-giza.jpg';
 
   const line = (text: string, i: number) => (
@@ -594,27 +593,22 @@ function ImageBreak() {
 export default function Home({ initialData, initialLocale }: { initialData: HomeData | null; initialLocale: string }) {
   const ready = useSiteReady();
   const { locale, t } = useLanguage();
-  const [data, setData] = useState<HomeData | null>(initialData);
-  // Server-rendered content is already on screen for the initial locale; only a
-  // language switch (or a failed server fetch) needs a client round trip.
-  // See usePageData: a dataless server render is a failure, not a load.
+  const [data, setData] = useState<HomeData>(initialData ?? fallbackHomeData());
   const [loading, setLoading] = useState(false);
-  const [retryToken, setRetryToken] = useState(0);
 
   useEffect(() => {
-    if (initialData && locale === initialLocale && retryToken === 0) return;
+    if (initialData && locale === initialLocale) return;
 
     let cancelled = false;
 
     async function fetchData() {
       setLoading(true);
       try {
-        const next = await getHomeData(locale);
+        const next = await getHomeDataSafe(locale);
         if (!cancelled) setData(next);
       } catch (err) {
-        if (cancelled) return;
         console.error("Failed to fetch home data:", err);
-        setData(null);
+        if (!cancelled) setData(fallbackHomeData());
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -622,22 +616,13 @@ export default function Home({ initialData, initialLocale }: { initialData: Home
 
     fetchData();
     return () => { cancelled = true; };
-  }, [locale, retryToken, initialData, initialLocale]);
+  }, [locale, initialData, initialLocale]);
 
-  if (loading) {
+  if (loading && !initialData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-white/50 font-mono2 text-sm">{t('Loading...')}</div>
       </div>
-    );
-  }
-
-  if (!data) {
-    return (
-      <RetryState
-        message={t("The homepage didn't load. It's not you — try again.")}
-        onRetry={() => setRetryToken(n => n + 1)}
-      />
     );
   }
 

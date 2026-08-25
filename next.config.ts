@@ -58,6 +58,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   outputFileTracingRoot: root,
+  serverExternalPackages: ["nodemailer"],
   // Static generation defaults to one worker per core. Against the shared-host
   // Laravel API that burst returns 500s, and pages then prerender with fallback
   // metadata. Fewer workers make the build slower but deterministic.
@@ -90,6 +91,7 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
+      { source: "/favicon.ico", destination: "/images/favicon.png" },
       // Only the versioned API surface is proxied. A previous catch-all on
       // `/api/proxy/:path*` exposed every route on the upstream host — admin
       // included — through this domain, and nothing in the app used it.

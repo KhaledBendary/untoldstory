@@ -33,6 +33,13 @@ export const LOCALE_TAGS: Record<Locale, string> = {
   tr: "tr", ru: "ru", zh: "zh", ja: "ja", ko: "ko", pl: "pl", sw: "sw",
 };
 
+/** Open Graph `og:locale` tags (underscore form). */
+export const OG_LOCALES: Record<Locale, string> = {
+  en: "en_US", ar: "ar_SA", de: "de_DE", es: "es_ES", fr: "fr_FR", it: "it_IT",
+  pt: "pt_PT", tr: "tr_TR", ru: "ru_RU", zh: "zh_CN", ja: "ja_JP", ko: "ko_KR",
+  pl: "pl_PL", sw: "sw_KE",
+};
+
 export const RTL_LOCALES: ReadonlySet<string> = new Set(["ar"]);
 
 export function isLocale(value: string | undefined): value is Locale {

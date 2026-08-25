@@ -3,9 +3,11 @@ import "../globals.css";
 import { Alexandria, Archivo, Inter, JetBrains_Mono } from "next/font/google";
 import SiteShell from "@/components/SiteShell";
 import StructuredData from "@/components/StructuredData";
-import { DEFAULT_LOCALE, PRERENDER_LOCALES, LOCALE_TAGS, isLocale, localeDir } from "@/lib/i18n";
+import { DEFAULT_LOCALE, PRERENDER_LOCALES, LOCALE_TAGS, OG_LOCALES, isLocale, localeDir, LOCALE_CODES } from "@/lib/i18n";
 import { getCommandCenterSchemas } from "@/data/seo-command-schema";
 import { getShellData } from "@/lib/page-data";
+import { BRAND, DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/seo";
+import { pageMeta } from "@/data/page-meta";
 
 /**
  * Self-hosted through next/font rather than a <link> to fonts.googleapis.com.
@@ -19,44 +21,43 @@ const jetbrains = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "6
 
 const fontClass = [alexandria.variable, archivo.variable, inter.variable, jetbrains.variable].join(" ");
 
-const siteUrl = "https://globaluntoldstory.com";
+const siteUrl = SITE_URL;
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: "Global Untold Story — Film & Video Production Services in Egypt & MENA",
-    template: "%s | Global Untold Story",
-  },
-  description: "Global Untold Story is a full-service film, video and content production studio based in Egyptian Media Production City, Dubai and Jeddah, serving Egypt, MENA and international clients.",
-  keywords: [
-    "film production Egypt", "video production company Cairo", "on-ground production services Egypt",
-    "TV commercial production Egypt", "documentary production", "corporate video production Cairo",
-    "media production agency Egypt", "production house MENA", "Dubai production company",
-    "line production Egypt", "fixer Egypt",
-  ],
-  authors: [{ name: "Global Untold Story" }],
-  creator: "Global Untold Story",
-  publisher: "Global Untold Story",
-  alternates: { canonical: "/" },
-  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
-  icons: { icon: "/images/favicon.png", apple: "/images/favicon.png" },
-  openGraph: {
-    type: "website",
-    siteName: "Global Untold Story",
-    title: "Global Untold Story — Film & Video Production Services in Egypt & MENA",
-    description: "Full-service film, video and content production studio. Where story meets execution — predictable budgets, premium results across Egypt, MENA and worldwide.",
-    url: siteUrl,
-    images: [{ url: "/images/on-ground-production-giza.jpg", width: 1200, height: 630, alt: "Global Untold Story production in Egypt" }],
-    locale: "en_US",
-    alternateLocale: ["ar_AR"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Global Untold Story — Film & Video Production Services in Egypt & MENA",
-    description: "Full-service film, video and content production studio. Where story meets execution.",
-    images: ["/images/on-ground-production-giza.jpg"],
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params?: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const raw = (await params)?.locale;
+  const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
+  const home = pageMeta("home", locale);
+  const others = LOCALE_CODES.filter((code) => code !== locale).map((code) => OG_LOCALES[code]);
+
+  return {
+    metadataBase: new URL(siteUrl),
+    title: { default: home.title, template: "%s" },
+    description: home.description,
+    keywords: [
+      "film production Egypt", "video production company Cairo", "on-ground production services Egypt",
+      "TV commercial production Egypt", "documentary production", "corporate video production Cairo",
+      "media production agency Egypt", "production house MENA", "Dubai production company",
+      "line production Egypt", "fixer Egypt",
+    ],
+    authors: [{ name: BRAND }],
+    creator: BRAND,
+    publisher: BRAND,
+    robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
+    icons: { icon: "/images/favicon.png", apple: "/images/favicon.png", shortcut: "/images/favicon.png" },
+    openGraph: {
+      type: "website",
+      siteName: BRAND,
+      images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: "Global Untold Story production in Egypt" }],
+      locale: OG_LOCALES[locale],
+      alternateLocale: others,
+    },
+    twitter: { card: "summary_large_image" },
+  };
+}
 
 const organization = {
   "@context": "https://schema.org",
@@ -71,6 +72,7 @@ const organization = {
   address: [
     { "@type": "PostalAddress", addressLocality: "Egyptian Media Production City", addressCountry: "EG" },
     { "@type": "PostalAddress", addressLocality: "Business Bay, Dubai", addressCountry: "AE" },
+    { "@type": "PostalAddress", addressLocality: "Jeddah", addressCountry: "SA" },
   ],
   contactPoint: [
     { "@type": "ContactPoint", telephone: "+201001299639", contactType: "sales", areaServed: "EG", availableLanguage: ["en", "ar"] },
@@ -91,7 +93,7 @@ const website = {
   name: "Global Untold Story",
   url: `${siteUrl}/`,
   publisher: { "@id": `${siteUrl}/#organization` },
-  inLanguage: ["en", "ar"],
+  inLanguage: [...LOCALE_CODES],
 };
 
 /**

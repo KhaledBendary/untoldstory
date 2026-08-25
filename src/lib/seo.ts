@@ -9,6 +9,9 @@
  * goes through here first.
  */
 
+import type { Metadata } from "next";
+import { alternatesFor, DEFAULT_LOCALE, isLocale, localizedPath, OG_LOCALES, type Locale } from "@/lib/i18n";
+
 export const SITE_URL = "https://globaluntoldstory.com";
 export const BRAND = "Global Untold Story";
 
@@ -250,4 +253,56 @@ export function sanitizeCmsHtml(html?: string | null) {
 /** Sanitise CMS rich text and demote its headings in one pass. */
 export function renderCmsHtml(html?: string | null) {
   return demoteHeadings(sanitizeCmsHtml(html));
+}
+
+export const DEFAULT_OG_IMAGE = "/images/on-ground-production-giza.jpg";
+
+type PageSeoInput = {
+  path: string;
+  locale: string;
+  title: string;
+  description?: string | null;
+  image?: string | null;
+  type?: "website" | "article";
+  publishedTime?: string;
+};
+
+/**
+ * Full per-route metadata. Every page must call this (or spread it) so a
+ * missing field cannot inherit the layout's homepage canonical / og:url.
+ */
+export function pageSeo({
+  path,
+  locale,
+  title,
+  description,
+  image,
+  type = "website",
+  publishedTime,
+}: PageSeoInput): Metadata {
+  const desc = buildDescription(description, title);
+  const url = absoluteUrl(localizedPath(path, locale));
+  const img = image || DEFAULT_OG_IMAGE;
+  return {
+    title: { absolute: title },
+    description: desc,
+    alternates: alternatesFor(path, locale),
+    robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
+    openGraph: {
+      title,
+      description: desc,
+      url,
+      siteName: BRAND,
+      locale: OG_LOCALES[(isLocale(locale) ? locale : DEFAULT_LOCALE) as Locale],
+      type,
+      images: [{ url: img, width: 1200, height: 630, alt: title }],
+      ...(publishedTime ? { publishedTime } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: desc,
+      images: [img],
+    },
+  };
 }

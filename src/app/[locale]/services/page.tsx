@@ -3,21 +3,16 @@ import Services from "@/components/pages/Services";
 import StructuredData from "@/components/StructuredData";
 import { applySeoOverrides } from "@/data/seo-overrides";
 import { pageMeta } from "@/data/page-meta";
-import { alternatesFor, isLocale, localizedPath, DEFAULT_LOCALE } from "@/lib/i18n";
+import { isLocale, localizedPath, DEFAULT_LOCALE } from "@/lib/i18n";
 import { getServicesData } from "@/lib/page-data";
-import { absoluteUrl, breadcrumbSchema, cleanHeadline } from "@/lib/seo";
+import { absoluteUrl, breadcrumbSchema, cleanHeadline, pageSeo } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
-
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const meta = pageMeta("services", locale);
-  return applySeoOverrides("/services", {
-    title: { absolute: meta.title },
-    description: meta.description,
-    alternates: alternatesFor("/services", locale),
-  }, locale);
+  return applySeoOverrides("/services", pageSeo({ path: "/services", locale, title: meta.title, description: meta.description }), locale);
 }
 
 export default async function Page({ params }: Props) {

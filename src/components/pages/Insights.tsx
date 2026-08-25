@@ -34,7 +34,7 @@ export default function Insights({ initialData, initialLocale }: { initialData: 
         <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-6">( {t('Insights')} )</p>
         <SplitWords
           as="h1"
-          text={t("Insights")}
+          text={t("Film Production Insights")}
           className="font-display font-black uppercase tracking-tight leading-[0.9] text-[12vw] md:text-[7.5vw]"
         />
       </section>

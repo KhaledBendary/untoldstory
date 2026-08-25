@@ -112,7 +112,7 @@ export default function Work({ initialData, initialLocale }: { initialData: Port
         <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-6">( {t('Work')} )</p>
         <SplitWords
           as="h1"
-          text={t('The story ends. The impact lives on.')}
+          text={t('Film & Advertising Portfolio')}
           className="font-display font-black uppercase tracking-tight leading-[0.9] text-[13vw] md:text-[8vw]"
         />
         <Reveal className="mt-6 max-w-xl">
