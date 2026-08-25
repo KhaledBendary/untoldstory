@@ -24,7 +24,7 @@ async function slugList() {
     const services = await api.getServices();
     return services.map((service) => ({ slug: service.slug }));
   } catch (e) {
-    console.error("Error fetching services for generateStaticParams:", e);
+    console.error("Error fetching services for generateStaticParams:", e instanceof Error ? e.message : e);
     return FALLBACK_SERVICES.map(({ slug }) => ({ slug }));
   }
 }

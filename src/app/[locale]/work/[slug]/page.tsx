@@ -27,12 +27,17 @@ export async function generateStaticParams() {
 }
 
 async function slugList() {
+  const extras = FALLBACK_PROJECTS.map(({ slug }) => ({ slug }));
   try {
     const portfolioData = await api.getPortfolio({ page: 1, per_page: 50 });
-    return portfolioData.items.map((project) => ({ slug: project.slug }));
+    const seen = new Set(portfolioData.items.map((project) => project.slug));
+    return [
+      ...portfolioData.items.map((project) => ({ slug: project.slug })),
+      ...extras.filter((item) => !seen.has(item.slug)),
+    ];
   } catch (e) {
-    console.error("Error fetching portfolio for generateStaticParams:", e);
-    return FALLBACK_PROJECTS.map(({ slug }) => ({ slug }));
+    console.error("Error fetching portfolio for generateStaticParams:", e instanceof Error ? e.message : e);
+    return extras;
   }
 }
 

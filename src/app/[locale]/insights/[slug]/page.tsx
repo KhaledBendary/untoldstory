@@ -29,7 +29,7 @@ async function slugList() {
     const seen = new Set(blogData.items.map((post) => post.slug));
     return [...blogData.items.map((post) => ({ slug: post.slug })), ...extras.filter((item) => !seen.has(item.slug))];
   } catch (e) {
-    console.error("Error fetching blog posts for generateStaticParams:", e);
+    console.error("Error fetching blog posts for generateStaticParams:", e instanceof Error ? e.message : e);
     return extras.length ? extras : FALLBACK_POSTS.filter((p) => !POST_SLUGS_THAT_REDIRECT.has(p.slug)).map(({ slug }) => ({ slug }));
   }
 }

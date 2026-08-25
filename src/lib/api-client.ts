@@ -25,9 +25,43 @@ function isRetryable(status?: number): boolean {
  * a build walks every page — the same URLs return 200 the moment the burst
  * passes. Retrying patiently is what keeps prerendered pages from shipping
  * their empty retry state, so back off far enough to outlast a bad window.
+ *
+ * During `next build` on Vercel the host is often unreachable, and six long
+ * retries across hundreds of pages stall the deploy until it errors. Fail
+ * faster there, and trip a short circuit so the rest of the build uses
+ * editorial fallbacks instead of waiting on a dead connection.
  */
-const RETRY_ATTEMPTS = 6;
-const RETRY_DELAYS_MS = [500, 1500, 3000, 6000, 10000];
+const IS_BUILD = process.env.NEXT_PHASE === "phase-production-build";
+const RETRY_ATTEMPTS = IS_BUILD ? 2 : 6;
+const RETRY_DELAYS_MS = IS_BUILD ? [400, 1000] : [500, 1500, 3000, 6000, 10000];
+const CIRCUIT_AFTER = 3;
+const CIRCUIT_MS = 60_000;
+
+type CircuitState = { fails: number; openedAt: number };
+const CIRCUIT_KEY = Symbol.for("globaluntoldstory.api-client.circuit");
+const circuitScope = globalThis as unknown as Record<symbol, CircuitState | undefined>;
+const circuit: CircuitState =
+  circuitScope[CIRCUIT_KEY] ?? (circuitScope[CIRCUIT_KEY] = { fails: 0, openedAt: 0 });
+
+function circuitOpen() {
+  if (circuit.fails < CIRCUIT_AFTER) return false;
+  if (Date.now() - circuit.openedAt > CIRCUIT_MS) {
+    circuit.fails = 0;
+    circuit.openedAt = 0;
+    return false;
+  }
+  return true;
+}
+
+function noteNetworkFailure() {
+  circuit.fails += 1;
+  if (circuit.fails >= CIRCUIT_AFTER) circuit.openedAt = Date.now();
+}
+
+function noteSuccess() {
+  circuit.fails = 0;
+  circuit.openedAt = 0;
+}
 
 /** Spread simultaneous retries so they don't re-collide on the same tick. */
 function backoffFor(attempt: number): number {
@@ -214,6 +248,10 @@ class ApiClient {
 
     let lastError: ApiError = new ApiError('API request failed: no attempts made');
 
+    if (isCacheableServerRead && circuitOpen()) {
+      throw new ApiError("API circuit open: upstream unreachable");
+    }
+
     // Server-side reads also go through Next's data cache, so a rebuilt page
     // can reuse a response across processes. The browser is left alone.
     const cacheInit: RequestInit & { next?: { revalidate: number } } = isCacheableServerRead
@@ -235,11 +273,13 @@ class ApiClient {
             response.status,
           );
         } else {
+          noteSuccess();
           return await response.json();
         }
       } catch (error) {
         // fetch() itself threw (network error, DNS failure, etc.) — no
         // status available, treated as retryable below.
+        noteNetworkFailure();
         lastError = new ApiError(
           error instanceof Error ? error.message : 'Network request failed',
         );
