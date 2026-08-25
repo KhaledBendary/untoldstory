@@ -18,6 +18,9 @@ function projectHeadline(title: string, client?: string | null, slug?: string) {
   return `${name} — ${client}`;
 }
 
+/** Every real slug is prerendered; unknown ones are 404s, not renders. */
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const slugs = await slugList();
   return PRERENDER_LOCALES.flatMap((locale) => slugs.map(({ slug }) => ({ locale, slug })));
