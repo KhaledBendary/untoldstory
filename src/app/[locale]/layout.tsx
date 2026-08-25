@@ -162,11 +162,15 @@ export function generateStaticParams() {
 export default async function RootLayout({
   children,
   params,
-}: Readonly<{ children: React.ReactNode; params: Promise<{ locale: string }> }>) {
+}: Readonly<{ children: React.ReactNode; params?: Promise<{ locale: string }> }>) {
   // The locale comes from the route segment, so <html lang>/<dir> are correct
   // in the static HTML — no headers() call, which would force every page to
   // render on demand and give up static generation entirely.
-  const { locale: raw } = await params;
+  //
+  // `params` is optional on purpose: Next renders the not-found boundary
+  // without them, and destructuring an absent promise threw here — which is
+  // why every 404 shipped an empty Suspense shell instead of a page.
+  const raw = (await params)?.locale;
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const shell = await getShellData(locale);
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import PostDetail from "@/components/pages/PostDetail";
 import StructuredData from "@/components/StructuredData";
 import { applySeoOverrides } from "@/data/seo-overrides";
@@ -135,6 +136,7 @@ export default async function Page({ params }: Props) {
   }
 
   const initialData = await postDetailWithFallback(slug, locale);
+  if (initialData?.status === "notFound") notFound();
 
   const crumbs = breadcrumbSchema([
     { name: "Insights", path: localizedPath("/insights", locale) },
