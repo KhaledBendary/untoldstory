@@ -47,6 +47,9 @@ export async function generateMetadata({
     creator: BRAND,
     publisher: BRAND,
     robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
+    verification: {
+      google: "9bgQyGP_WoXpY61HhzlvjYaaRM586odUzrLq4u_eawE",
+    },
     icons: { icon: "/images/favicon.png", apple: "/images/favicon.png", shortcut: "/images/favicon.png" },
     openGraph: {
       type: "website",
