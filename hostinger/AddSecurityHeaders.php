@@ -7,12 +7,19 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Drop this into the Laravel app on Hostinger and register it in
- * bootstrap/app.php (Laravel 11+) or app/Http/Kernel.php:
+ * Hostinger install (api.globaluntoldstory.com):
  *
- *   ->withMiddleware(fn ($m) => $m->append(\App\Http\Middleware\AddSecurityHeaders::class))
+ * 1. File Manager → domain folder → app/Http/Middleware/
+ *    Upload this file as AddSecurityHeaders.php
+ * 2. Open bootstrap/app.php and append the middleware:
  *
- * Also set expose_php = Off in php.ini / .htaccess: php_flag expose_php Off
+ *    ->withMiddleware(function ($middleware) {
+ *        $middleware->append(\App\Http\Middleware\AddSecurityHeaders::class);
+ *    })
+ *
+ * 3. Merge hostinger/.htaccess Header rules into Laravel public/.htaccess
+ *    (do not replace the RewriteEngine block).
+ * 4. php_flag expose_php Off (already in that .htaccess snippet).
  */
 class AddSecurityHeaders
 {

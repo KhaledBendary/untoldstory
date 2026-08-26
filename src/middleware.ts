@@ -31,18 +31,20 @@ export function middleware(request: NextRequest) {
   const params = request.nextUrl.searchParams;
 
   const dropWww = host === WWW_HOST;
-  const legacy = legacyDestination(pathname);
+  const trailingSlash = pathname.length > 1 && pathname.endsWith("/");
+  const stripped = trailingSlash ? pathname.slice(0, -1) : pathname;
+  const legacy = legacyDestination(stripped);
   const stripWpQuery = WP_QUERY_KEYS.some((key) => params.has(key));
-  const indexPhp = pathname === "/index.php" || pathname === "/index.html";
+  const indexPhp = stripped === "/index.php" || stripped === "/index.html";
 
-  if (dropWww || legacy || stripWpQuery || indexPhp) {
+  if (dropWww || legacy || trailingSlash || stripWpQuery || indexPhp) {
     const url = request.nextUrl.clone();
     if (dropWww) {
       url.hostname = PRODUCTION_HOST;
       url.protocol = "https:";
       url.port = "";
     }
-    url.pathname = legacy || (indexPhp ? "/" : pathname);
+    url.pathname = legacy || (indexPhp ? "/" : stripped);
     if (stripWpQuery) {
       for (const key of WP_QUERY_KEYS) url.searchParams.delete(key);
       if (url.pathname === "/index.php" || url.pathname === "/index.html") url.pathname = "/";

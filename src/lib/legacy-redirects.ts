@@ -31,7 +31,7 @@ const PAGE_ALIASES: Record<string, string> = {
   "/production-journey": "/insights/the-video-production-journey-from-idea-to-impact",
   "/brand-storytelling": "/insights/why-every-brand-needs-a-story-that-moves-people",
   "/how-to-choose-a-media-production-agency-in-egypt": "/insights/how-to-choose-a-media-production-agency-in-egypt",
-  "/professional-film-production-equipment": "/insights/film-production-in-egypt",
+  "/professional-film-production-equipment": "/insights/professional-film-production-equipment",
   "/corporate-video-production-in-cairo-what-every-brand-needs-to-know": "/insights/corporate-video-production-in-cairo",
   "/tv-commercial-production-in-egypt-complete-guide-2026": "/insights/tv-commercial-production-in-egypt",
 };
@@ -71,7 +71,8 @@ export const POST_SLUG_ALIASES: Record<string, string> = {
   "why-every-brand-needs-a-story-that-moves-people": "why-every-brand-needs-a-story-that-moves-people",
   "media-production-agency-in-egypt": "how-to-choose-a-media-production-agency-in-egypt",
   "how-to-choose-a-media-production-agency-in-egypt": "how-to-choose-a-media-production-agency-in-egypt",
-  "professional-film-production-equipment": "film-production-in-egypt",
+  "film-production-in-egypt": "professional-film-production-equipment",
+  "professional-film-production-equipment": "professional-film-production-equipment",
   "corporate-video-production-in-cairo-what-every-brand-needs-to-know": "corporate-video-production-in-cairo",
   "tv-commercial-production-in-egypt-complete-guide-2026": "tv-commercial-production-in-egypt",
 };
