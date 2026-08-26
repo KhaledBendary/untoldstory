@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import "../globals.css";
 import { Alexandria, Archivo, Inter, JetBrains_Mono } from "next/font/google";
 import SiteShell from "@/components/SiteShell";
@@ -176,6 +177,9 @@ export default async function RootLayout({
   // without them, and destructuring an absent promise threw here — which is
   // why every 404 shipped an empty Suspense shell instead of a page.
   const raw = (await params)?.locale;
+  // Unknown first segments used to render the English homepage (e.g. /index.php
+  // matching [locale]). 404 unless middleware already redirected them.
+  if (raw && !isLocale(raw)) notFound();
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const shell = await getShellData(locale);
 

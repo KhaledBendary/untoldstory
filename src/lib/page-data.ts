@@ -2,7 +2,7 @@ import { api } from "@/lib/api";
 import { ApiError } from "@/lib/api-client";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { POSTS as FALLBACK_POSTS, PROJECTS as FALLBACK_PROJECTS, SERVICES as FALLBACK_SERVICES } from "@/data/content";
-import { POST_SLUGS_THAT_REDIRECT, relatedPostSlugs, relatedServiceSlugs } from "@/lib/legacy-redirects";
+import { POST_SLUG_ALIASES, POST_SLUGS_THAT_REDIRECT, relatedPostSlugs, relatedServiceSlugs } from "@/lib/legacy-redirects";
 import type { About, BlogPost, LayoutData, PortfolioItem, Service } from "@/types/api";
 
 /**
@@ -62,7 +62,13 @@ function allMappedFallbackPosts(): BlogPost[] {
 }
 
 export function mappedFallbackPosts(): BlogPost[] {
-  return allMappedFallbackPosts().filter((p) => !POST_SLUGS_THAT_REDIRECT.has(p.slug));
+  const canonical = allMappedFallbackPosts().map((p) => {
+    const slug = POST_SLUG_ALIASES[p.slug];
+    return slug && slug !== p.slug ? { ...p, id: slug, slug } : p;
+  });
+  return [...new Map(canonical.map((p) => [p.slug, p])).values()].filter(
+    (p) => !POST_SLUGS_THAT_REDIRECT.has(p.slug),
+  );
 }
 
 function findFallbackPost(slug: string) {

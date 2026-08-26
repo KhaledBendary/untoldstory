@@ -75,6 +75,11 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/|api/|images/|favicon|robots.txt|sitemap.xml|.*\\.[\\w]+$).*)",
+    /*
+     * Run on WordPress leftovers (.php, .html, wp-sitemap.xml) so they 301
+     * instead of matching [locale] and serving a duplicate homepage.
+     * Skip real static assets only.
+     */
+    "/((?!_next/|api/|images/|favicon|robots.txt|sitemap.xml|.*\\.(?:ico|png|jpe?g|gif|webp|svg|avif|woff2?|ttf|eot|css|js|map|mp4|webm|txt|json|pdf)$).*)",
   ],
 };

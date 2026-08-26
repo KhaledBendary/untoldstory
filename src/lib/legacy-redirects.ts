@@ -14,7 +14,9 @@ const PAGE_ALIASES: Record<string, string> = {
   "/get-a-quote": "/contact",
   "/get-quote": "/contact",
   "/our-work": "/work",
+  "/our-portfolio": "/work",
   "/portfolio": "/work",
+  "/portfolios": "/work",
   "/projects": "/work",
   "/blog": "/insights",
   "/news": "/insights",
@@ -24,6 +26,12 @@ const PAGE_ALIASES: Record<string, string> = {
   "/index.php": "/",
   "/index.html": "/",
   "/home": "/",
+  "/sitemap_index.xml": "/sitemap.xml",
+  "/wp-sitemap.xml": "/sitemap.xml",
+  "/production-journey": "/insights/the-video-production-journey-from-idea-to-impact",
+  "/brand-storytelling": "/insights/why-every-brand-needs-a-story-that-moves-people",
+  "/how-to-choose-a-media-production-agency-in-egypt": "/insights/how-to-choose-a-media-production-agency-in-egypt",
+  "/professional-film-production-equipment": "/insights/film-production-in-egypt",
 };
 
 export const SERVICE_SLUG_ALIASES: Record<string, string> = {
@@ -31,8 +39,10 @@ export const SERVICE_SLUG_ALIASES: Record<string, string> = {
   "on-ground-production": "on-ground-egypt",
   "on-ground-production-services-egypt": "on-ground-egypt",
   "line-production-egypt": "on-ground-egypt",
+  "commercial": "commercial-video-production",
   "commercial-advertising": "commercial-video-production",
   "commercial-advertising-production": "commercial-video-production",
+  "documentary": "documentary-production-egypt",
   "documentary-production": "documentary-production-egypt",
   "corporate-content": "corporate-video-production-egypt",
   "corporate-industrial-content": "corporate-video-production-egypt",
@@ -59,6 +69,7 @@ export const POST_SLUG_ALIASES: Record<string, string> = {
   "why-every-brand-needs-a-story-that-moves-people": "why-every-brand-needs-a-story-that-moves-people",
   "media-production-agency-in-egypt": "how-to-choose-a-media-production-agency-in-egypt",
   "how-to-choose-a-media-production-agency-in-egypt": "how-to-choose-a-media-production-agency-in-egypt",
+  "professional-film-production-equipment": "film-production-in-egypt",
 };
 
 function stripSlash(path: string) {
@@ -78,6 +89,11 @@ function splitLocale(pathname: string) {
 
 function mapBare(bare: string): string | null {
   if (PAGE_ALIASES[bare]) return PAGE_ALIASES[bare];
+
+  if (/^\/(category|tag|author)(\/|$)/.test(bare)) return "/insights";
+  if (/^\/(feed|comments\/feed)(\/|$)/.test(bare)) return "/insights";
+  if (/^\/blog\/page\/\d+$/.test(bare)) return "/insights";
+  if (/^\/page\/\d+$/.test(bare)) return "/";
 
   const serviceMatch = bare.match(/^\/(?:service|services)\/([^/]+)$/);
   if (serviceMatch) {
