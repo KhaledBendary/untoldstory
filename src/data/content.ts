@@ -14,7 +14,7 @@ export interface Service {
 
 export const SERVICES: Service[] = [
   {
-    slug: 'on-ground-production',
+    slug: 'on-ground-egypt',
     index: '01',
     title: 'On Ground Production Services Egypt',
     short: 'Production Services in Egypt for International Crews.',
@@ -31,7 +31,7 @@ export const SERVICES: Service[] = [
     keywords: 'production services in Egypt for international crews, on-ground production services Egypt, line production Egypt, film fixer Egypt, filming permits Egypt',
   },
   {
-    slug: 'commercial-advertising',
+    slug: 'commercial-video-production',
     index: '02',
     title: 'Commercial Advertising Production',
     short: 'Campaign and advertising production for television, digital and performance channels.',
@@ -50,7 +50,7 @@ export const SERVICES: Service[] = [
     keywords: 'commercial video production Egypt & MENA, TV commercial production Egypt, advertising film production Cairo, performance campaign video',
   },
   {
-    slug: 'documentary-production',
+    slug: 'documentary-production-egypt',
     index: '03',
     title: 'Documentary Production',
     short: 'Research-led cinematic documentaries for platforms, broadcasters, institutions and brands.',
@@ -68,7 +68,7 @@ export const SERVICES: Service[] = [
     keywords: 'documentary production services Egypt, documentary production for broadcasters, documentary fixers Egypt, National Geographic style production MENA',
   },
   {
-    slug: 'corporate-industrial-content',
+    slug: 'corporate-video-production-egypt',
     index: '04',
     title: 'Corporate & Industrial Content',
     short: 'Corporate communication and industrial production for energy, safety, training and institutions.',
@@ -88,7 +88,7 @@ export const SERVICES: Service[] = [
     keywords: 'corporate video production Egypt, industrial filming Egypt, executive and safety films, oil and gas video content',
   },
   {
-    slug: 'event-coverage-live-production',
+    slug: 'event-production-live-streaming-egypt',
     index: '05',
     title: 'Event Coverage & Live Production',
     short: 'Strategy-led coverage and live production for conferences, summits and multi-day events.',
@@ -108,7 +108,7 @@ export const SERVICES: Service[] = [
     keywords: 'event production Egypt, live streaming production MENA, multi camera event coverage, conference and summit video production',
   },
   {
-    slug: 'tv-live-production',
+    slug: 'tv-show-production-live-broadcast',
     index: '06',
     title: 'TV Shows & Live Broadcast',
     short: 'Studio, field and live-broadcast production for episodic formats, talk shows and entertainment.',
@@ -144,7 +144,7 @@ export const SERVICES: Service[] = [
     keywords: 'podcast production services Egypt, video podcast production MENA, podcast format development, podcast editing and social clips',
   },
   {
-    slug: 'post-production-finishing',
+    slug: 'post-production',
     index: '08',
     title: 'Post-Production & Finishing',
     short: 'High-end editorial, color, audio, graphics, mastering and delivery workflows.',
@@ -162,7 +162,7 @@ export const SERVICES: Service[] = [
     keywords: 'post production services Egypt, video editing and color grading, sound design and mastering, motion graphics and VFX post',
   },
   {
-    slug: 'motion-cgi-ai',
+    slug: 'motion-graphics-cgi-vfx-ai',
     index: '09',
     title: 'Motion, CGI & AI-Powered Visuals',
     short: 'Motion design, CGI, VFX, data visualization and AI-assisted visual workflows.',
@@ -179,7 +179,7 @@ export const SERVICES: Service[] = [
     keywords: 'motion graphics production Egypt, CGI and VFX studio MENA, AI visual production, 3D product visualization',
   },
   {
-    slug: 'dubbing-voice-over',
+    slug: 'dubbing-voice-over-localization',
     index: '10',
     title: 'Dubbing, Voice-Over & Localization',
     short: 'Multilingual voice, dubbing, ADR, subtitling and multi-market packaging.',
@@ -196,7 +196,7 @@ export const SERVICES: Service[] = [
     keywords: 'dubbing services Egypt, multilingual voice over MENA, subtitling and content localization, ADR and audio post',
   },
   {
-    slug: 'photography',
+    slug: 'commercial-photography',
     index: '11',
     title: 'Photography',
     short: 'Commercial, product, food, corporate, event and lifestyle photography.',
@@ -213,7 +213,7 @@ export const SERVICES: Service[] = [
     keywords: 'commercial photography services Egypt, product and food photography MENA, corporate and executive photography, brand image libraries',
   },
   {
-    slug: 'performance-marketing',
+    slug: 'performance-marketing-creative-strategy',
     index: '12',
     title: 'Marketing Solutions & Performance',
     short: 'Marketing planning, creative systems, paid media and conversion support linked to production.',
@@ -458,7 +458,7 @@ export interface Post {
 
 const POSTS_STATIC: Post[] = [
   {
-    slug: 'production-journey',
+    slug: 'the-video-production-journey-from-idea-to-impact',
     title: 'The Video Production Journey: From Idea to Impact',
     date: '2025-06-24',
     category: 'Production',
@@ -473,7 +473,7 @@ const POSTS_STATIC: Post[] = [
     ],
   },
   {
-    slug: 'brand-storytelling',
+    slug: 'why-every-brand-needs-a-story-that-moves-people',
     title: 'Why Every Brand Needs a Story That Moves People',
     date: '2025-07-15',
     category: 'Video',
@@ -487,7 +487,7 @@ const POSTS_STATIC: Post[] = [
     ],
   },
   {
-    slug: 'media-production-agency-in-egypt',
+    slug: 'how-to-choose-a-media-production-agency-in-egypt',
     title: 'How to Choose a Media Production Agency in Egypt?',
     date: '2026-01-30',
     category: 'Production',

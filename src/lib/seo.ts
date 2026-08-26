@@ -10,7 +10,7 @@
  */
 
 import type { Metadata } from "next";
-import { alternatesFor, DEFAULT_LOCALE, isLocale, localizedPath, OG_LOCALES, type Locale } from "@/lib/i18n";
+import { alternatesFor, DEFAULT_LOCALE, isIndexableLocale, isLocale, localizedPath, OG_LOCALES, type Locale } from "@/lib/i18n";
 
 export const SITE_URL = "https://globaluntoldstory.com";
 export const BRAND = "Global Untold Story";
@@ -288,12 +288,15 @@ export function pageSeo({
   const safeTitle = clampTitle(title) || BRAND;
   const desc = buildDescription(description, safeTitle);
   const url = absoluteUrl(localizedPath(path, locale));
-  const img = image || DEFAULT_OG_IMAGE;
+  const img = absoluteUrl(image || DEFAULT_OG_IMAGE);
+  const indexable = isIndexableLocale(locale);
   return {
     title: { absolute: safeTitle },
     description: desc,
     alternates: alternatesFor(path, locale),
-    robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
+    robots: indexable
+      ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } }
+      : { index: false, follow: true, googleBot: { index: false, follow: true } },
     openGraph: {
       title: safeTitle,
       description: desc,

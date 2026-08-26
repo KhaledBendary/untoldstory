@@ -4,7 +4,7 @@ import "../globals.css";
 import { Alexandria, Archivo, Inter, JetBrains_Mono } from "next/font/google";
 import SiteShell from "@/components/SiteShell";
 import StructuredData from "@/components/StructuredData";
-import { DEFAULT_LOCALE, PRERENDER_LOCALES, LOCALE_TAGS, OG_LOCALES, isLocale, localeDir, LOCALE_CODES } from "@/lib/i18n";
+import { DEFAULT_LOCALE, PRERENDER_LOCALES, LOCALE_TAGS, OG_LOCALES, isLocale, localeDir, INDEXABLE_LOCALES, isIndexableLocale } from "@/lib/i18n";
 import { getCommandCenterSchemas } from "@/data/seo-command-schema";
 import { getShellData } from "@/lib/page-data";
 import { BRAND, DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/seo";
@@ -32,7 +32,7 @@ export async function generateMetadata({
   const raw = (await params)?.locale;
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const home = pageMeta("home", locale);
-  const others = LOCALE_CODES.filter((code) => code !== locale).map((code) => OG_LOCALES[code]);
+  const others = INDEXABLE_LOCALES.filter((code) => code !== locale).map((code) => OG_LOCALES[code]);
 
   return {
     metadataBase: new URL(siteUrl),
@@ -47,11 +47,14 @@ export async function generateMetadata({
     authors: [{ name: BRAND }],
     creator: BRAND,
     publisher: BRAND,
-    robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
+    robots: isIndexableLocale(locale)
+      ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } }
+      : { index: false, follow: true, googleBot: { index: false, follow: true } },
     verification: {
       google: "9bgQyGP_WoXpY61HhzlvjYaaRM586odUzrLq4u_eawE",
     },
     icons: { icon: "/images/favicon.png", apple: "/images/favicon.png", shortcut: "/images/favicon.png" },
+    manifest: "/site.webmanifest",
     openGraph: {
       type: "website",
       siteName: BRAND,
@@ -97,7 +100,7 @@ const website = {
   name: "Global Untold Story",
   url: `${siteUrl}/`,
   publisher: { "@id": `${siteUrl}/#organization` },
-  inLanguage: [...LOCALE_CODES],
+  inLanguage: [...INDEXABLE_LOCALES],
 };
 
 /**

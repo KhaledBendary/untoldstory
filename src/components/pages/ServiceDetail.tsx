@@ -13,6 +13,7 @@ import { useLanguage } from '../LanguageContext';
 import { cleanHeadline, renderCmsHtml } from '@/lib/seo';
 import { usePageData } from '@/hooks/usePageData';
 import { getServiceDetailData, type ServiceDetailData, type DetailResult } from '@/lib/page-data';
+import { getServiceFaqs } from '@/data/service-faqs';
 
 export default function ServiceDetail({ slug, initialData, initialLocale }: { slug: string; initialData: DetailResult<ServiceDetailData> | null; initialLocale: string }) {
   const { locale, t } = useLanguage();
@@ -136,10 +137,27 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
         </div>
       </section>
 
+      <section className="px-5 md:px-10 py-14 md:py-20 border-t border-white/10">
+        <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-6">( {t('Questions')} )</p>
+        <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl md:text-5xl mb-10">
+          {t('Frequently asked questions')}
+        </h2>
+        <dl className="max-w-3xl space-y-8">
+          {getServiceFaqs(slug).map((item) => (
+            <div key={item.question}>
+              <dt>
+                <h3 className="font-display font-bold text-xl md:text-2xl leading-snug">{item.question}</h3>
+              </dt>
+              <dd className="mt-3 text-white/65 leading-relaxed">{item.answer}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
       {/* Related work */}
       {relatedProjects.length > 0 && (
         <section className="px-5 md:px-10 py-16 md:py-24 border-t border-white/10">
-          <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl md:text-5xl mb-10">{t('Related work')}</h2>
+            <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl md:text-5xl mb-10">{t('Related work')}</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {relatedProjects.map((p: PortfolioItem) => (
               <Link key={p.slug} href={`/work/${p.slug}`} className="group block">

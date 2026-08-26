@@ -75,33 +75,56 @@ export default async function Page({ params }: Props) {
   const { slug, locale: raw } = await params;
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   let name = "";
-  let schema;
+  let schema: Record<string, unknown>[] | undefined;
 
   try {
     const project = await api.getPortfolioBySlug(slug, locale);
     name = cleanHeadline(project.title, slug);
-    schema = {
+    const blocks: Record<string, unknown>[] = [{
       "@context": "https://schema.org",
       "@type": "CreativeWork",
       name,
       description: buildDescription(project.results, name),
       creator: { "@type": "Organization", name: "Global Untold Story" },
-      image: project.image,
-    };
+      image: project.image ? absoluteUrl(project.image) : undefined,
+    }];
+    if (project.video) {
+      blocks.push({
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        name,
+        description: buildDescription(project.results, name),
+        thumbnailUrl: project.image ? absoluteUrl(project.image) : absoluteUrl("/images/on-ground-production-giza.jpg"),
+        contentUrl: absoluteUrl(project.video),
+      });
+    }
+    schema = blocks;
   } catch (e) {
     console.error("Error fetching project for page:", e);
     const live = await findProjectAnyLocale(slug, locale);
     const project = live ?? FALLBACK_PROJECTS.find((item) => item.slug === slug);
     if (project) {
       name = cleanHeadline(project.title, slug);
-      schema = {
+      const desc = buildDescription(live ? live.results : (project as { description: string }).description, name);
+      const blocks: Record<string, unknown>[] = [{
         "@context": "https://schema.org",
         "@type": "CreativeWork",
         name,
-        description: buildDescription(live ? live.results : (project as { description: string }).description, name),
+        description: desc,
         creator: { "@type": "Organization", name: "Global Untold Story" },
         image: project.image ? absoluteUrl(project.image) : undefined,
-      };
+      }];
+      if ("video" in project && project.video) {
+        blocks.push({
+          "@context": "https://schema.org",
+          "@type": "VideoObject",
+          name,
+          description: desc,
+          thumbnailUrl: project.image ? absoluteUrl(project.image) : absoluteUrl("/images/on-ground-production-giza.jpg"),
+          contentUrl: absoluteUrl(String(project.video)),
+        });
+      }
+      schema = blocks;
     }
   }
 
@@ -114,7 +137,7 @@ export default async function Page({ params }: Props) {
   ]);
 
   return <>
-    <StructuredData data={schema ? [schema, crumbs] : [crumbs]} />
+    <StructuredData data={schema ? [...schema, crumbs] : [crumbs]} />
     <ProjectDetail slug={slug} initialData={initialData} initialLocale={locale} />
   </>;
 }

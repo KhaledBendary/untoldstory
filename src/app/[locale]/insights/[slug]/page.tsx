@@ -75,13 +75,15 @@ export default async function Page({ params }: Props) {
   try {
     const post = await api.getBlogPostBySlug(slug, locale);
     name = cleanHeadline(post.title, slug);
+    const articleImage = post.featuredImage ? absoluteUrl(post.featuredImage) : absoluteUrl("/images/cinema-camera-red-dragon.jpg");
     schema = {
       "@context": "https://schema.org",
       "@type": "Article",
-      headline: name,
+      headline: post.title,
       description: buildDescription(post.excerpt, post.title),
       datePublished: post.publishedAt,
-      image: post.featuredImage || "",
+      dateModified: post.publishedAt,
+      image: articleImage,
       mainEntityOfPage: absoluteUrl(localizedPath(`/insights/${slug}`, locale)),
       author: { "@type": "Organization", name: "Global Untold Story" },
       publisher,
@@ -92,13 +94,15 @@ export default async function Page({ params }: Props) {
     const post = live ?? FALLBACK_POSTS.find((item) => relatedPostSlugs(slug).includes(item.slug));
     if (post) {
       name = cleanHeadline(post.title, slug);
+      const rawImage = live ? live.featuredImage : (post as { image?: string }).image;
       schema = {
         "@context": "https://schema.org",
         "@type": "Article",
-        headline: name,
+        headline: post.title,
         description: buildDescription(post.excerpt, post.title),
         datePublished: live ? live.publishedAt : (post as { date: string }).date,
-        image: live ? (live.featuredImage || "") : absoluteUrl((post as { image: string }).image),
+        dateModified: live ? live.publishedAt : (post as { date: string }).date,
+        image: rawImage ? absoluteUrl(rawImage) : absoluteUrl("/images/cinema-camera-red-dragon.jpg"),
         mainEntityOfPage: absoluteUrl(localizedPath(`/insights/${slug}`, locale)),
         author: { "@type": "Organization", name: "Global Untold Story" },
         publisher,

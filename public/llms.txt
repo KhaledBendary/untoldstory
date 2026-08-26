@@ -1,0 +1,26 @@
+# Global Untold Story
+
+Film and video production studio based at Egyptian Media Production City in Cairo, with offices in Dubai and Jeddah.
+
+Site: https://globaluntoldstory.com
+Contact: https://globaluntoldstory.com/contact
+Email: bendary@globaluntoldstory.com
+Phone: +201001299639
+
+## What we do
+
+Full-cycle production for international and regional clients: on-ground production in Egypt (permits, fixing, crew, equipment, locations, logistics), commercial advertising, documentary, corporate and industrial film, live events and broadcast, podcast, post-production, motion/CGI/VFX/AI, dubbing and localisation, commercial photography, performance marketing, and original IP.
+
+## Key pages
+
+- On-ground production in Egypt: https://globaluntoldstory.com/services/on-ground-egypt
+- Commercial video production: https://globaluntoldstory.com/services/commercial-video-production
+- Documentary production: https://globaluntoldstory.com/services/documentary-production-egypt
+- Services index: https://globaluntoldstory.com/services
+- Work: https://globaluntoldstory.com/work
+- Insights: https://globaluntoldstory.com/insights
+- About: https://globaluntoldstory.com/about
+
+## Languages
+
+English (canonical, unprefixed) and Arabic (`/ar`). Other locale prefixes exist for the language switcher but should not be treated as unique translations until their body copy is complete.

@@ -3,7 +3,7 @@ import type { BlogPost, PortfolioItem, Service } from "@/types/api";
 import { SITE_URL } from "@/lib/seo";
 import { getInsightsData, getWorkData, getServicesData } from "@/lib/page-data";
 import { POST_SLUG_ALIASES, SERVICE_SLUG_ALIASES } from "@/lib/legacy-redirects";
-import { LOCALE_CODES, LOCALE_TAGS, DEFAULT_LOCALE, localizedPath } from "@/lib/i18n";
+import { INDEXABLE_LOCALES, LOCALE_TAGS, DEFAULT_LOCALE, localizedPath } from "@/lib/i18n";
 
 /**
  * Only emit lastModified when the CMS actually knows when something changed.
@@ -19,7 +19,7 @@ function entry(
   // One <url> per route listing every language as an alternate, so Google can
   // see the whole cluster instead of treating the translations as strays.
   const languages: Record<string, string> = {};
-  for (const code of LOCALE_CODES) {
+  for (const code of INDEXABLE_LOCALES) {
     languages[LOCALE_TAGS[code]] = `${SITE_URL}${localizedPath(path, code)}`;
   }
   languages["x-default"] = `${SITE_URL}${localizedPath(path, DEFAULT_LOCALE)}`;

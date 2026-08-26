@@ -85,6 +85,7 @@ const nextConfig: NextConfig = {
     // delivery vehicle. No CMS asset needs it.
     dangerouslyAllowSVG: false,
     contentDispositionType: "attachment",
+    formats: ["image/avif", "image/webp"],
   },
   async headers() {
     return [

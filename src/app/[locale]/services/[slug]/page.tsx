@@ -8,6 +8,7 @@ import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/li
 import { getServiceDetailData, findServiceAnyLocale, safeFetch, serviceDetailWithFallback } from "@/lib/page-data";
 import { SERVICES as FALLBACK_SERVICES } from "@/data/content";
 import { relatedServiceSlugs, serviceStaticParams } from "@/lib/legacy-redirects";
+import { getServiceFaqs } from "@/data/service-faqs";
 import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
@@ -87,7 +88,7 @@ export default async function Page({ params }: Props) {
       name,
       description: buildDescription(service.shortDesc),
       url: absoluteUrl(localizedPath(`/services/${slug}`, locale)),
-      image: service.imageUrl || undefined,
+      image: service.imageUrl ? absoluteUrl(service.imageUrl) : undefined,
       provider: { "@type": "Organization", name: "Global Untold Story", url: "https://globaluntoldstory.com/" },
       brand: { "@type": "Organization", name: "Global Untold Story" },
       areaServed: ["Egypt", "UAE", "Saudi Arabia", "MENA"],
@@ -112,13 +113,24 @@ export default async function Page({ params }: Props) {
   const initialData = await serviceDetailWithFallback(slug, locale);
   if (initialData?.status === "notFound") notFound();
 
+  const faqs = getServiceFaqs(slug);
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: { "@type": "Answer", text: item.answer },
+    })),
+  };
+
   const crumbs = breadcrumbSchema([
     { name: "Services", path: localizedPath("/services", locale) },
     ...(name ? [{ name, path: localizedPath(`/services/${slug}`, locale) }] : []),
   ]);
 
   return <>
-    <StructuredData data={schema ? [schema, crumbs] : [crumbs]} />
+    <StructuredData data={schema ? [schema, faqSchema, crumbs] : [faqSchema, crumbs]} />
     <ServiceDetail slug={slug} initialData={initialData} initialLocale={locale} />
   </>;
 }

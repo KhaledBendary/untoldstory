@@ -144,26 +144,24 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
           </div>
         )}
 
-        <h1 className="font-display font-black uppercase leading-[0.88] tracking-[-0.02em] text-[8vw] sm:text-[7.5vw] md:text-[7vw] lg:text-[6.5vw] xl:text-[6vw] select-none" aria-label={`${headline} ${headline2}`}>
+        <h1 className="font-display font-black uppercase leading-[0.88] tracking-[-0.02em] text-[8vw] sm:text-[7.5vw] md:text-[7vw] lg:text-[6.5vw] xl:text-[6vw] select-none">
           {line(headline, 0)}
-          <span className="flex items-center gap-[0.15em]">
-            {line(headline2, 1)}
-            {hydrated ? (
-              <motion.span
-                className="hidden md:block font-mono2 font-normal text-[11px] tracking-[0.25em] normal-case text-white/60 max-w-[240px] leading-relaxed mt-[1vw]"
-                initial={{ opacity: 0 }}
-                animate={ready ? { opacity: 1 } : {}}
-                transition={{ duration: 1, delay: 1.2 }}
-              >
-                {t('Film, advertising, documentary services, content, post-production and marketing across Egypt, UAE and Saudi Arabia. From the region to the world')}
-              </motion.span>
-            ) : (
-              <span className="hidden md:block font-mono2 font-normal text-[11px] tracking-[0.25em] normal-case text-white/60 max-w-[240px] leading-relaxed mt-[1vw]">
-                {t('Film, advertising, documentary services, content, post-production and marketing across Egypt, UAE and Saudi Arabia. From the region to the world')}
-              </span>
-            )}
-          </span>
+          {line(headline2, 1)}
         </h1>
+        {hydrated ? (
+          <motion.p
+            className="hidden md:block font-mono2 font-normal text-[11px] tracking-[0.25em] normal-case text-white/60 max-w-[240px] leading-relaxed mt-5"
+            initial={{ opacity: 0 }}
+            animate={ready ? { opacity: 1 } : {}}
+            transition={{ duration: 1, delay: 1.2 }}
+          >
+            {t('Film, advertising, documentary services, content, post-production and marketing across Egypt, UAE and Saudi Arabia. From the region to the world')}
+          </motion.p>
+        ) : (
+          <p className="hidden md:block font-mono2 font-normal text-[11px] tracking-[0.25em] normal-case text-white/60 max-w-[240px] leading-relaxed mt-5">
+            {t('Film, advertising, documentary services, content, post-production and marketing across Egypt, UAE and Saudi Arabia. From the region to the world')}
+          </p>
+        )}
 
         {hydrated ? (
           <motion.div

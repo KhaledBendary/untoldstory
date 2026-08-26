@@ -17,15 +17,21 @@ export type Locale = (typeof LOCALE_CODES)[number];
 export const DEFAULT_LOCALE: Locale = "en";
 
 /**
- * Locales built ahead of time.
- *
- * All of them: a page generated on first request can be read mid-generation by
- * a crawler arriving at the same moment, and the upstream API is only safe to
- * walk at build volume because the client now caps concurrency, caches
- * responses, retries with backoff and falls back to list data. Prerendering
- * everything removes the cold-render window entirely.
+ * Locales that have real translated bodies and should be indexed.
+ * The rest stay routable (switcher, middleware) but are noindex until
+ * their CMS copy exists — otherwise Google indexes English duplicates.
  */
-export const PRERENDER_LOCALES: readonly Locale[] = LOCALE_CODES;
+export const INDEXABLE_LOCALES: readonly Locale[] = ["en", "ar"];
+
+export function isIndexableLocale(locale: string): locale is Locale {
+  return (INDEXABLE_LOCALES as readonly string[]).includes(locale);
+}
+
+/**
+ * Locales built ahead of time. Only indexable languages are prerendered so a
+ * crawler never receives a cold English shell at /de or /zh.
+ */
+export const PRERENDER_LOCALES: readonly Locale[] = INDEXABLE_LOCALES;
 
 /** BCP-47 tags for hreflang and <html lang>. */
 export const LOCALE_TAGS: Record<Locale, string> = {
@@ -63,7 +69,7 @@ export function localizedPath(path: string, locale: string): string {
  */
 export function alternatesFor(path: string, locale: string) {
   const languages: Record<string, string> = {};
-  for (const code of LOCALE_CODES) {
+  for (const code of INDEXABLE_LOCALES) {
     languages[LOCALE_TAGS[code]] = localizedPath(path, code);
   }
   languages["x-default"] = localizedPath(path, DEFAULT_LOCALE);

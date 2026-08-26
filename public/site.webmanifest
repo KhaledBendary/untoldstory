@@ -1,0 +1,17 @@
+{
+  "name": "Global Untold Story",
+  "short_name": "Untold Story",
+  "description": "Film and video production in Egypt and MENA. Egyptian Media Production City, Dubai and Jeddah.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/images/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
