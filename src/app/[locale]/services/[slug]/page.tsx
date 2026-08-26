@@ -7,12 +7,13 @@ import { api } from "@/lib/api";
 import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
 import { getServiceDetailData, findServiceAnyLocale, safeFetch, serviceDetailWithFallback } from "@/lib/page-data";
 import { SERVICES as FALLBACK_SERVICES } from "@/data/content";
+import { relatedServiceSlugs, serviceStaticParams } from "@/lib/legacy-redirects";
 import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
-/** Every real slug is prerendered; unknown ones are 404s, not renders. */
-export const dynamicParams = false;
+/** Every known slug is prerendered; extra CMS slugs still render on demand. */
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const slugs = await slugList();
@@ -22,10 +23,10 @@ export async function generateStaticParams() {
 async function slugList() {
   try {
     const services = await api.getServices();
-    return services.map((service) => ({ slug: service.slug }));
+    return serviceStaticParams(services.map((service) => service.slug), FALLBACK_SERVICES.map((s) => s.slug));
   } catch (e) {
     console.error("Error fetching services for generateStaticParams:", e instanceof Error ? e.message : e);
-    return FALLBACK_SERVICES.map(({ slug }) => ({ slug }));
+    return serviceStaticParams([], FALLBACK_SERVICES.map((s) => s.slug));
   }
 }
 
@@ -61,7 +62,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       );
     }
 
-    const service = FALLBACK_SERVICES.find((item) => item.slug === slug);
+    const service = FALLBACK_SERVICES.find((item) => relatedServiceSlugs(slug).includes(item.slug));
     if (!service) return serviceMeta(path, locale, fallbackTitle, fallbackTitle);
 
     return {

@@ -18,8 +18,8 @@ function projectHeadline(title: string, client?: string | null, slug?: string) {
   return `${name} — ${client}`;
 }
 
-/** Every real slug is prerendered; unknown ones are 404s, not renders. */
-export const dynamicParams = false;
+/** Known slugs are prerendered; remaining CMS slugs still render on demand. */
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const slugs = await slugList();

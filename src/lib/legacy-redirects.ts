@@ -26,7 +26,7 @@ const PAGE_ALIASES: Record<string, string> = {
   "/home": "/",
 };
 
-const SERVICE_SLUG_ALIASES: Record<string, string> = {
+export const SERVICE_SLUG_ALIASES: Record<string, string> = {
   "on-ground-production-services-in-egypt": "on-ground-egypt",
   "on-ground-production": "on-ground-egypt",
   "on-ground-production-services-egypt": "on-ground-egypt",
@@ -52,7 +52,7 @@ const SERVICE_SLUG_ALIASES: Record<string, string> = {
   "original-ip": "original-ip-development",
 };
 
-const POST_SLUG_ALIASES: Record<string, string> = {
+export const POST_SLUG_ALIASES: Record<string, string> = {
   "production-journey": "the-video-production-journey-from-idea-to-impact",
   "the-video-production-journey-from-idea-to-impact": "the-video-production-journey-from-idea-to-impact",
   "brand-storytelling": "why-every-brand-needs-a-story-that-moves-people",
@@ -118,3 +118,49 @@ export const POST_SLUGS_THAT_REDIRECT = new Set(
     .filter(([from, to]) => from !== to)
     .map(([from]) => from),
 );
+
+/** Old WordPress/fallback slug and the current CMS slug for the same record. */
+export function relatedServiceSlugs(slug: string): string[] {
+  const out = new Set([slug]);
+  for (const [from, to] of Object.entries(SERVICE_SLUG_ALIASES)) {
+    if (from === slug || to === slug) {
+      out.add(from);
+      out.add(to);
+    }
+  }
+  return [...out];
+}
+
+export function relatedPostSlugs(slug: string): string[] {
+  const out = new Set([slug]);
+  for (const [from, to] of Object.entries(POST_SLUG_ALIASES)) {
+    if (from === slug || to === slug) {
+      out.add(from);
+      out.add(to);
+    }
+  }
+  return [...out];
+}
+
+function uniqueSlugParams(slugs: Iterable<string>) {
+  return [...new Set(slugs)].filter(Boolean).map((slug) => ({ slug }));
+}
+
+/** Prerender every slug Google or the sitemap might still request. */
+export function serviceStaticParams(apiSlugs: string[] = [], fallbackSlugs: string[] = []) {
+  return uniqueSlugParams([
+    ...apiSlugs,
+    ...fallbackSlugs,
+    ...Object.keys(SERVICE_SLUG_ALIASES),
+    ...Object.values(SERVICE_SLUG_ALIASES),
+  ]);
+}
+
+export function postStaticParams(apiSlugs: string[] = [], fallbackSlugs: string[] = []) {
+  return uniqueSlugParams([
+    ...apiSlugs,
+    ...fallbackSlugs,
+    ...Object.keys(POST_SLUG_ALIASES),
+    ...Object.values(POST_SLUG_ALIASES),
+  ]);
+}

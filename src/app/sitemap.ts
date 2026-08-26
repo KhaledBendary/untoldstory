@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import type { BlogPost, PortfolioItem, Service } from "@/types/api";
 import { SITE_URL } from "@/lib/seo";
 import { getInsightsData, getWorkData, getServicesData } from "@/lib/page-data";
+import { POST_SLUG_ALIASES, SERVICE_SLUG_ALIASES } from "@/lib/legacy-redirects";
 import { LOCALE_CODES, LOCALE_TAGS, DEFAULT_LOCALE, localizedPath } from "@/lib/i18n";
 
 /**
@@ -42,6 +43,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const projects: (PortfolioItem | { slug: string })[] = await getWorkData();
   const posts: (BlogPost | { slug: string; date?: string; publishedAt?: string })[] = await getInsightsData();
 
+  const serviceSlugs = [...new Set(services.map((service) => SERVICE_SLUG_ALIASES[service.slug] || service.slug))];
+  const postEntries = [...new Map(
+    posts.map((post) => {
+      const slug = POST_SLUG_ALIASES[post.slug] && POST_SLUG_ALIASES[post.slug] !== post.slug
+        ? POST_SLUG_ALIASES[post.slug]
+        : post.slug;
+      return [slug, { ...post, slug }];
+    }),
+  ).values()];
+
   const newestPost = posts
     .map((post) => parseDate("publishedAt" in post ? post.publishedAt : undefined) ?? parseDate("date" in post ? post.date : undefined))
     .filter((date): date is Date => Boolean(date))
@@ -56,9 +67,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entry("/about", { changeFrequency: "monthly", priority: 0.8 }),
     entry("/contact", { changeFrequency: "monthly", priority: 0.8 }),
 
-    ...services.map((service) => entry(`/services/${service.slug}`, { changeFrequency: "monthly", priority: 0.8 })),
+    ...serviceSlugs.map((slug) => entry(`/services/${slug}`, { changeFrequency: "monthly", priority: 0.8 })),
     ...projects.map((project) => entry(`/work/${project.slug}`, { changeFrequency: "monthly", priority: 0.7 })),
-    ...posts.map((post) =>
+    ...postEntries.map((post) =>
       entry(`/insights/${post.slug}`, {
         lastModified:
           parseDate("publishedAt" in post ? post.publishedAt : undefined) ??

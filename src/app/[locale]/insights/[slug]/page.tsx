@@ -5,15 +5,15 @@ import StructuredData from "@/components/StructuredData";
 import { applySeoOverrides } from "@/data/seo-overrides";
 import { api } from "@/lib/api";
 import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
-import { findPostAnyLocale, mappedFallbackPosts, postDetailWithFallback } from "@/lib/page-data";
+import { findPostAnyLocale, postDetailWithFallback } from "@/lib/page-data";
 import { POSTS as FALLBACK_POSTS } from "@/data/content";
-import { POST_SLUGS_THAT_REDIRECT } from "@/lib/legacy-redirects";
+import { postStaticParams, relatedPostSlugs } from "@/lib/legacy-redirects";
 import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
-/** Every real slug is prerendered; unknown ones are 404s, not renders. */
-export const dynamicParams = false;
+/** Known slugs are prerendered; remaining CMS/legacy slugs still render on demand. */
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const slugs = await slugList();
@@ -21,16 +21,15 @@ export async function generateStaticParams() {
 }
 
 async function slugList() {
-  const extras = mappedFallbackPosts()
-    .filter((post) => !POST_SLUGS_THAT_REDIRECT.has(post.slug))
-    .map((post) => ({ slug: post.slug }));
   try {
     const blogData = await api.getBlogPosts({ page: 1, per_page: 50 });
-    const seen = new Set(blogData.items.map((post) => post.slug));
-    return [...blogData.items.map((post) => ({ slug: post.slug })), ...extras.filter((item) => !seen.has(item.slug))];
+    return postStaticParams(
+      blogData.items.map((post) => post.slug),
+      FALLBACK_POSTS.map((p) => p.slug),
+    );
   } catch (e) {
     console.error("Error fetching blog posts for generateStaticParams:", e instanceof Error ? e.message : e);
-    return extras.length ? extras : FALLBACK_POSTS.filter((p) => !POST_SLUGS_THAT_REDIRECT.has(p.slug)).map(({ slug }) => ({ slug }));
+    return postStaticParams([], FALLBACK_POSTS.map((p) => p.slug));
   }
 }
 
@@ -55,7 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       return postMeta(path, locale, buildTitle(live.title, slug), buildDescription(live.excerpt, live.title), live.featuredImage, live.publishedAt);
     }
 
-    const post = FALLBACK_POSTS.find((item) => item.slug === slug);
+    const post = FALLBACK_POSTS.find((item) => relatedPostSlugs(slug).includes(item.slug));
     if (!post) return postMeta(path, locale, fallbackTitle, fallbackTitle);
 
     return postMeta(path, locale, buildTitle(post.title, slug), buildDescription(post.excerpt, post.title), post.image, post.date);
@@ -90,7 +89,7 @@ export default async function Page({ params }: Props) {
   } catch (e) {
     console.error("Error fetching post for page:", e);
     const live = await findPostAnyLocale(slug, locale);
-    const post = live ?? FALLBACK_POSTS.find((item) => item.slug === slug);
+    const post = live ?? FALLBACK_POSTS.find((item) => relatedPostSlugs(slug).includes(item.slug));
     if (post) {
       name = cleanHeadline(post.title, slug);
       schema = {

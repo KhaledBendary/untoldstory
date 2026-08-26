@@ -2,7 +2,7 @@ import { api } from "@/lib/api";
 import { ApiError } from "@/lib/api-client";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { POSTS as FALLBACK_POSTS, PROJECTS as FALLBACK_PROJECTS, SERVICES as FALLBACK_SERVICES } from "@/data/content";
-import { POST_SLUGS_THAT_REDIRECT } from "@/lib/legacy-redirects";
+import { POST_SLUGS_THAT_REDIRECT, relatedPostSlugs, relatedServiceSlugs } from "@/lib/legacy-redirects";
 import type { About, BlogPost, LayoutData, PortfolioItem, Service } from "@/types/api";
 
 /**
@@ -41,26 +41,38 @@ export function mappedFallbackProjects(): PortfolioItem[] {
   }));
 }
 
+function allMappedFallbackPosts(): BlogPost[] {
+  return FALLBACK_POSTS.map((p) => ({
+    id: p.slug,
+    slug: p.slug,
+    title: p.title,
+    excerpt: p.excerpt,
+    date: p.date,
+    publishedAt: p.date,
+    category: p.category,
+    categorySlug: p.category.toLowerCase().replace(/\s+/g, "-"),
+    authorName: "Global Untold Story",
+    authorImage: null,
+    featuredImage: p.image,
+    body: Array.isArray(p.body) ? p.body.map((block) => `<p>${block}</p>`).join("") : String(p.body || ""),
+    readTimeMinutes: 6,
+    tags: [],
+    isFeatured: false,
+  }));
+}
+
 export function mappedFallbackPosts(): BlogPost[] {
-  return FALLBACK_POSTS
-    .filter((p) => !POST_SLUGS_THAT_REDIRECT.has(p.slug))
-    .map((p) => ({
-      id: p.slug,
-      slug: p.slug,
-      title: p.title,
-      excerpt: p.excerpt,
-      date: p.date,
-      publishedAt: p.date,
-      category: p.category,
-      categorySlug: p.category.toLowerCase().replace(/\s+/g, "-"),
-      authorName: "Global Untold Story",
-      authorImage: null,
-      featuredImage: p.image,
-      body: Array.isArray(p.body) ? p.body.map((block) => `<p>${block}</p>`).join("") : String(p.body || ""),
-      readTimeMinutes: 6,
-      tags: [],
-      isFeatured: false,
-    }));
+  return allMappedFallbackPosts().filter((p) => !POST_SLUGS_THAT_REDIRECT.has(p.slug));
+}
+
+function findFallbackPost(slug: string) {
+  const related = relatedPostSlugs(slug);
+  return allMappedFallbackPosts().find((p) => related.includes(p.slug));
+}
+
+function findFallbackService(slug: string) {
+  const related = relatedServiceSlugs(slug);
+  return mappedFallbackServices().find((s) => related.includes(s.slug));
 }
 
 export async function getServicesData(locale?: string): Promise<Service[]> {
@@ -261,7 +273,7 @@ export async function serviceDetailWithFallback(
     ]);
     if (service) return { status: "ok", data: { service, allServices, relatedProjects: [] } };
   }
-  const fallback = mappedFallbackServices().find((s) => s.slug === slug);
+  const fallback = findFallbackService(slug);
   if (fallback) {
     return { status: "ok", data: { service: fallback, allServices: mappedFallbackServices(), relatedProjects: [] } };
   }
@@ -301,7 +313,7 @@ export async function postDetailWithFallback(
     const allPosts = await safeFetch(() => getInsightsData(attempt), "insights-list");
     return { status: "ok", data: { post, allPosts: allPosts ?? [post] } };
   }
-  const fallback = mappedFallbackPosts().find((p) => p.slug === slug);
+  const fallback = findFallbackPost(slug);
   if (fallback) return { status: "ok", data: { post: fallback, allPosts: mappedFallbackPosts() } };
   return direct ?? null;
 }
@@ -330,7 +342,7 @@ export async function findPostAnyLocale(slug: string, locale?: string) {
     const found = await findPostInList(slug, attempt);
     if (found) return found;
   }
-  return mappedFallbackPosts().find((p) => p.slug === slug) ?? null;
+  return findFallbackPost(slug) ?? null;
 }
 
 /**
