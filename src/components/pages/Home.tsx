@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from '@/components/LocaleLink';
 import Image from 'next/image';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowUpRight, ArrowDown, ArrowRight } from 'lucide-react';
@@ -17,14 +17,15 @@ import { getHomeDataSafe, fallbackHomeData, type HomeData } from '@/lib/home-dat
 import { getServiceImage, getProjectImage, getPostImage } from '@/lib/utils';
 import type { Service, PortfolioItem, BlogPost } from '@/types/api';
 
-/** Animating next/image directly keeps one optimized asset across both
- *  branches — a plain motion.img would refetch the raw file on hydration. */
-const MotionImage = motion.create(Image);
+const HERO_VIDEO = '/videos/hero.webm';
 
 /* ---------------- HERO (from API) ---------------- */
 function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headline1?: string; headline2?: string; headline3?: string; subtext?: string; cta1?: { label: string; href: string }; cta2?: { label: string; href: string }; image?: string } | null }) {
   const ref = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const hydrated = useHydrated();
+  const reduceMotion = useReducedMotion();
+  const [frameReady, setFrameReady] = useState(false);
   const { t } = useLanguage();
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const imgY = useTransform(scrollYProgress, [0, 1], ['0%', '22%']);
@@ -33,7 +34,38 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
 
   const headline = t('Film & Video Production');
   const headline2 = t('Egypt & MENA');
-  const heroImage = hero?.image || '/images/on-ground-production-giza.jpg';
+  const showVideo = reduceMotion !== true;
+
+  useEffect(() => {
+    if (!showVideo) return;
+    const video = videoRef.current;
+    if (!video) return;
+    video.loop = true;
+    video.muted = true;
+    const markReady = () => setFrameReady(true);
+    const keepPlaying = () => {
+      if (document.visibilityState !== "visible") return;
+      if (video.paused) video.play().catch(() => {});
+    };
+    const restart = () => {
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    };
+    if (video.readyState >= 2) markReady();
+    video.addEventListener("loadeddata", markReady);
+    video.addEventListener("playing", markReady);
+    video.addEventListener("ended", restart);
+    video.addEventListener("pause", keepPlaying);
+    document.addEventListener("visibilitychange", keepPlaying);
+    video.play().catch(() => {});
+    return () => {
+      video.removeEventListener("loadeddata", markReady);
+      video.removeEventListener("playing", markReady);
+      video.removeEventListener("ended", restart);
+      video.removeEventListener("pause", keepPlaying);
+      document.removeEventListener("visibilitychange", keepPlaying);
+    };
+  }, [showVideo]);
 
   const line = (text: string, i: number) => (
     <span className="block overflow-hidden pb-[0.06em] -mb-[0.06em]">
@@ -54,28 +86,34 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
 
   return (
     <section ref={ref} className="relative h-[100svh] overflow-hidden">
-      <motion.div className="absolute inset-0" style={hydrated ? { y: imgY, scale: imgScale } : undefined}>
-        {hydrated ? (
-          <MotionImage
-            src={heroImage}
-            alt={hero?.subtext || 'Global Untold Story production team'}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-            initial={{ scale: 1.25, filter: 'grayscale(1) brightness(0.4)' }}
-            animate={ready ? { scale: 1, filter: 'grayscale(1) brightness(0.75)' } : {}}
-            transition={{ duration: 1.8, ease: EASE }}
+      <motion.div className="absolute inset-0 bg-[#0a0a0a]" style={hydrated ? { y: imgY, scale: imgScale } : undefined}>
+        {showVideo ? (
+          <motion.video
+            ref={videoRef}
+            className="absolute inset-0 h-full w-full object-cover"
+            src={HERO_VIDEO}
+            muted
+            loop
+            playsInline
+            autoPlay
+            preload="auto"
+            onEnded={() => {
+              const video = videoRef.current;
+              if (!video) return;
+              video.currentTime = 0;
+              video.play().catch(() => {});
+            }}
+            aria-hidden
+            initial={{ opacity: 0, scale: 1.08 }}
+            animate={
+              frameReady
+                ? { opacity: 1, scale: 1, filter: 'brightness(0.75)' }
+                : { opacity: 0, scale: 1.08 }
+            }
+            transition={{ duration: 0.8, ease: EASE }}
           />
         ) : (
-          <Image
-            src={heroImage}
-            alt={hero?.subtext || 'Global Untold Story production team'}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
+          <div className="absolute inset-0 bg-[#0a0a0a]" />
         )}
       </motion.div>
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-[#0a0a0a]/65" />
