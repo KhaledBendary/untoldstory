@@ -32,6 +32,8 @@ const PAGE_ALIASES: Record<string, string> = {
   "/brand-storytelling": "/insights/why-every-brand-needs-a-story-that-moves-people",
   "/how-to-choose-a-media-production-agency-in-egypt": "/insights/how-to-choose-a-media-production-agency-in-egypt",
   "/professional-film-production-equipment": "/insights/film-production-in-egypt",
+  "/corporate-video-production-in-cairo-what-every-brand-needs-to-know": "/insights/corporate-video-production-in-cairo",
+  "/tv-commercial-production-in-egypt-complete-guide-2026": "/insights/tv-commercial-production-in-egypt",
 };
 
 export const SERVICE_SLUG_ALIASES: Record<string, string> = {
@@ -70,6 +72,8 @@ export const POST_SLUG_ALIASES: Record<string, string> = {
   "media-production-agency-in-egypt": "how-to-choose-a-media-production-agency-in-egypt",
   "how-to-choose-a-media-production-agency-in-egypt": "how-to-choose-a-media-production-agency-in-egypt",
   "professional-film-production-equipment": "film-production-in-egypt",
+  "corporate-video-production-in-cairo-what-every-brand-needs-to-know": "corporate-video-production-in-cairo",
+  "tv-commercial-production-in-egypt-complete-guide-2026": "tv-commercial-production-in-egypt",
 };
 
 function stripSlash(path: string) {

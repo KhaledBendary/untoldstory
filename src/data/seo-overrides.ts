@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import overridesJson from "./seo-overrides.json";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
-import { BRAND } from "@/lib/seo";
+import { BRAND, buildDescription, clampTitle } from "@/lib/seo";
 
 export type SeoOverride = {
   title?: string;
@@ -73,14 +73,14 @@ export function applySeoOverrides(path: string, base: Metadata, locale: string =
 
   const next: Metadata = { ...base };
   if (o.title && !looksTruncated(o.title)) {
-    // Dynamic pages use { absolute: string }; static pages use string
+    const title = clampTitle(o.title);
     if (base.title && typeof base.title === "object" && "absolute" in base.title) {
-      next.title = { absolute: o.title };
+      next.title = { absolute: title };
     } else {
-      next.title = o.title;
+      next.title = title;
     }
   }
-  if (o.description && !looksTruncated(o.description)) next.description = o.description;
+  if (o.description && !looksTruncated(o.description)) next.description = buildDescription(o.description);
   if (o.canonical) {
     next.alternates = { ...(base.alternates || {}), canonical: o.canonical };
   }

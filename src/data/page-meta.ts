@@ -1,4 +1,5 @@
 import { DEFAULT_LOCALE, LOCALE_CODES, type Locale } from "@/lib/i18n";
+import { buildDescription, clampTitle } from "@/lib/seo";
 
 /**
  * Titles and descriptions for the six hand-written pages.
@@ -17,7 +18,7 @@ export type PageMeta = { title: string; description: string };
 
 const EN: Record<PageKey, PageMeta> = {
   home: {
-    title: "Film & Video Production, Egypt & MENA | Global Untold Story",
+    title: "Film & Video Production Egypt | Global Untold Story",
     description: "Full-cycle film, advertising and content production across Egypt, UAE and Saudi Arabia. Offices in Egyptian Media Production City, Dubai and Jeddah.",
   },
   about: {
@@ -44,8 +45,8 @@ const EN: Record<PageKey, PageMeta> = {
 
 const AR: Record<PageKey, PageMeta> = {
   home: {
-    title: "إنتاج أفلام وفيديو في مصر والمنطقة | Global Untold Story",
-    description: "إنتاج متكامل للأفلام والإعلانات والمحتوى في مصر والإمارات والسعودية. مكاتبنا في مدينة الإنتاج الإعلامي ودبي وجدة.",
+    title: "إنتاج أفلام في مصر | Global Untold Story",
+    description: "إنتاج أفلام وإعلانات في مصر والإمارات والسعودية. مكاتب مدينة الإنتاج الإعلامي ودبي وجدة.",
   },
   about: {
     title: "من نحن — استوديو إنتاج إبداعي | Global Untold Story",
@@ -400,7 +401,11 @@ const BY_LOCALE: Record<Locale, Record<PageKey, PageMeta>> = {
 
 /** Every locale is populated; the fallback guards against a bad `locale` string. */
 export function pageMeta(key: PageKey, locale: string): PageMeta {
-  return BY_LOCALE[locale as Locale]?.[key] ?? BY_LOCALE[DEFAULT_LOCALE][key];
+  const raw = BY_LOCALE[locale as Locale]?.[key] ?? BY_LOCALE[DEFAULT_LOCALE][key];
+  return {
+    title: clampTitle(raw.title),
+    description: buildDescription(raw.description),
+  };
 }
 
 /** Used by the build check to prove no language silently falls back. */

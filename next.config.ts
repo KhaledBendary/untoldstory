@@ -87,7 +87,26 @@ const nextConfig: NextConfig = {
     contentDispositionType: "attachment",
   },
   async headers() {
-    return [{ source: "/:path*", headers: SECURITY_HEADERS }];
+    return [
+      {
+        source: "/videos/:path*",
+        headers: [
+          ...SECURITY_HEADERS,
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      { source: "/:path*", headers: SECURITY_HEADERS },
+    ];
+  },
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.globaluntoldstory.com" }],
+        destination: "https://globaluntoldstory.com/:path*",
+        permanent: true,
+      },
+    ];
   },
   async rewrites() {
     return [

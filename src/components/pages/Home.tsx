@@ -15,9 +15,12 @@ import { useHydrated } from '@/hooks/useHydrated';
 import { useLanguage } from '../LanguageContext';
 import { getHomeDataSafe, fallbackHomeData, type HomeData } from '@/lib/home-data';
 import { getServiceImage, getProjectImage, getPostImage } from '@/lib/utils';
+import { formatPostDate } from '@/lib/dates';
 import type { Service, PortfolioItem, BlogPost } from '@/types/api';
 
-const HERO_VIDEO = '/videos/hero.webm';
+const HERO_POSTER = '/videos/hero-poster.jpg';
+const HERO_WEBM = '/videos/hero.webm';
+const HERO_MP4 = '/videos/hero.mp4';
 
 /* ---------------- HERO (from API) ---------------- */
 function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headline1?: string; headline2?: string; headline3?: string; subtext?: string; cta1?: { label: string; href: string }; cta2?: { label: string; href: string }; image?: string } | null }) {
@@ -91,12 +94,12 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
           <motion.video
             ref={videoRef}
             className="absolute inset-0 h-full w-full object-cover"
-            src={HERO_VIDEO}
+            poster={HERO_POSTER}
             muted
             loop
             playsInline
             autoPlay
-            preload="auto"
+            preload="metadata"
             onEnded={() => {
               const video = videoRef.current;
               if (!video) return;
@@ -108,12 +111,15 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
             animate={
               frameReady
                 ? { opacity: 1, scale: 1, filter: 'brightness(0.75)' }
-                : { opacity: 0, scale: 1.08 }
+                : { opacity: 1, scale: 1.08, filter: 'brightness(0.55)' }
             }
             transition={{ duration: 0.8, ease: EASE }}
-          />
+          >
+            <source src={HERO_WEBM} type="video/webm" />
+            <source src={HERO_MP4} type="video/mp4" />
+          </motion.video>
         ) : (
-          <div className="absolute inset-0 bg-[#0a0a0a]" />
+          <img src={HERO_POSTER} alt="" className="absolute inset-0 h-full w-full object-cover brightness-[0.75]" />
         )}
       </motion.div>
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-[#0a0a0a]/65" />
@@ -138,7 +144,7 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
           </div>
         )}
 
-        <h1 className="font-display font-black uppercase leading-[0.88] tracking-[-0.02em] text-[8vw] sm:text-[7.5vw] md:text-[7vw] lg:text-[6.5vw] xl:text-[6vw] select-none">
+        <h1 className="font-display font-black uppercase leading-[0.88] tracking-[-0.02em] text-[8vw] sm:text-[7.5vw] md:text-[7vw] lg:text-[6.5vw] xl:text-[6vw] select-none" aria-label={`${headline} ${headline2}`}>
           {line(headline, 0)}
           <span className="flex items-center gap-[0.15em]">
             {line(headline2, 1)}
@@ -469,7 +475,7 @@ function Manifesto({
 /* ---------------- PROCESS (from API) ---------------- */
 function Process({ process }: { process: { badge?: string; title?: string; steps?: Array<{ step: string; title: string; desc: string }> } | null }) {
   const { t } = useLanguage();
-  const steps = process?.steps || [
+  const defaults = [
     { step: '1', title: t('Think & Align'), desc: t('Objectives, audiences, scope, feasibility and success criteria.') },
     { step: '2', title: t('Create'), desc: t('Concepts, scripts, treatments, formats and creative direction.') },
     { step: '3', title: t('Prepare'), desc: t('Budgets, schedules, crews, casting, locations, permits and technical planning.') },
@@ -479,6 +485,11 @@ function Process({ process }: { process: { badge?: string; title?: string; steps
     { step: '7', title: t('Grow'), desc: t('Launch, test, optimize and turn finished content into measurable audience and business momentum.') },
     { step: '8', title: t('Scale'), desc: t('Expand winning ideas across platforms, formats, markets and languages without losing creative consistency.') },
   ];
+  const steps = (process?.steps?.length ? process.steps : defaults).map((s) => ({
+    ...s,
+    title: t(s.title),
+    desc: t(s.desc),
+  }));
 
   return (
     <section className="px-5 md:px-10 py-24 md:py-36 bg-[#fafafa] text-[#0a0a0a]">
@@ -486,7 +497,7 @@ function Process({ process }: { process: { badge?: string; title?: string; steps
         <div>
           <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-[#0a0a0a]/65 mb-4">( {process?.badge || t('Services')} )</p>
           <SplitWords
-            text={process?.title || t('ENTER AT ANY STAGE LEAVE WITH ONE EPIC RESULT')}
+            text={t(process?.title || 'ENTER AT ANY STAGE LEAVE WITH ONE EPIC RESULT')}
             className="font-display font-extrabold uppercase tracking-tight leading-[0.95] text-[8vw] md:text-[4.2vw]"
           />
         </div>
@@ -540,12 +551,13 @@ function InsightsTeaser({ posts }: { posts: BlogPost[] }) {
                   src={getPostImage(p)}
                   alt={p.title}
                   fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
                   className="object-cover"
                   loading="lazy"
                 />
               </div>
               <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 mb-3">
-                {p.category} — {new Date(p.date).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                {p.category}{formatPostDate(p, locale) ? ` — ${formatPostDate(p, locale)}` : ''}
               </p>
               <h3 className="font-display font-bold text-xl md:text-2xl leading-snug group-hover:opacity-70 transition-opacity">{p.title}</h3>
             </Link>

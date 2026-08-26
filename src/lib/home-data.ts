@@ -86,7 +86,11 @@ export async function getHomeData(locale?: string): Promise<HomeData> {
   return {
     services: servicesData || [],
     projects: portfolioData?.items || [],
-    posts: home.blog_preview || [],
+    posts: (home.blog_preview || []).map((post) => ({
+      ...post,
+      date: post.date || post.publishedAt,
+      publishedAt: post.publishedAt || post.date,
+    })),
     stats,
     clients: layoutData?.client_logos || [],
     hero: home.hero || null,

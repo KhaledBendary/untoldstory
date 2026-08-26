@@ -18,7 +18,7 @@ const DEFAULT_SOCIAL = {
   vimeo: 'https://vimeo.com/user252566067',
 };
 
-export default function ContactPage({ initialData, initialLocale }: { initialData: ContactData | null; initialLocale: string }) {
+export default function ContactPage({ initialData, initialLocale, formToken }: { initialData: ContactData | null; initialLocale: string; formToken: string }) {
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +54,7 @@ export default function ContactPage({ initialData, initialLocale }: { initialDat
         body: JSON.stringify({
           ...formData,
           website: String(data.get('website') || ''),
+          formToken: String(data.get('formToken') || formToken),
         }),
       });
       if (!response.ok) {
@@ -117,6 +118,7 @@ export default function ContactPage({ initialData, initialLocale }: { initialDat
           ) : (
             <form onSubmit={onSubmit} className="space-y-10">
               <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
+              <input type="hidden" name="formToken" value={formToken} />
               {error && (
                 <div className="border border-red-500/30 bg-red-500/10 p-4 text-red-200 text-sm space-y-3">
                   <p>{error}</p>

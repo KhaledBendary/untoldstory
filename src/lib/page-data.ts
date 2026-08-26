@@ -3,6 +3,7 @@ import { ApiError } from "@/lib/api-client";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { POSTS as FALLBACK_POSTS, PROJECTS as FALLBACK_PROJECTS, SERVICES as FALLBACK_SERVICES } from "@/data/content";
 import { POST_SLUG_ALIASES, POST_SLUGS_THAT_REDIRECT, relatedPostSlugs, relatedServiceSlugs } from "@/lib/legacy-redirects";
+import { isoPostDate } from "@/lib/dates";
 import type { About, BlogPost, LayoutData, PortfolioItem, Service } from "@/types/api";
 
 /**
@@ -39,6 +40,11 @@ export function mappedFallbackProjects(): PortfolioItem[] {
     results: p.description,
     isFeatured: false,
   }));
+}
+
+function normalizeBlogPost(post: BlogPost): BlogPost {
+  const iso = isoPostDate(post);
+  return { ...post, date: iso || post.date, publishedAt: iso || post.publishedAt };
 }
 
 function allMappedFallbackPosts(): BlogPost[] {
@@ -99,7 +105,7 @@ export async function getInsightsData(locale?: string): Promise<BlogPost[]> {
   const extras = mappedFallbackPosts();
   try {
     const data = await api.getBlogPosts({ page: 1, per_page: 50, locale });
-    const items = data?.items || [];
+    const items = (data?.items || []).map(normalizeBlogPost);
     const seen = new Set(items.map((p) => p.slug));
     return [...items, ...extras.filter((p) => !seen.has(p.slug))];
   } catch (e) {
@@ -207,7 +213,7 @@ export function getPostDetailData(slug: string, locale?: string) {
       api.getBlogPostBySlug(slug, locale),
       api.getBlogPosts({ page: 1, per_page: 50, locale }),
     ]);
-    return { post, allPosts: blog?.items || [] };
+    return { post: normalizeBlogPost(post), allPosts: (blog?.items || []).map(normalizeBlogPost) };
   });
 }
 

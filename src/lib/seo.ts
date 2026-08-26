@@ -103,8 +103,13 @@ function trimTagline(value: string, slug?: string) {
 function clampWords(value: string, max: number) {
   if (value.length <= max) return value;
   const cut = value.slice(0, max);
-  const lastSpace = cut.lastIndexOf(" ");
+  const lastSpace = Math.max(cut.lastIndexOf(" "), cut.lastIndexOf("،"));
   return (lastSpace > max * 0.5 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:—–-]+$/, "");
+}
+
+/** Clamp a finished title that already includes the brand suffix. */
+export function clampTitle(value: string) {
+  return clampWords(plainText(value), TITLE_MAX);
 }
 
 /** Strip HTML, markdown leftovers and collapse whitespace. */
@@ -280,27 +285,28 @@ export function pageSeo({
   type = "website",
   publishedTime,
 }: PageSeoInput): Metadata {
-  const desc = buildDescription(description, title);
+  const safeTitle = clampTitle(title) || BRAND;
+  const desc = buildDescription(description, safeTitle);
   const url = absoluteUrl(localizedPath(path, locale));
   const img = image || DEFAULT_OG_IMAGE;
   return {
-    title: { absolute: title },
+    title: { absolute: safeTitle },
     description: desc,
     alternates: alternatesFor(path, locale),
     robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
     openGraph: {
-      title,
+      title: safeTitle,
       description: desc,
       url,
       siteName: BRAND,
       locale: OG_LOCALES[(isLocale(locale) ? locale : DEFAULT_LOCALE) as Locale],
       type,
-      images: [{ url: img, width: 1200, height: 630, alt: title }],
+      images: [{ url: img, width: 1200, height: 630, alt: safeTitle }],
       ...(publishedTime ? { publishedTime } : {}),
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: safeTitle,
       description: desc,
       images: [img],
     },

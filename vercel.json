@@ -1,0 +1,10 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.globaluntoldstory.com" }],
+      "destination": "https://globaluntoldstory.com/:path*",
+      "permanent": true
+    }
+  ]
+}

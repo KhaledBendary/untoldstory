@@ -17,18 +17,10 @@ import { getAboutData } from '@/lib/page-data';
 // polished in every language; any members returned by the API are merged in.
 const FALLBACK_TEAM = [
   { name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary' },
-  { name: 'Mona Hassan', role: 'Creative Director', slug: 'mona-hassan' },
-  { name: 'Omar Farouk', role: 'Director of Photography', slug: 'omar-farouk' },
-  { name: 'Sara Khaled', role: 'Executive Producer', slug: 'sara-khaled' },
-  { name: 'Youssef Adel', role: 'Lead Editor', slug: 'youssef-adel' },
 ];
 
 const FALLBACK_TEAM_AR = [
   { name: 'خالد بنداري', role: 'الرئيس التنفيذي', slug: 'khaled-bendary' },
-  { name: 'منى حسن', role: 'المديرة الإبداعية', slug: 'mona-hassan' },
-  { name: 'عمر فاروق', role: 'مدير التصوير', slug: 'omar-farouk' },
-  { name: 'سارة خالد', role: 'المنتجة التنفيذية', slug: 'sara-khaled' },
-  { name: 'يوسف عادل', role: 'كبير المحررين', slug: 'youssef-adel' },
 ];
 
 /** Shape shared by the API's team records and the editorial fallback list. */
@@ -60,14 +52,20 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
     const role = m?.role || fb.role || '';
     return !role || /^\?+$/.test(role) || role.includes('?') ? fb.role : role;
   };
-  const team = apiTeam.length >= 5
-    ? apiTeam
+  const isRealName = (name: unknown): name is string => typeof name === "string" && name.length > 1 && !name.includes("?");
+  const realApi: TeamMember[] = apiTeam.filter((m: TeamMember) => isRealName(m?.name));
+  const team: TeamMember[] = realApi.length
+    ? realApi
     : fallbackTeam.map((fb) => {
         const match = apiTeam.find((m: TeamMember) => m.slug === fb.slug);
-        if (match) {
-          return { ...match, role: cleanRole(match, fb) };
-        }
-        return fb;
+        if (!match) return fb;
+        const merged: TeamMember = {
+          slug: fb.slug,
+          name: isRealName(match.name) ? match.name : fb.name,
+          role: cleanRole(match, fb),
+          image: typeof match.image === "string" ? match.image : undefined,
+        };
+        return merged;
       });
   const partnerLabels = aboutData?.partnerLabels || [];
 
@@ -96,6 +94,16 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
             <Reveal>
               <p className="text-white/60 leading-relaxed max-w-2xl">
                 {aboutData?.page?.subtitle || t('Under the leadership of CEO Khaled Bendary, our team owns the complete production cycle: strategy and planning, filming, live execution, post-production, delivery and localization. Brands, platforms, broadcasters, institutions and international crews trust us with the stories that matter most to them — and 90% come back for the next one.')}
+              </p>
+            </Reveal>
+            <Reveal>
+              <p className="text-white/60 leading-relaxed max-w-2xl">
+                {t('Based in Egyptian Media Production City, with offices in Dubai and Jeddah, we run film, advertising, documentary, corporate, live, post and original-IP work to the same standard. Permits, crews, locations and finishing sit in one team, so international productions in Egypt do not have to assemble a vendor chain from scratch.')}
+              </p>
+            </Reveal>
+            <Reveal>
+              <p className="text-white/60 leading-relaxed max-w-2xl">
+                {t('That is why clients return: one point of contact, a budget that holds, and a picture that still looks like the brief when it lands in every language and every cutdown.')}
               </p>
             </Reveal>
           </div>

@@ -119,6 +119,9 @@ export default function Work({ initialData, initialLocale }: { initialData: Port
           <p className="text-white/60 leading-relaxed">
             {t('Selected work created to move beyond the brief across platforms, cultures and audiences.')}
           </p>
+          <p className="text-white/60 leading-relaxed mt-4">
+            {t('Commercials, documentaries, corporate films, live events and photography shot in Egypt and across MENA for brands, platforms and institutions that need the full cycle — from the first treatment to the last deliverable.')}
+          </p>
         </Reveal>
       </section>
 

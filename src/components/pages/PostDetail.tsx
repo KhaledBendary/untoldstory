@@ -8,6 +8,7 @@ import { SplitWords, Reveal } from '../Reveal';
 import Magnetic from '../Magnetic';
 import RetryState from '../RetryState';
 import { getPostImage } from '@/lib/utils';
+import { formatPostDate } from '@/lib/dates';
 import type { BlogPost } from '@/types/api';
 import { useLanguage } from '../LanguageContext';
 import { renderCmsHtml } from '@/lib/seo';
@@ -71,7 +72,7 @@ export default function PostDetail({ slug, initialData, initialLocale }: { slug:
           </Reveal>
           <Reveal>
             <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 mb-5">
-              {post.category} — {new Date(post.date).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              {post.category}{formatPostDate(post, locale) ? ` — ${formatPostDate(post, locale)}` : ''}
             </p>
           </Reveal>
           <SplitWords

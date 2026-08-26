@@ -1,0 +1,4 @@
+Contact: mailto:bendary@globaluntoldstory.com
+Expires: 2027-08-26T00:00:00.000Z
+Preferred-Languages: en, ar
+Canonical: https://globaluntoldstory.com/.well-known/security.txt

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
 import { SplitWords, Reveal } from '../Reveal';
 import { getPostImage } from '@/lib/utils';
+import { formatPostDate } from '@/lib/dates';
 import type { BlogPost } from '@/types/api';
 import { useLanguage } from '../LanguageContext';
 import { usePageData } from '@/hooks/usePageData';
@@ -37,6 +38,9 @@ export default function Insights({ initialData, initialLocale }: { initialData: 
           text={t("Film Production Insights")}
           className="font-display font-black uppercase tracking-tight leading-[0.9] text-[12vw] md:text-[7.5vw]"
         />
+        <p className="mt-6 max-w-2xl text-white/60 leading-relaxed">
+          {t('Production insights, practical guides and field notes from film, commercials, documentaries and on-ground work in Egypt and MENA.')}
+        </p>
       </section>
 
       <section className="px-5 md:px-10 pb-24 md:pb-36">
@@ -45,7 +49,7 @@ export default function Insights({ initialData, initialLocale }: { initialData: 
           <Reveal>
             <Link href={`/insights/${featured.slug}`} className="group grid md:grid-cols-2 gap-8 border border-white/10 mb-8 hover:border-white/30 transition-colors">
               <div className="img-zoom relative aspect-[16/10] md:aspect-auto md:min-h-[420px]">
-                <Image src={getPostImage(featured)} alt={featured.title} fill className="object-cover" />
+                <Image src={getPostImage(featured)} alt={featured.title} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
               </div>
               <div className="p-8 md:p-12 flex flex-col justify-center">
                 <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 mb-4">
@@ -72,7 +76,7 @@ export default function Insights({ initialData, initialLocale }: { initialData: 
                 </div>
                 <div className="p-6">
                   <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 mb-3">
-                    {p.category} — {new Date(p.date).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    {p.category}{formatPostDate(p, locale) ? ` — ${formatPostDate(p, locale)}` : ''}
                   </p>
                   <h2 className="font-display font-bold text-lg leading-snug group-hover:opacity-70 transition-opacity">{p.title}</h2>
                 </div>

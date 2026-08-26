@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isMailConfigured, sendContactEmail } from "@/lib/mail";
+import { formTokenError } from "@/lib/form-token";
 
 export const runtime = "nodejs";
 
@@ -46,7 +47,7 @@ function isEmail(value: string) {
 
 export async function POST(request: NextRequest) {
   if (rateLimited(clientIp(request))) {
-    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": "900" } });
   }
 
   let body: Record<string, unknown>;
@@ -59,6 +60,11 @@ export async function POST(request: NextRequest) {
   // Honeypot: bots fill hidden fields. Pretend success so they stop.
   if (str(body.website, 200)) {
     return NextResponse.json({ ok: true });
+  }
+
+  const tokenProblem = formTokenError(str(body.formToken, 200));
+  if (tokenProblem) {
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
   const payload = {
