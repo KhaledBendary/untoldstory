@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import "../globals.css";
 import { Alexandria, Archivo, Inter, JetBrains_Mono } from "next/font/google";
 import SiteShell from "@/components/SiteShell";
@@ -23,6 +24,7 @@ const jetbrains = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "6
 const fontClass = [alexandria.variable, archivo.variable, inter.variable, jetbrains.variable].join(" ");
 
 const siteUrl = SITE_URL;
+const GA_MEASUREMENT_ID = "G-CV7T8W6SDJ";
 
 export async function generateMetadata({
   params,
@@ -186,12 +188,43 @@ export default async function RootLayout({
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const shell = await getShellData(locale);
 
-  return (
-    <html lang={LOCALE_TAGS[locale]} dir={localeDir(locale)} className={fontClass} suppressHydrationWarning>
-      <body suppressHydrationWarning>
-        <StructuredData data={[organization, website, ...offices, ...getCommandCenterSchemas()]} />
-        <SiteShell shell={shell} locale={locale}>{children}</SiteShell>
-      </body>
-    </html>
-  );
+return (
+  <html
+    lang={LOCALE_TAGS[locale]}
+    dir={localeDir(locale)}
+    className={fontClass}
+    suppressHydrationWarning
+  >
+    <body suppressHydrationWarning>
+
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+        strategy="afterInteractive"
+      />
+
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${GA_MEASUREMENT_ID}');
+        `}
+      </Script>
+
+      <StructuredData
+        data={[
+          organization,
+          website,
+          ...offices,
+          ...getCommandCenterSchemas(),
+        ]}
+      />
+
+      <SiteShell shell={shell} locale={locale}>
+        {children}
+      </SiteShell>
+
+    </body>
+  </html>
+);
 }
