@@ -22,14 +22,14 @@ const UPSTREAM_ORIGIN = new URL(UPSTREAM_API_BASE_URL).origin;
  */
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net",
   // framer-motion and GSAP animate via inline style attributes.
   "style-src 'self' 'unsafe-inline'",
   // Fonts are self-hosted through next/font, so no third-party origin here.
   "font-src 'self' data:",
-  `img-src 'self' data: blob: ${UPSTREAM_ORIGIN} https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com`,
+  `img-src 'self' data: blob: ${UPSTREAM_ORIGIN} https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://www.facebook.com`,
   `media-src 'self' ${UPSTREAM_ORIGIN}`,
-  `connect-src 'self' ${UPSTREAM_ORIGIN} https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com`,
+  `connect-src 'self' ${UPSTREAM_ORIGIN} https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.facebook.com https://connect.facebook.net`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

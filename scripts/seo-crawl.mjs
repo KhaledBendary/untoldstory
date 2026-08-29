@@ -10,12 +10,14 @@
  *   npm run build && npm start -- -p 3400
  *   npm run seo:crawl -- http://localhost:3400
  */
-import { LOCALE_CODES, DEFAULT_LOCALE, localizedPath } from "../src/lib/i18n.ts";
+import { LOCALE_CODES, INDEXABLE_LOCALES, DEFAULT_LOCALE, isIndexableLocale, localizedPath } from "../src/lib/i18n.ts";
 
 const ORIGIN = (process.argv[2] || "http://localhost:3400").replace(/\/$/, "");
 const TITLE_MAX = 60;
 const DESCRIPTION_MAX = 160;
-const EXPECTED_HREFLANG = 15; // 14 locales + x-default
+// Only indexable locales join the hreflang cluster; the rest are noindex
+// until their CMS copy exists, so they are not advertised as alternates.
+const EXPECTED_HREFLANG = INDEXABLE_LOCALES.length + 1; // + x-default
 const CONCURRENCY = 4;        // the upstream API sits behind this server
 
 const ROUTES = [
@@ -99,7 +101,13 @@ async function check(route, locale) {
   if (dir !== expectedDir) problems.push(`dir="${dir}" (expected "${expectedDir}")`);
 
   if (h1 !== 1) problems.push(`${h1} <h1> elements (expected exactly 1)`);
-  if (hreflang < EXPECTED_HREFLANG) problems.push(`${hreflang} hreflang links`);
+  if (hreflang !== EXPECTED_HREFLANG) problems.push(`${hreflang} hreflang links (expected ${EXPECTED_HREFLANG})`);
+
+  // A locale we do not index must say so, and one we do index must not.
+  const robots = pick(html, /<meta name="robots" content="([^"]*)"/) || "";
+  const noindexed = /noindex/i.test(robots);
+  if (isIndexableLocale(locale) && noindexed) problems.push(`indexable locale marked "${robots}"`);
+  if (!isIndexableLocale(locale) && !noindexed) problems.push("non-indexable locale is missing noindex");
   if (!/application\/ld\+json/.test(html)) problems.push("no structured data");
 
   return { path, problems, title: title ? decode(title) : "" };
