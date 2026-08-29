@@ -78,7 +78,7 @@ function backoffFor(attempt: number): number {
  * pages silently fell back to default metadata. Going through Next's data cache
  * collapses identical URLs into one request.
  */
-const SERVER_REVALIDATE_SECONDS = 300;
+const SERVER_REVALIDATE_SECONDS = 86400;
 
 function wait(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
