@@ -32,9 +32,11 @@ const CSP = [
   `connect-src 'self' ${UPSTREAM_ORIGIN} https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.facebook.com https://connect.facebook.net`,
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  // The Meta Pixel posts to facebook.com/tr/ from a hidden form.
+  "form-action 'self' https://www.facebook.com",
   "frame-ancestors 'none'",
-  "frame-src 'none'",
+  // …and frames facebook.com as its fallback transport.
+  "frame-src https://www.facebook.com",
   "manifest-src 'self'",
   "upgrade-insecure-requests",
 ].join("; ");
@@ -55,6 +57,10 @@ const SECURITY_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
+  // Hostinger runs the app under Passenger, which starts a plain Node process
+  // and needs the self-contained server bundle. Gated so Vercel keeps using
+  // its own adapter: set HOSTINGER_BUILD=1 only for that build.
+  ...(process.env.HOSTINGER_BUILD ? { output: "standalone" as const } : {}),
   reactStrictMode: true,
   poweredByHeader: false,
   // Next's default trailing-slash hop is 308. Old WordPress URLs then need a
