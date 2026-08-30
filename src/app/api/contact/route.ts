@@ -101,7 +101,12 @@ export async function POST(request: NextRequest) {
       code === "EAUTH" ? "authentication rejected"
       : code === "ECONNECTION" || code === "ESOCKET" ? "could not connect"
       : code === "ETIMEDOUT" || code === "ECONNRESET" ? "connection timed out"
-      : code === "EENVELOPE" ? "sender or recipient refused"
+      : code === "EENVELOPE"
+        // nodemailer records which SMTP verb was refused: MAIL FROM carries the
+        // sender, RCPT TO the recipient. Knowing which one halves the search.
+        ? (typeof error === "object" && error && "command" in error && String((error as { command: unknown }).command) === "RCPT TO"
+            ? "recipient address refused"
+            : "sender address refused")
       : undefined;
     return NextResponse.json(
       { error: "Failed to send email", ...(reason ? { reason, code } : {}) },
