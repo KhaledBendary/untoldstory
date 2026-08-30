@@ -81,7 +81,11 @@ export const config = {
      * Run on WordPress leftovers (.php, .html, wp-sitemap.xml) so they 301
      * instead of matching [locale] and serving a duplicate homepage.
      * Skip real static assets only.
+     *
+     * Every asset extension has to be listed here: anything missing gets the
+     * locale rewrite and 404s. `webmanifest` was, so /site.webmanifest — which
+     * exists in public/ and is referenced from the layout — was unreachable.
      */
-    "/((?!_next/|api/|images/|favicon|robots.txt|sitemap.xml|.*\\.(?:ico|png|jpe?g|gif|webp|svg|avif|woff2?|ttf|eot|css|js|map|mp4|webm|txt|json|pdf)$).*)",
+    "/((?!_next/|api/|images/|favicon|robots.txt|sitemap.xml|.*\\.(?:ico|png|jpe?g|gif|webp|svg|avif|woff2?|ttf|eot|css|js|map|mp4|webm|txt|json|pdf|webmanifest|xml|ics|mp3|wav|zip)$).*)",
   ],
 };
