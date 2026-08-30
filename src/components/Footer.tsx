@@ -107,9 +107,18 @@ export default function Footer({ initialData, initialLocale }: { initialData: Sh
 
       {/* Bottom bar */}
       <div className="px-5 md:px-10 py-6 border-t border-[#0a0a0a]/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <p className="font-mono2 text-[10px] tracking-[0.2em] uppercase text-[#0a0a0a]/65">
-          © {new Date().getFullYear()} {siteConfig?.name || 'Global Untold Story'}. {footer?.allRights || t('All rights reserved.')}
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+          <p className="font-mono2 text-[10px] tracking-[0.2em] uppercase text-[#0a0a0a]/65">
+            © {new Date().getFullYear()} {siteConfig?.name || 'Global Untold Story'}. {footer?.allRights || t('All rights reserved.')}
+          </p>
+          {/* Reachable from every page: a policy nobody can find does not count
+              as notice, and Meta requires a linked privacy policy for the pixel. */}
+          <nav className="flex flex-wrap gap-4 font-mono2 text-[10px] tracking-[0.2em] uppercase">
+            <Link href="/privacy" className="link-line text-[#0a0a0a]/65">{t('Privacy')}</Link>
+            <Link href="/terms" className="link-line text-[#0a0a0a]/65">{t('Terms')}</Link>
+            <Link href="/cookies" className="link-line text-[#0a0a0a]/65">{t('Cookies')}</Link>
+          </nav>
+        </div>
         <div className="flex flex-wrap items-center gap-6 md:gap-8">
           <Image src="/images/logo-black.png" alt="Global Untold Story" width={348} height={191} className="h-6 w-auto" />
           <div className="flex gap-5 font-mono2 text-[10px] tracking-[0.2em] uppercase">

@@ -66,6 +66,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entry("/insights", { lastModified: newestPost, changeFrequency: "monthly", priority: 0.8 }),
     entry("/about", { changeFrequency: "monthly", priority: 0.8 }),
     entry("/contact", { changeFrequency: "monthly", priority: 0.8 }),
+    // Low priority, but they must be listed: search engines and the ad
+    // platforms both look for a reachable, indexed privacy policy.
+    entry("/privacy", { changeFrequency: "yearly", priority: 0.3 }),
+    entry("/terms", { changeFrequency: "yearly", priority: 0.3 }),
+    entry("/cookies", { changeFrequency: "yearly", priority: 0.3 }),
 
     ...serviceSlugs.map((slug) => entry(`/services/${slug}`, { changeFrequency: "monthly", priority: 0.8 })),
     ...projects.map((project) => entry(`/work/${project.slug}`, { changeFrequency: "monthly", priority: 0.7 })),

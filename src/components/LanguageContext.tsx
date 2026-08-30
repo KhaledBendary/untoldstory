@@ -30,6 +30,10 @@ export const LANGUAGES: Language[] = [
 export const translations: Record<string, Record<string, string>> = {
   ar: {
     "Home": "الرئيسية",
+    "Privacy": "الخصوصية",
+    "Terms": "الشروط",
+    "Cookies": "الكوكيز",
+    "Read next": "اقرأ أيضاً",
     "Work": "أعمالنا",
     "Services": "خدماتنا",
     "About": "من نحن",

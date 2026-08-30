@@ -22,6 +22,7 @@ const CONCURRENCY = 4;        // the upstream API sits behind this server
 
 const ROUTES = [
   "/", "/about", "/contact", "/insights", "/services", "/work",
+  "/privacy", "/terms", "/cookies",
   "/services/on-ground-egypt",
   "/services/commercial-video-production",
   "/services/documentary-production-egypt",
