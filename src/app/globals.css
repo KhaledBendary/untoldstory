@@ -236,11 +236,23 @@ html[dir="rtl"] .animate-marquee-rev {
 .grain::before {
   content: '';
   position: fixed;
-  inset: -100%;
+  /*
+   * Was inset: -100%, which makes this three viewports wide and three tall —
+   * nine times the screen area — with an animated SVG turbulence filter on top.
+   * Chrome absorbs it; Safari rasterises SVG filters far more slowly and the
+   * whole page stutters. The keyframes never move more than 35%, so half a
+   * viewport of bleed is all the cover the animation actually needs.
+   */
+  inset: -50%;
   z-index: 200;
   pointer-events: none;
   opacity: 0.05;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* Tile one small square instead of scaling a single enormous texture. */
+  background-size: 250px 250px;
+  background-repeat: repeat;
+  /* Promote once, so moving it recomposites rather than repaints. */
+  will-change: transform;
   animation: grain 8s steps(10) infinite;
 }
 @keyframes grain {
@@ -257,4 +269,24 @@ html[dir="rtl"] .animate-marquee-rev {
 }
 img {
     filter: none;
+}
+
+/*
+ * Readers who ask for less motion get a still page: the grain stops, and so
+ * does everything else that loops or slides. Also spares low-powered devices
+ * the continuous compositing.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .grain::before {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -55,6 +55,17 @@ function SiteShellInner({ children, shell, locale: initialLocale }: { children: 
   }, [pathname]);
 
   useEffect(() => {
+    // Smooth scroll hijacks the wheel and drives scrolling from rAF. Safari
+    // already applies its own momentum curve, so the two fight and the page
+    // feels like it is catching — the stutter people report there and not in
+    // Chrome. Leave Safari's native scrolling alone, and skip the loop
+    // entirely for anyone who asked for less motion.
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const ua = navigator.userAgent;
+    const isSafari = /Safari/.test(ua) && !/Chrome|Chromium|Android|Edg\//.test(ua);
+
+    if (prefersReducedMotion || isSafari) return;
+
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
     let raf = 0;
     const loop = (time: number) => {
@@ -66,6 +77,9 @@ function SiteShellInner({ children, shell, locale: initialLocale }: { children: 
     return () => {
       cancelAnimationFrame(raf);
       lenis.destroy();
+      // Clear the handle too: route changes read it to scroll to the top, and
+      // a destroyed instance left behind means that silently does nothing.
+      delete (window as unknown as { lenis?: Lenis }).lenis;
     };
   }, [locale]);
 

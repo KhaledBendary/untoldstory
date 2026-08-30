@@ -93,7 +93,14 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
         {showVideo ? (
           <motion.video
             ref={videoRef}
-            className="absolute inset-0 h-full w-full object-cover"
+            /*
+             * brightness lives in CSS, not in the animation below: animating
+             * `filter` on a full-screen video makes Safari repaint the frame
+             * every tick instead of compositing it, which is most of why the
+             * hero stutters there. opacity and scale stay animated — both are
+             * GPU-composited and cost nothing.
+             */
+            className="absolute inset-0 h-full w-full object-cover brightness-[0.75]"
             poster={HERO_POSTER}
             muted
             loop
@@ -108,11 +115,7 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
             }}
             aria-hidden
             initial={{ opacity: 0, scale: 1.08 }}
-            animate={
-              frameReady
-                ? { opacity: 1, scale: 1, filter: 'brightness(0.75)' }
-                : { opacity: 1, scale: 1.08, filter: 'brightness(0.55)' }
-            }
+            animate={frameReady ? { opacity: 1, scale: 1 } : { opacity: 1, scale: 1.08 }}
             transition={{ duration: 0.8, ease: EASE }}
           >
             <source src={HERO_WEBM} type="video/webm" />
