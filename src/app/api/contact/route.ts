@@ -93,7 +93,20 @@ export async function POST(request: NextRequest) {
     await sendContactEmail(payload);
   } catch (error) {
     console.error("Contact email failed:", error);
-    return NextResponse.json({ error: "Failed to send email" }, { status: 502 });
+    // Return the SMTP failure *kind* — not the message, which can echo the
+    // address and server banner. "Failed to send email" alone gives whoever
+    // is debugging no way to tell a wrong password from a blocked port.
+    const code = typeof error === "object" && error && "code" in error ? String((error as { code: unknown }).code) : undefined;
+    const reason =
+      code === "EAUTH" ? "authentication rejected"
+      : code === "ECONNECTION" || code === "ESOCKET" ? "could not connect"
+      : code === "ETIMEDOUT" || code === "ECONNRESET" ? "connection timed out"
+      : code === "EENVELOPE" ? "sender or recipient refused"
+      : undefined;
+    return NextResponse.json(
+      { error: "Failed to send email", ...(reason ? { reason, code } : {}) },
+      { status: 502 },
+    );
   }
 
   const apiBase = process.env.API_BASE_URL || "https://api.globaluntoldstory.com/api/v1";
