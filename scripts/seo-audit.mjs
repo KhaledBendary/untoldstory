@@ -9,13 +9,17 @@
  *
  * Usage: npm run seo:audit   (after `npm run build`)
  */
+import { INDEXABLE_LOCALES } from "../src/lib/i18n.ts";
 import fs from "node:fs";
 import path from "node:path";
 
 const ROOT = ".next/server/app";
 const TITLE_MAX = 60;
 const DESCRIPTION_MAX = 160;
-const EXPECTED_HREFLANG = 15; // 14 locales + x-default
+// Read from the same constant the app uses. Hardcoding this drifted once
+// already: the policy narrowed to two indexable locales and the audit kept
+// demanding fifteen, reporting every page as broken.
+const EXPECTED_HREFLANG = INDEXABLE_LOCALES.length + 1; // + x-default
 
 if (!fs.existsSync(ROOT)) {
   console.error(`No build found at ${ROOT}. Run \`npm run build\` first.`);
@@ -67,7 +71,7 @@ for (const file of files) {
   }
 
   if (!/<h1[\s>]/.test(html)) at("no <h1> in server-rendered HTML");
-  if (hreflang < EXPECTED_HREFLANG) at(`${hreflang} hreflang links (expected ${EXPECTED_HREFLANG})`);
+  if (hreflang !== EXPECTED_HREFLANG) at(`${hreflang} hreflang links (expected ${EXPECTED_HREFLANG})`);
 }
 
 console.log(`Checked ${files.length} prerendered pages.`);

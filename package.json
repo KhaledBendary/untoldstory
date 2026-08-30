@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "seo:audit": "node scripts/seo-audit.mjs",
+    "seo:audit": "node --experimental-strip-types scripts/seo-audit.mjs",
     "seo:crawl": "node --experimental-strip-types scripts/seo-crawl.mjs"
   },
   "dependencies": {
