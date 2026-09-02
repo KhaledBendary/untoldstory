@@ -1,5 +1,6 @@
 import { SITE_URL } from "@/lib/seo";
 import { INDEXABLE_LOCALES } from "@/lib/i18n";
+import { localeSitemapPath } from "@/lib/sitemap-routes";
 
 /**
  * Sitemap index, pointing at one sitemap per indexable language.
@@ -17,7 +18,7 @@ export function GET() {
   const entries = INDEXABLE_LOCALES.map((locale) =>
     [
       "  <sitemap>",
-      `    <loc>${SITE_URL}/sitemaps/${locale}/sitemap.xml</loc>`,
+      `    <loc>${SITE_URL}${localeSitemapPath(locale)}</loc>`,
       `    <lastmod>${now}</lastmod>`,
       "  </sitemap>",
     ].join("\n"),

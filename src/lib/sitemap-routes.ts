@@ -1,6 +1,8 @@
 import type { BlogPost, PortfolioItem, Service } from "@/types/api";
 import { getInsightsData, getWorkData, getServicesData } from "@/lib/page-data";
 import { POST_SLUG_ALIASES, SERVICE_SLUG_ALIASES } from "@/lib/legacy-redirects";
+import { INDEXABLE_LOCALES, LOCALE_TAGS, DEFAULT_LOCALE, localizedPath } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/seo";
 
 /**
  * The set of real, indexable routes, gathered once.
@@ -70,4 +72,71 @@ export async function collectRoutes(): Promise<SitemapRoute[]> {
       priority: 0.6,
     })),
   ];
+}
+
+/**
+ * One sitemap per indexable language, each at its own static address:
+ * /sitemap-en.xml, /sitemap-ar.xml. A file per locale rather than one dynamic
+ * /sitemaps/[locale]/sitemap.xml route, because a dynamic segment followed by
+ * a literal `sitemap.xml` segment gets neither prerendered from
+ * generateStaticParams nor registered as a dynamic route — the build emits a
+ * lone `/sitemaps/-/sitemap.xml` placeholder and every real locale 404s in
+ * production, while `next start` hides it. Static paths have no such corner.
+ *
+ * Every <url> carries the full hreflang cluster, so the alternates stay intact
+ * whichever file Google reads first. seo:audit fails if an indexable locale has
+ * no route file, so the set here cannot silently fall behind INDEXABLE_LOCALES.
+ */
+
+export function localeSitemapPath(locale: string) {
+  return `/sitemap-${locale}.xml`;
+}
+
+// The pages give Next a relative canonical and it resolves "/" against
+// metadataBase down to a bare "https://globaluntoldstory.com". The sitemap has
+// to name the identical string, or it advertises a URL the page itself does not
+// claim as canonical.
+function absolute(path: string, locale: string) {
+  return `${SITE_URL}${localizedPath(path, locale)}`.replace(/\/$/, "");
+}
+
+function xmlEscape(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+export async function buildLocaleSitemap(locale: string) {
+  const routes = await collectRoutes();
+
+  const urls = routes.map((route) => {
+    const loc = absolute(route.path, locale);
+    const alternates = INDEXABLE_LOCALES.map(
+      (code) =>
+        `    <xhtml:link rel="alternate" hreflang="${LOCALE_TAGS[code]}" href="${xmlEscape(absolute(route.path, code))}"/>`,
+    ).join("\n");
+
+    return [
+      "  <url>",
+      `    <loc>${xmlEscape(loc)}</loc>`,
+      route.lastModified ? `    <lastmod>${route.lastModified.toISOString()}</lastmod>` : null,
+      `    <changefreq>${route.changeFrequency}</changefreq>`,
+      `    <priority>${route.priority}</priority>`,
+      alternates,
+      `    <xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(absolute(route.path, DEFAULT_LOCALE))}"/>`,
+      "  </url>",
+    ]
+      .filter(Boolean)
+      .join("\n");
+  });
+
+  const body = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${urls.join("\n")}
+</urlset>`;
+
+  return new Response(body, {
+    headers: {
+      "Content-Type": "application/xml; charset=utf-8",
+      "Cache-Control": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400",
+    },
+  });
 }

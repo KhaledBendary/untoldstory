@@ -74,6 +74,15 @@ for (const file of files) {
   if (hreflang !== EXPECTED_HREFLANG) at(`${hreflang} hreflang links (expected ${EXPECTED_HREFLANG})`);
 }
 
+// A locale added to INDEXABLE_LOCALES without its own sitemap route would be
+// advertised by the index and 404 there. Cheap to check, silent to miss.
+for (const locale of INDEXABLE_LOCALES) {
+  const route = `src/app/sitemap-${locale}.xml/route.ts`;
+  if (!fs.existsSync(route)) problems.push(`${locale} is indexable but ${route} does not exist`);
+  const built = path.join(ROOT, `sitemap-${locale}.xml.body`);
+  if (!fs.existsSync(built)) problems.push(`sitemap-${locale}.xml was not prerendered`);
+}
+
 console.log(`Checked ${files.length} prerendered pages.`);
 
 // Titles shared across locales are expected where the CMS has no translation,
