@@ -38,7 +38,7 @@ export function middleware(request: NextRequest) {
   const indexPhp = stripped === "/index.php" || stripped === "/index.html";
 
   if (dropWww || legacy || trailingSlash || stripWpQuery || indexPhp) {
-    const url = request.nextUrl.clone();
+    const url = new URL(request.url);
     if (dropWww) {
       url.hostname = PRODUCTION_HOST;
       url.protocol = "https:";
