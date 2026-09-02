@@ -1,4 +1,5 @@
 import { apiClient } from './api-client';
+import { documentaryBodyFor } from "@/data/documentary-body";
 import type {
   HomeData,
   LayoutData,
@@ -65,6 +66,30 @@ function scrubUnreadable<T>(value: T, depth = 0): T {
   return value;
 }
 
+/*
+ * The documentary service record holds the commercial body in every language
+ * but English — the wrong text was translated eight times over and is now
+ * indexable in all of them. Correct it here, where records enter, rather than
+ * at each caller: three separate code paths fetch a service, and the last bug
+ * of this shape was fixed three times before it was fixed once.
+ *
+ * documentaryBodyFor returns nothing once the stored text reads as a
+ * documentary page, so a CMS fix retires the correction by itself.
+ */
+function correctKnownBadBodies<T>(value: T, locale?: string): T {
+  if (!locale || !value || typeof value !== "object") return value;
+
+  const fix = (service: Record<string, unknown>) => {
+    if (service.slug !== "documentary-production-egypt") return service;
+    const corrected = documentaryBodyFor(locale, service.fullDesc as string | undefined);
+    return corrected ? { ...service, fullDesc: corrected } : service;
+  };
+
+  if (Array.isArray(value)) return value.map((item) =>
+    item && typeof item === "object" ? fix(item as Record<string, unknown>) : item) as T;
+  return fix(value as Record<string, unknown>) as T;
+}
+
 function unwrap<T>(res: ApiEnvelope<T>): T {
   return scrubUnreadable(res.data);
 }
@@ -89,12 +114,12 @@ export const api = {
 
   getServices: async (locale?: string): Promise<Service[]> => {
     const res = await apiClient.get<ApiEnvelope<CollectionData<Service>>>('/services', {}, { locale });
-    return scrubUnreadable(res.data.items);
+    return correctKnownBadBodies(scrubUnreadable(res.data.items), locale);
   },
 
   getServiceBySlug: async (slug: string, locale?: string): Promise<Service> => {
     const res = await apiClient.get<ApiEnvelope<Service>>(`/services/${slug}`, {}, { locale });
-    return unwrap(res);
+    return correctKnownBadBodies(unwrap(res), locale);
   },
 
   getPortfolio: async (params?: {

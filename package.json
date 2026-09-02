@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "seo:audit": "node --experimental-strip-types scripts/seo-audit.mjs",
     "seo:crawl": "node --experimental-strip-types scripts/seo-crawl.mjs",
-    "seo:translations": "node scripts/translation-coverage.mjs"
+    "seo:translations": "node scripts/translation-coverage.mjs",
+    "seo:documentary": "node scripts/check-documentary-body.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.43.0",
