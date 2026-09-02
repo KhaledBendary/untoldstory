@@ -20,16 +20,51 @@ const UPSTREAM_ORIGIN = new URL(UPSTREAM_API_BASE_URL).origin;
  * no plugins, no framing, no injected <base>, and form posts and network calls
  * restricted to this origin and the API.
  */
+/*
+ * Everywhere Google's tags actually send data.
+ *
+ * The policy listed https://*.analytics.google.com and not
+ * https://analytics.google.com — and a `*.` wildcard does not match the bare
+ * host. That is the host GA4 posts every page_view to, and its fallbacks
+ * (www.google.com, stats.g.doubleclick.net) were missing too, so every hit was
+ * refused by the browser and the property recorded nothing at all. The tag
+ * loaded, the cookies were written, and the network panel showed gtag.js
+ * arriving, which is exactly what makes this hard to see: the failure is in
+ * the console, not in whether the tag is present.
+ *
+ * Verify a change here by loading the site and reading the console for
+ * "violates the following Content Security Policy directive", not by checking
+ * that the tag is on the page.
+ */
+const GOOGLE_MEASUREMENT = [
+  "https://www.googletagmanager.com",
+  "https://www.google-analytics.com",
+  "https://*.google-analytics.com",
+  "https://analytics.google.com",
+  "https://*.analytics.google.com",
+  "https://stats.g.doubleclick.net",
+].join(" ");
+
+/* Google Ads conversion and remarketing tags, which ride on the same gtag. */
+const GOOGLE_ADS = [
+  "https://www.google.com",
+  "https://googleads.g.doubleclick.net",
+  "https://ad.doubleclick.net",
+  "https://www.googleadservices.com",
+].join(" ");
+
+const META = "https://www.facebook.com https://connect.facebook.net";
+
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net",
+  `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net`,
   // framer-motion and GSAP animate via inline style attributes.
   "style-src 'self' 'unsafe-inline'",
   // Fonts are self-hosted through next/font, so no third-party origin here.
   "font-src 'self' data:",
-  `img-src 'self' data: blob: ${UPSTREAM_ORIGIN} https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://www.facebook.com`,
+  `img-src 'self' data: blob: ${UPSTREAM_ORIGIN} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} https://www.facebook.com`,
   `media-src 'self' ${UPSTREAM_ORIGIN}`,
-  `connect-src 'self' ${UPSTREAM_ORIGIN} https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.facebook.com https://connect.facebook.net`,
+  `connect-src 'self' ${UPSTREAM_ORIGIN} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} ${META}`,
   "object-src 'none'",
   "base-uri 'self'",
   // The Meta Pixel posts to facebook.com/tr/ from a hidden form.

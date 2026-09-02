@@ -160,8 +160,61 @@ async function run() {
     process.exit(1);
   }
 
-  console.log(`Also verified /en/* redirects to the unprefixed URLs.`);
+  const cspProblems = await checkContentSecurityPolicy();
+  if (cspProblems.length) {
+    console.error(`
+Content-Security-Policy would block analytics:`);
+    for (const problem of cspProblems) console.error(`  ${problem}`);
+    process.exit(1);
+  }
+  console.log(`Also verified /en/* redirects to the unprefixed URLs, and that CSP allows the analytics endpoints.`);
   console.log("\nEvery URL passes: title, description, canonical, lang, dir, h1, hreflang, structured data.");
+}
+
+/*
+ * The tags are useless if the policy refuses their beacons.
+ *
+ * connect-src once listed https://*.analytics.google.com without the bare
+ * https://analytics.google.com, and a `*.` wildcard does not match the host
+ * itself — so every GA4 page_view was refused by the browser while the tag
+ * still loaded, the cookies were still written, and the property read zero.
+ * Nothing about the page looked wrong; the evidence was a console error.
+ *
+ * These are the hosts gtag actually posts to. A missing one is silent in
+ * production, so it fails the crawl instead.
+ */
+async function checkContentSecurityPolicy() {
+  const required = {
+    "connect-src": [
+      "https://www.google-analytics.com",
+      "https://analytics.google.com",
+      "https://stats.g.doubleclick.net",
+      "https://www.google.com",
+      "https://connect.facebook.net",
+      "https://www.facebook.com",
+    ],
+    "script-src": ["https://www.googletagmanager.com", "https://connect.facebook.net"],
+    "img-src": ["https://www.google-analytics.com", "https://www.facebook.com"],
+  };
+
+  const res = await fetch(`${ORIGIN}/`);
+  const csp = res.headers.get("content-security-policy");
+  if (!csp) return ["no Content-Security-Policy header"];
+
+  const directives = new Map(
+    csp.split(";").map((d) => d.trim()).filter(Boolean).map((d) => {
+      const [name, ...values] = d.split(/\s+/);
+      return [name, values];
+    }),
+  );
+
+  const missing = [];
+  for (const [directive, hosts] of Object.entries(required)) {
+    const allowed = directives.get(directive);
+    if (!allowed) { missing.push(`${directive} is not set`); continue; }
+    for (const host of hosts) if (!allowed.includes(host)) missing.push(`${directive} is missing ${host}`);
+  }
+  return missing;
 }
 
 run();

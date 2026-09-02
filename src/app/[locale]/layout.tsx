@@ -249,7 +249,13 @@ return (
           });
           try {
             var tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || '');
-            var mustAsk = /^(Europe|Atlantic\/(Canary|Madeira|Azores|Faroe|Reykjavik))/.test(tz);
+            // Plain string tests, not a regex. This was a regex literal, and a
+            // backslash inside a template literal is an escape: the emitted
+            // script read /^(Europe|Atlantic/ and threw SyntaxError, so the
+            // whole block died — consent defaults were never set and the
+            // banner's answer was never applied.
+            var EEA_ISLANDS = ['Atlantic/Canary','Atlantic/Madeira','Atlantic/Azores','Atlantic/Faroe','Atlantic/Reykjavik'];
+            var mustAsk = tz.indexOf('Europe/') === 0 || EEA_ISLANDS.indexOf(tz) !== -1;
             var stored = JSON.parse(localStorage.getItem('gus_consent') || 'null');
             var ok = (stored && stored.version === 1 && stored.choice === 'granted') || !mustAsk;
             if (ok) {
