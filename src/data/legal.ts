@@ -369,9 +369,10 @@ const AR: Record<LegalKey, LegalDoc> = {
 };
 
 /**
- * Locales without their own translation read the English text. A legal page in
- * a language nobody has reviewed is worse than an honest English one, so the
- * fallback is deliberate rather than a gap.
+ * All fourteen locales are written. The fallback stays because adding a
+ * language to LOCALE_CODES without adding it here would otherwise break the
+ * build rather than degrade to English, and `hasTranslation` still drives the
+ * notice on the page.
  */
 const FR: Record<LegalKey, LegalDoc> = {
   privacy: {
@@ -818,6 +819,629 @@ const PT: Record<LegalKey, LegalDoc> = {
   },
 };
 
+const TR: Record<LegalKey, LegalDoc> = {
+  privacy: {
+    eyebrow: "Gizlilik",
+    title: "Gizlilik Politikası",
+    updated: "Son güncelleme",
+    intro:
+      "Bu politika, globaluntoldstory.com kullanırken Global Untold Story\u2019nin neleri topladığını, nedenini ve bizden neler isteyebileceğinizi açıklar.",
+    sections: [
+      { heading: "Biz kimiz", body: [
+        "Global Untold Story; Egyptian Media Production City, Dubai Business Bay ve Cidde\u2019de ofisleri bulunan bir film, video ve içerik prodüksiyon stüdyosudur. Burada tanımlanan kişisel verilerin sorumlusu biziz.",
+        "Bu politikaya ilişkin her konu için bendary@globaluntoldstory.com adresine yazın."] },
+      { heading: "Bize verdikleriniz", body: [
+        "İletişim formu adınızı, e-posta adresinizi, telefonunuzu, ilgilendiğiniz hizmeti ve mesajınızı ister. Yalnızca ad, e-posta ve mesaj zorunludur.",
+        "Bunları size yanıt vermek ve sorduğunuz işi planlamak için kullanırız. Satmayız ve istemediğiniz pazarlama için kullanmayız.",
+        "Talebiniz bize e-posta ile ulaşır ve görüşmeyi sürdürebilmemiz için proje sistemimizde saklanır. Talepleri üç yıl saklar, sonra sileriz."] },
+      { heading: "Otomatik toplananlar", body: [
+        "Hangi sayfaların okunduğunu ve buraya nasıl gelindiğini anlamak için Google Analytics 4 kullanıyoruz. Görüntülenen sayfaları, ülke düzeyinde yaklaşık konumu, cihazı, tarayıcıyı ve yönlendiren siteyi kaydeder. Google bu verileri veri işleyen sıfatıyla alır.",
+        "Reklamlarımızın doğru kitlelere ulaşıp ulaşmadığını ölçmek için Meta Pikselini kullanıyoruz. Sayfa görüntülemelerini kaydeder ve oturumunuz açıksa bunları bir Meta hesabıyla ilişkilendirebilir.",
+        "Avrupa Birliği ve Birleşik Krallık\u2019ta hiçbiri onayınız olmadan çalışmaz; diğer yerlerde sayfayla birlikte yüklenir. İstediğiniz zaman reddedebilirsiniz."] },
+      { heading: "Başka kimler görüyor", body: [
+        "Vercel bu siteyi barındırır ve IP adresiniz dahil tarayıcınızın isteklerini işler.",
+        "Hostinger, form mesajlarını saklayan içerik sistemimizi barındırır ve bildirim e-postasını iletir.",
+        "Google ve Meta yukarıda anlatılan verileri alır. E-postamızı Google Workspace taşır.",
+        "Liste bundan ibarettir. Yasa gerektirmedikçe verilerinizi başka kimseyle paylaşmayız."] },
+      { heading: "Nerede işleniyor", body: [
+        "Ofislerimiz Mısır, BAE ve Suudi Arabistan\u2019dadır ve yukarıdaki hizmetler uluslararası çalışır; dolayısıyla verileriniz ülkenizin dışında işlenir. Google, Meta ve Vercel, AB ve Birleşik Krallık dışına aktarımlarda standart sözleşme hükümlerini kullanır."] },
+      { heading: "Neler isteyebilirsiniz", body: [
+        "Elimizdekilerin bir kopyasını, düzeltilmesini veya silinmesini isteyebilirsiniz. Analiz ve reklam takibine itiraz edebilir, onayınızı istediğiniz zaman geri çekebilirsiniz.",
+        "bendary@globaluntoldstory.com adresine yazın; otuz gün içinde yanıtlarız. AB veya Birleşik Krallık\u2019taysanız ve sonuçtan memnun kalmazsanız ulusal veri koruma kurumunuza başvurabilirsiniz."] },
+      { heading: "Çocuklar", body: [
+        "Bu site prodüksiyon işi verenlere yöneliktir. Çocuklara yönelik değildir ve on altı yaşından küçüklerden bilerek veri toplamayız."] },
+      { heading: "Değişiklikler", body: [
+        "Bu politika değiştiğinde yukarıdaki tarihi güncelleriz. Önemli değişiklikler sitede duyurulur."] },
+    ],
+  },
+  terms: {
+    eyebrow: "Koşullar",
+    title: "Kullanım Koşulları",
+    updated: "Son güncelleme",
+    intro:
+      "Bu koşullar globaluntoldstory.com kullanımınızı kapsar. Prodüksiyon işlerini kapsamaz; onlar her proje için imzalanan sözleşmeye tabidir.",
+    sections: [
+      { heading: "Bu siteyi kullanmak", body: [
+        "Bu siteyi okuyabilir, bağlantılarını hukuka uygun her amaçla paylaşabilirsiniz.",
+        "Siteyi bütünüyle kopyalayamaz, başkaları için erişimi bozacak hızda veri çekemez, erişim verilmemiş bölümlere ulaşmaya çalışamaz ve kendi işiniz gibi sunamazsınız."] },
+      { heading: "Burada gösterilen işler", body: [
+        "Bu sitedeki filmler, fotoğraflar, kampanyalar ve metinler Global Untold Story\u2019ye veya bunları sipariş eden müşterilere aittir. Müşteri adları ve logoları onlara aittir ve ürettiğimiz işleri tanımlamak için burada yer alır.",
+        "Buradaki hiçbir şey size yeniden kullanım lisansı vermez. İsterseniz bize sorun."] },
+      { heading: "Talep sözleşme değildir", body: [
+        "Formu göndermek bir görüşme başlatır. Anlaşma oluşturmaz, tarih ayırmaz, fiyat sabitlemez. İş, iki taraf da bir teklifi imzaladığında başlar.",
+        "Bu sitede geçen rakamlar, süreler veya müsaitlik bilgileri yol göstericidir ve projenin ayrıntılarına bağlıdır."] },
+      { heading: "Doğruluk", body: [
+        "Siteyi güncel tutuyoruz; ancak işler, hizmet açıklamaları ve müsaitlik değişir. Okuduğunuz anda her şeyin eksiksiz veya güncel olduğunu garanti etmiyoruz."] },
+      { heading: "Dış bağlantılar", body: [
+        "Başka sitelere bağlantı verdiğimizde — sosyal platformlar, müşteriler, iş ortakları — yayımladıklarını denetlemeyiz ve bunlardan sorumlu değiliz."] },
+      { heading: "Sorumluluk", body: [
+        "Bu siteyi olduğu gibi sunuyoruz. Yasanın izin verdiği ölçüde, kullanımından veya erişilememesinden doğan zararlardan sorumlu değiliz.",
+        "Yukarıdakiler ölüm, bedensel zarar veya hile hâlindeki sorumluluğu sınırlamaz."] },
+      { heading: "Uygulanacak hukuk", body: [
+        "Bu koşullar Mısır Arap Cumhuriyeti hukukuna tabidir ve bunlara ilişkin uyuşmazlıklarda Mısır mahkemeleri yetkilidir."] },
+    ],
+  },
+  cookies: {
+    eyebrow: "Çerezler",
+    title: "Çerez Politikası",
+    updated: "Son güncelleme",
+    intro:
+      "Bu sayfa sitenin kullandığı her çerezi ve benzeri teknolojiyi, her birinin ne işe yaradığını ve isteğe bağlı olanların nasıl kapatılacağını listeler.",
+    sections: [
+      { heading: "Kendi koyduklarımız", body: [
+        "Dil tercihiniz okuduğunuz adreste taşınır — Türkçe için /tr, İngilizce için ön ek yok — çerezde değil.",
+        "İletişim formu her ziyaretçiye kısa ömürlü bir jeton verir; böylece formu dolduran kişiyi otomatik bir betikten ayırırız. Hakkınızda hiçbir şey taşımaz ve hızla geçersizleşir.",
+        "Onay bandına verdiğiniz yanıt tarayıcınızda yerel olarak saklanır; her ziyarette yeniden sormamak için."] },
+      { heading: "Google Analytics", body: [
+        "Ölçüm kimliği G-G38ZL9GYXF. Ziyaretleri saymak ve geri gelen okuru yeniden ayırmak için _ga ve _ga_* koyar. En fazla iki yıl kalır.",
+        "Bu bize hangi işlerin ve yazıların gerçekten okunduğunu söyler. Sizi adınızla tanımlamaz."] },
+      { heading: "Meta Pikseli", body: [
+        "Piksel kimliği 780471777947136. _fbp koyar ve bir Meta reklamından geldiğinizde _fbc parametresini okur. Yaklaşık üç ay kalır.",
+        "Reklamlarımızın ilgilenen kişilere ulaşıp ulaşmadığını ölçer. Aynı tarayıcıda Facebook veya Instagram oturumunuz açıksa Meta ziyareti o hesapla ilişkilendirebilir."] },
+      { heading: "Nasıl kapatılır", body: [
+        "Avrupa Birliği ve Birleşik Krallık\u2019ta onayınız olmadan hiçbiri çalışmaz; reddetmeniz yeterlidir.",
+        "Her tarayıcı çerezleri engelleyebilir veya silebilir — ayarlarda Gizlilik bölümüne bakın. Engellemek sitenin çalışmasını durdurmaz; buradaki hiçbir şey çereze ihtiyaç duymaz.",
+        "Google, Analytics için tools.google.com/dlpage/gaoptout adresinde bir devre dışı bırakma eklentisi yayımlar. Meta\u2019nın reklam denetimleri hesap ayarlarınızdadır."] },
+      { heading: "Değişiklikler", body: [
+        "Bir etiket ekler veya kaldırırsak bu sayfa da değişir ve yukarıdaki tarih ilerler."] },
+    ],
+  },
+};
+
+const RU: Record<LegalKey, LegalDoc> = {
+  privacy: {
+    eyebrow: "Конфиденциальность",
+    title: "Политика конфиденциальности",
+    updated: "Последнее обновление",
+    intro:
+      "Эта политика объясняет, что собирает Global Untold Story при использовании globaluntoldstory.com, зачем и о чём вы можете нас попросить.",
+    sections: [
+      { heading: "Кто мы", body: [
+        "Global Untold Story — студия производства фильмов, видео и контента с офисами в Egyptian Media Production City, Business Bay в Дубае и Джидде. Мы являемся оператором описанных здесь персональных данных.",
+        "По любым вопросам этой политики пишите на bendary@globaluntoldstory.com."] },
+      { heading: "Что вы сообщаете нам", body: [
+        "Форма обратной связи запрашивает имя, адрес электронной почты, телефон, интересующую услугу и сообщение. Обязательны только имя, почта и сообщение.",
+        "Мы используем их, чтобы ответить и спланировать работу, о которой вы пишете. Мы их не продаём и не используем для рассылок, о которых вы не просили.",
+        "Ваш запрос приходит нам по почте и сохраняется в системе проектов, чтобы вернуться к разговору. Запросы храним три года, затем удаляем."] },
+      { heading: "Что собирается автоматически", body: [
+        "Мы используем Google Analytics 4, чтобы понимать, какие страницы читают и как на них попадают. Записываются просмотры страниц, примерное расположение на уровне страны, устройство, браузер и сайт-источник. Google получает эти данные как обработчик.",
+        "Мы используем пиксель Meta, чтобы измерять, доходит ли наша реклама до нужной аудитории. Он записывает просмотры и может связать их с аккаунтом Meta, если вы в него вошли.",
+        "В ЕС и Великобритании ни один из них не срабатывает до вашего согласия; в других местах они загружаются вместе со страницей. Вы можете отказаться в любой момент."] },
+      { heading: "Кто ещё их видит", body: [
+        "Vercel размещает этот сайт и обрабатывает запросы вашего браузера, включая IP-адрес.",
+        "Hostinger размещает нашу систему управления контентом, где хранятся сообщения формы, и пересылает уведомление по почте.",
+        "Google и Meta получают данные, описанные выше. Google Workspace обслуживает нашу электронную почту.",
+        "Это полный список. Мы не передаём ваши данные никому другому, если этого не требует закон."] },
+      { heading: "Где они обрабатываются", body: [
+        "Наши офисы находятся в Египте, ОАЭ и Саудовской Аравии, а перечисленные сервисы работают по всему миру, поэтому данные обрабатываются за пределами вашей страны. Google, Meta и Vercel применяют стандартные договорные условия для передач за пределы ЕС и Великобритании."] },
+      { heading: "О чём вы можете попросить", body: [
+        "Вы можете запросить копию имеющихся у нас данных, их исправление или удаление. Вы можете возразить против аналитического и рекламного отслеживания и отозвать согласие в любое время.",
+        "Напишите на bendary@globaluntoldstory.com — ответим в течение тридцати дней. Если вы в ЕС или Великобритании и ответ вас не устроил, вы можете обратиться в национальный орган по защите данных."] },
+      { heading: "Дети", body: [
+        "Этот сайт предназначен для тех, кто заказывает производство. Он не адресован детям, и мы сознательно не собираем данные лиц младше шестнадцати лет."] },
+      { heading: "Изменения", body: [
+        "При изменении политики мы обновляем дату вверху. О существенных изменениях сообщим на самом сайте."] },
+    ],
+  },
+  terms: {
+    eyebrow: "Условия",
+    title: "Условия использования",
+    updated: "Последнее обновление",
+    intro:
+      "Эти условия распространяются на использование globaluntoldstory.com. Они не распространяются на производственные работы — их регулирует договор, подписанный по конкретному проекту.",
+    sections: [
+      { heading: "Использование сайта", body: [
+        "Вы можете читать этот сайт и делиться ссылками на него в любых законных целях.",
+        "Нельзя копировать сайт целиком, выгружать его с частотой, ухудшающей доступ для других, пытаться попасть в разделы, доступ к которым вам не предоставлен, или выдавать его за свою работу."] },
+      { heading: "Показанные работы", body: [
+        "Фильмы, фотографии, кампании и тексты на этом сайте принадлежат Global Untold Story или заказчикам. Названия и логотипы клиентов принадлежат им и приведены здесь, чтобы обозначить произведённые нами работы.",
+        "Ничто здесь не даёт вам лицензии на повторное использование. Если она нужна — спросите нас."] },
+      { heading: "Запрос — не договор", body: [
+        "Отправка формы начинает разговор. Она не создаёт соглашения, не резервирует дату и не фиксирует цену. Работа начинается, когда обе стороны подписывают предложение.",
+        "Любые суммы, сроки или сведения о доступности на сайте носят ориентировочный характер и зависят от специфики проекта."] },
+      { heading: "Точность", body: [
+        "Мы поддерживаем сайт в актуальном состоянии, но портфолио, описания услуг и доступность меняются. Мы не гарантируем, что всё здесь полно и актуально в момент чтения."] },
+      { heading: "Внешние ссылки", body: [
+        "Когда мы ссылаемся на другие сайты — соцсети, клиентов, партнёров — мы не контролируем их содержимое и не отвечаем за него."] },
+      { heading: "Ответственность", body: [
+        "Мы предоставляем сайт как есть. В пределах, допускаемых законом, мы не отвечаем за убытки, возникшие из-за его использования или недоступности.",
+        "Ничто из перечисленного не ограничивает ответственность за смерть, причинение вреда здоровью или обман."] },
+      { heading: "Применимое право", body: [
+        "Эти условия регулируются правом Арабской Республики Египет, и споры по ним подсудны её судам."] },
+    ],
+  },
+  cookies: {
+    eyebrow: "Файлы cookie",
+    title: "Политика использования cookie",
+    updated: "Последнее обновление",
+    intro:
+      "На этой странице перечислены все файлы cookie и схожие технологии, которые использует сайт, назначение каждого и способ отключить необязательные.",
+    sections: [
+      { heading: "Что устанавливаем мы", body: [
+        "Выбранный язык хранится в самом адресе, который вы читаете — /ru для русского, без префикса для английского, — а не в cookie.",
+        "Форма обратной связи выдаёт каждому посетителю короткоживущий токен, чтобы отличить человека от автоматического скрипта. Он не содержит сведений о вас и быстро истекает.",
+        "Ваш ответ на баннер согласия сохраняется локально в браузере, чтобы не спрашивать при каждом визите."] },
+      { heading: "Google Analytics", body: [
+        "Идентификатор G-G38ZL9GYXF. Устанавливает _ga и _ga_*, чтобы считать визиты и отличать вернувшегося читателя от нового. Срок — до двух лет.",
+        "Это показывает, какие работы и статьи действительно читают. Вас по имени это не идентифицирует."] },
+      { heading: "Пиксель Meta", body: [
+        "Идентификатор 780471777947136. Устанавливает _fbp и читает параметр _fbc, когда вы приходите из рекламы Meta. Срок — около трёх месяцев.",
+        "Он измеряет, доходит ли реклама до заинтересованных людей. Если в том же браузере вы вошли в Facebook или Instagram, Meta может связать визит с этим аккаунтом."] },
+      { heading: "Как отключить", body: [
+        "В ЕС и Великобритании ничего не срабатывает до вашего согласия — достаточно отказаться.",
+        "Любой браузер может блокировать или удалять cookie — ищите раздел конфиденциальности в настройках. Блокировка не мешает сайту работать: ничему здесь cookie не нужны.",
+        "Google публикует надстройку для отключения Analytics на tools.google.com/dlpage/gaoptout. Рекламные настройки Meta находятся в параметрах вашего аккаунта."] },
+      { heading: "Изменения", body: [
+        "Если мы добавим или уберём тег, страница изменится вместе с ним, а дата вверху сдвинется."] },
+    ],
+  },
+};
+
+const PL: Record<LegalKey, LegalDoc> = {
+  privacy: {
+    eyebrow: "Prywatność",
+    title: "Polityka prywatności",
+    updated: "Ostatnia aktualizacja",
+    intro:
+      "Ta polityka wyjaśnia, co Global Untold Story zbiera podczas korzystania z globaluntoldstory.com, dlaczego i o co możesz nas poprosić.",
+    sections: [
+      { heading: "Kim jesteśmy", body: [
+        "Global Untold Story to studio produkcji filmowej, wideo i treści z biurami w Egyptian Media Production City, w Business Bay w Dubaju oraz w Dżuddzie. Jesteśmy administratorem opisanych tu danych osobowych.",
+        "We wszystkich sprawach dotyczących tej polityki pisz na bendary@globaluntoldstory.com."] },
+      { heading: "Co nam przekazujesz", body: [
+        "Formularz kontaktowy prosi o imię i nazwisko, adres e-mail, telefon, interesującą Cię usługę oraz wiadomość. Obowiązkowe są tylko imię, e-mail i wiadomość.",
+        "Używamy ich, aby odpowiedzieć i zaplanować pracę, o którą pytasz. Nie sprzedajemy ich i nie wykorzystujemy do marketingu, o który nie prosiłeś.",
+        "Twoje zapytanie trafia do nas e-mailem i jest przechowywane w naszym systemie projektowym, byśmy mogli wrócić do rozmowy. Zapytania przechowujemy trzy lata, potem usuwamy."] },
+      { heading: "Co zbierane jest automatycznie", body: [
+        "Używamy Google Analytics 4, aby wiedzieć, które strony są czytane i skąd przychodzą odwiedzający. Zapisuje odsłony, przybliżoną lokalizację na poziomie kraju, urządzenie, przeglądarkę i witrynę odsyłającą. Google otrzymuje te dane jako podmiot przetwarzający.",
+        "Używamy piksela Meta, aby mierzyć, czy nasze reklamy trafiają do właściwych odbiorców. Zapisuje odsłony i może powiązać je z kontem Meta, jeśli jesteś na nie zalogowany.",
+        "W Unii Europejskiej i Wielkiej Brytanii żadne z nich nie uruchamia się przed Twoją zgodą; w innych miejscach ładują się wraz ze stroną. W każdej chwili możesz odmówić."] },
+      { heading: "Kto jeszcze je widzi", body: [
+        "Vercel hostuje tę witrynę i przetwarza żądania Twojej przeglądarki, w tym adres IP.",
+        "Hostinger hostuje nasz system treści, w którym zapisywane są wiadomości z formularza, i przekazuje e-mail powiadamiający.",
+        "Google i Meta otrzymują dane opisane powyżej. Google Workspace obsługuje naszą pocztę.",
+        "To pełna lista. Nie udostępniamy Twoich danych nikomu innemu, chyba że wymaga tego prawo."] },
+      { heading: "Gdzie są przetwarzane", body: [
+        "Nasze biura znajdują się w Egipcie, ZEA i Arabii Saudyjskiej, a powyższe usługi działają międzynarodowo, więc Twoje dane są przetwarzane poza Twoim krajem. Google, Meta i Vercel stosują standardowe klauzule umowne dla transferów poza UE i Wielką Brytanię."] },
+      { heading: "O co możesz poprosić", body: [
+        "Możesz poprosić o kopię posiadanych przez nas danych, ich sprostowanie lub usunięcie. Możesz sprzeciwić się śledzeniu analitycznemu i reklamowemu oraz w każdej chwili wycofać zgodę.",
+        "Napisz na bendary@globaluntoldstory.com — odpowiemy w ciągu trzydziestu dni. Jeśli jesteś w UE lub Wielkiej Brytanii i odpowiedź Cię nie zadowala, możesz złożyć skargę do krajowego organu ochrony danych."] },
+      { heading: "Dzieci", body: [
+        "Ta witryna jest skierowana do osób zlecających produkcje. Nie jest przeznaczona dla dzieci i świadomie nie zbieramy danych osób poniżej szesnastego roku życia."] },
+      { heading: "Zmiany", body: [
+        "Gdy ta polityka się zmieni, zaktualizujemy datę u góry. O istotnych zmianach poinformujemy na stronie."] },
+    ],
+  },
+  terms: {
+    eyebrow: "Regulamin",
+    title: "Warunki korzystania",
+    updated: "Ostatnia aktualizacja",
+    intro:
+      "Te warunki dotyczą korzystania z globaluntoldstory.com. Nie obejmują prac produkcyjnych, które reguluje umowa podpisana dla danego projektu.",
+    sections: [
+      { heading: "Korzystanie z witryny", body: [
+        "Możesz czytać tę witrynę i udostępniać linki do niej w każdym zgodnym z prawem celu.",
+        "Nie możesz kopiować jej w całości, pobierać danych w tempie pogarszającym dostęp innym, próbować sięgać do części, do których nie otrzymałeś dostępu, ani przedstawiać jej jako własnej pracy."] },
+      { heading: "Prezentowane prace", body: [
+        "Filmy, fotografie, kampanie i teksty w tej witrynie należą do Global Untold Story lub do klientów, którzy je zamówili. Nazwy i logotypy klientów należą do nich i występują tu, aby oznaczyć prace, które wykonaliśmy.",
+        "Nic tutaj nie udziela Ci licencji na ponowne wykorzystanie. Jeśli jej potrzebujesz — zapytaj."] },
+      { heading: "Zapytanie to nie umowa", body: [
+        "Wysłanie formularza rozpoczyna rozmowę. Nie tworzy umowy, nie rezerwuje terminu i nie ustala ceny. Praca zaczyna się, gdy obie strony podpiszą ofertę.",
+        "Kwoty, terminy czy dostępność wspomniane w witrynie mają charakter orientacyjny i zależą od specyfiki projektu."] },
+      { heading: "Aktualność", body: [
+        "Utrzymujemy witrynę na bieżąco, ale portfolio, opisy usług i dostępność się zmieniają. Nie gwarantujemy, że wszystko jest kompletne i aktualne w chwili czytania."] },
+      { heading: "Linki zewnętrzne", body: [
+        "Gdy linkujemy do innych witryn — mediów społecznościowych, klientów, partnerów — nie kontrolujemy tego, co publikują, i nie odpowiadamy za to."] },
+      { heading: "Odpowiedzialność", body: [
+        "Udostępniamy tę witrynę w stanie, w jakim jest. W zakresie dozwolonym prawem nie odpowiadamy za straty wynikające z korzystania z niej lub braku dostępu.",
+        "Powyższe nie ogranicza odpowiedzialności za śmierć, szkodę na osobie ani oszustwo."] },
+      { heading: "Prawo właściwe", body: [
+        "Te warunki podlegają prawu Arabskiej Republiki Egiptu, a spory z nich wynikające rozstrzygają jej sądy."] },
+    ],
+  },
+  cookies: {
+    eyebrow: "Pliki cookie",
+    title: "Polityka plików cookie",
+    updated: "Ostatnia aktualizacja",
+    intro:
+      "Ta strona wymienia wszystkie pliki cookie i podobne technologie używane przez witrynę, ich przeznaczenie oraz sposób wyłączenia opcjonalnych.",
+    sections: [
+      { heading: "Co ustawiamy sami", body: [
+        "Wybór języka zapisany jest w adresie, który czytasz — /pl dla polskiego, bez prefiksu dla angielskiego — a nie w pliku cookie.",
+        "Formularz kontaktowy wydaje każdemu odwiedzającemu krótkotrwały token, abyśmy odróżnili człowieka od automatycznego skryptu. Nie zawiera niczego na Twój temat i szybko wygasa.",
+        "Twoja odpowiedź na baner zgody zapisywana jest lokalnie w przeglądarce, aby nie pytać przy każdej wizycie."] },
+      { heading: "Google Analytics", body: [
+        "Identyfikator pomiaru G-G38ZL9GYXF. Ustawia _ga i _ga_*, aby liczyć wizyty i odróżniać powracającego czytelnika od nowego. Trwają do dwóch lat.",
+        "Mówi nam to, które prace i artykuły są naprawdę czytane. Nie identyfikuje Cię z imienia i nazwiska."] },
+      { heading: "Piksel Meta", body: [
+        "Identyfikator 780471777947136. Ustawia _fbp i odczytuje parametr _fbc, gdy przychodzisz z reklamy Meta. Trwa około trzech miesięcy.",
+        "Mierzy, czy nasze reklamy docierają do zainteresowanych. Jeśli w tej samej przeglądarce jesteś zalogowany na Facebooku lub Instagramie, Meta może powiązać wizytę z tym kontem."] },
+      { heading: "Jak je wyłączyć", body: [
+        "W Unii Europejskiej i Wielkiej Brytanii nic nie uruchamia się przed Twoją zgodą — wystarczy odmówić.",
+        "Każda przeglądarka potrafi blokować lub usuwać pliki cookie — poszukaj Prywatności w ustawieniach. Zablokowanie ich nie przeszkadza witrynie działać: nic tutaj nie potrzebuje pliku cookie.",
+        "Google udostępnia dodatek wyłączający Analytics pod adresem tools.google.com/dlpage/gaoptout. Ustawienia reklamowe Meta znajdziesz w ustawieniach swojego konta."] },
+      { heading: "Zmiany", body: [
+        "Jeśli dodamy lub usuniemy tag, ta strona zmieni się wraz z nim, a data u góry przesunie się."] },
+    ],
+  },
+};
+
+const ZH: Record<LegalKey, LegalDoc> = {
+  privacy: {
+    eyebrow: "隐私",
+    title: "隐私政策",
+    updated: "最后更新",
+    intro:
+      "本政策说明您在使用 globaluntoldstory.com 时 Global Untold Story 会收集哪些信息、原因，以及您可以要求我们做什么。",
+    sections: [
+      { heading: "我们是谁", body: [
+        "Global Untold Story 是一家电影、视频与内容制作公司，办公室位于埃及传媒制作城、迪拜商业湾和吉达。我们是此处所述个人数据的控制者。",
+        "与本政策相关的任何事宜，请写信至 bendary@globaluntoldstory.com。"] },
+      { heading: "您提供的信息", body: [
+        "联系表单会询问您的姓名、电子邮箱、电话、感兴趣的服务以及留言。其中只有姓名、邮箱和留言为必填。",
+        "我们用这些信息回复您并筹划您咨询的项目。我们不会出售，也不会用于您未要求的营销。",
+        "您的咨询会通过邮件发送给我们，并保存在项目系统中以便继续沟通。咨询记录保存三年后删除。"] },
+      { heading: "自动收集的信息", body: [
+        "我们使用 Google Analytics 4 了解哪些页面被阅读以及访客如何到达。它记录页面浏览、国家级别的大致位置、设备、浏览器和来源网站。Google 以数据处理者身份接收这些数据。",
+        "我们使用 Meta 像素衡量广告是否触达了合适的受众。它记录页面浏览，若您已登录 Meta 账户，可将浏览与该账户关联。",
+        "在欧盟和英国，两者均须先获得您的同意才会运行；其他地区随页面加载。您可随时拒绝。"] },
+      { heading: "还有谁能看到", body: [
+        "Vercel 托管本网站并处理您浏览器发出的请求，包括您的 IP 地址。",
+        "Hostinger 托管我们的内容系统，其中保存表单留言，并转发通知邮件。",
+        "Google 与 Meta 接收上述数据。我们的电子邮件由 Google Workspace 承载。",
+        "这就是完整名单。除法律要求外，我们不会将您的数据提供给任何其他方。"] },
+      { heading: "数据在哪里处理", body: [
+        "我们的办公室位于埃及、阿联酋和沙特阿拉伯，上述服务在全球运行，因此您的数据会在您所在国家之外处理。对于欧盟和英国以外的传输，Google、Meta 和 Vercel 采用标准合同条款。"] },
+      { heading: "您可以提出的要求", body: [
+        "您可以索取我们所持数据的副本，要求更正或删除。您可以反对分析和广告追踪，并随时撤回同意。",
+        "请写信至 bendary@globaluntoldstory.com，我们将在三十天内答复。若您在欧盟或英国且对答复不满意，可向所在国数据保护机构投诉。"] },
+      { heading: "未成年人", body: [
+        "本网站面向委托制作业务的人士，并非面向儿童，我们也不会有意收集十六岁以下人士的信息。"] },
+      { heading: "变更", body: [
+        "本政策变更时，我们会更新顶部日期。重大变更将在网站上公告。"] },
+    ],
+  },
+  terms: {
+    eyebrow: "条款",
+    title: "使用条款",
+    updated: "最后更新",
+    intro:
+      "本条款适用于您对 globaluntoldstory.com 的使用，不适用于制作业务——后者由各项目签署的合同约定。",
+    sections: [
+      { heading: "使用本网站", body: [
+        "您可以出于任何合法目的阅读本网站并分享其链接。",
+        "您不得整站复制、以影响他人访问的速率抓取、试图访问未获授权的部分，或将其冒充为自己的作品。"] },
+      { heading: "此处展示的作品", body: [
+        "本网站的影片、摄影、广告与文字归 Global Untold Story 或委托方所有。客户名称与标识归各客户所有，出现在此处用于标明我们制作的作品。",
+        "本网站的任何内容均不授予您再次使用的许可。如有需要，请与我们联系。"] },
+      { heading: "咨询不构成合同", body: [
+        "提交表单只是开启对话，并不构成协议、不预留档期、也不锁定价格。工作自双方签署提案时开始。",
+        "本网站提及的任何金额、周期或档期均为参考，取决于具体项目情况。"] },
+      { heading: "准确性", body: [
+        "我们会保持网站更新，但作品、服务说明与档期会变化。我们不保证您阅读时此处内容完整或最新。"] },
+      { heading: "外部链接", body: [
+        "当我们链接到其他网站——社交平台、客户、合作伙伴——我们无法控制其发布的内容，也不对其负责。"] },
+      { heading: "责任", body: [
+        "本网站按现状提供。在法律允许的范围内，我们不对因使用本网站或无法访问而产生的损失承担责任。",
+        "上述内容不限制因死亡、人身伤害或欺诈而产生的责任。"] },
+      { heading: "适用法律", body: [
+        "本条款受阿拉伯埃及共和国法律管辖，相关争议由其法院管辖。"] },
+    ],
+  },
+  cookies: {
+    eyebrow: "Cookie",
+    title: "Cookie 政策",
+    updated: "最后更新",
+    intro:
+      "本页列出本网站使用的每一项 Cookie 及类似技术、各自的用途，以及如何关闭可选项。",
+    sections: [
+      { heading: "我们自己设置的", body: [
+        "您选择的语言体现在您正在阅读的网址中——中文为 /zh，英文无前缀——而不是保存在 Cookie 里。",
+        "联系表单会为每位访客签发一个短期令牌，以便区分真人与自动脚本。它不包含您的任何信息，且很快失效。",
+        "您对同意提示的选择保存在浏览器本地，以免每次到访都重复询问。"] },
+      { heading: "Google Analytics", body: [
+        "衡量 ID 为 G-G38ZL9GYXF。设置 _ga 与 _ga_* 以统计访问量并区分回访读者与新读者，最长保留两年。",
+        "这让我们知道哪些作品和文章确实被阅读，并不会以姓名识别您。"] },
+      { heading: "Meta 像素", body: [
+        "像素 ID 为 780471777947136。设置 _fbp，并在您通过 Meta 广告到达时读取 _fbc 参数，保留约三个月。",
+        "它用于衡量广告是否触达了感兴趣的人群。若您在同一浏览器中登录了 Facebook 或 Instagram，Meta 可能将此次访问与该账户关联。"] },
+      { heading: "如何关闭", body: [
+        "在欧盟和英国，未经您同意不会运行任何项目——拒绝即可。",
+        "任何浏览器都可以阻止或删除 Cookie，请在设置中查找隐私相关选项。阻止并不会影响本网站运行：此处没有任何功能依赖 Cookie。",
+        "Google 在 tools.google.com/dlpage/gaoptout 提供 Analytics 停用插件。Meta 的广告设置位于您的账户设置中。"] },
+      { heading: "变更", body: [
+        "若我们新增或移除某项代码，本页会随之更新，顶部日期也会变更。"] },
+    ],
+  },
+};
+
+const JA: Record<LegalKey, LegalDoc> = {
+  privacy: {
+    eyebrow: "プライバシー",
+    title: "プライバシーポリシー",
+    updated: "最終更新",
+    intro:
+      "本ポリシーは、globaluntoldstory.com のご利用にあたり Global Untold Story が何を取得するか、その理由、そしてお客様が当社に何を求められるかを説明します。",
+    sections: [
+      { heading: "運営者について", body: [
+        "Global Untold Story は、エジプト・メディアプロダクションシティ、ドバイのビジネスベイ、ジッダに拠点を置く映像・動画・コンテンツの制作スタジオです。本ポリシーに記載する個人データの管理者は当社です。",
+        "本ポリシーに関するお問い合わせは bendary@globaluntoldstory.com までご連絡ください。"] },
+      { heading: "お客様からいただく情報", body: [
+        "お問い合わせフォームでは、お名前、メールアドレス、電話番号、ご関心のあるサービス、メッセージをお伺いします。必須項目はお名前・メールアドレス・メッセージのみです。",
+        "これらはご返信と、ご相談内容の検討のために使用します。販売することはなく、ご依頼のない営業目的にも使用しません。",
+        "お問い合わせはメールで当社に届き、やり取りを継続できるようプロジェクト管理システムに保存されます。保存期間は三年間で、その後削除します。"] },
+      { heading: "自動的に取得される情報", body: [
+        "どのページが読まれ、どのように到達したかを把握するため Google Analytics 4 を使用しています。ページビュー、国単位のおおよその位置、端末、ブラウザ、参照元サイトを記録します。Google は処理者としてこれらを受領します。",
+        "広告が適切な相手に届いているかを測定するため Meta ピクセルを使用しています。ページビューを記録し、Meta アカウントにログイン中の場合はそれと関連付けられることがあります。",
+        "EU および英国では、いずれも同意前には作動しません。それ以外の地域ではページとともに読み込まれます。いつでも拒否できます。"] },
+      { heading: "ほかに閲覧する事業者", body: [
+        "Vercel は本サイトをホストし、IP アドレスを含むブラウザからのリクエストを処理します。",
+        "Hostinger はフォーム送信内容を保存するコンテンツ管理システムをホストし、通知メールを中継します。",
+        "Google と Meta は上記のデータを受領します。当社のメールは Google Workspace が担っています。",
+        "以上がすべてです。法令で求められる場合を除き、ほかの誰にもお客様のデータを提供しません。"] },
+      { heading: "処理される場所", body: [
+        "当社の拠点はエジプト、UAE、サウジアラビアにあり、上記サービスも国際的に稼働するため、お客様のデータはお客様の国以外でも処理されます。EU・英国域外への移転について、Google、Meta、Vercel は標準契約条項を用いています。"] },
+      { heading: "お客様の権利", body: [
+        "当社が保有する情報の写しの提供、訂正、削除をご請求いただけます。分析・広告目的の追跡に異議を述べること、同意をいつでも撤回することも可能です。",
+        "bendary@globaluntoldstory.com までご連絡ください。三十日以内に回答します。EU または英国にお住まいでご納得いただけない場合は、各国のデータ保護当局に申し立てることができます。"] },
+      { heading: "お子さまについて", body: [
+        "本サイトは制作を発注される方に向けたものです。お子さま向けではなく、十六歳未満の方の情報を意図して取得することはありません。"] },
+      { heading: "変更", body: [
+        "本ポリシーを変更した場合は冒頭の日付を更新します。重要な変更はサイト上でお知らせします。"] },
+    ],
+  },
+  terms: {
+    eyebrow: "利用規約",
+    title: "利用規約",
+    updated: "最終更新",
+    intro:
+      "本規約は globaluntoldstory.com のご利用に適用されます。制作業務には適用されず、そちらは案件ごとに締結する契約が定めます。",
+    sections: [
+      { heading: "本サイトの利用", body: [
+        "適法な目的であれば、本サイトを閲覧し、そのリンクを共有していただけます。",
+        "サイト全体の複製、他の利用者の閲覧を妨げる速度での取得、アクセス権の与えられていない領域への到達の試み、および自らの制作物としての提示はご遠慮ください。"] },
+      { heading: "掲載している作品", body: [
+        "本サイトの映像、写真、キャンペーン、文章は Global Untold Story または発注いただいたクライアントに帰属します。クライアント名およびロゴは各社に帰属し、当社が手がけた仕事を示すために掲載しています。",
+        "本サイトのいかなる内容も再利用の許諾を与えるものではありません。ご希望の際はお問い合わせください。"] },
+      { heading: "お問い合わせは契約ではありません", body: [
+        "フォームの送信は対話の開始にすぎません。合意の成立、日程の確保、価格の確定のいずれも生じません。作業は双方が提案書に署名した時点で開始します。",
+        "本サイトに記載の金額、期間、稼働可否はいずれも目安であり、案件の内容により異なります。"] },
+      { heading: "正確性", body: [
+        "本サイトは随時更新していますが、実績、サービス内容、稼働状況は変化します。ご覧の時点ですべてが完全かつ最新であることを保証するものではありません。"] },
+      { heading: "外部リンク", body: [
+        "他のサイト（ソーシャルメディア、クライアント、パートナー）へリンクする場合、それらの掲載内容を当社が管理することはなく、責任も負いません。"] },
+      { heading: "責任", body: [
+        "本サイトは現状有姿で提供します。法令が許す範囲において、利用またはアクセス不能により生じた損害について責任を負いません。",
+        "上記は、死亡、人身傷害、詐欺に関する責任を制限するものではありません。"] },
+      { heading: "準拠法", body: [
+        "本規約はエジプト・アラブ共和国法に準拠し、これに関する紛争は同国の裁判所が管轄します。"] },
+    ],
+  },
+  cookies: {
+    eyebrow: "Cookie",
+    title: "Cookie ポリシー",
+    updated: "最終更新",
+    intro:
+      "本ページでは、本サイトが使用するすべての Cookie および類似技術、それぞれの目的、任意のものを無効にする方法を掲載しています。",
+    sections: [
+      { heading: "当社が設定するもの", body: [
+        "言語の選択は Cookie ではなく、ご覧いただいている URL に含まれます（日本語は /ja、英語は接頭辞なし）。",
+        "お問い合わせフォームは、入力者と自動スクリプトを見分けるために訪問者ごとに短時間有効なトークンを発行します。お客様に関する情報は含まず、すぐに失効します。",
+        "同意バナーへのご回答はブラウザ内にのみ保存され、訪問のたびに再度お尋ねしないようにしています。"] },
+      { heading: "Google Analytics", body: [
+        "測定 ID は G-G38ZL9GYXF です。訪問数の計測と再訪読者の判別のために _ga および _ga_* を設定し、最長二年間保持されます。",
+        "どの作品や記事が実際に読まれているかを把握するためのもので、お名前で個人を特定するものではありません。"] },
+      { heading: "Meta ピクセル", body: [
+        "ピクセル ID は 780471777947136 です。_fbp を設定し、Meta 広告から到達した場合は _fbc パラメータを読み取ります。保持期間は約三か月です。",
+        "広告が関心のある方に届いているかを測定します。同じブラウザで Facebook または Instagram にログインしている場合、Meta が訪問をそのアカウントと関連付けることがあります。"] },
+      { heading: "無効にする方法", body: [
+        "EU および英国では、同意前に作動するものはありません。拒否していただくだけで十分です。",
+        "どのブラウザでも Cookie の拒否・削除が可能です（設定内の「プライバシー」をご確認ください）。拒否しても本サイトの動作には支障ありません。Cookie を必要とする機能はありません。",
+        "Google は tools.google.com/dlpage/gaoptout で Analytics の無効化アドオンを提供しています。Meta の広告設定はアカウント設定内にあります。"] },
+      { heading: "変更", body: [
+        "タグを追加または削除した場合は本ページも更新し、冒頭の日付を変更します。"] },
+    ],
+  },
+};
+
+const KO: Record<LegalKey, LegalDoc> = {
+  privacy: {
+    eyebrow: "개인정보",
+    title: "개인정보처리방침",
+    updated: "최종 업데이트",
+    intro:
+      "이 방침은 globaluntoldstory.com 이용 시 Global Untold Story가 무엇을 수집하는지, 그 이유, 그리고 무엇을 요청하실 수 있는지 설명합니다.",
+    sections: [
+      { heading: "회사 소개", body: [
+        "Global Untold Story는 이집트 미디어 프로덕션 시티, 두바이 비즈니스베이, 제다에 사무소를 둔 영화·영상·콘텐츠 제작 스튜디오입니다. 여기에 기술된 개인정보의 처리자는 당사입니다.",
+        "이 방침과 관련한 문의는 bendary@globaluntoldstory.com으로 보내주십시오."] },
+      { heading: "제공해 주시는 정보", body: [
+        "문의 양식에서는 성함, 이메일 주소, 전화번호, 관심 서비스, 메시지를 요청합니다. 필수 항목은 성함·이메일·메시지뿐입니다.",
+        "회신과 문의하신 작업의 검토를 위해 사용합니다. 판매하지 않으며, 요청하지 않으신 마케팅에도 사용하지 않습니다.",
+        "문의는 이메일로 전달되며 대화를 이어갈 수 있도록 프로젝트 시스템에 보관됩니다. 문의는 3년간 보관 후 삭제합니다."] },
+      { heading: "자동으로 수집되는 정보", body: [
+        "어떤 페이지가 읽히고 어떤 경로로 방문하는지 파악하기 위해 Google Analytics 4를 사용합니다. 페이지 조회, 국가 단위의 대략적 위치, 기기, 브라우저, 유입 사이트를 기록합니다. Google은 수탁자로서 이 데이터를 받습니다.",
+        "광고가 적절한 대상에게 도달하는지 측정하기 위해 Meta 픽셀을 사용합니다. 페이지 조회를 기록하며, Meta 계정에 로그인되어 있으면 해당 계정과 연결될 수 있습니다.",
+        "EU와 영국에서는 동의 전에는 어느 것도 실행되지 않으며, 그 외 지역에서는 페이지와 함께 로드됩니다. 언제든 거부하실 수 있습니다."] },
+      { heading: "그 밖에 열람하는 곳", body: [
+        "Vercel은 이 사이트를 호스팅하며 IP 주소를 포함한 브라우저 요청을 처리합니다.",
+        "Hostinger는 양식 메시지를 저장하는 콘텐츠 시스템을 호스팅하고 알림 이메일을 중계합니다.",
+        "Google과 Meta는 위에 설명한 데이터를 받습니다. 이메일은 Google Workspace가 담당합니다.",
+        "이것이 전부입니다. 법이 요구하는 경우를 제외하고 다른 누구와도 공유하지 않습니다."] },
+      { heading: "처리 장소", body: [
+        "사무소는 이집트, UAE, 사우디아라비아에 있으며 위 서비스는 국제적으로 운영되므로 데이터는 귀하의 국가 밖에서도 처리됩니다. EU·영국 역외 이전에 대해 Google, Meta, Vercel은 표준계약조항을 사용합니다."] },
+      { heading: "요청하실 수 있는 사항", body: [
+        "보유 중인 정보의 사본, 정정 또는 삭제를 요청하실 수 있습니다. 분석·광고 추적에 반대하거나 동의를 언제든 철회하실 수 있습니다.",
+        "bendary@globaluntoldstory.com으로 연락 주시면 30일 이내에 답변드립니다. EU 또는 영국에 계시고 답변에 만족하지 못하실 경우 해당 국가의 개인정보 감독기구에 이의를 제기하실 수 있습니다."] },
+      { heading: "아동", body: [
+        "이 사이트는 제작을 의뢰하시는 분들을 위한 것으로 아동을 대상으로 하지 않으며, 16세 미만의 정보를 고의로 수집하지 않습니다."] },
+      { heading: "변경", body: [
+        "이 방침이 변경되면 상단 날짜를 갱신합니다. 중요한 변경 사항은 사이트에 공지합니다."] },
+    ],
+  },
+  terms: {
+    eyebrow: "이용약관",
+    title: "이용약관",
+    updated: "최종 업데이트",
+    intro:
+      "이 약관은 globaluntoldstory.com 이용에 적용됩니다. 제작 업무에는 적용되지 않으며, 해당 업무는 프로젝트별로 체결한 계약이 규율합니다.",
+    sections: [
+      { heading: "사이트 이용", body: [
+        "적법한 목적이라면 이 사이트를 읽고 링크를 공유하실 수 있습니다.",
+        "사이트 전체를 복제하거나, 타인의 접속을 저해하는 속도로 수집하거나, 접근 권한이 없는 영역에 접근을 시도하거나, 본인의 작업물로 제시하실 수 없습니다."] },
+      { heading: "게시된 작업물", body: [
+        "이 사이트의 영상, 사진, 캠페인, 문구는 Global Untold Story 또는 이를 의뢰한 고객에게 귀속됩니다. 고객명과 로고는 각 고객의 자산이며, 당사가 제작한 작업을 표시하기 위해 게재되었습니다.",
+        "여기의 어떤 내용도 재사용 라이선스를 부여하지 않습니다. 필요하시면 문의해 주십시오."] },
+      { heading: "문의는 계약이 아닙니다", body: [
+        "양식 제출은 대화의 시작일 뿐입니다. 합의가 성립되거나 일정이 확보되거나 가격이 확정되지 않습니다. 작업은 양측이 제안서에 서명한 시점에 시작됩니다.",
+        "이 사이트에 언급된 금액, 일정, 가용 여부는 참고 사항이며 프로젝트의 구체적 내용에 따라 달라집니다."] },
+      { heading: "정확성", body: [
+        "사이트를 최신 상태로 유지하지만 포트폴리오, 서비스 설명, 가용 여부는 변합니다. 열람 시점에 모든 내용이 완전하거나 최신이라고 보장하지 않습니다."] },
+      { heading: "외부 링크", body: [
+        "다른 사이트(소셜 플랫폼, 고객사, 파트너)로 연결하는 경우, 해당 사이트의 게시물은 당사가 관리하지 않으며 이에 대한 책임도 지지 않습니다."] },
+      { heading: "책임", body: [
+        "이 사이트는 있는 그대로 제공됩니다. 법이 허용하는 범위에서, 이용 또는 접속 불가로 발생한 손실에 대해 책임지지 않습니다.",
+        "위 내용은 사망, 신체 상해, 사기에 대한 책임을 제한하지 않습니다."] },
+      { heading: "준거법", body: [
+        "이 약관은 이집트 아랍 공화국 법률의 적용을 받으며, 관련 분쟁은 해당 국가의 법원이 관할합니다."] },
+    ],
+  },
+  cookies: {
+    eyebrow: "쿠키",
+    title: "쿠키 정책",
+    updated: "최종 업데이트",
+    intro:
+      "이 페이지는 사이트가 사용하는 모든 쿠키와 유사 기술, 각각의 용도, 선택적 항목을 끄는 방법을 안내합니다.",
+    sections: [
+      { heading: "당사가 설정하는 것", body: [
+        "언어 선택은 쿠키가 아니라 지금 보고 계신 주소에 담깁니다. 한국어는 /ko, 영어는 접두어가 없습니다.",
+        "문의 양식은 사람과 자동 스크립트를 구분하기 위해 방문자마다 수명이 짧은 토큰을 발급합니다. 귀하에 관한 정보는 담고 있지 않으며 곧 만료됩니다.",
+        "동의 배너에 대한 응답은 브라우저에 로컬로 저장되어 방문할 때마다 다시 묻지 않도록 합니다."] },
+      { heading: "Google Analytics", body: [
+        "측정 ID는 G-G38ZL9GYXF입니다. 방문 수를 집계하고 재방문 독자와 신규 독자를 구분하기 위해 _ga와 _ga_*를 설정하며 최대 2년간 유지됩니다.",
+        "어떤 작업물과 글이 실제로 읽히는지 알려줄 뿐, 이름으로 개인을 식별하지 않습니다."] },
+      { heading: "Meta 픽셀", body: [
+        "픽셀 ID는 780471777947136입니다. _fbp를 설정하고 Meta 광고를 통해 유입된 경우 _fbc 매개변수를 읽습니다. 약 3개월간 유지됩니다.",
+        "광고가 관심 있는 분들에게 도달하는지 측정합니다. 같은 브라우저에서 Facebook 또는 Instagram에 로그인되어 있으면 Meta가 방문을 해당 계정과 연결할 수 있습니다."] },
+      { heading: "끄는 방법", body: [
+        "EU와 영국에서는 동의 전에 실행되는 것이 없으며, 거부만 하시면 됩니다.",
+        "모든 브라우저는 쿠키를 차단하거나 삭제할 수 있습니다. 설정에서 개인정보 항목을 확인해 주십시오. 차단해도 사이트 이용에는 지장이 없습니다. 여기에는 쿠키가 필요한 기능이 없습니다.",
+        "Google은 tools.google.com/dlpage/gaoptout에서 Analytics 차단 부가기능을 제공합니다. Meta의 광고 설정은 계정 설정에 있습니다."] },
+      { heading: "변경", body: [
+        "태그를 추가하거나 제거하면 이 페이지도 함께 바뀌고 상단 날짜가 갱신됩니다."] },
+    ],
+  },
+};
+
+const SW: Record<LegalKey, LegalDoc> = {
+  privacy: {
+    eyebrow: "Faragha",
+    title: "Sera ya Faragha",
+    updated: "Ilisasishwa mwisho",
+    intro:
+      "Sera hii inaeleza kile Global Untold Story hukusanya unapotumia globaluntoldstory.com, kwa nini, na unachoweza kutuomba kuhusu hilo.",
+    sections: [
+      { heading: "Sisi ni nani", body: [
+        "Global Untold Story ni studio ya utayarishaji wa filamu, video na maudhui yenye ofisi katika Egyptian Media Production City, Business Bay jijini Dubai, na Jeddah. Sisi ndio wadhibiti wa data binafsi zilizoelezwa hapa.",
+        "Kwa jambo lolote kuhusu sera hii, andika kwa bendary@globaluntoldstory.com."] },
+      { heading: "Unachotupa", body: [
+        "Fomu ya mawasiliano huuliza jina lako, barua pepe, simu, huduma inayokuvutia na ujumbe wako. Jina, barua pepe na ujumbe pekee ndizo za lazima.",
+        "Tunazitumia kukujibu na kupanga kazi unayouliza. Hatuziuzi wala hatuzitumii kwa matangazo usiyoyaomba.",
+        "Ombi lako hutufikia kwa barua pepe na huhifadhiwa katika mfumo wetu wa miradi ili tuendelee na mazungumzo. Tunahifadhi maombi kwa miaka mitatu, kisha tunayafuta."] },
+      { heading: "Kinachokusanywa kiotomatiki", body: [
+        "Tunatumia Google Analytics 4 kuelewa kurasa zinazosomwa na jinsi watu wanavyofika. Hurekodi kurasa zilizotazamwa, eneo la takriban kwa kiwango cha nchi, kifaa, kivinjari na tovuti iliyokuleta. Google hupokea data hii kama msindikaji.",
+        "Tunatumia Meta Pixel kupima kama matangazo yetu yanawafikia watu sahihi. Hurekodi kurasa zilizotazamwa na inaweza kuziunganisha na akaunti ya Meta ikiwa umeingia.",
+        "Katika Umoja wa Ulaya na Uingereza, hakuna kinachoanza kabla ya ridhaa yako; kwingineko hupakia pamoja na ukurasa. Unaweza kukataa wakati wowote."] },
+      { heading: "Nani mwingine anaziona", body: [
+        "Vercel huandaa tovuti hii na kushughulikia maombi ya kivinjari chako, ikijumuisha anwani yako ya IP.",
+        "Hostinger huandaa mfumo wetu wa maudhui, unaohifadhi ujumbe wa fomu, na hupeleka barua pepe ya taarifa.",
+        "Google na Meta hupokea data iliyoelezwa hapo juu. Barua pepe yetu inaendeshwa na Google Workspace.",
+        "Hiyo ndiyo orodha kamili. Hatushiriki data yako na mtu mwingine yeyote isipokuwa sheria inapotutaka."] },
+      { heading: "Zinakoshughulikiwa", body: [
+        "Ofisi zetu ziko Misri, Falme za Kiarabu na Saudi Arabia, na huduma zilizotajwa hufanya kazi kimataifa, hivyo data yako hushughulikiwa nje ya nchi yako. Google, Meta na Vercel hutumia vifungu vya kawaida vya mkataba kwa uhamishaji nje ya EU na Uingereza."] },
+      { heading: "Unachoweza kuomba", body: [
+        "Unaweza kuomba nakala ya tulichonacho, kuomba kirekebishwe, au kifutwe. Unaweza kupinga ufuatiliaji wa uchanganuzi na matangazo, na kuondoa ridhaa wakati wowote.",
+        "Andika kwa bendary@globaluntoldstory.com nasi tutajibu ndani ya siku thelathini. Ukiwa EU au Uingereza na hukuridhika, unaweza kulalamika kwa mamlaka ya taifa lako ya ulinzi wa data."] },
+      { heading: "Watoto", body: [
+        "Tovuti hii ni kwa ajili ya wanaoagiza kazi za utayarishaji. Haikusudiwi watoto, na hatukusanyi kwa makusudi taarifa za mtu yeyote aliye chini ya miaka kumi na sita."] },
+      { heading: "Mabadiliko", body: [
+        "Sera hii inapobadilika, tunasasisha tarehe iliyo juu. Mabadiliko makubwa yatatangazwa kwenye tovuti yenyewe."] },
+    ],
+  },
+  terms: {
+    eyebrow: "Masharti",
+    title: "Masharti ya Matumizi",
+    updated: "Ilisasishwa mwisho",
+    intro:
+      "Masharti haya yanahusu matumizi yako ya globaluntoldstory.com. Hayahusu kazi za utayarishaji, ambazo huongozwa na mkataba uliotiwa saini kwa kila mradi.",
+    sections: [
+      { heading: "Kutumia tovuti hii", body: [
+        "Unaweza kusoma tovuti hii na kushiriki viungo vyake kwa madhumuni yoyote halali.",
+        "Huruhusiwi kuinakili yote, kuivuna kwa kasi inayoathiri wengine, kujaribu kufikia sehemu usizopewa ruhusa, wala kuiwasilisha kama kazi yako."] },
+      { heading: "Kazi zilizoonyeshwa", body: [
+        "Filamu, picha, kampeni na maandishi kwenye tovuti hii ni mali ya Global Untold Story au ya wateja walioziagiza. Majina na nembo za wateja ni mali yao na zinaonekana hapa kutambulisha kazi tulizotayarisha.",
+        "Hakuna kilicho hapa kinachokupa leseni ya kuzitumia tena. Ukitaka, tuulize."] },
+      { heading: "Ombi si mkataba", body: [
+        "Kutuma fomu huanzisha mazungumzo. Haitengenezi makubaliano, hairidhii tarehe, wala haiwekei bei. Kazi huanza pande zote mbili zinapotia saini pendekezo.",
+        "Takwimu, ratiba au upatikanaji vilivyotajwa kwenye tovuti hii ni vya mwongozo na hutegemea maelezo ya mradi husika."] },
+      { heading: "Usahihi", body: [
+        "Tunaisasisha tovuti, lakini kazi, maelezo ya huduma na upatikanaji hubadilika. Hatuhakikishi kila kitu hapa ni kamili au cha sasa wakati unaposoma."] },
+      { heading: "Viungo vya nje", body: [
+        "Tunapounganisha na tovuti nyingine — mitandao ya kijamii, wateja, washirika — hatudhibiti wanachochapisha wala hatuwajibiki nacho."] },
+      { heading: "Dhima", body: [
+        "Tunatoa tovuti hii kama ilivyo. Kwa kadiri sheria inavyoruhusu, hatuwajibiki kwa hasara zinazotokana na kuitumia au kushindwa kuifikia.",
+        "Hakuna kilicho hapo juu kinachopunguza dhima kwa kifo, majeraha ya mwili, au udanganyifu."] },
+      { heading: "Sheria inayotumika", body: [
+        "Masharti haya yanaongozwa na sheria za Jamhuri ya Kiarabu ya Misri, na mahakama zake zina mamlaka juu ya migogoro inayohusiana nayo."] },
+    ],
+  },
+  cookies: {
+    eyebrow: "Vidakuzi",
+    title: "Sera ya Vidakuzi",
+    updated: "Ilisasishwa mwisho",
+    intro:
+      "Ukurasa huu unaorodhesha kila kidakuzi na teknolojia kama hizo zinazotumiwa na tovuti hii, kazi ya kila kimoja, na jinsi ya kuzima vile vya hiari.",
+    sections: [
+      { heading: "Tunachoweka sisi wenyewe", body: [
+        "Chaguo lako la lugha liko katika anwani unayosoma — /sw kwa Kiswahili, bila kiambishi kwa Kiingereza — si katika kidakuzi.",
+        "Fomu ya mawasiliano hutoa tokeni ya muda mfupi kwa kila mgeni ili tutofautishe mtu na hati otomatiki. Haina chochote kukuhusu na huisha haraka.",
+        "Jibu lako kwa taarifa ya ridhaa huhifadhiwa ndani ya kivinjari chako, ili tusikuulize kila unapotembelea."] },
+      { heading: "Google Analytics", body: [
+        "Kitambulisho cha upimaji G-G38ZL9GYXF. Huweka _ga na _ga_* kuhesabu ziara na kutofautisha msomaji anayerudi na mgeni mpya. Hudumu hadi miaka miwili.",
+        "Hii hutuambia kazi na makala zipi zinasomwa kwelikweli. Haikutambui kwa jina."] },
+      { heading: "Meta Pixel", body: [
+        "Kitambulisho 780471777947136. Huweka _fbp na husoma kigezo _fbc unapofika kupitia tangazo la Meta. Hudumu takriban miezi mitatu.",
+        "Hupima kama matangazo yetu yanawafikia watu wenye nia. Ukiwa umeingia Facebook au Instagram katika kivinjari kilekile, Meta inaweza kuunganisha ziara na akaunti hiyo."] },
+      { heading: "Jinsi ya kuvizima", body: [
+        "Katika Umoja wa Ulaya na Uingereza hakuna kinachoanza kabla ya ridhaa yako; kukataa kunatosha.",
+        "Kila kivinjari kinaweza kuzuia au kufuta vidakuzi — tafuta Faragha katika mipangilio yake. Kuvizuia hakuzuii tovuti hii kufanya kazi; hakuna kitu hapa kinachohitaji kidakuzi.",
+        "Google huchapisha kiendelezi cha kuzima Analytics katika tools.google.com/dlpage/gaoptout. Vidhibiti vya matangazo vya Meta viko katika mipangilio ya akaunti yako."] },
+      { heading: "Mabadiliko", body: [
+        "Tukiongeza au kuondoa lebo, ukurasa huu hubadilika nayo na tarehe iliyo juu husonga mbele."] },
+    ],
+  },
+};
+
 const BY_LOCALE: Partial<Record<Locale, Record<LegalKey, LegalDoc>>> = {
   en: EN,
   ar: AR,
@@ -826,6 +1450,13 @@ const BY_LOCALE: Partial<Record<Locale, Record<LegalKey, LegalDoc>>> = {
   es: ES,
   it: IT,
   pt: PT,
+  tr: TR,
+  ru: RU,
+  pl: PL,
+  zh: ZH,
+  ja: JA,
+  ko: KO,
+  sw: SW,
 };
 
 export function legalDoc(key: LegalKey, locale: string): LegalDoc {
