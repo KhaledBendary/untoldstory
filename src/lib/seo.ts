@@ -128,9 +128,23 @@ export function plainText(value?: string | null) {
  * Turn a CMS headline into something that fits a SERP: drop the tagline the
  * CMS glued on after the first sentence, de-shout it, and keep it short.
  */
+/**
+ * "apache-egypt-operations-documentary" -> "Apache Egypt Operations Documentary".
+ *
+ * Used when a record has no usable name of its own. It is not a translation,
+ * but it names the page, and every alternative is worse: an empty <h1>, or a
+ * title identical to the brand on every such page.
+ */
+export function nameFromSlug(slug?: string) {
+  return (slug || "")
+    .replace(/[-_]+/g, " ")
+    .trim()
+    .replace(/\b\p{L}/gu, (c) => c.toUpperCase());
+}
+
 export function cleanHeadline(raw?: string | null, slug?: string) {
   let value = plainText(raw);
-  if (!value) return "";
+  if (!value) return nameFromSlug(slug);
 
   const shouted = isAllCaps(value);
 

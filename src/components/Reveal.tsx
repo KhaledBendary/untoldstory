@@ -8,16 +8,20 @@ const EASE = [0.76, 0, 0.24, 1] as const;
 
 /** Splits children text into words, each revealed with a masked rise. */
 export function SplitWords({ text, className = '', delay = 0, as: Tag = 'h2' }: {
-  text: string; className?: string; delay?: number; as?: 'h1' | 'h2' | 'h3' | 'p' | 'span' | 'div';
+  text?: string | null; className?: string; delay?: number; as?: 'h1' | 'h2' | 'h3' | 'p' | 'span' | 'div';
 }) {
   const hydrated = useHydrated();
-  const words = text.split(' ');
+  // A heading whose CMS text is missing must not take the page down with it.
+  // Unreadable Arabic fields are now dropped at the API boundary, so `text`
+  // can legitimately arrive undefined where it never used to.
+  const value = typeof text === 'string' ? text : '';
+  const words = value.split(' ');
 
   // Arabic script letters connect and have tall ascenders/descenders — the
   // per-word overflow-hidden mask clips them. Render Arabic (and any RTL
   // script) as plain text instead of splitting into masked words.
-  if (!hydrated || /[\u0600-\u06FF]/.test(text)) {
-    return <Tag className={className} aria-label={text}>{text}</Tag>;
+  if (!hydrated || /[\u0600-\u06FF]/.test(value)) {
+    return <Tag className={className} aria-label={value}>{value}</Tag>;
   }
 
   const container: Variants = {
@@ -36,7 +40,7 @@ export function SplitWords({ text, className = '', delay = 0, as: Tag = 'h2' }: 
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, margin: '-8% 0px' }}
-      aria-label={text}
+      aria-label={value}
     >
       {words.map((w, i) => (
         <span key={i} className="inline-block overflow-hidden pb-[0.08em] -mb-[0.08em] align-bottom">

@@ -12,7 +12,10 @@ import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadl
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
 /** "Huawei Commercial — Huawei" reads badly; keep the client only when it adds something. */
-function projectHeadline(title: string, client?: string | null, slug?: string) {
+function projectHeadline(title: string | undefined, client?: string | null, slug?: string) {
+  // cleanHeadline reads the name out of the slug when the record has none —
+  // the Arabic ones arrive titleless once unreadable text is scrubbed, and
+  // without this every one of them was titled "Global Untold Story".
   const name = cleanHeadline(title, slug);
   if (!client || name.toLowerCase().includes(client.toLowerCase())) return name;
   return `${name} — ${client}`;

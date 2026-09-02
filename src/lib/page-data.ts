@@ -4,7 +4,7 @@ import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { POSTS as FALLBACK_POSTS, PROJECTS as FALLBACK_PROJECTS, SERVICES as FALLBACK_SERVICES } from "@/data/content";
 import { POST_SLUG_ALIASES, POST_SLUGS_THAT_REDIRECT, legacyDestination, relatedPostSlugs, relatedServiceSlugs } from "@/lib/legacy-redirects";
 import { isoPostDate } from "@/lib/dates";
-import { isUnreadable } from "@/lib/seo";
+import { isUnreadable, nameFromSlug } from "@/lib/seo";
 import type { About, BlogPost, LayoutData, PortfolioItem, Service } from "@/types/api";
 
 /**
@@ -43,9 +43,22 @@ export function mappedFallbackProjects(): PortfolioItem[] {
   }));
 }
 
+/*
+ * Give every record a title the page can print.
+ *
+ * Unreadable CMS text is dropped where it enters the app, which leaves the
+ * Arabic portfolio records with no title at all — and the detail page then
+ * rendered an empty <h1>. The metadata already reads a name out of the slug;
+ * the visible heading has to come from the same place, or the page has a title
+ * in the tab and nothing at the top.
+ */
+function withDisplayTitle<T extends { slug?: string; title?: string }>(record: T): T {
+  return record.title ? record : { ...record, title: nameFromSlug(record.slug) };
+}
+
 function normalizeBlogPost(post: BlogPost): BlogPost {
   const iso = isoPostDate(post);
-  return { ...post, date: iso || post.date, publishedAt: iso || post.publishedAt };
+  return withDisplayTitle({ ...post, date: iso || post.date, publishedAt: iso || post.publishedAt });
 }
 
 function allMappedFallbackPosts(): BlogPost[] {
@@ -139,7 +152,7 @@ export async function getInsightsData(locale?: string): Promise<BlogPost[]> {
 export async function getWorkData(locale?: string): Promise<PortfolioItem[]> {
   try {
     const { items } = await api.getPortfolio({ per_page: 100, locale });
-    return items?.length ? items : mappedFallbackProjects();
+    return items?.length ? items.map(withDisplayTitle) : mappedFallbackProjects();
   } catch (e) {
     console.error("Failed to fetch work:", e);
     return mappedFallbackProjects();
@@ -223,7 +236,7 @@ export function getProjectDetailData(slug: string, locale?: string) {
       api.getPortfolioBySlug(slug, locale),
       api.getPortfolio({ per_page: 100, locale }),
     ]);
-    return { project, allProjects: portfolio.items || [] };
+    return { project: withDisplayTitle(project), allProjects: (portfolio.items || []).map(withDisplayTitle) };
   });
 }
 
@@ -260,7 +273,8 @@ export async function findServiceInList(slug: string, locale?: string): Promise<
 export async function findProjectInList(slug: string, locale?: string): Promise<PortfolioItem | null> {
   try {
     const { items } = await api.getPortfolio({ per_page: 100, locale });
-    return items?.find((p) => p.slug === slug) ?? null;
+    const found = items?.find((p) => p.slug === slug);
+    return found ? withDisplayTitle(found) : null;
   } catch {
     return null;
   }

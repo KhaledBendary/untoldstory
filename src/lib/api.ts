@@ -34,8 +34,39 @@ type PaginatedData<T> = { items: T[]; pagination: {
   total: number;
 } };
 
+/*
+ * Drop CMS text that lost its encoding, wherever it appears.
+ *
+ * Several Arabic records store their text in a column that turned every letter
+ * into "?", and it was reaching the page: a portfolio h1 read
+ * "???? ?????? ?????? ??? ????????" to visitors, and the same string went out
+ * as the meta description. Guards were added at the two places it was noticed
+ * — the About team, then buildDescription — and each time it turned up
+ * somewhere else, because the problem is the data, not the display.
+ *
+ * unwrap is where every record enters the app, so scrub here and no consumer
+ * can receive it. The fields become undefined and the existing fallbacks take
+ * over, which is what those fallbacks are for.
+ *
+ * This hides the damage; it does not repair it. The Arabic text needs
+ * re-entering in the CMS before the real words can appear.
+ */
+const UNREADABLE = /\?{3,}/;
+
+function scrubUnreadable<T>(value: T, depth = 0): T {
+  if (depth > 6) return value;
+  if (typeof value === "string") return (UNREADABLE.test(value) ? undefined : value) as T;
+  if (Array.isArray(value)) return value.map((item) => scrubUnreadable(item, depth + 1)) as T;
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [key, item] of Object.entries(value)) out[key] = scrubUnreadable(item, depth + 1);
+    return out as T;
+  }
+  return value;
+}
+
 function unwrap<T>(res: ApiEnvelope<T>): T {
-  return res.data;
+  return scrubUnreadable(res.data);
 }
 
 // ==================== PUBLIC CONTENT ENDPOINTS ====================
@@ -58,7 +89,7 @@ export const api = {
 
   getServices: async (locale?: string): Promise<Service[]> => {
     const res = await apiClient.get<ApiEnvelope<CollectionData<Service>>>('/services', {}, { locale });
-    return res.data.items;
+    return scrubUnreadable(res.data.items);
   },
 
   getServiceBySlug: async (slug: string, locale?: string): Promise<Service> => {
@@ -73,7 +104,7 @@ export const api = {
     per_page?: number;
   }): Promise<{ items: PortfolioItem[]; pagination: { current_page: number; last_page: number; per_page: number; total: number } }> => {
     const res = await apiClient.get<ApiEnvelope<PaginatedData<PortfolioItem>>>('/portfolio', params);
-    return { items: res.data.items, pagination: res.data.pagination };
+    return { items: scrubUnreadable(res.data.items), pagination: res.data.pagination };
   },
 
   getPortfolioBySlug: async (slug: string, locale?: string): Promise<PortfolioItem> => {
@@ -90,7 +121,7 @@ export const api = {
     per_page?: number;
   }): Promise<{ items: BlogPost[]; pagination: { current_page: number; last_page: number; per_page: number; total: number } }> => {
     const res = await apiClient.get<ApiEnvelope<PaginatedData<BlogPost>>>('/blog', params);
-    return { items: res.data.items, pagination: res.data.pagination };
+    return { items: scrubUnreadable(res.data.items), pagination: res.data.pagination };
   },
 
   getBlogPostBySlug: async (slug: string, locale?: string): Promise<BlogPost> => {
@@ -180,7 +211,7 @@ export const adminApi = {
     const res = await apiClient.get<ApiEnvelope<PaginatedData<ContactRequest>>>('/admin/contact-requests', params, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return { items: res.data.items, pagination: res.data.pagination };
+    return { items: scrubUnreadable(res.data.items), pagination: res.data.pagination };
   },
 
   getContactRequest: async (token: string, id: number): Promise<ContactRequest> => {
@@ -206,7 +237,7 @@ export const adminApi = {
     const res = await apiClient.get<ApiEnvelope<PaginatedData<Lead>>>('/admin/leads', params, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return { items: res.data.items, pagination: res.data.pagination };
+    return { items: scrubUnreadable(res.data.items), pagination: res.data.pagination };
   },
 
   getLead: async (token: string, id: number): Promise<Lead> => {
