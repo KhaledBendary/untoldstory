@@ -58,7 +58,10 @@ export function localeDir(locale: string): "ltr" | "rtl" {
 
 /** Public path for a route in a given locale. English carries no prefix. */
 export function localizedPath(path: string, locale: string): string {
-  const clean = path === "/" ? "" : path.startsWith("/") ? path : `/${path}`;
+  // "" and "/" both mean the home page. Only "/" was handled, so the empty
+  // form produced "/ar/" — a URL that redirects, which a sitemap must never
+  // advertise.
+  const clean = path === "/" || path === "" ? "" : path.startsWith("/") ? path : `/${path}`;
   if (locale === DEFAULT_LOCALE) return clean || "/";
   return `/${locale}${clean}`;
 }
