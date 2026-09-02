@@ -211,9 +211,46 @@ return (
     className={fontClass}
     suppressHydrationWarning
   >
+    {/*
+      * Consent defaults, inlined in <head> so they run before anything else.
+      *
+      * next/script's beforeInteractive was not early enough — the gtag tag
+      * still appeared first in the document. Consent Mode only holds if the
+      * denial is on the dataLayer before gtag initialises; set after, the
+      * first page_view has already gone.
+      *
+      * Denied to begin with, then granted from localStorage for anyone who
+      * already agreed — and granted outright outside the regions that require
+      * asking, so this does not quietly stop measuring Egypt and the Gulf.
+      */}
+    <head>
+      <script dangerouslySetInnerHTML={{ __html: `window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('consent', 'default', {
+            analytics_storage: 'denied',
+            ad_storage: 'denied',
+            ad_user_data: 'denied',
+            ad_personalization: 'denied',
+            wait_for_update: 500
+          });
+          try {
+            var tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || '');
+            var mustAsk = /^(Europe|Atlantic\/(Canary|Madeira|Azores|Faroe|Reykjavik))/.test(tz);
+            var stored = JSON.parse(localStorage.getItem('gus_consent') || 'null');
+            var ok = (stored && stored.version === 1 && stored.choice === 'granted') || !mustAsk;
+            if (ok) {
+              gtag('consent', 'update', {
+                analytics_storage: 'granted',
+                ad_storage: 'granted',
+                ad_user_data: 'granted',
+                ad_personalization: 'granted'
+              });
+            }
+          } catch (e) {}` }} />
+    </head>
     <body suppressHydrationWarning>
 
-      <Script
+            <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
         strategy="afterInteractive"
       />
