@@ -158,7 +158,9 @@ export function cleanHeadline(raw?: string | null, slug?: string) {
  * ~60 characters Google renders.
  */
 export function buildTitle(raw?: string | null, slug?: string, fallback = BRAND) {
-  const name = cleanHeadline(raw, slug) || fallback;
+  // Same guard as buildDescription: a title of question marks is worse than
+  // the slug-derived fallback.
+  const name = cleanHeadline(isUnreadable(raw) ? undefined : raw, slug) || fallback;
   const suffix = ` | ${BRAND}`;
   if (name === BRAND) return name;
   if (name.length + suffix.length <= TITLE_MAX) return name + suffix;
@@ -169,8 +171,40 @@ export function buildTitle(raw?: string | null, slug?: string, fallback = BRAND)
  * Meta description clamped to 155 characters, preferring a sentence boundary
  * so a trimmed description still reads as a finished thought.
  */
+/**
+ * CMS text that lost its encoding, and now reads as a run of "?".
+ *
+ * Three Arabic portfolio records ship descriptions that are entirely question
+ * marks, and they were going out as the meta description — the one line Google
+ * shows under the result. A description in the wrong language is poor; a
+ * description of literal punctuation is worse, so treat unreadable text as
+ * absent and let the caller's fallback stand.
+ *
+ * This hides the damage, it does not repair it: the Arabic text has to be
+ * re-entered in the CMS.
+ */
+export function isUnreadable(value?: unknown): value is string {
+  return typeof value === "string" && /\?{3,}/.test(value);
+}
+
+/**
+ * CMS excerpts are sometimes the first paragraph of the body, cut wherever the
+ * paragraph happened to end — "Pre-production is the foundation. It is where
+ * we:" was going out as the meta description in eight languages. A line that
+ * stops on a colon promises a list Google has no room to print, so cut back to
+ * the last finished sentence, and if too little survives use the fallback.
+ */
+function endOnASentence(value: string) {
+  if (!/[:;,]\s*$/.test(value)) return value;
+  const trimmed = value.replace(/[\s:;,]+$/, "");
+  const stop = Math.max(trimmed.lastIndexOf(". "), trimmed.lastIndexOf("! "), trimmed.lastIndexOf("? "));
+  const kept = stop > 0 ? trimmed.slice(0, stop + 1) : trimmed;
+  return kept.length >= 40 ? kept : "";
+}
+
 export function buildDescription(raw?: string | null, fallback = "") {
-  const value = plainText(raw) || plainText(fallback);
+  const cleaned = isUnreadable(raw) ? "" : endOnASentence(plainText(raw));
+  const value = cleaned || plainText(fallback);
   if (!value) return "";
   if (value.length <= DESCRIPTION_MAX) return value;
 

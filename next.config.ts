@@ -53,6 +53,23 @@ const GOOGLE_ADS = [
   "https://www.googleadservices.com",
 ].join(" ");
 
+/*
+ * Remarketing audience pixels come from the visitor's own Google domain —
+ * an Egyptian visitor is sent to www.google.com.eg — and a CSP cannot express
+ * "any Google country domain" without allowing far more than Google. Listed
+ * here are the markets this studio actually sells into. A visitor from
+ * somewhere else still measures and still converts; only their remarketing
+ * pixel is refused, which is the right trade for not widening the policy.
+ */
+const GOOGLE_COUNTRY_DOMAINS = [
+  "https://www.google.com.eg",
+  "https://www.google.ae",
+  "https://www.google.com.sa",
+  "https://www.google.co.uk",
+  "https://www.google.de",
+  "https://www.google.fr",
+].join(" ");
+
 const META = "https://www.facebook.com https://connect.facebook.net";
 
 const CSP = [
@@ -62,7 +79,7 @@ const CSP = [
   "style-src 'self' 'unsafe-inline'",
   // Fonts are self-hosted through next/font, so no third-party origin here.
   "font-src 'self' data:",
-  `img-src 'self' data: blob: ${UPSTREAM_ORIGIN} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} https://www.facebook.com`,
+  `img-src 'self' data: blob: ${UPSTREAM_ORIGIN} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} ${GOOGLE_COUNTRY_DOMAINS} https://www.facebook.com`,
   `media-src 'self' ${UPSTREAM_ORIGIN}`,
   `connect-src 'self' ${UPSTREAM_ORIGIN} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} ${META}`,
   "object-src 'none'",

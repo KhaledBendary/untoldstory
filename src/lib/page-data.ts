@@ -4,6 +4,7 @@ import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { POSTS as FALLBACK_POSTS, PROJECTS as FALLBACK_PROJECTS, SERVICES as FALLBACK_SERVICES } from "@/data/content";
 import { POST_SLUG_ALIASES, POST_SLUGS_THAT_REDIRECT, legacyDestination, relatedPostSlugs, relatedServiceSlugs } from "@/lib/legacy-redirects";
 import { isoPostDate } from "@/lib/dates";
+import { isUnreadable } from "@/lib/seo";
 import type { About, BlogPost, LayoutData, PortfolioItem, Service } from "@/types/api";
 
 /**
@@ -108,10 +109,6 @@ export async function getServicesData(locale?: string): Promise<Service[]> {
  * This masks broken data, it does not repair it. The Arabic role and bio need
  * re-entering in the CMS before the real text can appear.
  */
-function isUnreadable(value: unknown): boolean {
-  return typeof value === "string" && /\?{3,}/.test(value);
-}
-
 export async function getAboutData(locale?: string): Promise<About> {
   const about = await api.getAbout(locale);
   if (!Array.isArray(about?.team)) return about;

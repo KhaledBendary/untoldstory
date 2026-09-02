@@ -89,8 +89,18 @@ async function check(route, locale) {
     problems.push(`title ${decode(title).length} chars`);
 
   if (!description) problems.push("no meta description");
-  else if (decode(description).length > DESCRIPTION_MAX)
-    problems.push(`description ${decode(description).length} chars`);
+  else {
+    const text = decode(description);
+    if (text.length > DESCRIPTION_MAX) problems.push(`description ${text.length} chars`);
+    /*
+     * What it says, not just that it exists. Length and presence were checked
+     * and both passed while three Arabic portfolio pages advertised
+     * "???? ?????? ????? ..." to searchers — the CMS text had lost its
+     * encoding, and that string is what Google prints under the result.
+     */
+    if (/\?{3,}/.test(text)) problems.push("description is unreadable (lost encoding)");
+    if (/[:;,]$/.test(text.trim())) problems.push("description stops mid-sentence");
+  }
 
   const expectedCanonical = `https://globaluntoldstory.com${path === "/" ? "" : path}`;
   if (!canonical) problems.push("no canonical");
