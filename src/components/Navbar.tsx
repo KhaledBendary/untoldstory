@@ -10,6 +10,7 @@ import Magnetic from './Magnetic';
 import { EASE } from './Reveal';
 import type { LayoutData } from '@/types/api';
 import { useLanguage, LANGUAGES } from './LanguageContext';
+import { trackContactClick } from '@/lib/analytics';
 import { usePageData } from '@/hooks/usePageData';
 import { getShellData, type ShellData } from '@/lib/page-data';
 
@@ -191,7 +192,7 @@ export default function Navbar({ initialData, initialLocale }: { initialData: Sh
               exit={{ opacity: 0 }}
               transition={{ delay: 0.5 }}
             >
-              <a href={`mailto:${layout?.site_config?.email || 'bendary@globaluntoldstory.com'}`} className="hover:text-white transition-colors">
+              <a href={`mailto:${layout?.site_config?.email || 'bendary@globaluntoldstory.com'}`} onClick={() => trackContactClick("email")} className="hover:text-white transition-colors">
                 {layout?.site_config?.email || 'bendary@globaluntoldstory.com'}
               </a>
               <div className="flex gap-6">

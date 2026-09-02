@@ -9,6 +9,7 @@ import Magnetic from './Magnetic';
 import { Reveal, SplitWords } from './Reveal';
 import type { Service, LayoutData } from '@/types/api';
 import { useLanguage } from './LanguageContext';
+import { trackContactClick } from '@/lib/analytics';
 import { usePageData } from '@/hooks/usePageData';
 import { getShellData, type ShellData } from '@/lib/page-data';
 
@@ -50,7 +51,7 @@ export default function Footer({ initialData, initialLocale }: { initialData: Sh
               {t('Get in touch')} <ArrowUpRight className="w-4 h-4 group-hover:rotate-45 transition-transform duration-500 rtl:-scale-x-100" />
             </Link>
           </Magnetic>
-          <a href={`mailto:${siteConfig?.email || 'bendary@globaluntoldstory.com'}`} className="hidden sm:inline font-mono2 text-[11px] tracking-[0.2em] uppercase link-line">
+          <a href={`mailto:${siteConfig?.email || 'bendary@globaluntoldstory.com'}`} onClick={() => trackContactClick("email")} className="hidden sm:inline font-mono2 text-[11px] tracking-[0.2em] uppercase link-line">
             {siteConfig?.email || 'bendary@globaluntoldstory.com'}
           </a>
         </Reveal>
@@ -97,7 +98,7 @@ export default function Footer({ initialData, initialLocale }: { initialData: Sh
                 <p className="font-medium">{o.region}</p>
                 <p className="text-[#0a0a0a]/65 text-[13px]">{o.address}</p>
                 {o.phone && (
-                  <a href={`tel:${o.phone}`} className="text-[#0a0a0a]/70 link-line text-[13px]">{o.phone}</a>
+                  <a onClick={() => trackContactClick("phone")} href={`tel:${o.phone}`} className="text-[#0a0a0a]/70 link-line text-[13px]">{o.phone}</a>
                 )}
               </li>
             ))}

@@ -1,5 +1,7 @@
 "use client";
 
+import { trackContactClick } from "@/lib/analytics";
+
 const WHATSAPP_NUMBER = "201001299639";
 
 export default function WhatsAppButton() {
@@ -8,6 +10,7 @@ export default function WhatsAppButton() {
       href={`https://wa.me/${WHATSAPP_NUMBER}`}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => trackContactClick("whatsapp")}
       aria-label="Chat with us on WhatsApp"
       className="fixed bottom-5 right-5 md:bottom-8 md:right-8 z-[200] w-14 h-14 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform duration-300"
     >

@@ -6,6 +6,7 @@ import { SplitWords, Reveal } from '../Reveal';
 import Magnetic from '../Magnetic';
 import type { ContactForm } from '@/types/api';
 import { useLanguage } from '../LanguageContext';
+import { trackLead, trackFormStart, trackContactClick } from '@/lib/analytics';
 import { usePageData } from '@/hooks/usePageData';
 import { getContactData, type ContactData } from '@/lib/page-data';
 
@@ -31,6 +32,13 @@ export default function ContactPage({ initialData, initialLocale, formToken }: {
   const email = layout?.site_config?.email || FALLBACK_EMAIL;
   const offices = layout?.footer?.offices || [];
   const socialLinks = layout?.site_config?.socialLinks;
+
+  const [startedTracked, setStartedTracked] = useState(false);
+  const onFirstInput = () => {
+    if (startedTracked) return;
+    setStartedTracked(true);
+    trackFormStart();
+  };
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -61,6 +69,8 @@ export default function ContactPage({ initialData, initialLocale, formToken }: {
         throw new Error(`Contact submit failed: ${response.status}`);
       }
       setSent(true);
+      // After the 200, not before: a lead the server refused is not a lead.
+      trackLead("form", { service: formData.service || "not specified" });
     } catch (err) {
       // The submission genuinely failed (network error, proxy/API down, or a
       // non-2xx response) — do NOT mark this as sent. Previously this branch
@@ -112,11 +122,11 @@ export default function ContactPage({ initialData, initialLocale, formToken }: {
               <h2 className="font-display font-extrabold uppercase text-3xl mb-4">{t('Your story is on its way')}</h2>
               <p className="text-white/60 leading-relaxed">
                 {t("We'll get back to you within one business day. If you need immediate assistance, write to us directly at")}{' '}
-                <a href={`mailto:${email}`} className="link-line text-white">{email}</a>.
+                <a href={`mailto:${email}`} onClick={() => trackContactClick("email")} className="link-line text-white">{email}</a>.
               </p>
             </div>
           ) : (
-            <form onSubmit={onSubmit} className="space-y-10">
+            <form onSubmit={onSubmit} onInput={onFirstInput} className="space-y-10">
               <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
               <input type="hidden" name="formToken" value={formToken} />
               {error && (
@@ -176,7 +186,7 @@ export default function ContactPage({ initialData, initialLocale, formToken }: {
           <Reveal>
             <div className="border border-white/15 p-8 md:p-10">
               <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-6">{t('Contact')}</p>
-              <a href={`mailto:${email}`} className="flex items-center gap-3 font-display font-bold text-lg md:text-xl mb-4 hover:opacity-70 transition-opacity break-all">
+              <a href={`mailto:${email}`} onClick={() => trackContactClick("email")} className="flex items-center gap-3 font-display font-bold text-lg md:text-xl mb-4 hover:opacity-70 transition-opacity break-all">
                 <Mail className="w-5 h-5 shrink-0" /> {email}
               </a>
               {offices.filter(o => o.phone).map(o => (
