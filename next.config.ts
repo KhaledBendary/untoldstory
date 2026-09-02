@@ -66,6 +66,7 @@ const nextConfig: NextConfig = {
   // Next's default trailing-slash hop is 308. Old WordPress URLs then need a
   // second 301 onto the canonical path. Handle the slash ourselves as 301.
   skipTrailingSlashRedirect: true,
+  skipMiddlewareUrlNormalize: true,
   outputFileTracingRoot: root,
   serverExternalPackages: ["nodemailer"],
   // Static generation defaults to one worker per core. Against the shared-host
