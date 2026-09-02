@@ -9,6 +9,7 @@ const PAGE_ALIASES: Record<string, string> = {
   "/aboutus": "/about",
   "/who-we-are": "/about",
   "/our-story": "/about",
+  "/about-me": "/about",
   "/contact-us": "/contact",
   "/contactus": "/contact",
   "/get-a-quote": "/contact",
