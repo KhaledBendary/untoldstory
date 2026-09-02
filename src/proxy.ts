@@ -2,6 +2,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n";
 import { legacyDestination } from "@/lib/legacy-redirects";
 
+/**
+ * Renamed from middleware.ts for Next 16, which deprecated that file
+ * convention and warns on every build. The exported function has to match the
+ * filename, so `middleware` became `proxy`; nothing else about the behaviour
+ * changes — same matcher, same redirects, same locale routing.
+ */
 /** Header the root layout reads to set <html lang> and dir on the server. */
 export const LOCALE_HEADER = "x-site-locale";
 
@@ -25,7 +31,7 @@ function markNonProduction(response: NextResponse, request: NextRequest) {
   return response;
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const host = hostname(request.headers.get("host"));
   const { pathname } = request.nextUrl;
   const params = request.nextUrl.searchParams;
