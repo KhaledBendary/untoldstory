@@ -16,11 +16,21 @@ import { getAboutData } from '@/lib/page-data';
 // role/bio encoding. These fallback members keep the team section full and
 // polished in every language; any members returned by the API are merged in.
 const FALLBACK_TEAM = [
-  { name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary' },
+  {
+    name: 'Khaled Bendary',
+    role: 'CEO',
+    slug: 'khaled-bendary',
+    bio: 'Founder of Global Untold Story, working across film, advertising, documentary and live production in Egypt, the Gulf and beyond.',
+  },
 ];
 
 const FALLBACK_TEAM_AR = [
-  { name: 'خالد بنداري', role: 'الرئيس التنفيذي', slug: 'khaled-bendary' },
+  {
+    name: 'خالد بنداري',
+    role: 'الرئيس التنفيذي',
+    slug: 'khaled-bendary',
+    bio: 'مؤسس Global Untold Story، ويعمل في الأفلام والإعلانات والأفلام الوثائقية والإنتاج المباشر في مصر والخليج وخارجهما.',
+  },
 ];
 
 /** Shape shared by the API's team records and the editorial fallback list. */
@@ -53,20 +63,36 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
     return !role || /^\?+$/.test(role) || role.includes('?') ? fb.role : role;
   };
   const isRealName = (name: unknown): name is string => typeof name === "string" && name.length > 1 && !name.includes("?");
-  const realApi: TeamMember[] = apiTeam.filter((m: TeamMember) => isRealName(m?.name));
-  const team: TeamMember[] = realApi.length
-    ? realApi
-    : fallbackTeam.map((fb) => {
-        const match = apiTeam.find((m: TeamMember) => m.slug === fb.slug);
-        if (!match) return fb;
-        const merged: TeamMember = {
+
+  /*
+   * Repair each field on its own.
+   *
+   * The previous version kept an API record whenever its *name* looked clean,
+   * and the CMS stores this team with a readable Latin name beside an Arabic
+   * role saved in the wrong encoding — so "Khaled Bendary" passed the check and
+   * carried "?????? ????????" onto the live page with it. Match the fallback by
+   * name as well as slug, because these records ship no slug at all.
+   */
+  const matchFallback = (m: TeamMember) => {
+    const name = (m.name || "").trim().toLowerCase();
+    return fallbackTeam.find(
+      (fb) => (m.slug && fb.slug === m.slug) || (fb.slug || "").replace(/-/g, " ") === name,
+    );
+  };
+
+  const team: TeamMember[] = apiTeam.length
+    ? apiTeam.map((m: TeamMember) => {
+        const fb = matchFallback(m);
+        if (!fb) return m;
+        return {
           slug: fb.slug,
-          name: isRealName(match.name) ? match.name : fb.name,
-          role: cleanRole(match, fb),
-          image: typeof match.image === "string" ? match.image : undefined,
+          name: isRealName(m.name) ? m.name : fb.name,
+          role: cleanRole(m, fb),
+          bio: m.bio && !m.bio.includes("?") ? m.bio : fb.bio,
+          image: typeof m.image === "string" ? m.image : undefined,
         };
-        return merged;
-      });
+      })
+    : fallbackTeam;
   const partnerLabels = aboutData?.partnerLabels || [];
 
   return (

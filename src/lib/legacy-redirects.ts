@@ -94,6 +94,8 @@ function splitLocale(pathname: string) {
 
 function mapBare(bare: string): string | null {
   if (PAGE_ALIASES[bare]) return PAGE_ALIASES[bare];
+  // Old service pages that lived at the site root, not under /service/.
+  if (SERVICE_ALIASES[bare]) return SERVICE_ALIASES[bare];
 
   if (/^\/(category|tag|author)(\/|$)/.test(bare)) return "/insights";
   if (/^\/(feed|comments\/feed)(\/|$)/.test(bare)) return "/insights";
@@ -126,6 +128,68 @@ function mapBare(bare: string): string | null {
 /**
  * Permanent destination for a legacy public path, or null if the URL is current.
  */
+/**
+ * Service pages under their pre-CMS slugs.
+ *
+ * The CMS renamed every service when the site moved, and Google still holds
+ * the old addresses — an SEO review found /tv-shows-live-broadcast-production
+ * and /ai-powered-cgi among the URLs it had discovered. Each maps to the
+ * closest current service rather than to /services, because a redirect that
+ * lands on a list makes the visitor start their search again.
+ *
+ * Right-hand values are live slugs from /api/v1/services; changing one there
+ * means changing it here.
+ */
+const SERVICE_ALIASES: Record<string, string> = {
+  "/on-ground-production": "/services/on-ground-egypt",
+  "/on-ground-production-services-egypt": "/services/on-ground-egypt",
+  "/line-production-egypt": "/services/on-ground-egypt",
+  "/production-services-egypt": "/services/on-ground-egypt",
+  "/fixer-egypt": "/services/on-ground-egypt",
+
+  "/commercial-advertising": "/services/commercial-video-production",
+  "/tv-commercial-production-in-egypt": "/services/commercial-video-production",
+  "/advertising-production": "/services/commercial-video-production",
+
+  "/documentary-production": "/services/documentary-production-egypt",
+  "/documentary": "/services/documentary-production-egypt",
+
+  "/corporate-industrial-content": "/services/corporate-video-production-egypt",
+  "/corporate-video-production-in-cairo": "/services/corporate-video-production-egypt",
+  "/corporate-video": "/services/corporate-video-production-egypt",
+
+  "/event-coverage-live-production": "/services/event-production-live-streaming-egypt",
+  "/event-coverage": "/services/event-production-live-streaming-egypt",
+  "/live-streaming": "/services/event-production-live-streaming-egypt",
+
+  "/tv-live-production": "/services/tv-show-production-live-broadcast",
+  "/tv-shows-live-broadcast-production": "/services/tv-show-production-live-broadcast",
+
+  "/podcast": "/services/podcast-production",
+  "/video-podcast": "/services/podcast-production",
+
+  "/post-production-finishing": "/services/post-production",
+  "/post": "/services/post-production",
+
+  "/motion-cgi-ai": "/services/motion-graphics-cgi-vfx-ai",
+  "/motion-cgi": "/services/motion-graphics-cgi-vfx-ai",
+  "/ai-powered-cgi": "/services/motion-graphics-cgi-vfx-ai",
+  "/vfx": "/services/motion-graphics-cgi-vfx-ai",
+
+  "/dubbing-voice-over": "/services/dubbing-voice-over-localization",
+  "/localization": "/services/dubbing-voice-over-localization",
+  "/voice-over": "/services/dubbing-voice-over-localization",
+
+  "/photography": "/services/commercial-photography",
+  "/commercial-photography-services": "/services/commercial-photography",
+
+  "/performance-marketing": "/services/performance-marketing-creative-strategy",
+  "/marketing-solutions": "/services/performance-marketing-creative-strategy",
+
+  "/original-ip": "/services/original-ip-development",
+  "/ip-development": "/services/original-ip-development",
+};
+
 export function legacyDestination(pathname: string): string | null {
   const { locale, bare } = splitLocale(pathname);
   const mapped = mapBare(bare);
