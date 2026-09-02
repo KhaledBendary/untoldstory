@@ -49,7 +49,31 @@ export function middleware(request: NextRequest) {
       for (const key of WP_QUERY_KEYS) url.searchParams.delete(key);
       if (url.pathname === "/index.php" || url.pathname === "/index.html") url.pathname = "/";
     }
-    return markNonProduction(NextResponse.redirect(url, 301), request);
+
+    /*
+     * Build the Location header from the parts rather than handing the URL
+     * object to NextResponse.redirect.
+     *
+     * Assigning `url.pathname = "/ar"` on a cloned NextURL did not stick: the
+     * response still carried `Location: /ar/`, so every trailing-slash URL
+     * redirected to itself. Browsers gave up after eight hops and Search
+     * Console reported them as redirect errors — /about/, /services/, /ar/ and
+     * every other path a person might type with a slash on the end.
+     */
+    const target = `${url.pathname}${url.search}`;
+    if (target === `${pathname}${request.nextUrl.search}`) {
+      // Nothing actually changes — serve the page instead of looping.
+      return markNonProduction(NextResponse.next(), request);
+    }
+
+    // Absolute: NextResponse rejects a bare path with ERR_INVALID_URL, and the
+    // Location header is well-formed either way.
+    const destinationHost = dropWww ? PRODUCTION_HOST : request.headers.get("host") || PRODUCTION_HOST;
+    const scheme = destinationHost.startsWith("localhost") ? "http" : "https";
+    return markNonProduction(
+      NextResponse.redirect(`${scheme}://${destinationHost}${target}`, 301),
+      request,
+    );
   }
 
   const [, first, ...rest] = pathname.split("/");
