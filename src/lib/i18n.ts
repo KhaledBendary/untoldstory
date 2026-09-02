@@ -20,8 +20,20 @@ export const DEFAULT_LOCALE: Locale = "en";
  * Locales that have real translated bodies and should be indexed.
  * The rest stay routable (switcher, middleware) but are noindex until
  * their CMS copy exists — otherwise Google indexes English duplicates.
+ *
+ * This list was ["en", "ar"] on the assumption that the other twelve were
+ * English shells. Measured against production instead of assumed: ar, fr, de,
+ * es, it, pt, ru and tr serve genuinely translated bodies — industry wording,
+ * not a machine gloss — with only two blog articles still English in every
+ * locale. zh, ja, ko, pl and sw really are the English text throughout, so
+ * they stay out; indexing them would be the duplicate problem this list exists
+ * to prevent.
+ *
+ * Re-measure before adding one: `node scripts/translation-coverage.mjs`.
  */
-export const INDEXABLE_LOCALES: readonly Locale[] = ["en", "ar"];
+export const INDEXABLE_LOCALES: readonly Locale[] = [
+  "en", "ar", "fr", "de", "es", "it", "pt", "ru", "tr",
+];
 
 export function isIndexableLocale(locale: string): locale is Locale {
   return (INDEXABLE_LOCALES as readonly string[]).includes(locale);

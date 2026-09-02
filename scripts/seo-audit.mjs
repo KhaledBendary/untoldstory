@@ -39,6 +39,15 @@ const decode = (s) =>
   s.replace(/&amp;/g, "&").replace(/&#x27;/g, "'").replace(/&quot;/g, '"')
    .replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 
+/*
+ * A request for a path that is not a route leaves its 404 page in the ISR
+ * cache, and the walk above then reads it as if it were a page — /sitemap-zh.xml
+ * was reported for having no canonical, no h1 and no hreflang, none of which a
+ * sitemap has. Anything whose route ends in a file extension is not an HTML
+ * page and does not belong in this audit.
+ */
+const isHtmlRoute = (route) => !/\.[a-z0-9]{2,5}$/i.test(route);
+
 const problems = [];
 const titles = new Map();
 const files = walk(ROOT);
@@ -46,6 +55,7 @@ const files = walk(ROOT);
 for (const file of files) {
   const html = fs.readFileSync(file, "utf8");
   const route = file.split(path.sep).join("/").replace(ROOT, "").replace(/\.html$/, "");
+  if (!isHtmlRoute(route)) continue;
   const at = (msg) => problems.push(`${route}: ${msg}`);
 
   const title = (html.match(/<title>([^<]*)<\/title>/) || [])[1];
