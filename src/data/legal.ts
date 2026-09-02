@@ -373,9 +373,99 @@ const AR: Record<LegalKey, LegalDoc> = {
  * a language nobody has reviewed is worse than an honest English one, so the
  * fallback is deliberate rather than a gap.
  */
+const FR: Record<LegalKey, LegalDoc> = {
+  privacy: {
+    eyebrow: "Confidentialité",
+    title: "Politique de confidentialité",
+    updated: "Dernière mise à jour",
+    intro:
+      "Cette politique explique ce que Global Untold Story collecte lorsque vous utilisez globaluntoldstory.com, pourquoi, et ce que vous pouvez nous demander.",
+    sections: [
+      { heading: "Qui nous sommes", body: [
+        "Global Untold Story est un studio de production de films, de vidéos et de contenus, avec des bureaux à Egyptian Media Production City, à Business Bay (Dubaï) et à Djeddah. Nous sommes responsables du traitement des données décrites ici.",
+        "Pour toute question relative à cette politique, écrivez à bendary@globaluntoldstory.com."] },
+      { heading: "Ce que vous nous confiez", body: [
+        "Le formulaire de contact demande votre nom, votre adresse e-mail, votre téléphone, le service qui vous intéresse et votre message. Seuls le nom, l\u2019e-mail et le message sont obligatoires.",
+        "Nous les utilisons pour vous répondre et préparer le projet dont vous parlez. Nous ne les vendons pas et ne les utilisons pas pour une prospection que vous n\u2019avez pas demandée.",
+        "Votre demande nous est envoyée par e-mail et conservée dans notre système de projets afin de reprendre la conversation. Nous gardons les demandes trois ans, puis les supprimons."] },
+      { heading: "Ce qui est collecté automatiquement", body: [
+        "Nous utilisons Google Analytics 4 pour savoir quelles pages sont lues et par quel chemin. Il enregistre les pages vues, une localisation approximative au niveau du pays, l\u2019appareil, le navigateur et le site référent. Google reçoit ces données en tant que sous-traitant.",
+        "Nous utilisons le pixel Meta pour mesurer si nos publicités touchent les bonnes audiences. Il enregistre les pages vues et peut les relier à un compte Meta si vous y êtes connecté.",
+        "Dans l\u2019Union européenne et au Royaume-Uni, aucun des deux ne se déclenche avant votre accord ; ailleurs ils se chargent avec la page. Vous pouvez refuser à tout moment."] },
+      { heading: "Qui d\u2019autre y a accès", body: [
+        "Vercel héberge ce site et traite les requêtes de votre navigateur, y compris votre adresse IP.",
+        "Hostinger héberge notre système de contenu, qui stocke les messages du formulaire, et relaie l\u2019e-mail de notification.",
+        "Google et Meta reçoivent les données décrites ci-dessus. Google Workspace assure notre messagerie.",
+        "C\u2019est la liste complète. Nous ne partageons vos données avec personne d\u2019autre, sauf obligation légale."] },
+      { heading: "Où elles sont traitées", body: [
+        "Nos bureaux sont en Égypte, aux Émirats et en Arabie saoudite, et les services ci-dessus opèrent à l\u2019international : vos données sont donc traitées hors de votre pays. Google, Meta et Vercel s\u2019appuient sur les clauses contractuelles types pour les transferts hors UE et Royaume-Uni."] },
+      { heading: "Ce que vous pouvez demander", body: [
+        "Vous pouvez demander une copie de ce que nous détenons, sa rectification ou sa suppression. Vous pouvez vous opposer au suivi analytique et publicitaire et retirer votre consentement à tout moment.",
+        "Écrivez à bendary@globaluntoldstory.com ; nous répondons sous trente jours. Dans l\u2019UE ou au Royaume-Uni, vous pouvez saisir votre autorité nationale de protection des données."] },
+      { heading: "Mineurs", body: [
+        "Ce site s\u2019adresse aux personnes qui commandent des productions. Il ne vise pas les enfants et nous ne collectons pas sciemment de données de personnes de moins de seize ans."] },
+      { heading: "Modifications", body: [
+        "Lorsque cette politique change, la date en haut est mise à jour. Toute modification importante sera annoncée sur le site."] },
+    ],
+  },
+  terms: {
+    eyebrow: "Conditions",
+    title: "Conditions d\u2019utilisation",
+    updated: "Dernière mise à jour",
+    intro:
+      "Ces conditions couvrent votre utilisation de globaluntoldstory.com. Elles ne couvrent pas les travaux de production, régis par le contrat signé pour chaque projet.",
+    sections: [
+      { heading: "Utiliser ce site", body: [
+        "Vous pouvez consulter ce site et en partager les liens à toute fin licite.",
+        "Vous ne pouvez pas le copier intégralement, l\u2019aspirer à un rythme qui en dégrade l\u2019accès pour autrui, tenter d\u2019atteindre des parties auxquelles vous n\u2019avez pas accès, ni le présenter comme votre travail."] },
+      { heading: "Les travaux présentés", body: [
+        "Les films, photographies, campagnes et textes de ce site appartiennent à Global Untold Story ou aux clients qui les ont commandés. Les noms et logos des clients leur appartiennent et figurent ici pour identifier des travaux que nous avons produits.",
+        "Rien ici ne vous accorde de licence de réutilisation. Si vous le souhaitez, demandez-nous."] },
+      { heading: "Une demande n\u2019est pas un contrat", body: [
+        "Envoyer le formulaire ouvre une conversation. Cela ne crée pas d\u2019accord, ne réserve pas de date et ne fixe pas de prix. Le travail commence à la signature d\u2019une proposition par les deux parties.",
+        "Les montants, délais ou disponibilités mentionnés sur ce site sont indicatifs et dépendent des spécificités du projet."] },
+      { heading: "Exactitude", body: [
+        "Nous tenons ce site à jour, mais les réalisations, descriptions de services et disponibilités évoluent. Nous ne garantissons pas que tout y soit complet ou à jour au moment de votre lecture."] },
+      { heading: "Liens externes", body: [
+        "Lorsque nous renvoyons vers d\u2019autres sites — réseaux sociaux, clients, partenaires — nous ne contrôlons pas ce qu\u2019ils publient et n\u2019en sommes pas responsables."] },
+      { heading: "Responsabilité", body: [
+        "Ce site est fourni en l\u2019état. Dans la limite permise par la loi, nous ne sommes pas responsables des pertes résultant de son utilisation ou de son indisponibilité.",
+        "Rien ici ne limite la responsabilité en cas de décès, de dommage corporel ou de fraude."] },
+      { heading: "Droit applicable", body: [
+        "Ces conditions sont régies par le droit de la République arabe d\u2019Égypte, dont les tribunaux sont compétents pour les litiges s\u2019y rapportant."] },
+    ],
+  },
+  cookies: {
+    eyebrow: "Cookies",
+    title: "Politique de cookies",
+    updated: "Dernière mise à jour",
+    intro:
+      "Cette page liste chaque cookie et technologie similaire utilisés par ce site, leur rôle et la façon de désactiver ceux qui sont facultatifs.",
+    sections: [
+      { heading: "Ce que nous déposons nous-mêmes", body: [
+        "Votre choix de langue est porté par l\u2019adresse que vous lisez — /fr pour le français, sans préfixe pour l\u2019anglais — et non par un cookie.",
+        "Le formulaire de contact délivre un jeton de courte durée à chaque visiteur afin de distinguer une personne d\u2019un script automatisé. Il ne contient rien vous concernant et expire rapidement.",
+        "Votre réponse à la bannière de consentement est conservée localement dans votre navigateur, afin de ne pas vous la reposer à chaque visite."] },
+      { heading: "Google Analytics", body: [
+        "Identifiant de mesure G-G38ZL9GYXF. Dépose _ga et _ga_* pour compter les visites et distinguer un lecteur qui revient d\u2019un nouveau. Durée maximale : deux ans.",
+        "Cela nous indique quels travaux et quels articles sont réellement lus. Cela ne vous identifie pas nommément."] },
+      { heading: "Pixel Meta", body: [
+        "Identifiant 780471777947136. Dépose _fbp et lit le paramètre _fbc lorsque vous arrivez depuis une publicité Meta. Durée : environ trois mois.",
+        "Cela mesure si nos publicités atteignent des personnes intéressées. Si vous êtes connecté à Facebook ou Instagram dans le même navigateur, Meta peut relier la visite à ce compte."] },
+      { heading: "Les désactiver", body: [
+        "Dans l\u2019Union européenne et au Royaume-Uni, rien ne se déclenche avant votre accord ; refuser suffit.",
+        "Tout navigateur peut bloquer ou supprimer les cookies — cherchez Confidentialité dans ses réglages. Les bloquer n\u2019empêche pas ce site de fonctionner : rien ici n\u2019a besoin d\u2019un cookie.",
+        "Google publie un module de désactivation d\u2019Analytics sur tools.google.com/dlpage/gaoptout. Les réglages publicitaires de Meta se trouvent dans les préférences de votre compte."] },
+      { heading: "Modifications", body: [
+        "Si nous ajoutons ou retirons une balise, cette page change avec elle et la date en haut est mise à jour."] },
+    ],
+  },
+};
+
 const BY_LOCALE: Partial<Record<Locale, Record<LegalKey, LegalDoc>>> = {
   en: EN,
   ar: AR,
+  fr: FR,
 };
 
 export function legalDoc(key: LegalKey, locale: string): LegalDoc {
