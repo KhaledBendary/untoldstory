@@ -303,9 +303,69 @@ export function sanitizeCmsHtml(html?: string | null) {
     .replace(/\ssrcdoc\s*=\s*("[^"]*"|'[^']*')/gi, "");
 }
 
+/**
+ * Turn Markdown that was pasted into a rich-text field into real elements.
+ *
+ * The CMS stores some bodies as Markdown wrapped in paragraph tags —
+ * `<p>## Mehr als nur ein Heldenfilm</p>` — so the markup is valid HTML and
+ * renders exactly as typed. The German service pages showed twenty-eight
+ * literal "##" and "**" to readers, the Italian four. It is the editor's
+ * content that is wrong, but the page can read it correctly, and every
+ * language shares one renderer.
+ *
+ * Deliberately a small subset, applied only to a paragraph's whole text: ATX
+ * headings, bold, bullet lists and horizontal rules. Anything more needs a
+ * real parser, and guessing at partial Markdown inside prose would damage text
+ * that is already correct.
+ */
+export function markdownInHtml(html?: string | null) {
+  if (!html) return "";
+  // Cheap check first: most bodies are clean HTML and should not be walked.
+  // A paired *emphasis* counts too — "(*hero films*)" was showing its
+  // asterisks on the German pages, and it never starts a line.
+  const LOOKS_LIKE_MARKDOWN = /(^|>)\s*(#{2,6}\s|\*\*|[-*][\s\p{L}]|---)|\*[^*<>\n]{1,120}\*/mu;
+  if (!LOOKS_LIKE_MARKDOWN.test(html)) return html;
+
+  let out = html;
+
+  // <p>## Heading</p> -> <h2>Heading</h2>, keeping the level the editor chose.
+  out = out.replace(
+    /<p>\s*(#{2,6})\s+([\s\S]*?)<\/p>/gi,
+    (_m, hashes: string, text: string) => `<h${hashes.length}>${text.trim()}</h${hashes.length}>`,
+  );
+
+  // A paragraph that is only a rule.
+  out = out.replace(/<p>\s*-{3,}\s*<\/p>/gi, "<hr>");
+
+  // A paragraph of "* item" lines becomes a list. Bullets arrive both as
+  // separate paragraphs and as one paragraph of <br>-separated lines.
+  out = out.replace(/<p>\s*([*-])\s+([\s\S]*?)<\/p>/gi, (_m, _bullet: string, text: string) => {
+    const items = text
+      .split(/<br\s*\/?>|\n/)
+      .map((line) => line.replace(/^\s*[*-]\s+/, "").trim())
+      .filter(Boolean);
+    return `<ul>${items.map((item) => `<li>${item}</li>`).join("")}</ul>`;
+  });
+  out = out.replace(/<\/ul>\s*<ul>/gi, "");
+
+  // **bold** anywhere, but never across a tag boundary.
+  out = out.replace(/\*\*([^*<>]+)\*\*/g, "<strong>$1</strong>");
+
+  // *emphasis* — require the pair to sit inside one run of text, so a stray
+  // asterisk in prose is left alone.
+  out = out.replace(/(^|[\s(])\*([^*<>\n]{1,120})\*(?=[\s.,;:!?)]|$)/g, "$1<em>$2</em>");
+
+  // A bullet marker left at the very start of an element's text, with no
+  // closing partner — "<li>*ospitalità e turismo</li>". Unpaired, so the
+  // emphasis rule above will not touch it, and it is only ever a leftover.
+  out = out.replace(/>(\s*)[*-](?=[\p{L}])/gu, ">$1");
+
+  return out;
+}
+
 /** Sanitise CMS rich text and demote its headings in one pass. */
 export function renderCmsHtml(html?: string | null) {
-  return demoteHeadings(sanitizeCmsHtml(html));
+  return demoteHeadings(markdownInHtml(sanitizeCmsHtml(html)));
 }
 
 export const DEFAULT_OG_IMAGE = "/images/on-ground-production-giza.jpg";
