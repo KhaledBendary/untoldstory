@@ -42,6 +42,20 @@ const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-G38ZL9
  */
 const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID ?? "780471777947136";
 
+/**
+ * Analytics only counts the real site.
+ *
+ * Both tags used to fire wherever the page was served, so every preview
+ * deployment on *.vercel.app and every `next dev` session on localhost was
+ * recorded as live traffic — sessions from the people building the site mixed
+ * into the numbers the ads are judged on. The pages are deliberately static
+ * (see generateStaticParams below: no headers() call), so the host cannot be
+ * checked while rendering; the guard runs in the browser instead, around the
+ * calls that actually start recording. gtag.js still downloads on a preview,
+ * but without config() it reports nothing.
+ */
+const ANALYTICS_HOST = new URL(SITE_URL).hostname;
+
 export async function generateMetadata({
   params,
 }: {
@@ -260,7 +274,9 @@ return (
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', '${GA_MEASUREMENT_ID}');
+          if (location.hostname === '${ANALYTICS_HOST}') {
+            gtag('config', '${GA_MEASUREMENT_ID}');
+          }
         `}
       </Script>
 
@@ -276,8 +292,10 @@ return (
               t.src=v;s=b.getElementsByTagName(e)[0];
               s.parentNode.insertBefore(t,s)}(window,document,'script',
               'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init', '${FB_PIXEL_ID}');
-              fbq('track', 'PageView');
+              if (location.hostname === '${ANALYTICS_HOST}') {
+                fbq('init', '${FB_PIXEL_ID}');
+                fbq('track', 'PageView');
+              }
             `}
           </Script>
           {/* Keeps the pixel working for visitors who block scripts. A real

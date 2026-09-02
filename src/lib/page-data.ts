@@ -2,7 +2,7 @@ import { api } from "@/lib/api";
 import { ApiError } from "@/lib/api-client";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { POSTS as FALLBACK_POSTS, PROJECTS as FALLBACK_PROJECTS, SERVICES as FALLBACK_SERVICES } from "@/data/content";
-import { POST_SLUG_ALIASES, POST_SLUGS_THAT_REDIRECT, relatedPostSlugs, relatedServiceSlugs } from "@/lib/legacy-redirects";
+import { POST_SLUG_ALIASES, POST_SLUGS_THAT_REDIRECT, legacyDestination, relatedPostSlugs, relatedServiceSlugs } from "@/lib/legacy-redirects";
 import { isoPostDate } from "@/lib/dates";
 import type { About, BlogPost, LayoutData, PortfolioItem, Service } from "@/types/api";
 
@@ -392,10 +392,50 @@ export async function findPostAnyLocale(slug: string, locale?: string) {
  */
 export type ShellData = { layout: LayoutData | null; services: Service[] };
 
+/*
+ * Point CMS-authored links at the URL they end up on.
+ *
+ * The footer menu comes from the CMS, and the CMS still held "/portfolio" from
+ * the WordPress site — so every page linked to a 301 rather than to /work, on
+ * eighty pages across both languages. The middleware caught the hop and the
+ * visitor arrived, but an internal link should never spend a redirect: it slows
+ * the click and it makes Google discover the site through URLs that are meant
+ * to be retired.
+ *
+ * Rewriting through the same table the redirects use fixes the whole class,
+ * not just the one link, and costs nothing when a link is already current.
+ * Fragments are kept: /services#slug maps as /services and gets its hash back.
+ */
+function currentHref(href: unknown): string | undefined {
+  if (typeof href !== "string" || !href.startsWith("/")) return typeof href === "string" ? href : undefined;
+  const [path, hash] = href.split("#");
+  const destination = legacyDestination(path);
+  return destination ? `${destination}${hash ? `#${hash}` : ""}` : href;
+}
+
+function withCurrentLinks(layout: LayoutData | null): LayoutData | null {
+  if (!layout?.footer) return layout;
+  const fix = (links: unknown) =>
+    Array.isArray(links)
+      ? links.map((link) =>
+          link && typeof link === "object" ? { ...link, href: currentHref((link as { href?: unknown }).href) } : link,
+        )
+      : links;
+
+  return {
+    ...layout,
+    footer: {
+      ...layout.footer,
+      aboutLinks: fix(layout.footer.aboutLinks) as LayoutData["footer"]["aboutLinks"],
+      serviceLinks: fix(layout.footer.serviceLinks) as LayoutData["footer"]["serviceLinks"],
+    },
+  };
+}
+
 export async function getShellData(locale?: string): Promise<ShellData> {
   const [layout, services] = await Promise.all([
     safeFetch(() => api.getLayout(locale), "layout"),
     safeFetch(() => getServicesData(locale), "shell-services"),
   ]);
-  return { layout: layout ?? null, services: services ?? [] };
+  return { layout: withCurrentLinks(layout ?? null), services: services ?? [] };
 }
