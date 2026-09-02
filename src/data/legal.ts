@@ -5,7 +5,7 @@ import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
  *
  * Written against what this site actually does, not from a template: the
  * contact form fields in `src/lib/mail.ts`, the analytics tags in the locale
- * layout (GA4 G-CV7T8W6SDJ and Meta Pixel 780471777947136), and the two hosts
+ * layout (GA4 G-G38ZL9GYXF and Meta Pixel 780471777947136), and the two hosts
  * involved — Vercel serves the site, the Laravel API on Hostinger stores
  * enquiries. If any of those change, this copy has to change with them.
  *
@@ -169,7 +169,7 @@ const EN: Record<LegalKey, LegalDoc> = {
       {
         heading: "Google Analytics",
         body: [
-          "Measurement ID G-CV7T8W6SDJ. Sets _ga and _ga_* to count visits and tell a returning reader from a new one. They last up to two years.",
+          "Measurement ID G-G38ZL9GYXF. Sets _ga and _ga_* to count visits and tell a returning reader from a new one. They last up to two years.",
           "This tells us which work and which articles people actually read. It does not identify you by name.",
         ],
       },
@@ -339,7 +339,7 @@ const AR: Record<LegalKey, LegalDoc> = {
       {
         heading: "Google Analytics",
         body: [
-          "معرّف القياس G-CV7T8W6SDJ. يضع ‎_ga‎ و‎_ga_*‎ لعدّ الزيارات وتمييز القارئ العائد عن الجديد. وتستمر حتى سنتين.",
+          "معرّف القياس G-G38ZL9GYXF. يضع ‎_ga‎ و‎_ga_*‎ لعدّ الزيارات وتمييز القارئ العائد عن الجديد. وتستمر حتى سنتين.",
           "يخبرنا هذا بالأعمال والمقالات التي تُقرأ فعلاً. ولا يحدّد هويتك بالاسم.",
         ],
       },

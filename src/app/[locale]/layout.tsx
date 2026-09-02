@@ -24,7 +24,16 @@ const jetbrains = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "6
 const fontClass = [alexandria.variable, archivo.variable, inter.variable, jetbrains.variable].join(" ");
 
 const siteUrl = SITE_URL;
-const GA_MEASUREMENT_ID = "G-CV7T8W6SDJ";
+/**
+ * GA4 measurement id, overridable per environment.
+ *
+ * This was G-CV7T8W6SDJ for two days after the migration — a valid-looking id
+ * belonging to a different property. Google accepts any id without checking
+ * it, so the tag fired, the network showed a clean /g/collect, and the
+ * property still read zero. Verify against Admin → Data Streams, not against
+ * whether the request succeeds.
+ */
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-G38ZL9GYXF";
 
 /**
  * Meta Pixel. Overridable per environment so a preview deployment can point at
