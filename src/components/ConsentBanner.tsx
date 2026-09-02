@@ -29,10 +29,21 @@ export default function ConsentBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Only after mount: the decision depends on localStorage and timezone,
-    // neither of which exists during the server render.
+    /*
+     * Only after mount: the decision depends on localStorage and the visitor's
+     * timezone, neither of which exists during the server render.
+     *
+     * The lint rule warns about cascading renders, which needs a dependency
+     * that the setState itself changes. This runs once on an empty dependency
+     * list and sets a value it never reads back, so it costs one extra render
+     * and cannot loop. useSyncExternalStore would be the usual alternative and
+     * is wrong here: its client snapshot would differ from the server's on the
+     * very first render, which is a hydration mismatch — the same one that had
+     * to be reverted out of useHydrated.
+     */
     if (readConsent() !== null) return;
     if (!consentRequired()) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reasoned above
     setVisible(true);
   }, []);
 
