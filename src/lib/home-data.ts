@@ -101,11 +101,11 @@ export async function getHomeData(locale?: string): Promise<HomeData> {
 }
 
 /** Server render must never take the whole page down over an API blip. */
-export function fallbackHomeData(): HomeData {
+export function fallbackHomeData(locale?: string): HomeData {
   return {
     services: mappedFallbackServices(),
     projects: mappedFallbackProjects(),
-    posts: mappedFallbackPosts(),
+    posts: mappedFallbackPosts(locale),
     stats: [
       { value: 3, suffix: "+", label: "Offices" },
       { value: 90, suffix: "%", label: "Repeat business" },
@@ -131,10 +131,10 @@ export async function getHomeDataSafe(locale?: string): Promise<HomeData> {
     const data = await getHomeData(locale);
     if (!data.services.length) data.services = mappedFallbackServices();
     if (!data.projects.length) data.projects = mappedFallbackProjects();
-    if (!data.posts.length) data.posts = mappedFallbackPosts();
+    if (!data.posts.length) data.posts = mappedFallbackPosts(locale);
     return data;
   } catch (e) {
     console.error("Failed to fetch home data on the server:", e);
-    return fallbackHomeData();
+    return fallbackHomeData(locale);
   }
 }

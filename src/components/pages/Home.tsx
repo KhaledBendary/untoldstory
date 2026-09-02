@@ -644,7 +644,7 @@ function ImageBreak() {
 export default function Home({ initialData, initialLocale }: { initialData: HomeData | null; initialLocale: string }) {
   const ready = useSiteReady();
   const { locale, t } = useLanguage();
-  const [data, setData] = useState<HomeData>(initialData ?? fallbackHomeData());
+  const [data, setData] = useState<HomeData>(initialData ?? fallbackHomeData(initialLocale));
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -659,7 +659,7 @@ export default function Home({ initialData, initialLocale }: { initialData: Home
         if (!cancelled) setData(next);
       } catch (err) {
         console.error("Failed to fetch home data:", err);
-        if (!cancelled) setData(fallbackHomeData());
+        if (!cancelled) setData(fallbackHomeData(locale));
       } finally {
         if (!cancelled) setLoading(false);
       }

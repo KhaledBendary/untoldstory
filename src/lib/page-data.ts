@@ -4,6 +4,7 @@ import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { POSTS as FALLBACK_POSTS, PROJECTS as FALLBACK_PROJECTS, SERVICES as FALLBACK_SERVICES } from "@/data/content";
 import { POST_SLUG_ALIASES, POST_SLUGS_THAT_REDIRECT, legacyDestination, relatedPostSlugs, relatedServiceSlugs } from "@/lib/legacy-redirects";
 import { isoPostDate } from "@/lib/dates";
+import { postTranslation } from "@/data/post-translations";
 import { isUnreadable, nameFromSlug } from "@/lib/seo";
 import type { About, BlogPost, LayoutData, PortfolioItem, Service } from "@/types/api";
 
@@ -61,28 +62,42 @@ function normalizeBlogPost(post: BlogPost): BlogPost {
   return withDisplayTitle({ ...post, date: iso || post.date, publishedAt: iso || post.publishedAt });
 }
 
-function allMappedFallbackPosts(): BlogPost[] {
-  return FALLBACK_POSTS.map((p) => ({
-    id: p.slug,
-    slug: p.slug,
-    title: p.title,
-    excerpt: p.excerpt,
-    date: p.date,
-    publishedAt: p.date,
-    category: p.category,
-    categorySlug: p.category.toLowerCase().replace(/\s+/g, "-"),
-    authorName: "Global Untold Story",
-    authorImage: null,
-    featuredImage: p.image,
-    body: Array.isArray(p.body) ? p.body.map((block) => `<p>${block}</p>`).join("") : String(p.body || ""),
-    readTimeMinutes: 6,
-    tags: [],
-    isFeatured: false,
-  }));
+/*
+ * Two insights articles live in this repo rather than the CMS, so every locale
+ * was serving them in English while the rest of the page around them was
+ * translated. They were the only untranslated pages left in the seven locales
+ * opened for indexing. The translations sit in post-translations.ts; a locale
+ * with none keeps the English text, which is the honest fallback.
+ */
+function allMappedFallbackPosts(locale?: string): BlogPost[] {
+  return FALLBACK_POSTS.map((p) => {
+    const translated = locale ? postTranslation(p.slug, locale) : undefined;
+    const title = translated?.title ?? p.title;
+    const excerpt = translated?.excerpt ?? p.excerpt;
+    const body = translated?.body ?? p.body;
+
+    return {
+      id: p.slug,
+      slug: p.slug,
+      title,
+      excerpt,
+      date: p.date,
+      publishedAt: p.date,
+      category: p.category,
+      categorySlug: p.category.toLowerCase().replace(/\s+/g, "-"),
+      authorName: "Global Untold Story",
+      authorImage: null,
+      featuredImage: p.image,
+      body: Array.isArray(body) ? body.map((block) => `<p>${block}</p>`).join("") : String(body || ""),
+      readTimeMinutes: 6,
+      tags: [],
+      isFeatured: false,
+    };
+  });
 }
 
-export function mappedFallbackPosts(): BlogPost[] {
-  const canonical = allMappedFallbackPosts().map((p) => {
+export function mappedFallbackPosts(locale?: string): BlogPost[] {
+  const canonical = allMappedFallbackPosts(locale).map((p) => {
     const slug = POST_SLUG_ALIASES[p.slug];
     return slug && slug !== p.slug ? { ...p, id: slug, slug } : p;
   });
@@ -91,9 +106,9 @@ export function mappedFallbackPosts(): BlogPost[] {
   );
 }
 
-function findFallbackPost(slug: string) {
+function findFallbackPost(slug: string, locale?: string) {
   const related = relatedPostSlugs(slug);
-  return allMappedFallbackPosts().find((p) => related.includes(p.slug));
+  return allMappedFallbackPosts(locale).find((p) => related.includes(p.slug));
 }
 
 function findFallbackService(slug: string) {
@@ -137,7 +152,7 @@ export async function getAboutData(locale?: string): Promise<About> {
 }
 
 export async function getInsightsData(locale?: string): Promise<BlogPost[]> {
-  const extras = mappedFallbackPosts();
+  const extras = mappedFallbackPosts(locale);
   try {
     const data = await api.getBlogPosts({ page: 1, per_page: 50, locale });
     const items = (data?.items || []).map(normalizeBlogPost);
@@ -361,8 +376,8 @@ export async function postDetailWithFallback(
     const allPosts = await safeFetch(() => getInsightsData(attempt), "insights-list");
     return { status: "ok", data: { post, allPosts: allPosts ?? [post] } };
   }
-  const fallback = findFallbackPost(slug);
-  if (fallback) return { status: "ok", data: { post: fallback, allPosts: mappedFallbackPosts() } };
+  const fallback = findFallbackPost(slug, locale);
+  if (fallback) return { status: "ok", data: { post: fallback, allPosts: mappedFallbackPosts(locale) } };
   return direct ?? null;
 }
 
