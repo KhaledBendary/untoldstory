@@ -97,8 +97,33 @@ export async function getServicesData(locale?: string): Promise<Service[]> {
   }
 }
 
+/*
+ * The CMS holds this team's Arabic role and bio in a column that lost the
+ * encoding, so they arrive as runs of "?". About.tsx already substitutes clean
+ * copy at render, but it is a client component: the raw record still travelled
+ * in the flight payload, shipping several kilobytes of corrupt text on every
+ * Arabic page view. Drop the unusable fields here and the payload carries only
+ * what is displayable — the component's existing fallback fills the gap.
+ *
+ * This masks broken data, it does not repair it. The Arabic role and bio need
+ * re-entering in the CMS before the real text can appear.
+ */
+function isUnreadable(value: unknown): boolean {
+  return typeof value === "string" && /\?{3,}/.test(value);
+}
+
 export async function getAboutData(locale?: string): Promise<About> {
-  return api.getAbout(locale);
+  const about = await api.getAbout(locale);
+  if (!Array.isArray(about?.team)) return about;
+
+  return {
+    ...about,
+    team: about.team.map((member) => ({
+      ...member,
+      role: isUnreadable(member?.role) ? undefined : member?.role,
+      bio: isUnreadable(member?.bio) ? undefined : member?.bio,
+    })),
+  };
 }
 
 export async function getInsightsData(locale?: string): Promise<BlogPost[]> {

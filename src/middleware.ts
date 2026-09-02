@@ -109,7 +109,13 @@ export const config = {
      * Every asset extension has to be listed here: anything missing gets the
      * locale rewrite and 404s. `webmanifest` was, so /site.webmanifest — which
      * exists in public/ and is referenced from the layout — was unreachable.
+     *
+     * `xml` is deliberately NOT in that extension list. It was, so middleware
+     * never saw /sitemap_index.xml or /wp-sitemap.xml and their redirect rules
+     * were dead — the first line of this comment claimed they ran while the
+     * pattern excluded them. Our own sitemaps are named explicitly instead, so
+     * they stay untouched and every other .xml reaches the redirect table.
      */
-    "/((?!_next/|api/|images/|favicon|robots.txt|sitemap.xml|.*\\.(?:ico|png|jpe?g|gif|webp|svg|avif|woff2?|ttf|eot|css|js|map|mp4|webm|txt|json|pdf|webmanifest|xml|ics|mp3|wav|zip)$).*)",
+    "/((?!_next/|api/|images/|favicon|robots.txt|sitemap.xml|sitemap-[a-z]{2}.xml|.*\\.(?:ico|png|jpe?g|gif|webp|svg|avif|woff2?|ttf|eot|css|js|map|mp4|webm|txt|json|pdf|webmanifest|ics|mp3|wav|zip)$).*)",
   ],
 };
