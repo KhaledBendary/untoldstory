@@ -363,9 +363,101 @@ export function markdownInHtml(html?: string | null) {
   return out;
 }
 
+/**
+ * Unwrap copy that was pasted out of a chat assistant's answer panel.
+ *
+ * Several service bodies arrive inside
+ * `<div id="model-response-message-content…" class="markdown markdown-main-panel
+ * … tutor-markdown-rendering">`, with `data-path-to-node` on every child and
+ * empty `<span class="">` around runs of text. The editor copied the rendered
+ * answer rather than the text of it.
+ *
+ * Nothing here is visible on its own, but the container is why the translator
+ * note survived a first attempt at removing it: the note was the assistant's
+ * opening line, and with the wrapper in place it was never the first block.
+ */
+export function unwrapPastedEditorMarkup(html?: string | null) {
+  if (!html) return "";
+  let out = html;
+
+  const container = /^\s*<div\b[^>]*(?:markdown-main-panel|tutor-markdown-rendering|model-response-message-content)[^>]*>/i;
+  if (container.test(out)) {
+    out = out.replace(container, "").replace(/<\/div>\s*$/i, "");
+  }
+
+  return out
+    .replace(/\sdata-path-to-node\s*=\s*("[^"]*"|'[^']*')/gi, "")
+    .replace(/<span class="">([\s\S]*?)<\/span>/gi, "$1")
+    .trim();
+}
+
+/**
+ * Remove the note the translator left at the top of the copy.
+ *
+ * Several bodies were pasted straight out of a chat assistant, wrapper markup
+ * and all — "Voici la traduction en français :", "Hier ist die Übersetzung der
+ * langen Nachricht ins Deutsche:", "Ecco la traduzione in italiano:", and on
+ * one Italian page a note written in Spanish explaining that Italian was
+ * supplied instead. Readers saw all of it, and so did Google once those
+ * locales were indexed.
+ *
+ * Deliberately narrow: only a short leading block that announces a translation.
+ * Prose about translation is ordinary on a localisation service page — "una
+ * campaña nunca debe sentirse traducida" is real copy — so the pattern has to
+ * sit at the very start, be brief, and end on a colon, which an actual
+ * sentence of body copy does not.
+ *
+ * The umlaut is optional in the German alternatives because entities are
+ * blanked rather than decoded before the test, so `&Uuml;bersetzung` reaches
+ * it as `bersetzung`.
+ */
+const TRANSLATOR_NOTE =
+  /^\s*(?:\(|\[)?\s*(?:nota|note|hinweis)?\s*:?\s*(?:voici|ecco|hier ist|aqu[íi] tienes|aqui est[áa]|here is|this is|en lugar de)[\s\S]{0,200}?(?:traduction|traduzione|[üu]?bersetzung|traducci[óo]n|translation|traducida|tradotta|[üu]?bersetzt|translated)[\s\S]{0,80}?:\s*$/i;
+
+/**
+ * A note saying the copy that follows replaces what came before it. Narrower
+ * than TRANSLATOR_NOTE on purpose, because acting on it discards content.
+ */
+const SUPERSEDING_NOTE =
+  /(?:en lugar de|invece di|anstelle von|au lieu de|instead of)[\s\S]{0,160}?(?:traduci|traduzione|traduction|[üu]?bersetzung|traducci[óo]n|translat|versi[oó]ne?)[\s\S]{0,80}?:\s*\)?\s*$/i;
+
+export function stripTranslatorNote(html?: string | null) {
+  if (!html) return "";
+  let out = html;
+
+  /*
+   * A note that supersedes what came before it — "En lugar de español, aquí
+   * tienes la versión completa traducida al italiano". The Italian commercial
+   * page carried eleven blocks of Spanish, then this line, then the Italian
+   * copy: readers met a whole article in the wrong language before reaching
+   * theirs. The note marks where the real text starts, so everything ahead of
+   * it goes with it.
+   */
+  const blocks = [...out.matchAll(/<(p|h[1-6])\b[^>]*>([\s\S]*?)<\/\1\s*>/gi)];
+  for (const block of blocks.slice(0, 40)) {
+    const text = block[2].replace(/<[^>]+>/g, "").replace(/&[a-z]+;/gi, " ").trim();
+    if (text.length > 220 || !SUPERSEDING_NOTE.test(text)) continue;
+    out = out.slice((block.index ?? 0) + block[0].length);
+    break;
+  }
+
+  // …and a plain "here is the translation" opener, which only ever leads.
+  for (let i = 0; i < 2; i += 1) {
+    const block = out.match(/^\s*<(p|h[1-6])\b[^>]*>([\s\S]*?)<\/\1\s*>/i);
+    if (!block) break;
+    const text = block[2].replace(/<[^>]+>/g, "").replace(/&[a-z]+;/gi, " ").trim();
+    if (text.length > 220 || !TRANSLATOR_NOTE.test(text)) break;
+    out = out.slice(block[0].length);
+    // The note is usually followed by a rule separating it from the copy.
+    out = out.replace(/^\s*(?:<p>\s*-{3,}\s*<\/p>|<hr\s*\/?>)/i, "");
+  }
+
+  return out.trim();
+}
+
 /** Sanitise CMS rich text and demote its headings in one pass. */
 export function renderCmsHtml(html?: string | null) {
-  return demoteHeadings(markdownInHtml(sanitizeCmsHtml(html)));
+  return demoteHeadings(markdownInHtml(stripTranslatorNote(unwrapPastedEditorMarkup(sanitizeCmsHtml(html)))));
 }
 
 export const DEFAULT_OG_IMAGE = "/images/on-ground-production-giza.jpg";
