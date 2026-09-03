@@ -61,7 +61,13 @@ for (const file of files) {
   const title = (html.match(/<title>([^<]*)<\/title>/) || [])[1];
   const description = (html.match(/<meta name="description" content="([^"]*)"/) || [])[1];
   const canonical = (html.match(/<link rel="canonical" href="([^"]*)"/) || [])[1];
-  const hreflang = (html.match(/hrefLang=/gi) || []).length;
+  /*
+   * Only the <link rel="alternate"> elements in the head. The language switcher
+   * now renders real anchors and marks each with hrefLang, which is correct on
+   * a link to another language version — but it meant a bare "hrefLang=" count
+   * read 24 where 10 were expected, on every page.
+   */
+  const hreflang = (html.match(/<link[^>]+rel="alternate"[^>]+hrefLang=/gi) || []).length;
 
   if (!title) at("no <title>");
   else {

@@ -81,7 +81,13 @@ async function check(route, locale) {
   const canonical = pick(html, /<link rel="canonical" href="([^"]*)"/);
   const lang = pick(html, /<html lang="([^"]*)"/);
   const dir = pick(html, /<html[^>]*dir="([^"]*)"/);
-  const hreflang = (html.match(/hrefLang=/gi) || []).length;
+  /*
+   * Only the <link rel="alternate"> elements in the head. The language switcher
+   * now renders real anchors and marks each with hrefLang, which is correct on
+   * a link to another language version — but it meant a bare "hrefLang=" count
+   * read 24 where 10 were expected, on every page.
+   */
+  const hreflang = (html.match(/<link[^>]+rel="alternate"[^>]+hrefLang=/gi) || []).length;
   const h1 = (html.match(/<h1[\s>]/g) || []).length;
 
   if (!title) problems.push("no <title>");

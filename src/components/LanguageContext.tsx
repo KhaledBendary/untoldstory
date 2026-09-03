@@ -540,6 +540,8 @@ interface LanguageContextProps {
   locale: string;
   dir: 'ltr' | 'rtl';
   changeLocale: (code: string) => void;
+  /** Where this same page lives in another language. */
+  localeHref: (code: string) => string;
   t: (key: string) => string;
 }
 
@@ -555,11 +557,28 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   // the translated pages indexable at all.
   const { locale, bare } = useMemo(() => {
     const [, first, ...rest] = pathname.split('/');
-    if (isLocale(first) && first !== DEFAULT_LOCALE) {
+    /*
+     * Strip the prefix for English too. English is served unprefixed, but the
+     * app route is [locale], so at prerender the pathname is "/en/services"
+     * while in the browser it is "/services". Excluding the default locale
+     * here left `bare` as "/en/services" during the build, and the language
+     * links came out as "/ar/en/services". The locale is the same either way;
+     * only `bare` was wrong, and only in the HTML the crawler reads.
+     */
+    if (isLocale(first)) {
       return { locale: first, bare: `/${rest.join('/')}`.replace(/\/$/, '') || '/' };
     }
     return { locale: DEFAULT_LOCALE, bare: pathname };
   }, [pathname]);
+
+  /*
+   * The switcher needs a real URL, not just a handler. It was a row of
+   * <button onClick>, so the rendered HTML contained no link to any other
+   * language: readers without JavaScript had no way across, and crawlers had
+   * only the hreflang tags and the sitemaps to go on. Those do the job, but a
+   * link is what the page should have been offering all along.
+   */
+  const localeHref = (code: string) => localizedPath(bare, code);
 
   const changeLocale = (code: string) => {
     if (!isLocale(code) || code === locale) return;
@@ -569,7 +588,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const t = (key: string) => translations[locale]?.[key] || translations['en']?.[key] || key;
 
   return (
-    <LanguageContext.Provider value={{ locale, dir: localeDir(locale), changeLocale, t }}>
+    <LanguageContext.Provider value={{ locale, dir: localeDir(locale), changeLocale, localeHref, t }}>
       {children}
     </LanguageContext.Provider>
   );

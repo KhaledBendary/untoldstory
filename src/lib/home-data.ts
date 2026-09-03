@@ -106,9 +106,15 @@ export function fallbackHomeData(locale?: string): HomeData {
     services: mappedFallbackServices(),
     projects: mappedFallbackProjects(),
     posts: mappedFallbackPosts(locale),
+    // Mirrors what the CMS serves, so a fallback render says the same thing
+    // the live page does rather than a quietly different pair of numbers.
+    // Mirrors what the CMS serves, so a fallback render says the same thing the
+    // live page does rather than a quietly different pair of numbers. It used
+    // to read 3 offices and 90% — and the homepage paired that 3 with the word
+    // "clients".
     stats: [
-      { value: 3, suffix: "+", label: "Offices" },
-      { value: 90, suffix: "%", label: "Repeat business" },
+      { value: 50, suffix: "+", label: "Satisfied clients" },
+      { value: 90, suffix: "%", label: "Repeat business rate" },
     ],
     clients: [],
     hero: {

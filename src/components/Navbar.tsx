@@ -36,7 +36,7 @@ export default function Navbar({ initialData, initialLocale }: { initialData: Sh
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const { locale, changeLocale, t } = useLanguage();
+  const { locale, changeLocale, t, localeHref } = useLanguage();
   const { data } = usePageData(initialData, initialLocale, getShellData);
   const layout = data?.layout ?? null;
 
@@ -100,20 +100,43 @@ export default function Navbar({ initialData, initialLocale }: { initialData: Sh
                 </button>
               </Magnetic>
 
-              <AnimatePresence>
-                {dropdownOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    transition={{ duration: 0.2, ease: 'easeOut' }}
-                    className={`absolute ${locale === 'ar' ? 'left-0' : 'right-0'} top-full mt-2 w-56 bg-[#0a0a0a]/95 border border-white/10 backdrop-blur-md shadow-2xl rounded-none`}
-                  >
+              {/*
+                * Mounted whether or not it is open, and animated between the
+                * two states rather than added and removed.
+                *
+                * It used to mount on open, so the language links existed only
+                * after a click: the served HTML contained no link to any other
+                * version of the page. hreflang and the sitemaps carry that for
+                * Google, but a reader with JavaScript off had no way across at
+                * all. Closed, it is transparent and takes no clicks, and its
+                * links are out of the tab order — the behaviour on screen is
+                * unchanged.
+                */}
+              <motion.div
+                initial={false}
+                animate={dropdownOpen
+                  ? { opacity: 1, y: 0, scale: 1, visibility: 'visible' }
+                  : { opacity: 0, y: -10, scale: 0.95, visibility: 'hidden' }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                style={{ pointerEvents: dropdownOpen ? 'auto' : 'none' }}
+                className={`absolute ${locale === 'ar' ? 'left-0' : 'right-0'} top-full mt-2 w-56 bg-[#0a0a0a]/95 border border-white/10 backdrop-blur-md shadow-2xl rounded-none`}
+              >
                     <div className="grid grid-cols-2 gap-x-2 gap-y-2 p-3 max-h-[70vh] overflow-y-auto">
+                      {/*
+                        * A real <a href>, not a button. The href is what a
+                        * crawler follows and what works with JavaScript off;
+                        * the click handler keeps the in-app navigation, so
+                        * nothing about the experience changes.
+                        */}
                       {LANGUAGES.map((lang) => (
-                        <button
+                        <a
                           key={lang.code}
-                          onClick={() => {
+                          href={localeHref(lang.code)}
+                          hrefLang={lang.code}
+                          tabIndex={dropdownOpen ? 0 : -1}
+                          onClick={(event) => {
+                            if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+                            event.preventDefault();
                             changeLocale(lang.code);
                             setDropdownOpen(false);
                           }}
@@ -123,12 +146,10 @@ export default function Navbar({ initialData, initialLocale }: { initialData: Sh
                         >
                           <span className="uppercase font-bold">{lang.code}</span>
                           <span className="text-[9px] font-normal leading-none opacity-60 text-right">{lang.name}</span>
-                        </button>
+                        </a>
                       ))}
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              </motion.div>
             </div>
 
             <Magnetic strength={0.4}>

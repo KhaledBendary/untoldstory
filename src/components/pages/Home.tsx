@@ -383,6 +383,28 @@ const CLIENT_LOGO_ROWS = [
   { src: '/images/clients-row-4.png', w: 1660, h: 85 },
 ];
 
+/** Used only when the API gives us nothing; the figures the studio actually has. */
+const FALLBACK_TRUST_STATS = [
+  { value: 50, suffix: "+", label: "Satisfied clients" },
+  { value: 90, suffix: "%", label: "Repeat business rate" },
+];
+
+/*
+ * Each figure carries its own label.
+ *
+ * This block used to take stats by position and pair them with labels written
+ * here — stats[0] with "clients", stats[1] with "repeat business". The CMS
+ * later ordered its figures differently, and the homepage began telling
+ * visitors the studio had "3+ clients" and a "50% repeat business" rate. The
+ * real values are 50+ clients and 90%; the first figure is the three offices.
+ * A production company understating itself by an order of magnitude, in the
+ * section headed "Our journey with the Titans".
+ *
+ * The CMS localises its labels, so they are rendered through t() and come out
+ * in the reader's language. Its values arrive as "3+" or "360°" and are split
+ * into number and suffix upstream in home-data, which is why both are printed
+ * here rather than a "+" being hardcoded onto whatever number turned up.
+ */
 function ClientLogos({ stats }: { stats: Array<{ value: number; suffix: string; label: string }> }) {
   const { t } = useLanguage();
   return (
@@ -396,7 +418,12 @@ function ClientLogos({ stats }: { stats: Array<{ value: number; suffix: string; 
           />
         </div>
         <Reveal className="font-mono2 text-[11px] tracking-[0.2em] uppercase text-white/50 md:text-right leading-loose">
-          {stats[0]?.value || 50}+ {t('clients')}<br />{stats[1]?.value || 90}% {t('repeat business')}
+          {(stats.length ? stats : FALLBACK_TRUST_STATS).slice(0, 2).map((stat, i) => (
+            <span key={stat.label}>
+              {i > 0 ? <br /> : null}
+              {stat.value}{stat.suffix} {t(stat.label)}
+            </span>
+          ))}
         </Reveal>
       </div>
 

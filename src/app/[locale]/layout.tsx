@@ -70,12 +70,12 @@ export async function generateMetadata({
     metadataBase: new URL(siteUrl),
     title: { default: home.title, template: "%s" },
     description: home.description,
-    keywords: [
-      "film production Egypt", "video production company Cairo", "on-ground production services Egypt",
-      "TV commercial production Egypt", "documentary production", "corporate video production Cairo",
-      "media production agency Egypt", "production house MENA", "Dubai production company",
-      "line production Egypt", "fixer Egypt",
-    ],
+    /*
+     * No `keywords`. Google stopped using the meta keywords tag for ranking in
+     * 2009 and says so plainly; Bing treats stuffing it as a negative signal.
+     * All it did here was publish the exact phrase list this site competes on,
+     * in English, on every page including the Arabic and Russian ones.
+     */
     authors: [{ name: BRAND }],
     creator: BRAND,
     publisher: BRAND,
