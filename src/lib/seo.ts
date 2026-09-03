@@ -456,8 +456,14 @@ export function stripTranslatorNote(html?: string | null) {
 }
 
 /** Sanitise CMS rich text and demote its headings in one pass. */
+/*
+ * Presentation only. The content repairs — unwrapping pasted editor markup and
+ * removing translator notes — run where records enter the app, so the damage is
+ * not serialized into the flight payload on its way to being hidden here. See
+ * repairCmsText in api.ts.
+ */
 export function renderCmsHtml(html?: string | null) {
-  return demoteHeadings(markdownInHtml(stripTranslatorNote(unwrapPastedEditorMarkup(sanitizeCmsHtml(html)))));
+  return demoteHeadings(markdownInHtml(sanitizeCmsHtml(html)));
 }
 
 export const DEFAULT_OG_IMAGE = "/images/on-ground-production-giza.jpg";

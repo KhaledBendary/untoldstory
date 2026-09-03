@@ -1,5 +1,6 @@
 import { apiClient } from './api-client';
 import { documentaryBodyFor } from "@/data/documentary-body";
+import { stripTranslatorNote, unwrapPastedEditorMarkup } from "@/lib/seo";
 import type {
   HomeData,
   LayoutData,
@@ -76,10 +77,38 @@ function scrubUnreadable<T>(value: T, depth = 0): T {
  * documentaryBodyFor returns nothing once the stored text reads as a
  * documentary page, so a CMS fix retires the correction by itself.
  */
+/*
+ * Repair the rich-text fields as records arrive.
+ *
+ * Several bodies were pasted out of a chat assistant's answer panel, keeping
+ * its container markup and its opening line — readers were shown "Ecco la
+ * traduzione in italiano:" and, on one page, eleven blocks of Spanish before
+ * the Italian began. Cleaning it at render hid it from the page but still sent
+ * every byte to the browser inside the flight payload; the same mistake was
+ * made with unreadable Arabic text and fixed here in the end.
+ */
+const RICH_TEXT_FIELDS = ["fullDesc", "body", "content", "description"] as const;
+
+function repairCmsText<T>(value: T): T {
+  if (!value || typeof value !== "object") return value;
+  if (Array.isArray(value)) return value.map((item) => repairCmsText(item)) as T;
+
+  const record = value as Record<string, unknown>;
+  let changed: Record<string, unknown> | null = null;
+  for (const field of RICH_TEXT_FIELDS) {
+    const text = record[field];
+    if (typeof text !== "string" || !text) continue;
+    const repaired = stripTranslatorNote(unwrapPastedEditorMarkup(text));
+    if (repaired !== text) (changed ??= { ...record })[field] = repaired;
+  }
+  return (changed ?? record) as T;
+}
+
 function correctKnownBadBodies<T>(value: T, locale?: string): T {
   if (!locale || !value || typeof value !== "object") return value;
 
   const fix = (service: Record<string, unknown>) => {
+    service = repairCmsText(service);
     if (service.slug !== "documentary-production-egypt") return service;
     const corrected = documentaryBodyFor(locale, service.fullDesc as string | undefined);
     return corrected ? { ...service, fullDesc: corrected } : service;
@@ -91,7 +120,7 @@ function correctKnownBadBodies<T>(value: T, locale?: string): T {
 }
 
 function unwrap<T>(res: ApiEnvelope<T>): T {
-  return scrubUnreadable(res.data);
+  return repairCmsText(scrubUnreadable(res.data));
 }
 
 // ==================== PUBLIC CONTENT ENDPOINTS ====================
@@ -129,7 +158,7 @@ export const api = {
     per_page?: number;
   }): Promise<{ items: PortfolioItem[]; pagination: { current_page: number; last_page: number; per_page: number; total: number } }> => {
     const res = await apiClient.get<ApiEnvelope<PaginatedData<PortfolioItem>>>('/portfolio', params);
-    return { items: scrubUnreadable(res.data.items), pagination: res.data.pagination };
+    return { items: repairCmsText(scrubUnreadable(res.data.items)), pagination: res.data.pagination };
   },
 
   getPortfolioBySlug: async (slug: string, locale?: string): Promise<PortfolioItem> => {
@@ -146,7 +175,7 @@ export const api = {
     per_page?: number;
   }): Promise<{ items: BlogPost[]; pagination: { current_page: number; last_page: number; per_page: number; total: number } }> => {
     const res = await apiClient.get<ApiEnvelope<PaginatedData<BlogPost>>>('/blog', params);
-    return { items: scrubUnreadable(res.data.items), pagination: res.data.pagination };
+    return { items: repairCmsText(scrubUnreadable(res.data.items)), pagination: res.data.pagination };
   },
 
   getBlogPostBySlug: async (slug: string, locale?: string): Promise<BlogPost> => {
@@ -236,7 +265,7 @@ export const adminApi = {
     const res = await apiClient.get<ApiEnvelope<PaginatedData<ContactRequest>>>('/admin/contact-requests', params, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return { items: scrubUnreadable(res.data.items), pagination: res.data.pagination };
+    return { items: repairCmsText(scrubUnreadable(res.data.items)), pagination: res.data.pagination };
   },
 
   getContactRequest: async (token: string, id: number): Promise<ContactRequest> => {
@@ -262,7 +291,7 @@ export const adminApi = {
     const res = await apiClient.get<ApiEnvelope<PaginatedData<Lead>>>('/admin/leads', params, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return { items: scrubUnreadable(res.data.items), pagination: res.data.pagination };
+    return { items: repairCmsText(scrubUnreadable(res.data.items)), pagination: res.data.pagination };
   },
 
   getLead: async (token: string, id: number): Promise<Lead> => {
