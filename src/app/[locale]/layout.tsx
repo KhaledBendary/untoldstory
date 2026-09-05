@@ -284,14 +284,30 @@ return (
         * when the container initialises; next/script's beforeInteractive was
         * not early enough for the tag it replaced, and it would not be early
         * enough for this one either.
+        *
+        * Loaded on the production host only. Before Tag Manager, GA4 refused
+        * to configure anywhere else, which is what stopped preview deployments
+        * and local dev being counted as live traffic. Doing the same thing
+        * with a trigger condition inside the container would be the tidier
+        * home for it — `environment` is pushed below for exactly that — but
+        * this way the protection does not depend on a setting no one can see
+        * from the code.
+        *
+        * The cost is real: no tag in this container fires on a preview URL, so
+        * a new tag cannot be exercised there. Drop the isProduction check to
+        * test one, or move the condition into the container and drop it for
+        * good.
         */}
       <script dangerouslySetInnerHTML={{ __html: `window.dataLayer = window.dataLayer || [];
-          window.dataLayer.push({ environment: location.hostname === '${ANALYTICS_HOST}' ? 'production' : 'preview' });
-          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','${GTM_CONTAINER_ID}');` }} />
+          var isProduction = location.hostname === '${ANALYTICS_HOST}';
+          window.dataLayer.push({ environment: isProduction ? 'production' : 'preview' });
+          if (isProduction) {
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','${GTM_CONTAINER_ID}');
+          }` }} />
     </head>
     <body suppressHydrationWarning>
 
