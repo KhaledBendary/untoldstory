@@ -24,16 +24,17 @@ const jetbrains = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "6
 const fontClass = [alexandria.variable, archivo.variable, inter.variable, jetbrains.variable].join(" ");
 
 const siteUrl = SITE_URL;
-/**
- * GA4 measurement id, overridable per environment.
+/*
+ * No GA4 measurement id here any more — G-G38ZL9GYXF is configured inside the
+ * GTM container instead.
  *
- * This was G-CV7T8W6SDJ for two days after the migration — a valid-looking id
- * belonging to a different property. Google accepts any id without checking
- * it, so the tag fired, the network showed a clean /g/collect, and the
- * property still read zero. Verify against Admin → Data Streams, not against
+ * Worth carrying over the lesson that id cost: it was G-CV7T8W6SDJ for two
+ * days after the migration, a valid-looking id belonging to a different
+ * property. Google accepts any id without checking it, so the tag fired, the
+ * network showed a clean /g/collect, and the property read zero. Whatever id
+ * the container holds, verify it against Admin → Data Streams — not against
  * whether the request succeeds.
  */
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-G38ZL9GYXF";
 
 /**
  * Meta Pixel. Overridable per environment so a preview deployment can point at
@@ -43,16 +44,25 @@ const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-G38ZL9
 const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID ?? "780471777947136";
 
 /**
- * Analytics only counts the real site.
+ * Google Tag Manager. GA4 is configured inside this container, not here.
+ *
+ * The measurement id used to be hardcoded in a gtag.js snippet on this page.
+ * That means the site now measures nothing unless GTM-TJ66KW2R actually holds
+ * a GA4 tag for G-G38ZL9GYXF — the container is the only thing standing
+ * between a visit and the property.
+ */
+const GTM_CONTAINER_ID = process.env.NEXT_PUBLIC_GTM_ID ?? "GTM-TJ66KW2R";
+
+/**
+ * Which deployment this is, on the dataLayer before the container loads.
  *
  * Both tags used to fire wherever the page was served, so every preview
- * deployment on *.vercel.app and every `next dev` session on localhost was
- * recorded as live traffic — sessions from the people building the site mixed
- * into the numbers the ads are judged on. The pages are deliberately static
- * (see generateStaticParams below: no headers() call), so the host cannot be
- * checked while rendering; the guard runs in the browser instead, around the
- * calls that actually start recording. gtag.js still downloads on a preview,
- * but without config() it reports nothing.
+ * deployment on *.vercel.app and every `next dev` session was recorded as live
+ * traffic — the people building the site mixed into the numbers the ads are
+ * judged on. That was fixed by refusing to configure GA4 off the production
+ * host, and configuring GA4 is now GTM's job, so the guard has to move with
+ * it: this publishes the environment and a trigger condition in the container
+ * keeps preview traffic out. Without that condition the pollution comes back.
  */
 const ANALYTICS_HOST = new URL(SITE_URL).hostname;
 
@@ -267,24 +277,34 @@ return (
               });
             }
           } catch (e) {}` }} />
+
+      {/*
+        * The container, inline and directly after the consent defaults above.
+        * Consent Mode only holds if the denial is already on the dataLayer
+        * when the container initialises; next/script's beforeInteractive was
+        * not early enough for the tag it replaced, and it would not be early
+        * enough for this one either.
+        */}
+      <script dangerouslySetInnerHTML={{ __html: `window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({ environment: location.hostname === '${ANALYTICS_HOST}' ? 'production' : 'preview' });
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','${GTM_CONTAINER_ID}');` }} />
     </head>
     <body suppressHydrationWarning>
 
-            <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-        strategy="afterInteractive"
-      />
-
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          if (location.hostname === '${ANALYTICS_HOST}') {
-            gtag('config', '${GA_MEASUREMENT_ID}');
-          }
-        `}
-      </Script>
+      {/* The container's no-JavaScript fallback, first thing in the body. */}
+      <noscript>
+        <iframe
+          src={`https://www.googletagmanager.com/ns.html?id=${GTM_CONTAINER_ID}`}
+          height="0"
+          width="0"
+          style={{ display: "none", visibility: "hidden" }}
+          title="Google Tag Manager"
+        />
+      </noscript>
 
       {FB_PIXEL_ID ? (
         <>
