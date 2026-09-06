@@ -432,16 +432,16 @@ function ClientLogos({ stats }: { stats: Array<{ value: number; suffix: string; 
         {CLIENT_LOGO_ROWS.map((row, i) => (
           <Reveal key={row.src} delay={i * 0.06} className="relative w-full overflow-hidden bg-[#0a0a0a]">
             <div className={`client-logo-track ${i % 2 ? 'client-logo-track-reverse' : ''}`}>
-              {[0, 1].map(copy => (
+              {[0, 1, 2].map(copy => (
                 <Image
                   key={copy}
                   src={row.src}
                   alt={copy === 0 ? 'Brands and platforms Global Untold Story has produced for' : ''}
-                  aria-hidden={copy === 1 ? true : undefined}
+                  aria-hidden={copy > 0 ? true : undefined}
                   width={row.w}
                   height={row.h}
                   sizes="100vw"
-                  className="client-strip w-1/2 h-auto shrink-0"
+                  className="client-strip h-auto shrink-0 max-w-none"
                   loading="lazy"
                 />
               ))}
