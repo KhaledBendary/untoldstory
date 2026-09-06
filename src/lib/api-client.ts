@@ -72,13 +72,11 @@ function backoffFor(attempt: number): number {
 /**
  * Seconds Next.js may serve a cached API response before refetching.
  *
- * This also makes the build survivable: `next build` renders with many workers
- * at once, and every page hits the API twice (generateMetadata, then the page
- * body). Un-deduped, that burst made the upstream Laravel app return 500s, and
- * pages silently fell back to default metadata. Going through Next's data cache
- * collapses identical URLs into one request.
+ * Five minutes still collapses duplicate page-build requests, while allowing a
+ * project published in the CMS to appear in the Work list promptly. A daily
+ * cache kept newly published projects absent from the list until the next day.
  */
-const SERVER_REVALIDATE_SECONDS = 86400;
+const SERVER_REVALIDATE_SECONDS = 300;
 
 function wait(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));

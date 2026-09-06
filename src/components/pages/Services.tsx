@@ -5,7 +5,7 @@ import Link from '@/components/LocaleLink';
 import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
 import { SplitWords, Reveal } from '../Reveal';
-import { getServiceImage } from '@/lib/utils';
+import { getServiceImagePosition, getServiceImage } from '@/lib/utils';
 import type { Service } from '@/types/api';
 import { SERVICES as FALLBACK_SERVICES } from '@/data/content';
 import { useLanguage } from '../LanguageContext';
@@ -41,7 +41,7 @@ export default function Services({ initialData, initialLocale }: { initialData: 
         <SplitWords
           as="h1"
           text={t('Production Services in Egypt & MENA')}
-          className="font-display font-black uppercase tracking-tight leading-[0.9] text-[12vw] md:text-[7.5vw] max-w-6xl"
+          className="font-display font-black uppercase tracking-tight leading-[0.9] text-[6vw] w-full"
         />
         <Reveal className="mt-8 max-w-xl">
           <p className="text-white/60 leading-relaxed">
@@ -59,7 +59,7 @@ export default function Services({ initialData, initialLocale }: { initialData: 
               className="group relative bg-[#0a0a0a] p-8 md:p-12 overflow-hidden min-h-[300px] md:min-h-[340px] flex flex-col"
             >
               <Image
-                src={getServiceImage(s)}
+                src={getServiceImage(s)} style={{ objectPosition: getServiceImagePosition(s) }}
                 alt={`${s.title} — Global Untold Story`}
                 fill
                 className="object-cover opacity-0 group-hover:opacity-25 scale-110 group-hover:scale-100 transition-all duration-700"

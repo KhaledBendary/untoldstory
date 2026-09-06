@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "i18n:ui": "node scripts/check-ui-translations.mjs",
     "seo:audit": "node --experimental-strip-types scripts/seo-audit.mjs",
     "seo:crawl": "node --experimental-strip-types scripts/seo-crawl.mjs",
     "seo:translations": "node scripts/translation-coverage.mjs",

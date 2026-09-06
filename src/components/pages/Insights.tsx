@@ -53,14 +53,14 @@ export default function Insights({ initialData, initialLocale }: { initialData: 
               </div>
               <div className="p-8 md:p-12 flex flex-col justify-center">
                 <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 mb-4">
-                  {t('Home') === 'الرئيسية' ? 'مميز' : 'Featured'} — {featured.category}
+                  {t('Featured')} — {featured.category}
                 </p>
                 <h2 className="font-display font-extrabold text-2xl md:text-4xl leading-tight mb-4 group-hover:opacity-70 transition-opacity">
                   {featured.title}
                 </h2>
                 <p className="text-white/55 leading-relaxed mb-6">{featured.excerpt}</p>
                 <span className="inline-flex items-center gap-2 font-mono2 text-[11px] tracking-[0.25em] uppercase">
-                  {t('Home') === 'الرئيسية' ? 'اقرأ' : t('Read')} <ArrowUpRight className="w-4 h-4 group-hover:rotate-45 transition-transform duration-500 rtl:-scale-x-100" />
+                  {t('Read')} <ArrowUpRight className="w-4 h-4 group-hover:rotate-45 transition-transform duration-500 rtl:-scale-x-100" />
                 </span>
               </div>
             </Link>

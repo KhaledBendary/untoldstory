@@ -10,7 +10,36 @@ const ASSET_BASE_URL = (
 /**
  * Helper to get the correct image URL for a Service, handling both API and fallback properties
  */
+export function getServiceImagePosition(service: Service): string {
+  const positions: Record<string, string> = {
+    'commercial-video-production': '75% 55%',
+    'commercial-photography': '50% 43%',
+    'dubbing-voice-over-localization': '30% 50%',
+    'event-production-live-streaming-egypt': '80% 65%',
+    'motion-graphics-cgi-vfx-ai': '50% 35%',
+    'original-ip-development': '50% 65%',
+    'performance-marketing-creative-strategy': '70% 45%',
+    'podcast-production': '70% 25%',
+    'post-production': '50% 35%',
+    'tv-show-production-live-broadcast': '50% 25%',
+  };
+  return positions[service.slug] ?? '50% 50%';
+}
+
 export function getServiceImage(service: Service, fallbackUrl: string = '/images/hero-giza-pyramids.jpg'): string {
+  const referenceImages: Record<string, string> = {
+    'commercial-video-production': '/images/commercial-advertising-production-services-egypt.webp',
+    'commercial-photography': '/images/commercial-product-photography-clorox.webp',
+    'dubbing-voice-over-localization': '/images/dubbing-voice-over-localization-services.webp',
+    'event-production-live-streaming-egypt': '/images/event-coverage-live-production-egypt.webp',
+    'motion-graphics-cgi-vfx-ai': '/images/motion-graphics-cgi-vfx-ai-production.webp',
+    'original-ip-development': '/images/original-ip-development-tv-format-creation.webp',
+    'performance-marketing-creative-strategy': '/images/performance-marketing-creative-strategy-analytics.webp',
+    'podcast-production': '/images/podcast-video-podcast-production.webp',
+    'post-production': '/images/post-production-video-editing-finishing.webp',
+    'tv-show-production-live-broadcast': '/images/tv-show-production-live-broadcast.webp',
+  };
+  if (referenceImages[service.slug]) return referenceImages[service.slug];
   const possibleUrls = [service.imageUrl].filter(Boolean) as string[];
   return resolveImageUrl(possibleUrls[0] || fallbackUrl);
 }

@@ -91,7 +91,7 @@ export default function Navbar({ initialData, initialLocale }: { initialData: Sh
               <Magnetic strength={0.3}>
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  aria-label="Change language"
+                  aria-label={t('Change language')}
                   className="flex items-center gap-1.5 font-mono2 text-[11px] tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors py-2 px-1"
                 >
                   <Globe className="w-3.5 h-3.5" />

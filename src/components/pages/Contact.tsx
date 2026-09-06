@@ -80,7 +80,7 @@ export default function ContactPage({ initialData, initialLocale, formToken }: {
       // keep the form visible with the error banner and offer a manual
       // mailto fallback the visitor can choose to use.
       console.error('Failed to submit contact form:', err);
-      setError(t('Failed to submit form. Please try again, or use the button below to email us directly.'));
+      setError('Failed to submit form. Please try again, or use the button below to email us directly.');
 
       const subject = encodeURIComponent(`New project inquiry — ${formData.service}`);
       const body = encodeURIComponent(
@@ -131,46 +131,46 @@ export default function ContactPage({ initialData, initialLocale, formToken }: {
               <input type="hidden" name="formToken" value={formToken} />
               {error && (
                 <div className="border border-red-500/30 bg-red-500/10 p-4 text-red-200 text-sm space-y-3">
-                  <p>{error}</p>
+                  <p>{t(error)}</p>
                   {pendingMailto && (
                     <a
                       href={pendingMailto}
                       className="inline-flex items-center gap-2 underline hover:text-white transition-colors"
                     >
-                      Open email to {email} <ArrowUpRight className="w-3.5 h-3.5" />
+                      {t('Open email to')} {email} <ArrowUpRight className="w-3.5 h-3.5" />
                     </a>
                   )}
                 </div>
               )}
               <div className="grid sm:grid-cols-2 gap-10">
                 <div>
-                  <label htmlFor="name" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">{t('Home') === 'الرئيسية' ? 'الاسم الكامل *' : 'Full name *'}</label>
-                  <input id="name" name="name" required placeholder={t('Home') === 'الرئيسية' ? 'اسمك' : 'Your name'} className={inputCls} />
+                  <label htmlFor="name" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">{t('Full name *')}</label>
+                  <input id="name" name="name" required placeholder={t('Your name')} className={inputCls} />
                 </div>
                 <div>
-                  <label htmlFor="email" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">{t('Home') === 'الرئيسية' ? 'البريد الإلكتروني *' : 'Email address *'}</label>
+                  <label htmlFor="email" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">{t('Email address *')}</label>
                   <input id="email" name="email" type="email" required placeholder="you@company.com" className={inputCls} />
                 </div>
               </div>
               <div className="grid sm:grid-cols-2 gap-10">
                 <div>
-                  <label htmlFor="phone" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">{t('Home') === 'الرئيسية' ? 'رقم الهاتف' : 'Phone number'}</label>
+                  <label htmlFor="phone" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">{t('Phone number')}</label>
                   <input id="phone" name="phone" type="tel" placeholder="+20 ..." className={inputCls} />
                 </div>
                 <div>
-                  <label htmlFor="service" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">{t('Home') === 'الرئيسية' ? 'الخدمة المطلوبة *' : 'Interested service *'}</label>
+                  <label htmlFor="service" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">{t('Interested service *')}</label>
                   <select id="service" name="service" required defaultValue="" className={`${inputCls} bg-[#0a0a0a] cursor-pointer`} disabled={loading}>
-                    <option value="" disabled>{t('Home') === 'الرئيسية' ? 'اختر خدمة' : 'Select a service'}</option>
+                    <option value="" disabled>{t('Select a service')}</option>
                     {services.map(s => (
                       <option key={s.slug} value={s.title}>{s.title}</option>
                     ))}
-                    <option value="Other">{t('Home') === 'الرئيسية' ? 'غير ذلك / لست متأكداً' : 'Other / Not sure yet'}</option>
+                    <option value="Other">{t('Other / Not sure yet')}</option>
                   </select>
                 </div>
               </div>
               <div>
-                <label htmlFor="message" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">{t('Home') === 'الرئيسية' ? 'تفاصيل مشروعك *' : 'Your project *'}</label>
-                <textarea id="message" name="message" required rows={4} placeholder={t('Home') === 'الرئيسية' ? 'التفاصيل، الموقع، الجدول الزمني...' : 'Format, locations, timeline, ambition — tell us everything.'} className={`${inputCls} resize-none`} />
+                <label htmlFor="message" className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">{t('Your project *')}</label>
+                <textarea id="message" name="message" required rows={4} placeholder={t('Format, locations, timeline, ambition — tell us everything.')} className={`${inputCls} resize-none`} />
               </div>
               <Magnetic>
                 <button type="submit" disabled={submitting} className="inline-flex items-center gap-3 bg-[#fafafa] text-[#0a0a0a] px-10 py-5 font-mono2 text-[11px] tracking-[0.25em] uppercase hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed">

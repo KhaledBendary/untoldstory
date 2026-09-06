@@ -14,7 +14,8 @@ import { useSiteReady } from '../SiteContext';
 import { useHydrated } from '@/hooks/useHydrated';
 import { useLanguage } from '../LanguageContext';
 import { getHomeDataSafe, fallbackHomeData, type HomeData } from '@/lib/home-data';
-import { getServiceImage, getProjectImage, getPostImage } from '@/lib/utils';
+import { usePageData } from '@/hooks/usePageData';
+import { getServiceImagePosition, getServiceImage, getProjectImage, getPostImage } from '@/lib/utils';
 import { formatPostDate } from '@/lib/dates';
 import type { Service, PortfolioItem, BlogPost } from '@/types/api';
 
@@ -135,13 +136,13 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
             animate={ready ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.9, delay: 0.7, ease: EASE }}
           >
-            <span>( {hero?.badge || t('Film & Video Production')} )</span>
+            <span>( {t(hero?.badge || 'Film & Video Production')} )</span>
             <span className="hidden md:inline text-white/55">/</span>
             <span className="hidden md:inline">{t('Egypt — MENA — Worldwide')}</span>
           </motion.div>
         ) : (
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-5 font-mono2 text-[10px] md:text-[11px] tracking-[0.3em] uppercase text-white/70">
-            <span>( {hero?.badge || t('Film & Video Production')} )</span>
+            <span>( {t(hero?.badge || 'Film & Video Production')} )</span>
             <span className="hidden md:inline text-white/55">/</span>
             <span className="hidden md:inline">{t('Egypt — MENA — Worldwide')}</span>
           </div>
@@ -176,7 +177,7 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
             <Link href={hero?.cta1?.href || '/work'}>
               <Magnetic>
                 <span className="inline-flex items-center gap-3 bg-[#fafafa] text-[#0a0a0a] px-7 md:px-9 py-4 font-mono2 text-[11px] tracking-[0.25em] uppercase hover:bg-white transition-colors">
-                  {hero?.cta1?.label || t('Our Work')} <ArrowUpRight className="w-4 h-4 rtl:-scale-x-100" />
+                  {t(hero?.cta1?.label || 'Our Work')} <ArrowUpRight className="w-4 h-4 rtl:-scale-x-100" />
                 </span>
               </Magnetic>
             </Link>
@@ -192,7 +193,7 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
             <Link href={hero?.cta1?.href || '/work'}>
               <Magnetic>
                 <span className="inline-flex items-center gap-3 bg-[#fafafa] text-[#0a0a0a] px-7 md:px-9 py-4 font-mono2 text-[11px] tracking-[0.25em] uppercase hover:bg-white transition-colors">
-                  {hero?.cta1?.label || t('Our Work')} <ArrowUpRight className="w-4 h-4 rtl:-scale-x-100" />
+                  {t(hero?.cta1?.label || 'Our Work')} <ArrowUpRight className="w-4 h-4 rtl:-scale-x-100" />
                 </span>
               </Magnetic>
             </Link>
@@ -238,7 +239,7 @@ function ServicesList({ services }: { services: Service[] }) {
                 transition={{ duration: 0.55, ease: EASE }}
               >
                 <Image
-                  src={getServiceImage(s)}
+                  src={getServiceImage(s)} style={{ objectPosition: getServiceImagePosition(s) }}
                   alt={`${s.title} — Global Untold Story`}
                   fill
                   className="object-cover"
@@ -429,16 +430,22 @@ function ClientLogos({ stats }: { stats: Array<{ value: number; suffix: string; 
 
       <div className="mt-14 md:mt-20 border-t border-white/10 divide-y divide-white/10">
         {CLIENT_LOGO_ROWS.map((row, i) => (
-          <Reveal key={row.src} delay={i * 0.06} className="relative w-full bg-[#0a0a0a]">
-            <Image
-              src={row.src}
-              alt="Brands and platforms Global Untold Story has produced for"
-              width={row.w}
-              height={row.h}
-              sizes="100vw"
-              className="w-full h-auto"
-              loading="lazy"
-            />
+          <Reveal key={row.src} delay={i * 0.06} className="relative w-full overflow-hidden bg-[#0a0a0a]">
+            <div className={`client-logo-track ${i % 2 ? 'client-logo-track-reverse' : ''}`}>
+              {[0, 1].map(copy => (
+                <Image
+                  key={copy}
+                  src={row.src}
+                  alt={copy === 0 ? 'Brands and platforms Global Untold Story has produced for' : ''}
+                  aria-hidden={copy === 1 ? true : undefined}
+                  width={row.w}
+                  height={row.h}
+                  sizes="100vw"
+                  className="client-strip w-1/2 h-auto shrink-0"
+                  loading="lazy"
+                />
+              ))}
+            </div>
           </Reveal>
         ))}
       </div>
@@ -671,32 +678,10 @@ function ImageBreak() {
 export default function Home({ initialData, initialLocale }: { initialData: HomeData | null; initialLocale: string }) {
   const ready = useSiteReady();
   const { locale, t } = useLanguage();
-  const [data, setData] = useState<HomeData>(initialData ?? fallbackHomeData(initialLocale));
-  const [loading, setLoading] = useState(false);
+  const { data: pageData, loading } = usePageData(initialData, initialLocale, getHomeDataSafe);
+  const data = pageData ?? fallbackHomeData(locale);
 
-  useEffect(() => {
-    if (initialData && locale === initialLocale) return;
-
-    let cancelled = false;
-
-    async function fetchData() {
-      setLoading(true);
-      try {
-        const next = await getHomeDataSafe(locale);
-        if (!cancelled) setData(next);
-      } catch (err) {
-        console.error("Failed to fetch home data:", err);
-        if (!cancelled) setData(fallbackHomeData(locale));
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    fetchData();
-    return () => { cancelled = true; };
-  }, [locale, initialData, initialLocale]);
-
-  if (loading && !initialData) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-white/50 font-mono2 text-sm">{t('Loading...')}</div>

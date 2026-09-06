@@ -28,7 +28,7 @@ export default function SiteShell({
   locale: string;
 }) {
   return (
-    <LanguageProvider>
+    <LanguageProvider key={locale}>
       <SiteShellInner shell={shell} locale={locale}>{children}</SiteShellInner>
     </LanguageProvider>
   );
