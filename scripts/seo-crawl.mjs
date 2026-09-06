@@ -206,11 +206,14 @@ async function checkContentSecurityPolicy() {
       "https://analytics.google.com",
       "https://stats.g.doubleclick.net",
       "https://www.google.com",
+      // Google Ads posts conversions to the visitor's own country domain, so
+      // an Egyptian lead was refused here while the form itself succeeded.
+      "https://www.google.com.eg",
       "https://connect.facebook.net",
       "https://www.facebook.com",
     ],
     "script-src": ["https://www.googletagmanager.com", "https://connect.facebook.net"],
-    "img-src": ["https://www.google-analytics.com", "https://www.facebook.com"],
+    "img-src": ["https://www.google-analytics.com", "https://www.facebook.com", "https://www.google.com.eg"],
   };
 
   const res = await fetch(`${ORIGIN}/`);

@@ -54,12 +54,18 @@ const GOOGLE_ADS = [
 ].join(" ");
 
 /*
- * Remarketing audience pixels come from the visitor's own Google domain —
- * an Egyptian visitor is sent to www.google.com.eg — and a CSP cannot express
- * "any Google country domain" without allowing far more than Google. Listed
- * here are the markets this studio actually sells into. A visitor from
- * somewhere else still measures and still converts; only their remarketing
- * pixel is refused, which is the right trade for not widening the policy.
+ * Google sends a visitor to their own country domain — an Egyptian visitor to
+ * www.google.com.eg — and a CSP cannot express "any Google country domain"
+ * without allowing far more than Google. Listed here are the markets this
+ * studio sells into.
+ *
+ * These belong in connect-src as well as img-src. They were in img-src alone,
+ * on the assumption that only remarketing pixels used them; Google Ads posts
+ * its conversions to /pagead/1p-conversion on the same country domain, so an
+ * Egyptian visitor completing the contact form had their conversion refused by
+ * this policy while the form itself succeeded. Found in the browser console on
+ * the live site — nothing about the page or the network panel looks wrong when
+ * this happens.
  */
 const GOOGLE_COUNTRY_DOMAINS = [
   "https://www.google.com.eg",
@@ -81,7 +87,7 @@ const CSP = [
   "font-src 'self' data:",
   `img-src 'self' data: blob: ${UPSTREAM_ORIGIN} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} ${GOOGLE_COUNTRY_DOMAINS} https://www.facebook.com`,
   `media-src 'self' ${UPSTREAM_ORIGIN}`,
-  `connect-src 'self' ${UPSTREAM_ORIGIN} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} ${META}`,
+  `connect-src 'self' ${UPSTREAM_ORIGIN} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} ${GOOGLE_COUNTRY_DOMAINS} ${META}`,
   "object-src 'none'",
   "base-uri 'self'",
   // The Meta Pixel posts to facebook.com/tr/ from a hidden form.
