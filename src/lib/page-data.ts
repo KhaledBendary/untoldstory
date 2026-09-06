@@ -57,9 +57,23 @@ function withDisplayTitle<T extends { slug?: string; title?: string }>(record: T
   return record.title ? record : { ...record, title: nameFromSlug(record.slug) };
 }
 
-function normalizeBlogPost(post: BlogPost): BlogPost {
+function translatedBody(body: string[]): string {
+  return body.map((block) => block.startsWith("<") ? block : `<p>${block}</p>`).join("");
+}
+
+function normalizeBlogPost(post: BlogPost, locale?: string): BlogPost {
   const iso = isoPostDate(post);
-  return withDisplayTitle({ ...post, date: iso || post.date, publishedAt: iso || post.publishedAt });
+  const normalized = withDisplayTitle({ ...post, date: iso || post.date, publishedAt: iso || post.publishedAt });
+  const translated = locale ? postTranslation(normalized.slug, locale) : undefined;
+  if (!translated) return normalized;
+
+  return {
+    ...normalized,
+    title: translated.title,
+    excerpt: translated.excerpt,
+    body: translatedBody(translated.body),
+    category: locale === "ar" ? "محتوى" : normalized.category,
+  };
 }
 
 /*
@@ -155,7 +169,7 @@ export async function getInsightsData(locale?: string): Promise<BlogPost[]> {
   const extras = mappedFallbackPosts(locale);
   try {
     const data = await api.getBlogPosts({ page: 1, per_page: 50, locale });
-    const items = (data?.items || []).map(normalizeBlogPost);
+    const items = (data?.items || []).map((post) => normalizeBlogPost(post, locale));
     const seen = new Set(items.map((p) => p.slug));
     return [...items, ...extras.filter((p) => !seen.has(p.slug))];
   } catch (e) {
@@ -263,7 +277,10 @@ export function getPostDetailData(slug: string, locale?: string) {
       api.getBlogPostBySlug(slug, locale),
       api.getBlogPosts({ page: 1, per_page: 50, locale }),
     ]);
-    return { post: normalizeBlogPost(post), allPosts: (blog?.items || []).map(normalizeBlogPost) };
+    return {
+      post: normalizeBlogPost(post, locale),
+      allPosts: (blog?.items || []).map((item) => normalizeBlogPost(item, locale)),
+    };
   });
 }
 
@@ -298,7 +315,8 @@ export async function findProjectInList(slug: string, locale?: string): Promise<
 export async function findPostInList(slug: string, locale?: string): Promise<BlogPost | null> {
   try {
     const data = await api.getBlogPosts({ page: 1, per_page: 50, locale });
-    return data?.items?.find((p) => p.slug === slug) ?? null;
+    const post = data?.items?.find((p) => p.slug === slug);
+    return post ? normalizeBlogPost(post, locale) : null;
   } catch {
     return null;
   }
