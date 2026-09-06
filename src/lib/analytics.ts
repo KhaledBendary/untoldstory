@@ -16,6 +16,7 @@ type FbqFn = (command: string, ...args: unknown[]) => void;
 
 declare global {
   interface Window {
+    dataLayer?: unknown[];
     gtag?: GtagFn;
     fbq?: FbqFn;
   }
@@ -49,6 +50,24 @@ function meta(event: string, params?: Record<string, unknown>) {
 export function trackLead(method: LeadMethod, params: Record<string, unknown> = {}) {
   ga("generate_lead", { method, ...params });
   meta("Lead", { content_name: method, ...params });
+}
+
+/**
+ * The contact-form conversion is emitted only after its API request succeeds.
+ * The data-layer shape is kept explicit because the advertising container uses
+ * it to identify a completed form submission.
+ */
+export function trackContactFormSuccess(service?: string) {
+  if (typeof window !== "undefined") {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "generate_lead",
+      form_id: "contact_form",
+    });
+  }
+
+  // Send the corresponding GA4 and Meta conversion with the same form ID.
+  trackLead("form", { form_id: "contact_form", service: service || "not specified" });
 }
 
 /** Someone started typing. The gap between this and generate_lead is the

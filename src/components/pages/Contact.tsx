@@ -6,7 +6,7 @@ import { SplitWords, Reveal } from '../Reveal';
 import Magnetic from '../Magnetic';
 import type { ContactForm } from '@/types/api';
 import { useLanguage } from '../LanguageContext';
-import { trackLead, trackFormStart, trackContactClick } from '@/lib/analytics';
+import { trackContactFormSuccess, trackFormStart, trackContactClick } from '@/lib/analytics';
 import { usePageData } from '@/hooks/usePageData';
 import { getContactData, type ContactData } from '@/lib/page-data';
 
@@ -69,8 +69,8 @@ export default function ContactPage({ initialData, initialLocale, formToken }: {
         throw new Error(`Contact submit failed: ${response.status}`);
       }
       setSent(true);
-      // After the 200, not before: a lead the server refused is not a lead.
-      trackLead("form", { service: formData.service || "not specified" });
+      // Fire only after the server has confirmed the contact form submission.
+      trackContactFormSuccess(formData.service);
     } catch (err) {
       // The submission genuinely failed (network error, proxy/API down, or a
       // non-2xx response) — do NOT mark this as sent. Previously this branch
