@@ -206,6 +206,14 @@ const offices = [
   ],
 }));
 
+/*
+ * Every locale is built, so an unrecognised one is a 404 rather than something
+ * to render. The proxy already rewrites a non-locale first segment to /en, so
+ * this segment only ever sees real locales — this closes the path that does not
+ * go through it.
+ */
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return PRERENDER_LOCALES.map((locale) => ({ locale }));
 }
