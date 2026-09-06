@@ -204,7 +204,9 @@ export default function ContactPage({ initialData, initialLocale, formToken }: {
                   <p className="flex items-center gap-2 font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-3">
                     <MapPin className="w-3.5 h-3.5" /> {o.region}
                   </p>
-                  <h3 className="font-display font-extrabold uppercase text-2xl mb-1">{o.region}</h3>
+                  {/* h2, not h3: each office is a section of this page, sitting
+                      directly under its h1. As an h3 the page skipped a level. */}
+                  <h2 className="font-display font-extrabold uppercase text-2xl mb-1">{o.region}</h2>
                   <p className="text-white/60 text-sm">{o.address}</p>
                   {o.phone && <a href={`tel:${o.phone}`} className="text-white/80 text-sm link-line inline-block mt-2">{o.phone}</a>}
                 </div>

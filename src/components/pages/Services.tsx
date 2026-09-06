@@ -10,11 +10,11 @@ import type { Service } from '@/types/api';
 import { SERVICES as FALLBACK_SERVICES } from '@/data/content';
 import { useLanguage } from '../LanguageContext';
 import { usePageData } from '@/hooks/usePageData';
-import { getServicesData } from '@/lib/page-data';
+import { getServiceCards, type ServiceCard } from '@/lib/page-data';
 
-export default function Services({ initialData, initialLocale }: { initialData: Service[] | null; initialLocale: string }) {
+export default function Services({ initialData, initialLocale }: { initialData: ServiceCard[] | null; initialLocale: string }) {
   const { t } = useLanguage();
-  const { data, loading, failed } = usePageData(initialData, initialLocale, getServicesData);
+  const { data, loading, failed } = usePageData(initialData, initialLocale, getServiceCards);
   const services = data ?? [];
 
 

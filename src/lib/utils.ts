@@ -10,7 +10,7 @@ const ASSET_BASE_URL = (
 /**
  * Helper to get the correct image URL for a Service, handling both API and fallback properties
  */
-export function getServiceImage(service: Service, fallbackUrl: string = '/images/hero-giza-pyramids.jpg'): string {
+export function getServiceImage(service: Pick<Service, 'imageUrl'>, fallbackUrl: string = '/images/hero-giza-pyramids.jpg'): string {
   const possibleUrls = [service.imageUrl].filter(Boolean) as string[];
   return resolveImageUrl(possibleUrls[0] || fallbackUrl);
 }
@@ -18,7 +18,7 @@ export function getServiceImage(service: Service, fallbackUrl: string = '/images
 /**
  * Helper to get the correct image URL for a PortfolioItem
  */
-export function getProjectImage(project: PortfolioItem, fallbackUrl: string = '/images/hero-giza-pyramids.jpg'): string {
+export function getProjectImage(project: Pick<PortfolioItem, 'image' | 'img'>, fallbackUrl: string = '/images/hero-giza-pyramids.jpg'): string {
   const possibleUrls = [project.image, project.img].filter(Boolean) as string[];
   return resolveImageUrl(possibleUrls[0] || fallbackUrl);
 }
@@ -26,7 +26,7 @@ export function getProjectImage(project: PortfolioItem, fallbackUrl: string = '/
 /**
  * Helper to get the correct image URL for a BlogPost
  */
-export function getPostImage(post: BlogPost, fallbackUrl: string = '/images/hero-giza-pyramids.jpg'): string {
+export function getPostImage(post: Pick<BlogPost, 'featuredImage'>, fallbackUrl: string = '/images/hero-giza-pyramids.jpg'): string {
   const possibleUrls = [post.featuredImage].filter(Boolean) as string[];
   return resolveImageUrl(possibleUrls[0] || fallbackUrl);
 }

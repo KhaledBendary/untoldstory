@@ -266,6 +266,18 @@ export function breadcrumbSchema(trail: Array<{ name: string; path: string }>) {
  */
 export function demoteHeadings(html?: string | null) {
   if (!html) return "";
+
+  /*
+   * Shift only when the body brings an <h1> of its own.
+   *
+   * This used to shift unconditionally, which fixed the body carrying
+   * thirty-two h1s and broke every body that was already correct: copy
+   * starting at h2 came out as h3 sitting directly under the page's h1, a
+   * level skipped on four pages. A body that starts at h2 already nests
+   * properly beneath the page title and should be left where it is.
+   */
+  if (!/<h1\b/i.test(html)) return html;
+
   return html.replace(/<(\/?)h([1-5])\b/gi, (_match, slash: string, level: string) => {
     return `<${slash}h${Math.min(Number(level) + 1, 6)}`;
   });

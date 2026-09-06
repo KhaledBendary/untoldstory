@@ -4,7 +4,7 @@ import StructuredData from "@/components/StructuredData";
 import { applySeoOverrides } from "@/data/seo-overrides";
 import { pageMeta } from "@/data/page-meta";
 import { isLocale, localizedPath, DEFAULT_LOCALE } from "@/lib/i18n";
-import { getServicesData } from "@/lib/page-data";
+import { getServiceCards } from "@/lib/page-data";
 import { absoluteUrl, breadcrumbSchema, cleanHeadline, pageSeo } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function Page({ params }: Props) {
   const { locale: raw } = await params;
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
-  const services = await getServicesData(locale);
+  const services = await getServiceCards(locale);
 
   const itemList = {
     "@context": "https://schema.org",

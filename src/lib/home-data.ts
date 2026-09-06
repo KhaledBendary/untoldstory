@@ -10,10 +10,27 @@ import { mappedFallbackPosts, mappedFallbackProjects, mappedFallbackServices } f
  * useEffect, so the HTML search engines received contained no page content at
  * all — no headline, no services, no h1.
  */
+/*
+ * The homepage lists names and pictures; it never renders a body.
+ *
+ * These were the full records. Each service carries its complete article in
+ * `fullDesc` — thousands of words, up to 45 kb apiece — and all thirteen were
+ * serialised into the homepage to render thirteen links, alongside every
+ * project and post in full. The page came to 1.2 mb of HTML for about 4 kb of
+ * visible text.
+ *
+ * Narrowed to exactly what the three sections read. Adding a field to a card
+ * means adding it here too, which is the point: the cost of shipping it is
+ * visible at the place you decide to.
+ */
+export type HomeService = Pick<Service, "slug" | "title" | "imageUrl">;
+export type HomeProject = Pick<PortfolioItem, "slug" | "title" | "client" | "category" | "image" | "img">;
+export type HomePost = Pick<BlogPost, "slug" | "title" | "category" | "featuredImage" | "date" | "publishedAt">;
+
 export type HomeData = {
-  services: Service[];
-  projects: PortfolioItem[];
-  posts: BlogPost[];
+  services: HomeService[];
+  projects: HomeProject[];
+  posts: HomePost[];
   stats: Array<{ value: number; suffix: string; label: string }>;
   clients: Array<{ name: string; displayName: string }>;
   hero: {
@@ -84,13 +101,9 @@ export async function getHomeData(locale?: string): Promise<HomeData> {
   });
 
   return {
-    services: servicesData || [],
-    projects: portfolioData?.items || [],
-    posts: (home.blog_preview || []).map((post) => ({
-      ...post,
-      date: post.date || post.publishedAt,
-      publishedAt: post.publishedAt || post.date,
-    })),
+    services: (servicesData || []).map(toHomeService),
+    projects: (portfolioData?.items || []).map(toHomeProject),
+    posts: (home.blog_preview || []).map(toHomePost),
     stats,
     clients: layoutData?.client_logos || [],
     hero: home.hero || null,
@@ -100,12 +113,20 @@ export async function getHomeData(locale?: string): Promise<HomeData> {
   };
 }
 
+/* Keep only the fields the homepage cards actually read. */
+const toHomeService = (s: Service): HomeService => ({ slug: s.slug, title: s.title, imageUrl: s.imageUrl });
+const toHomeProject = (p: PortfolioItem): HomeProject =>
+  ({ slug: p.slug, title: p.title, client: p.client, category: p.category, image: p.image, img: p.img });
+const toHomePost = (p: BlogPost): HomePost =>
+  ({ slug: p.slug, title: p.title, category: p.category, featuredImage: p.featuredImage,
+     date: p.date || p.publishedAt, publishedAt: p.publishedAt || p.date });
+
 /** Server render must never take the whole page down over an API blip. */
 export function fallbackHomeData(locale?: string): HomeData {
   return {
-    services: mappedFallbackServices(),
-    projects: mappedFallbackProjects(),
-    posts: mappedFallbackPosts(locale),
+    services: mappedFallbackServices().map(toHomeService),
+    projects: mappedFallbackProjects().map(toHomeProject),
+    posts: mappedFallbackPosts(locale).map(toHomePost),
     // Mirrors what the CMS serves, so a fallback render says the same thing
     // the live page does rather than a quietly different pair of numbers.
     // Mirrors what the CMS serves, so a fallback render says the same thing the
@@ -135,9 +156,9 @@ export function fallbackHomeData(locale?: string): HomeData {
 export async function getHomeDataSafe(locale?: string): Promise<HomeData> {
   try {
     const data = await getHomeData(locale);
-    if (!data.services.length) data.services = mappedFallbackServices();
-    if (!data.projects.length) data.projects = mappedFallbackProjects();
-    if (!data.posts.length) data.posts = mappedFallbackPosts(locale);
+    if (!data.services.length) data.services = mappedFallbackServices().map(toHomeService);
+    if (!data.projects.length) data.projects = mappedFallbackProjects().map(toHomeProject);
+    if (!data.posts.length) data.posts = mappedFallbackPosts(locale).map(toHomePost);
     return data;
   } catch (e) {
     console.error("Failed to fetch home data on the server:", e);
