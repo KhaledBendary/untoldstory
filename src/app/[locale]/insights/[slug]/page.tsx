@@ -13,7 +13,19 @@ import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadl
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
 /** Known slugs are prerendered; remaining CMS/legacy slugs still render on demand. */
-export const dynamicParams = true;
+/*
+ * An unknown slug is a 404, not a page to build.
+ *
+ * With a blocking fallback, every made-up URL a crawler tried was rendered and
+ * written to the ISR cache — one write per distinct URL, which is unbounded and
+ * exactly what a scanner produces. Verified against production before changing
+ * it: /ar/work/<random> returned MISS, then HIT on the next request.
+ *
+ * The cost is that a slug added in the CMS needs a deploy before it resolves.
+ * generateStaticParams below reads the live lists at build time, so a redeploy
+ * is all it takes.
+ */
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const slugs = await slugList();

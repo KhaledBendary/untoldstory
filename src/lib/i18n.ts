@@ -40,10 +40,18 @@ export function isIndexableLocale(locale: string): locale is Locale {
 }
 
 /**
- * Locales built ahead of time. Only indexable languages are prerendered so a
- * crawler never receives a cold English shell at /de or /zh.
+ * Locales built ahead of time — all of them.
+ *
+ * This used to be the indexable ones only, so /zh and /sw were rendered on
+ * demand and written to the ISR cache the first time anyone asked. Combined
+ * with a blocking fallback on the detail routes, that made the cache
+ * write-heavy: 451k writes against a 200k allowance in a month. A page built
+ * once at deploy is never written again until it revalidates.
+ *
+ * The withheld languages are still noindex — see INDEXABLE_LOCALES. Building
+ * them is about what the cache does, not about what Google sees.
  */
-export const PRERENDER_LOCALES: readonly Locale[] = INDEXABLE_LOCALES;
+export const PRERENDER_LOCALES: readonly Locale[] = LOCALE_CODES;
 
 /** BCP-47 tags for hreflang and <html lang>. */
 export const LOCALE_TAGS: Record<Locale, string> = {

@@ -10,7 +10,7 @@ const ASSET_BASE_URL = (
 /**
  * Helper to get the correct image URL for a Service, handling both API and fallback properties
  */
-export function getServiceImagePosition(service: Service): string {
+export function getServiceImagePosition(service: Pick<Service, 'slug'>): string {
   const positions: Record<string, string> = {
     'commercial-video-production': '75% 55%',
     'commercial-photography': '50% 43%',
@@ -26,7 +26,7 @@ export function getServiceImagePosition(service: Service): string {
   return positions[service.slug] ?? '50% 50%';
 }
 
-export function getServiceImage(service: Service, fallbackUrl: string = '/images/hero-giza-pyramids.jpg'): string {
+export function getServiceImage(service: Pick<Service, 'slug' | 'imageUrl'>, fallbackUrl: string = '/images/hero-giza-pyramids.jpg'): string {
   const referenceImages: Record<string, string> = {
     'commercial-video-production': '/images/commercial-advertising-production-services-egypt.webp',
     'commercial-photography': '/images/commercial-product-photography-clorox.webp',
@@ -47,7 +47,7 @@ export function getServiceImage(service: Service, fallbackUrl: string = '/images
 /**
  * Helper to get the correct image URL for a PortfolioItem
  */
-export function getProjectImage(project: PortfolioItem, fallbackUrl: string = '/images/hero-giza-pyramids.jpg'): string {
+export function getProjectImage(project: Pick<PortfolioItem, 'image' | 'img'>, fallbackUrl: string = '/images/hero-giza-pyramids.jpg'): string {
   const possibleUrls = [project.image, project.img].filter(Boolean) as string[];
   return resolveImageUrl(possibleUrls[0] || fallbackUrl);
 }
@@ -55,7 +55,7 @@ export function getProjectImage(project: PortfolioItem, fallbackUrl: string = '/
 /**
  * Helper to get the correct image URL for a BlogPost
  */
-export function getPostImage(post: BlogPost, fallbackUrl: string = '/images/hero-giza-pyramids.jpg'): string {
+export function getPostImage(post: Pick<BlogPost, 'featuredImage'>, fallbackUrl: string = '/images/hero-giza-pyramids.jpg'): string {
   const possibleUrls = [post.featuredImage].filter(Boolean) as string[];
   return resolveImageUrl(possibleUrls[0] || fallbackUrl);
 }

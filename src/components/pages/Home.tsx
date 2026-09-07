@@ -13,7 +13,7 @@ import { SplitWords, Reveal, LineReveal, EASE } from '../Reveal';
 import { useSiteReady } from '../SiteContext';
 import { useHydrated } from '@/hooks/useHydrated';
 import { useLanguage } from '../LanguageContext';
-import { getHomeDataSafe, fallbackHomeData, type HomeData } from '@/lib/home-data';
+import { getHomeDataSafe, fallbackHomeData, type HomeData, type HomeService, type HomeProject, type HomePost } from '@/lib/home-data';
 import { usePageData } from '@/hooks/usePageData';
 import { getServiceImagePosition, getServiceImage, getProjectImage, getPostImage } from '@/lib/utils';
 import { formatPostDate } from '@/lib/dates';
@@ -209,7 +209,7 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
 }
 
 /* ---------------- SERVICES LIST ---------------- */
-function ServicesList({ services }: { services: Service[] }) {
+function ServicesList({ services }: { services: HomeService[] }) {
   const [active, setActive] = useState<number | null>(null);
   const { t } = useLanguage();
   return (
@@ -281,7 +281,7 @@ function workPriority(p: PortfolioItem) {
   return 0;
 }
 
-function WorkScroll({ projects }: { projects: PortfolioItem[] }) {
+function WorkScroll({ projects }: { projects: HomeProject[] }) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const featured = [...projects]
@@ -560,7 +560,7 @@ function Process({ process }: { process: { badge?: string; title?: string; steps
 }
 
 /* ---------------- INSIGHTS ---------------- */
-function InsightsTeaser({ posts }: { posts: BlogPost[] }) {
+function InsightsTeaser({ posts }: { posts: HomePost[] }) {
   const featuredPosts = posts.slice(0, 3);
   const { locale, t } = useLanguage();
   return (

@@ -130,6 +130,23 @@ function findFallbackService(slug: string) {
   return mappedFallbackServices().find((s) => related.includes(s.slug));
 }
 
+/**
+ * A service as a listing shows it: name, blurb, picture.
+ *
+ * The full record carries the article in `fullDesc`, which the cards never
+ * render. Sending the list untrimmed put 600 kb of unread text into /services,
+ * /contact and every service detail page.
+ */
+export type ServiceCard = Pick<Service, "slug" | "title" | "shortDesc" | "imageUrl">;
+
+export const toServiceCard = (s: Service): ServiceCard =>
+  ({ slug: s.slug, title: s.title, shortDesc: s.shortDesc, imageUrl: s.imageUrl });
+
+/** The listing's own loader, so a client refetch returns the same shape. */
+export async function getServiceCards(locale?: string): Promise<ServiceCard[]> {
+  return (await getServicesData(locale)).map(toServiceCard);
+}
+
 export async function getServicesData(locale?: string): Promise<Service[]> {
   try {
     const list = await api.getServices(locale);
@@ -188,11 +205,13 @@ export async function getWorkData(locale?: string): Promise<PortfolioItem[]> {
   }
 }
 
-export type ContactData = { services: Service[]; layout: LayoutData | null };
+// The form's dropdown shows service names; nothing on the page reads a body.
+export type ContactData = { services: ShellService[]; layout: LayoutData | null };
 
 export async function getContactData(locale?: string): Promise<ContactData> {
   try {
-    const [services, layout] = await Promise.all([getServicesData(locale), api.getLayout(locale)]);
+    const [full, layout] = await Promise.all([getServicesData(locale), api.getLayout(locale)]);
+    const services = (full || []).map(({ slug, title }) => ({ slug, title }));
     return { services: services || [], layout: layout ?? null };
   } catch (e) {
     console.error("Failed to fetch contact data:", e);
@@ -231,7 +250,8 @@ async function asDetail<T>(load: () => Promise<T>): Promise<DetailResult<T>> {
 
 export type ServiceDetailData = {
   service: Service;
-  allServices: Service[];
+  // Only for the "next service" link and the "03 / 13" counter.
+  allServices: ShellService[];
   relatedProjects: PortfolioItem[];
 };
 
@@ -253,7 +273,7 @@ export function getServiceDetailData(slug: string, locale?: string) {
       )
       .slice(0, 3);
 
-    return { service, allServices: allServices || [], relatedProjects };
+    return { service, allServices: (allServices || []).map(({ slug, title }) => ({ slug, title })), relatedProjects };
   });
 }
 
@@ -434,7 +454,17 @@ export async function findPostAnyLocale(slug: string, locale?: string) {
  * footer could show anything. Fetched on the server instead, the shell arrives
  * complete in the HTML and those round trips disappear.
  */
-export type ShellData = { layout: LayoutData | null; services: Service[] };
+/**
+ * What the shell needs, and nothing more.
+ *
+ * This used to be the full Service records. The footer lists seven service
+ * names, and to render those names every page on the site was serialising all
+ * thirteen complete service articles into its HTML — the privacy page came to
+ * 590 kb, the homepage to 1.2 mb, of which about 4 kb was ever visible. Two
+ * fields is what the footer reads, so two fields is what it gets.
+ */
+export type ShellService = { slug: string; title: string };
+export type ShellData = { layout: LayoutData | null; services: ShellService[] };
 
 /*
  * Point CMS-authored links at the URL they end up on.
@@ -481,5 +511,9 @@ export async function getShellData(locale?: string): Promise<ShellData> {
     safeFetch(() => api.getLayout(locale), "layout"),
     safeFetch(() => getServicesData(locale), "shell-services"),
   ]);
-  return { layout: withCurrentLinks(layout ?? null), services: services ?? [] };
+  return {
+    layout: withCurrentLinks(layout ?? null),
+    // Only the fields the footer renders travel with every page.
+    services: (services ?? []).map(({ slug, title }) => ({ slug, title })),
+  };
 }
