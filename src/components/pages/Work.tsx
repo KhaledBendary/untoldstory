@@ -135,7 +135,7 @@ export default function Work({ initialData, initialLocale }: { initialData: Port
                 filter === c ? 'bg-[#fafafa] text-[#0a0a0a] border-[#fafafa]' : 'border-white/20 text-white/60 hover:border-white/60 hover:text-white'
               }`}
             >
-              {c === 'All' ? (t('Home') === 'الرئيسية' ? 'الكل' : 'All') : c}
+              {t(c)}
               <span className="ms-2 opacity-70">{c === 'All' ? projects.length : projects.filter(p => p.category === c).length}</span>
             </button>
           ))}

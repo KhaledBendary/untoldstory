@@ -190,9 +190,19 @@ img.keep-color,
 }
 
 /* Marquee */
-@keyframes marquee {
+.client-logo-track {
+  display: flex;
+  direction: ltr;
+  width: max-content;
+  animation: client-logo-marquee 40s linear infinite;
+  will-change: transform;
+}
+.client-logo-track-reverse {
+  animation-direction: reverse;
+}
+@keyframes client-logo-marquee {
   from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  to { transform: translateX(-33.333333%); }
 }
 @keyframes marquee-rev {
   from { transform: translateX(-50%); }
@@ -288,5 +298,16 @@ img {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* The client wall is intentionally a continuous moving showcase. Keep its
+     seamless loop running when the browser has reduced-motion enabled. */
+  .client-logo-track {
+    animation: client-logo-marquee 40s linear infinite !important;
+    animation-play-state: running !important;
+  }
+
+  .client-logo-track-reverse {
+    animation-direction: reverse !important;
   }
 }

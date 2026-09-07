@@ -18,7 +18,13 @@ export function usePageData<T>(
   deps: unknown[] = [],
 ) {
   const { locale } = useLanguage();
-  const [data, setData] = useState<T | null>(initialData);
+  const depsKey = JSON.stringify(deps);
+  const key = `${locale}|${depsKey}`;
+  const serverKey = `${initialLocale}|${depsKey}`;
+  const [snapshot, setSnapshot] = useState({ data: initialData, key: serverKey, source: initialData });
+  const data = snapshot.key === key && snapshot.source === initialData
+    ? snapshot.data
+    : locale === initialLocale ? initialData : null;
   // When the server rendered without data it had already exhausted its
   // retries, so the honest server-side state is "failed", not "loading" — and
   // the failed view is a real page with an <h1>, where the spinner was markup
@@ -35,8 +41,6 @@ export function usePageData<T>(
     fetcherRef.current = fetcher;
   });
 
-  const depsKey = JSON.stringify(deps);
-
   // What `data` currently holds. Starts at the server locale when the server
   // succeeded, so mounting costs no request — but switching away and back
   // still refetches, rather than leaving the other language's copy on screen.
@@ -44,6 +48,7 @@ export function usePageData<T>(
 
   useEffect(() => {
     const key = `${locale}|${depsKey}`;
+    if (initialData && locale === initialLocale && retryToken === 0) return;
     if (loadedKeyRef.current === key && retryToken === 0) return;
 
     let cancelled = false;
@@ -54,7 +59,7 @@ export function usePageData<T>(
       try {
         const next = await fetcherRef.current(locale);
         if (cancelled) return;
-        setData(next);
+        setSnapshot({ data: next, key, source: initialData });
         loadedKeyRef.current = key;
       } catch (err) {
         if (cancelled) return;
@@ -66,11 +71,11 @@ export function usePageData<T>(
     })();
 
     return () => { cancelled = true; };
-  }, [locale, depsKey, retryToken]);
+  }, [locale, depsKey, retryToken, initialData, initialLocale]);
 
   return {
     data,
-    loading,
+    loading: loading || (snapshot.key !== key && !(initialData && locale === initialLocale)),
     failed,
     retry: () => setRetryToken((n) => n + 1),
   };
