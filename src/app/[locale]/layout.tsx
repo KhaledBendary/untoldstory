@@ -357,7 +357,7 @@ return (
               height="1"
               width="1"
               style={{ display: "none" }}
-              alt=""
+              alt="image?url=%2Fimages%2Fclients row 5 — Global Untold Story"
               src={`https://www.facebook.com/tr?id=${FB_PIXEL_ID}&ev=PageView&noscript=1`}
             />
           </noscript>
