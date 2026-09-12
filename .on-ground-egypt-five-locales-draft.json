@@ -1,0 +1,971 @@
+{
+  "status": "reviewed-ready-for-package",
+  "service_slug": "on-ground-egypt",
+  "locales": ["zh", "ja", "ko", "pl", "sw"],
+  "source_locale": "en",
+  "service_fields": {
+    "zh": {
+      "title": "面向国际团队的埃及制作服务：本地知识，国际制作标准。",
+      "short_desc": "涵盖许可、制片协调、团队、设备、地点、物流和后期制作的本地制作支持，可作为完整服务或单独制作模块提供。"
+    },
+    "ja": {
+      "title": "国際チーム向けエジプト制作サービス：現地の知識、国際的な制作基準。",
+      "short_desc": "許可、フィクシング、クルー、機材、ロケーション、ロジスティクス、ポストプロダクションを網羅する現地制作サポートを、包括的なサービスまたは個別の制作モジュールとして提供します。"
+    },
+    "ko": {
+      "title": "국제 제작진을 위한 이집트 제작 서비스: 현지 지식, 국제 제작 기준.",
+      "short_desc": "허가, 픽싱, 제작진, 장비, 로케이션, 물류 및 후반 제작 전반을 아우르는 현지 제작 지원을 종합 서비스 또는 개별 제작 모듈로 제공합니다."
+    },
+    "pl": {
+      "title": "Usługi produkcyjne w Egipcie dla międzynarodowych ekip: lokalna wiedza, międzynarodowe standardy produkcji.",
+      "short_desc": "Lokalne wsparcie produkcyjne obejmujące pozwolenia, fixing, ekipy, sprzęt, lokalizacje, logistykę i postprodukcję, dostępne jako pełna usługa lub pojedyncze moduły produkcyjne."
+    },
+    "sw": {
+      "title": "Huduma za uzalishaji nchini Misri kwa timu za kimataifa: maarifa ya ndani, viwango vya kimataifa vya uzalishaji.",
+      "short_desc": "Usaidizi wa uzalishaji wa ndani unaojumuisha vibali, fixing, timu, vifaa, maeneo, logistics na post production, unaopatikana kama huduma kamili au moduli binafsi za uzalishaji."
+    }
+  },
+  "completed_sections": ["introduction-and-local-knowledge", "planning-and-permits", "fixer-and-local-crews", "equipment-and-locations", "art-department", "transport-and-logistics", "post-production", "subtitling-dubbing-and-localization", "production-support-for-different-formats", "documentary-and-egyptian-heritage-production", "planning-to-film-in-egypt", "why-work-with-global-untold-story", "faq-production-permits-and-lead-time", "faq-crews-sites-and-production-support", "faq-localization-budget-and-cta"],
+  "sections": {
+    "introduction-and-local-knowledge": {
+      "source_block_range": [1, 13],
+      "zh": [
+        "埃及拥有非凡的取景地、经验丰富的团队，以及能够承载几乎任何故事的视觉景观。",
+        "同时，制作执行也可能面临很高的复杂度。",
+        "拍摄许可、准入、出行、设备运输、当地法规和特定场地要求，都会影响制作应如何规划。",
+        "Global Untold Story 为在埃及各地拍摄的国际制作公司、纪录片团队、播出机构、代理公司和品牌提供支持。",
+        "我们作为您的本地制作合作伙伴，将创意简报转化为可执行的计划，并统筹实现该计划所需的人员、供应商和物流。",
+        "客户可仅委托我们处理取景勘察、许可、本地团队或设备等单项需求，也可委托我们统筹整个在地制作。",
+        "本地经验。国际制作标准。",
+        "每个国际制作项目都有自己的工作流程、预期和创意重点。",
+        "我们的职责不是取代这一体系。",
+        "而是让它在埃及顺畅运作。",
+        "在团队抵达前，我们会与制片人、导演和制作经理紧密协调，确认哪些事项需要在当地安排，以及哪些因素可能影响进度、预算或创意方向。",
+        "这让来访团队在摄影机开拍前，就能清楚了解整个制作安排。",
+        "在符合准入、安全和审批要求的前提下，我们可支持在开罗、吉萨、亚历山大、卢克索、阿斯旺、红海、西奈、西部沙漠及埃及其他地区进行制作。"
+      ],
+      "ja": [
+        "エジプトには卓越したロケーション、経験豊富なクルー、そしてほぼあらゆる物語を支えられる豊かな映像環境があります。",
+        "一方で、現地での制作運営には高い複雑性が伴うこともあります。",
+        "許可、アクセス、移動、機材輸送、現地規制、ロケーション固有の要件はすべて、制作計画の立て方に影響します。",
+        "Global Untold Storyは、エジプト各地で撮影する国際制作会社、ドキュメンタリーチーム、放送局、エージェンシー、ブランドを支援します。",
+        "私たちは現地制作パートナーとして、ブリーフを実行可能な計画に落とし込み、その実現に必要な人員、サプライヤー、ロジスティクスを管理します。",
+        "ロケハン、許可取得、現地クルー、機材など一部の要件だけをご依頼いただくことも、現地制作全体の管理をお任せいただくことも可能です。",
+        "現地の知見。国際基準の制作。",
+        "国際制作にはそれぞれ固有のワークフロー、期待値、クリエイティブ上の優先事項があります。",
+        "私たちの役割は、その仕組みを置き換えることではありません。",
+        "エジプトでその仕組みが適切に機能するようにすることです。",
+        "チーム到着前に、プロデューサー、ディレクター、制作マネージャーと密に連携し、現地で整えるべき事項と、スケジュール、予算、クリエイティブ方針に影響し得る要素を確認します。",
+        "これにより、来訪チームはカメラが回り始める前に制作全体を明確に把握できます。",
+        "アクセス、安全、承認に関する要件を満たすことを前提に、カイロ、ギザ、アレクサンドリア、ルクソール、アスワン、紅海、シナイ、西部砂漠など、エジプト各地での制作を支援できます。"
+      ],
+      "ko": [
+        "이집트에는 탁월한 촬영지와 숙련된 제작진, 그리고 거의 모든 종류의 이야기를 담아낼 수 있는 풍부한 시각적 환경이 있습니다.",
+        "동시에 현지 제작 운영은 높은 복잡성을 수반할 수 있습니다.",
+        "촬영 허가, 출입, 이동, 장비 운송, 현지 규정 및 장소별 요구 사항은 모두 제작 계획 수립 방식에 영향을 미칩니다.",
+        "Global Untold Story는 이집트 전역에서 촬영하는 해외 제작사, 다큐멘터리 팀, 방송사, 에이전시 및 브랜드를 지원합니다.",
+        "저희는 현지 제작 파트너로서 브리프를 실행 가능한 계획으로 전환하고, 이를 실현하는 데 필요한 인력, 협력업체 및 물류를 관리합니다.",
+        "로케이션 헌팅, 허가, 현지 제작진 또는 장비처럼 한 가지 필요 사항만 의뢰하실 수도 있고, 현지 전체 제작 관리를 맡기실 수도 있습니다.",
+        "현지 지식. 국제 제작 기준.",
+        "모든 국제 제작에는 고유한 워크플로, 기대치 및 창의적 우선순위가 있습니다.",
+        "저희의 역할은 그 시스템을 대체하는 것이 아닙니다.",
+        "그 시스템이 이집트에서 제대로 작동하도록 만드는 것입니다.",
+        "팀이 도착하기 전에 프로듀서, 감독 및 제작 매니저와 긴밀히 협력하여 현지에서 준비할 사항과 일정, 예산 또는 창의적 접근에 영향을 줄 수 있는 요소를 파악합니다.",
+        "이를 통해 방문 제작팀은 카메라가 돌아가기 전에 제작 전반을 명확히 파악할 수 있습니다.",
+        "접근, 안전 및 승인 요건을 전제로 카이로, 기자, 알렉산드리아, 룩소르, 아스완, 홍해, 시나이, 서부 사막 및 이집트 전역의 다른 지역에서 제작을 지원할 수 있습니다."
+      ],
+      "pl": [
+        "Egipt oferuje wyjątkowe lokacje, doświadczone ekipy oraz wizualne środowisko zdolne udźwignąć niemal każdą historię.",
+        "Jednocześnie realizacja produkcji może być wymagająca operacyjnie.",
+        "Pozwolenia, dostęp, podróże, transport sprzętu, lokalne przepisy i wymagania właściwe dla danej lokacji wpływają na sposób planowania produkcji.",
+        "Global Untold Story wspiera międzynarodowe firmy produkcyjne, ekipy dokumentalne, nadawców, agencje i marki realizujące zdjęcia w całym Egipcie.",
+        "Działamy jako lokalny partner produkcyjny: przekładamy brief na praktyczny plan oraz zarządzamy ludźmi, dostawcami i logistyką potrzebnymi do jego realizacji.",
+        "Klienci mogą zaangażować nas do pojedynczego zadania, takiego jak scouting lokacji, pozwolenia, lokalna ekipa czy sprzęt, albo powierzyć nam zarządzanie całą produkcją na miejscu.",
+        "Lokalna wiedza. Międzynarodowe standardy produkcji.",
+        "Każda międzynarodowa produkcja ma własny proces pracy, oczekiwania i priorytety kreatywne.",
+        "Naszą rolą nie jest zastępowanie tego systemu.",
+        "Naszą rolą jest sprawienie, by działał on właściwie w Egipcie.",
+        "Przed przyjazdem ściśle współpracujemy z producentami, reżyserami i kierownikami produkcji, ustalając, co należy zorganizować lokalnie oraz co może wpłynąć na harmonogram, budżet lub podejście kreatywne.",
+        "Dzięki temu przyjezdny zespół ma jasny obraz produkcji, zanim kamery zaczną pracę.",
+        "Z zastrzeżeniem wymogów dotyczących dostępu, bezpieczeństwa i zgód, możemy wspierać produkcje w Kairze, Gizie, Aleksandrii, Luksorze, Asuanie, nad Morzem Czerwonym, na Synaju, na Pustyni Zachodniej i w innych częściach Egiptu."
+      ],
+      "sw": [
+        "Misri ina maeneo ya kipekee, timu zenye uzoefu na mazingira ya taswira yanayoweza kuunga mkono karibu aina yoyote ya simulizi.",
+        "Wakati huo huo, utekelezaji wa uzalishaji unaweza kuwa na mahitaji makubwa ya kiutendaji.",
+        "Vibali, ufikiaji, safari, usafirishaji wa vifaa, kanuni za ndani na mahitaji maalum ya eneo huathiri namna uzalishaji unavyopaswa kupangwa.",
+        "Global Untold Story inasaidia kampuni za kimataifa za uzalishaji, timu za filamu za makala, watangazaji, mashirika na chapa zinazorekodi kote Misri.",
+        "Tunafanya kazi kama mshirika wako wa uzalishaji wa ndani, tukigeuza brief kuwa mpango unaotekelezeka na kusimamia watu, wasambazaji na uratibu wa vifaa unaohitajika kuutekeleza.",
+        "Wateja wanaweza kutuleta kwa hitaji moja, kama kutafuta maeneo, vibali, timu ya ndani au vifaa, au kututeua kusimamia uzalishaji mzima wa eneo husika.",
+        "Ujuzi wa ndani. Viwango vya kimataifa vya uzalishaji.",
+        "Kila uzalishaji wa kimataifa huja na mtiririko wake wa kazi, matarajio na vipaumbele vya ubunifu.",
+        "Jukumu letu si kuchukua nafasi ya mfumo huo.",
+        "Ni kuufanya ufanye kazi ipasavyo nchini Misri.",
+        "Kabla ya timu kuwasili, tunaratibu kwa karibu na watayarishaji, waongozaji na mameneja wa uzalishaji ili kubaini kinachohitaji kupangwa ndani ya nchi na kinachoweza kuathiri ratiba, bajeti au mwelekeo wa ubunifu.",
+        "Hii huipa timu inayotembelea picha wazi ya uzalishaji kabla kamera hazijaanza kurekodi.",
+        "Kwa kuzingatia mahitaji ya ufikiaji, usalama na idhini, tunaweza kusaidia uzalishaji huko Cairo, Giza, Alexandria, Luxor, Aswan, Bahari Nyekundu, Sinai, Jangwa la Magharibi na maeneo mengine kote Misri."
+      ]
+    },
+    "planning-and-permits": {
+      "source_block_range": [14, 29],
+      "zh": [
+        "埃及制作支持服务",
+        "制作规划与可行性评估",
+        "强有力的制作在团队抵达前就开始了。",
+        "我们审阅创意简报、方案、剧本和拟定的取景地，以评估在现有时间表和预算内哪些安排切实可行。",
+        "随后，我们会制定制作架构，涵盖团队需求、设备、取景地、交通、住宿、审批和拍摄物流。",
+        "前期制作支持可包括：",
+        "制作预算与成本规划 | 拍摄日程与制作日历 | 团队及部门架构 | 技术要求 | 分镜表与故事板 | 取景地可行性 | 差旅与行程计划 | 风险与应急预案 | 制作时间线 | 区域拍摄物流",
+        "目标很明确：及早识别挑战，保护创意雄心，并避免制作期间代价高昂的意外情况。",
+        "拍摄许可、准入与文件准备",
+        "在埃及的拍摄要求会因项目、内容、地点、设备以及出行团队成员的国籍而异。",
+        "我们协调申请、支持性文件，并与相关主管部门、场地管理方、机构和业主沟通。",
+        "敏感区域、政府场所、考古遗址和文化遗产地点可能需要额外审批和更长的准备周期。",
+        "我们的支持可包括：",
+        "一般拍摄许可协调 | 特定地点审批 | 剧本、梗概与方案文件 | 制作材料的阿拉伯语翻译 | 考古及文化遗产地点协调 | 博物馆与机构协调 | 适用情况下的无人机许可协调 | 与当地主管部门及场地管理方沟通 | 私人产权场地准入 | 制作文件准备",
+        "最终许可和场地准入仍须获得相关主管部门、机构和业主的批准。",
+        "我们会如实向制作方说明可能的要求、现实的准备周期、限制条件和可行的替代方案。"
+      ],
+      "ja": [
+        "エジプトでの制作サポートサービス",
+        "企画と制作の実現可能性",
+        "強い制作は、クルーが到着する前に始まります。",
+        "ブリーフ、トリートメント、脚本、予定ロケーションを確認し、利用可能なスケジュールと予算の中で何が実現可能かを見極めます。",
+        "そこから、クルー要件、機材、ロケーション、輸送、宿泊、承認、撮影ロジスティクスを含む制作体制を構築します。",
+        "プリプロダクションの支援には、以下が含まれます。",
+        "制作予算とコスト計画 | 撮影スケジュールと制作カレンダー | クルーおよび部門構成 | 技術要件 | ショットリストと絵コンテ | ロケーションの実現可能性 | 渡航・移動計画 | リスクおよび緊急時対応計画 | 制作タイムライン | 地域での撮影ロジスティクス",
+        "目的は明確です。課題を早期に見つけ、クリエイティブな意図を守り、制作中の高額な想定外を避けることです。",
+        "撮影許可、アクセス、書類対応",
+        "エジプトでの撮影要件は、プロジェクト、内容、場所、機材、渡航するクルーの国籍によって異なります。",
+        "申請、補足書類の準備、関係当局、ロケーション管理者、機関、物件所有者との連絡を調整します。",
+        "センシティブな場所、政府関連施設、考古学遺跡、文化遺産のロケーションでは、追加承認とより長い準備期間が必要になる場合があります。",
+        "当社の支援には、以下が含まれます。",
+        "一般的な撮影許可の調整 | 場所ごとの承認 | 脚本・あらすじ・トリートメントの書類 | 制作資料のアラビア語翻訳 | 考古学・文化遺産サイトの調整 | 博物館・機関との調整 | 必要に応じたドローン許可の調整 | 地方当局およびサイト管理者との連絡 | 私有地へのアクセス | 制作書類の準備",
+        "最終的な許可とロケーションへのアクセスは、関係当局、機関、物件所有者の承認を前提とします。",
+        "想定される要件、現実的な準備期間、制約、利用可能な代替案について、制作チームに率直に助言します。"
+      ],
+      "ko": [
+        "이집트 제작 지원 서비스",
+        "기획 및 제작 실현 가능성",
+        "탄탄한 제작은 제작진이 도착하기 전에 시작됩니다.",
+        "브리프, 트리트먼트, 대본 및 예정된 촬영지를 검토하여 주어진 일정과 예산 안에서 무엇이 실현 가능한지 평가합니다.",
+        "그 후 제작진 요구 사항, 장비, 촬영지, 운송, 숙박, 승인 절차 및 촬영 물류를 포괄하는 제작 구조를 수립합니다.",
+        "프리프로덕션 지원에는 다음이 포함될 수 있습니다.",
+        "제작 예산 및 비용 계획 | 촬영 일정 및 제작 캘린더 | 제작진 및 부서 구성 | 기술 요구 사항 | 쇼트 리스트 및 스토리보드 | 촬영지 실현 가능성 | 출장 및 이동 계획 | 위험 및 비상 대응 계획 | 제작 타임라인 | 지역 촬영 물류",
+        "목표는 분명합니다. 과제를 조기에 파악하고 창의적 목표를 지키며 제작 중 비용이 큰 돌발 상황을 피하는 것입니다.",
+        "촬영 허가, 접근 및 문서 준비",
+        "이집트의 촬영 요건은 프로젝트, 콘텐츠, 장소, 장비 및 방문 제작진의 국적에 따라 달라집니다.",
+        "신청 절차와 지원 문서를 조율하고, 관련 당국, 촬영지 관리자, 기관 및 부동산 소유자와의 소통을 관리합니다.",
+        "민감한 장소, 정부 시설, 고고학 유적지 및 문화유산 장소는 추가 승인과 더 긴 준비 기간이 필요할 수 있습니다.",
+        "저희의 지원에는 다음이 포함될 수 있습니다.",
+        "일반 촬영 허가 조율 | 장소별 승인 | 대본, 시놉시스 및 트리트먼트 문서 | 제작 자료의 아랍어 번역 | 고고학 및 문화유산 장소 조율 | 박물관 및 기관 조율 | 필요한 경우 드론 허가 조율 | 현지 당국 및 현장 관리팀과의 소통 | 사유지 접근 | 제작 문서 준비",
+        "최종 허가와 촬영지 접근은 관련 당국, 기관 및 소유자의 승인에 따릅니다.",
+        "예상 요건, 현실적인 준비 기간, 제한 사항 및 가능한 대안을 제작팀에 솔직하게 안내합니다."
+      ],
+      "pl": [
+        "Usługi wsparcia produkcji w Egipcie",
+        "Planowanie i wykonalność produkcji",
+        "Solidna produkcja zaczyna się, zanim ekipa przyjedzie na miejsce.",
+        "Analizujemy brief, treatment, scenariusz i planowane lokacje, aby ocenić, co jest wykonalne w ramach dostępnego harmonogramu i budżetu.",
+        "Następnie tworzymy strukturę produkcji obejmującą potrzeby ekipy, sprzęt, lokacje, transport, zakwaterowanie, zgody i logistykę zdjęć.",
+        "Wsparcie preprodukcyjne może obejmować:",
+        "Budżety produkcyjne i planowanie kosztów | Harmonogramy zdjęć i kalendarze produkcyjne | Struktury ekipy i działów | Wymagania techniczne | Listy ujęć i storyboardy | Wykonalność lokacji | Plany podróży i przemieszczania się | Planowanie ryzyka i sytuacji awaryjnych | Harmonogram produkcji | Regionalna logistyka zdjęć",
+        "Cel jest jasny: wcześnie rozpoznać wyzwania, chronić ambicję kreatywną i uniknąć kosztownych niespodzianek w trakcie produkcji.",
+        "Pozwolenia na zdjęcia, dostęp i dokumentacja",
+        "Wymagania dotyczące filmowania w Egipcie różnią się w zależności od projektu, treści, lokacji, sprzętu i narodowości przyjezdnej ekipy.",
+        "Koordynujemy wnioski, dokumentację uzupełniającą oraz komunikację z właściwymi władzami, zarządcami lokacji, instytucjami i właścicielami nieruchomości.",
+        "Wrażliwe lokacje, obiekty rządowe, stanowiska archeologiczne i miejsca dziedzictwa kulturowego mogą wymagać dodatkowych zgód i dłuższego czasu przygotowania.",
+        "Nasze wsparcie może obejmować:",
+        "Koordynację ogólnych pozwoleń na zdjęcia | Zgody właściwe dla danej lokacji | Dokumentację scenariusza, synopsisu i treatmentu | Tłumaczenie materiałów produkcyjnych na język arabski | Koordynację stanowisk archeologicznych i miejsc dziedzictwa | Koordynację z muzeami i instytucjami | Koordynację pozwoleń na drony, gdy ma zastosowanie | Komunikację z lokalnymi władzami i zarządcami obiektów | Dostęp do terenów prywatnych | Przygotowanie dokumentacji produkcyjnej",
+        "Ostateczne pozwolenia i dostęp do lokacji nadal podlegają zatwierdzeniu przez właściwe władze, instytucje i właścicieli nieruchomości.",
+        "Uczciwie doradzamy produkcji w zakresie prawdopodobnych wymagań, realistycznych terminów przygotowania, ograniczeń i dostępnych alternatyw."
+      ],
+      "sw": [
+        "Huduma za usaidizi wa uzalishaji nchini Misri",
+        "Upangaji na uwezekano wa uzalishaji",
+        "Uzalishaji imara huanza kabla ya timu kuwasili.",
+        "Tunakagua brief, treatment, hati ya filamu na maeneo yanayopangwa ili kutathmini kile kinachowezekana ndani ya ratiba na bajeti iliyopo.",
+        "Kutoka hapo, tunaunda muundo wa uzalishaji unaojumuisha mahitaji ya timu, vifaa, maeneo, usafiri, malazi, idhini na uratibu wa upigaji picha.",
+        "Usaidizi wa kabla ya uzalishaji unaweza kujumuisha:",
+        "Bajeti za uzalishaji na upangaji wa gharama | Ratiba za upigaji picha na kalenda za uzalishaji | Miundo ya timu na idara | Mahitaji ya kiufundi | Orodha za picha na storyboard | Uwezekano wa maeneo | Mipango ya safari na usafiri | Upangaji wa hatari na dharura | Ratiba ya uzalishaji | Uratibu wa upigaji picha wa kikanda",
+        "Lengo ni wazi: kutambua changamoto mapema, kulinda malengo ya ubunifu na kuepuka gharama za kushtukiza wakati wa uzalishaji.",
+        "Vibali vya kurekodi, ufikiaji na nyaraka",
+        "Mahitaji ya kurekodi nchini Misri hutofautiana kulingana na mradi, maudhui, eneo, vifaa na uraia wa timu inayosafiri.",
+        "Tunaratibu maombi, nyaraka saidizi na mawasiliano na mamlaka husika, wasimamizi wa maeneo, taasisi na wamiliki wa mali.",
+        "Maeneo nyeti, ya serikali, ya kiakiolojia na ya urithi yanaweza kuhitaji idhini za ziada na muda mrefu zaidi wa maandalizi.",
+        "Usaidizi wetu unaweza kujumuisha:",
+        "Uratibu wa vibali vya jumla vya kurekodi | Idhini maalum za maeneo | Nyaraka za hati, muhtasari na treatment | Tafsiri ya Kiarabu ya nyenzo za uzalishaji | Uratibu wa maeneo ya kiakiolojia na urithi | Uratibu na makumbusho na taasisi | Uratibu wa vibali vya droni inapohitajika | Mawasiliano na mamlaka za ndani na wasimamizi wa maeneo | Ufikiaji wa mali binafsi | Maandalizi ya nyaraka za uzalishaji",
+        "Vibali vya mwisho na ufikiaji wa maeneo bado hutegemea idhini ya mamlaka husika, taasisi na wamiliki wa mali.",
+        "Tunashauri timu ya uzalishaji kwa uwazi kuhusu mahitaji yanayoweza kutokea, muda halisi wa maandalizi, vikwazo na mbadala zinazopatikana."
+      ]
+    },
+    "fixer-and-local-crews": {
+      "source_block_range": [30, 44],
+      "zh": [
+        "场务协调与执行制片服务",
+        "可靠的本地制作团队不应只负责安排供应商。",
+        "它还应理解创意简报、预判问题，并让制作持续推进。",
+        "我们的场务协调与执行制片服务涵盖在埃及拍摄的日常管理。",
+        "我们协调各部门、供应商、取景地、团队调度和日程，同时与来访制作团队保持清晰顺畅的沟通。",
+        "支持内容可包括：",
+        "本地制作管理 | 场务协调与制作协调员 | 通告单和每日计划 | 供应商与合作方管理 | 团队与演职人员协调 | 基地管理 | 多地点排期 | 多组别排期 | 现场问题处理 | 制作管控 | 每日制作报告 | 与本地合作伙伴沟通",
+        "无论项目是精简的纪录片小组还是规模更大的广告制作，我们都会根据实际需求搭建团队和工作流程。",
+        "本地影视团队与演职人员",
+        "埃及拥有经验丰富的制作专业人才，覆盖电影、电视、广告、纪录片和现场制作领域。",
+        "我们根据项目规模、技术要求和偏好的工作方式配置本地团队。",
+        "服务范围可从精简的纪录片团队延伸至完整的摄影、灯光、录音、器材、制作、美术和后期制作部门。",
+        "可提供的团队成员包括：",
+        "摄影指导 | 摄影师及助理 | 灯光师与灯光团队 | 录音师 | 器材与搭建团队 | 制片人与制作经理 | 场务协调与协调员 | 美术部门团队 | 发型、化妆与服装团队 | 数据管理员 | 制作助理 | 剪辑师与后期制作专家",
+        "我们还可通过可信赖的本地合作伙伴协调选角、主持人、受访者、演员、模特、群众演员和配音人才。"
+      ],
+      "ja": [
+        "フィクサーおよびラインプロダクションサービス",
+        "信頼できる現地制作チームは、単にサプライヤーを手配するだけでは不十分です。",
+        "ブリーフを理解し、問題を予測し、制作を前進させる必要があります。",
+        "当社のフィクサーおよびラインプロダクションサービスは、エジプトでの撮影における日々の管理を担います。",
+        "部門、ベンダー、ロケーション、クルーの移動、スケジュールを調整しながら、来訪する制作チームとの明確な連絡体制を維持します。",
+        "支援内容には、以下が含まれます。",
+        "現地制作管理 | フィクサーと制作コーディネーター | コールシートと日別スケジュール | ベンダー・サプライヤー管理 | クルー・キャスト調整 | ユニットベース管理 | 複数ロケーションのスケジューリング | 複数ユニットのスケジューリング | 現場での問題解決 | 制作管理 | 日次制作レポート | 現地パートナーとの連絡",
+        "小規模なドキュメンタリー・ユニットでも、より大規模な広告制作でも、実際の要件に合わせてチームとワークフローを構築します。",
+        "現地の映像クルーと出演者",
+        "エジプトには、映画、テレビ、広告、ドキュメンタリー、ライブ制作の各分野で活動する経験豊富な制作プロフェッショナルが豊富にいます。",
+        "プロジェクトの規模、技術要件、希望する働き方に応じて、現地クルーを手配します。",
+        "小規模なドキュメンタリーチームから、カメラ、照明、音声、グリップ、制作、美術、ポストプロダクションのフル部門まで対応可能です。",
+        "手配可能なクルーには、以下が含まれます。",
+        "撮影監督 | カメラオペレーターとアシスタント | ガファーと照明チーム | 録音技師 | グリップ・リギングチーム | プロデューサーと制作マネージャー | フィクサーとコーディネーター | 美術部門チーム | ヘア、メイク、衣装チーム | データマネージャー | 制作アシスタント | 編集者とポストプロダクション専門家",
+        "信頼できる現地パートナーを通じて、キャスティング、司会者、出演協力者、俳優、モデル、エキストラ、ボイス・タレントの調整も行えます。"
+      ],
+      "ko": [
+        "픽서 및 라인 프로덕션 서비스",
+        "신뢰할 수 있는 현지 제작팀은 단순히 협력업체를 섭외하는 것 이상을 해야 합니다.",
+        "브리프를 이해하고 문제를 예측하며 제작이 계속 진행되도록 해야 합니다.",
+        "저희의 픽서 및 라인 프로덕션 서비스는 이집트 촬영 현장의 일상적인 관리를 담당합니다.",
+        "부서, 협력업체, 촬영지, 제작진 이동 및 일정을 조율하면서 방문 제작팀과 명확한 소통 체계를 유지합니다.",
+        "지원 범위에는 다음이 포함될 수 있습니다.",
+        "현지 제작 관리 | 픽서 및 제작 코디네이터 | 콜시트 및 일일 일정 | 협력업체 및 공급업체 관리 | 제작진 및 출연진 조율 | 유닛 베이스 관리 | 다중 촬영지 일정 관리 | 다중 유닛 일정 관리 | 현장 문제 해결 | 제작 통제 | 일일 제작 보고 | 현지 파트너와의 소통",
+        "소규모 다큐멘터리 유닛이든 더 큰 규모의 광고 제작이든, 실제 요구 사항에 맞춰 팀과 워크플로를 구성합니다.",
+        "현지 영상 제작진 및 출연 인력",
+        "이집트에는 영화, 텔레비전, 광고, 다큐멘터리 및 라이브 제작 전반에서 활동하는 풍부한 경험의 제작 전문가들이 있습니다.",
+        "프로젝트의 규모, 기술 요구 사항 및 선호하는 작업 방식에 맞춰 현지 제작진을 구성합니다.",
+        "소규모 다큐멘터리 팀부터 카메라, 조명, 음향, 그립, 제작, 미술 및 후반 제작의 완전한 부서 구성까지 가능합니다.",
+        "제공 가능한 제작진에는 다음이 포함됩니다.",
+        "촬영감독 | 카메라 오퍼레이터 및 어시스턴트 | 가퍼 및 조명팀 | 녹음 기사 | 그립 및 리깅팀 | 프로듀서 및 제작 매니저 | 픽서 및 코디네이터 | 미술팀 | 헤어, 메이크업 및 의상팀 | 데이터 매니저 | 제작 보조 | 편집자 및 후반 제작 전문가",
+        "신뢰할 수 있는 현지 파트너를 통해 캐스팅, 진행자, 출연 협력자, 배우, 모델, 엑스트라 및 성우 인력도 조율할 수 있습니다."
+      ],
+      "pl": [
+        "Usługi fixerów i line production",
+        "Rzetelny lokalny zespół produkcyjny powinien robić więcej niż tylko organizować dostawców.",
+        "Powinien rozumieć brief, przewidywać problemy i utrzymywać produkcję w ruchu.",
+        "Nasze usługi fixerów i line production obejmują codzienne zarządzanie planem zdjęciowym w Egipcie.",
+        "Koordynujemy działy, dostawców, lokacje, przemieszczanie się ekipy i harmonogramy, utrzymując jednocześnie jasną komunikację z przyjezdnym zespołem produkcyjnym.",
+        "Wsparcie może obejmować:",
+        "Lokalne zarządzanie produkcją | Fixerzy i koordynatorzy produkcji | Call sheety i harmonogramy dzienne | Zarządzanie dostawcami i podwykonawcami | Koordynacja ekipy i talentów | Zarządzanie bazą produkcyjną | Harmonogramowanie wielu lokacji | Harmonogramowanie wielu jednostek | Rozwiązywanie problemów na planie | Kontrola produkcji | Codzienne raportowanie produkcyjne | Komunikacja z lokalnymi partnerami",
+        "Niezależnie od tego, czy projekt jest kameralnym zespołem dokumentalnym, czy większą produkcją reklamową, budujemy zespół i przepływ pracy wokół jego rzeczywistych potrzeb.",
+        "Lokalne ekipy filmowe i talenty",
+        "Egipt dysponuje szeroką pulą doświadczonych profesjonalistów produkcyjnych pracujących przy filmie, telewizji, reklamie, dokumentach i produkcjach na żywo.",
+        "Dobieramy lokalną ekipę zgodnie ze skalą, wymaganiami technicznymi i preferowanym stylem pracy projektu.",
+        "Może to obejmować zarówno niewielki zespół dokumentalny, jak i pełne działy kamery, oświetlenia, dźwięku, gripu, produkcji, scenografii i postprodukcji.",
+        "Dostępna ekipa może obejmować:",
+        "Operatorów obrazu | Operatorów kamer i asystentów | Gafferów i ekipy oświetleniowe | Realizatorów dźwięku | Ekipy gripu i riggingu | Producentów i kierowników produkcji | Fixerów i koordynatorów | Zespoły działu scenografii | Zespoły fryzjerskie, charakteryzatorskie i kostiumowe | Menedżerów danych | Asystentów produkcji | Montażystów i specjalistów postprodukcji",
+        "Za pośrednictwem zaufanych lokalnych partnerów możemy również koordynować casting, prezenterów, uczestników, aktorów, modeli, statystów i talenty głosowe."
+      ],
+      "sw": [
+        "Huduma za fixer na line production",
+        "Timu ya uzalishaji ya ndani inayotegemewa inapaswa kufanya zaidi ya kupanga wasambazaji.",
+        "Inapaswa kuelewa brief, kutarajia matatizo na kuendeleza uzalishaji bila kusimama.",
+        "Huduma zetu za fixer na line production zinahusu usimamizi wa kila siku wa upigaji picha nchini Misri.",
+        "Tunaratibu idara, wasambazaji, maeneo, harakati za timu na ratiba huku tukidumisha mawasiliano wazi na timu ya uzalishaji inayotembelea.",
+        "Usaidizi unaweza kujumuisha:",
+        "Usimamizi wa uzalishaji wa ndani | Fixer na waratibu wa uzalishaji | Call sheet na ratiba za kila siku | Usimamizi wa wasambazaji na watoa huduma | Uratibu wa timu na vipaji | Usimamizi wa kituo cha uzalishaji | Upangaji wa ratiba za maeneo mengi | Upangaji wa ratiba za vitengo vingi | Utatuzi wa matatizo setini | Udhibiti wa uzalishaji | Ripoti za kila siku za uzalishaji | Mawasiliano na washirika wa ndani",
+        "Iwe mradi ni kikundi kidogo cha filamu ya makala au uzalishaji mkubwa wa kibiashara, tunaunda timu na mtiririko wa kazi kulingana na mahitaji yake halisi.",
+        "Timu za filamu za ndani na vipaji",
+        "Misri ina kundi kubwa la wataalamu wa uzalishaji wenye uzoefu katika filamu, televisheni, utangazaji, filamu za makala na uzalishaji wa moja kwa moja.",
+        "Tunapata timu ya ndani kulingana na ukubwa, mahitaji ya kiufundi na mtindo wa kazi unaopendelewa wa mradi.",
+        "Hii inaweza kuanzia timu ndogo ya filamu ya makala hadi idara kamili za kamera, taa, sauti, grip, uzalishaji, sanaa na post production.",
+        "Timu inayopatikana inaweza kujumuisha:",
+        "Wakurugenzi wa upigaji picha | Waendeshaji wa kamera na wasaidizi | Gaffer na timu za taa | Warekodi sauti | Timu za grip na rigging | Watayarishaji na mameneja wa uzalishaji | Fixer na waratibu | Timu za idara ya sanaa | Timu za nywele, urembo na mavazi | Wasimamizi wa data | Wasaidizi wa uzalishaji | Wahariri na wataalamu wa post production",
+        "Tunaweza pia kuratibu casting, watangazaji, washiriki, waigizaji, wanamitindo, watu wa ziada na vipaji vya sauti kupitia washirika wa ndani wanaoaminika."
+      ]
+    },
+    "equipment-and-locations": {
+      "source_block_range": [45, 59],
+      "zh": [
+        "摄影、灯光、录音与制作设备",
+        "我们根据创意简报、技术规格、拍摄条件和可用预算协调设备方案。",
+        "可包括摄影机、镜头、灯光、录音、器材、监看、数据管理和专业制作设备。",
+        "如来访团队自带设备，我们可提供本地增配、备用设备和技术支持。",
+        "设备协调可涵盖：",
+        "电影摄影机套装 | 广播及纪录片摄影系统 | 镜头与专业光学设备 | 灯光与配电 | 录音设备 | 器材与摄影机支撑系统 | 无人机（须经批准） | 数据管理与备份流程 | 提词器、监视器与回放设备 | 无线视频系统 | 制作通信系统 | 专业制作设备",
+        "我们的重点不是推荐最大的设备套餐。",
+        "而是为故事、拍摄日程和拍摄环境配置最合适的设备方案。",
+        "取景勘察与场地管理",
+        "埃及拥有古老寺庙、考古遗址、现代都市景观、工业设施、海岸线、沙漠、村庄、豪华物业以及独特的自然景观。",
+        "我们的取景勘察流程将创意研究与实际制作评估结合起来。",
+        "场地必须在视觉上有效，同时也必须在制作计划内具备可进入性、可控性和现实可行性。",
+        "场地服务可包括：",
+        "创意场地研究 | 场地照片和参考视频 | 线上及实地勘景 | 准入与许可评估 | 日照路径和时间考量 | 供电、停车和基地评估 | 当地区域协调 | 与业主谈判 | 场地协议 | 拍摄日场地管理 | 替代场地建议 | 区域物流评估",
+        "当首选场地不具备可行性时，我们会提供现实的替代方案，而不会让制作因追逐不可执行的选项而浪费时间。"
+      ],
+      "ja": [
+        "カメラ、照明、音声、制作機材",
+        "クリエイティブブリーフ、技術仕様、撮影条件、利用可能な予算に基づいて機材パッケージを調整します。",
+        "カメラ、レンズ、照明、音声、グリップ、モニタリング、データ管理、専門的な制作機材が含まれます。",
+        "来訪クルーが自前の機材を持ち込む場合も、現地での追加機材、バックアップ、技術要件を支援できます。",
+        "機材調整には、以下が含まれます。",
+        "シネマカメラパッケージ | 放送・ドキュメンタリー用カメラシステム | レンズと専門光学機器 | 照明と電源配分 | 録音機材 | グリップおよびカメラサポートシステム | 承認を前提としたドローン | データ管理とバックアップのワークフロー | プロンプター、モニター、再生機器 | ワイヤレス映像システム | 制作コミュニケーションシステム | 専門制作機材",
+        "私たちの焦点は、最大のパッケージを勧めることではありません。",
+        "物語、スケジュール、撮影環境に適したパッケージを組み立てることです。",
+        "ロケーション・スカウティングと管理",
+        "エジプトには、古代寺院、考古学遺跡、現代的な都市景観、産業施設、海岸線、砂漠、村落、高級物件、個性豊かな自然景観があります。",
+        "当社のロケーション・スカウティングは、クリエイティブなリサーチと実務的な制作評価を組み合わせます。",
+        "ロケーションは視覚的に機能するだけでなく、制作計画の中でアクセス可能で、管理可能で、現実的でなければなりません。",
+        "ロケーションサービスには、以下が含まれます。",
+        "クリエイティブなロケーションリサーチ | ロケーション写真と参考映像 | オンラインおよび現地レキ | アクセスと許可の評価 | 日照経路と時間帯の検討 | 電源、駐車、ユニットベースの評価 | 地域調整 | 物件所有者との交渉 | ロケーション契約 | 撮影日のロケーション管理 | 代替ロケーションの提案 | 地域物流の評価",
+        "希望するロケーションが実用的でない場合、実現不可能な選択肢を追って制作時間を失うのではなく、現実的な代替案を提示します。"
+      ],
+      "ko": [
+        "카메라, 조명, 음향 및 제작 장비",
+        "창의적 브리프, 기술 사양, 촬영 조건 및 가용 예산을 바탕으로 장비 패키지를 조율합니다.",
+        "카메라, 렌즈, 조명, 음향, 그립, 모니터링, 데이터 관리 및 특수 제작 장비가 포함될 수 있습니다.",
+        "방문 제작팀이 자체 장비를 가져오는 경우에도 현지 추가 장비, 백업 및 기술 요구 사항을 지원할 수 있습니다.",
+        "장비 조율 범위에는 다음이 포함될 수 있습니다.",
+        "시네마 카메라 패키지 | 방송 및 다큐멘터리 카메라 시스템 | 렌즈 및 특수 광학 장비 | 조명 및 전력 배분 | 음향 녹음 장비 | 그립 및 카메라 지지 시스템 | 승인 조건의 드론 | 데이터 관리 및 백업 워크플로 | 프롬프터, 모니터 및 재생 장비 | 무선 영상 시스템 | 제작 커뮤니케이션 시스템 | 특수 제작 장비",
+        "저희의 초점은 가장 큰 패키지를 권하는 데 있지 않습니다.",
+        "이야기, 일정 및 촬영 환경에 맞는 올바른 패키지를 구성하는 데 있습니다.",
+        "로케이션 헌팅 및 관리",
+        "이집트에는 고대 사원, 고고학 유적지, 현대적인 도시 경관, 산업 시설, 해안선, 사막, 마을, 고급 부동산 및 독특한 자연 경관이 있습니다.",
+        "저희의 로케이션 헌팅 절차는 창의적 조사와 실무적인 제작 평가를 결합합니다.",
+        "로케이션은 시각적으로 적합해야 할 뿐 아니라 제작 계획 안에서 접근 가능하고 관리 가능하며 현실적이어야 합니다.",
+        "로케이션 서비스에는 다음이 포함될 수 있습니다.",
+        "창의적 로케이션 조사 | 로케이션 사진 및 참고 영상 | 온라인 및 현장 답사 | 접근 및 허가 평가 | 일조 경로 및 시간 고려 | 전력, 주차 및 유닛 베이스 평가 | 지역 조율 | 부동산 소유자 협상 | 로케이션 계약 | 촬영일 로케이션 관리 | 대체 로케이션 제안 | 지역 물류 평가",
+        "선호하는 로케이션이 현실적이지 않을 때는 실행 불가능한 선택지를 좇아 제작 시간을 잃지 않도록 현실적인 대안을 제시합니다."
+      ],
+      "pl": [
+        "Kamera, oświetlenie, dźwięk i sprzęt produkcyjny",
+        "Koordynujemy pakiety sprzętowe w oparciu o brief kreatywny, specyfikację techniczną, warunki zdjęciowe i dostępny budżet.",
+        "Może to obejmować kamery, obiektywy, oświetlenie, dźwięk, grip, monitoring, zarządzanie danymi i specjalistyczny sprzęt produkcyjny.",
+        "Jeśli przyjezdna ekipa przywozi własny sprzęt, możemy zapewnić lokalne uzupełnienia, backupy i wsparcie techniczne.",
+        "Koordynacja sprzętu może obejmować:",
+        "Pakiety kamer filmowych | Systemy kamer broadcastowych i dokumentalnych | Obiektywy i specjalistyczna optyka | Oświetlenie i dystrybucja zasilania | Sprzęt do nagrania dźwięku | Systemy gripu i wsparcia kamery | Drony, po uzyskaniu zgody | Zarządzanie danymi i procesy backupu | Telepromptery, monitory i odtwarzanie | Bezprzewodowe systemy wideo | Systemy komunikacji produkcyjnej | Specjalistyczny sprzęt produkcyjny",
+        "Nie skupiamy się na rekomendowaniu największego pakietu.",
+        "Skupiamy się na zbudowaniu właściwego pakietu dla historii, harmonogramu i środowiska zdjęciowego.",
+        "Scouting i zarządzanie lokacjami",
+        "Egipt oferuje starożytne świątynie, stanowiska archeologiczne, nowoczesne panoramy miast, obiekty przemysłowe, wybrzeża, pustynie, wsie, luksusowe nieruchomości i charakterystyczne krajobrazy naturalne.",
+        "Nasz proces scoutingu lokacji łączy badania kreatywne z praktyczną oceną produkcyjną.",
+        "Lokacja musi działać wizualnie, ale musi też być dostępna, możliwa do kontrolowania i realistyczna w ramach planu produkcji.",
+        "Usługi lokacyjne mogą obejmować:",
+        "Kreatywne badanie lokacji | Zdjęcia lokacji i filmy referencyjne | Rekonesanse wirtualne i fizyczne | Ocena dostępu i pozwoleń | Analiza drogi słońca i czasu | Ocena zasilania, parkingu i bazy produkcyjnej | Koordynacja lokalna | Negocjacje z właścicielami nieruchomości | Umowy lokacyjne | Zarządzanie lokacją w dniu zdjęciowym | Rekomendacje alternatywnych lokacji | Ocena logistyki regionalnej",
+        "Gdy preferowana lokacja nie jest praktyczna, przedstawiamy realistyczne alternatywy, zamiast pozwalać produkcji tracić czas na niewykonalną opcję."
+      ],
+      "sw": [
+        "Kamera, taa, sauti na vifaa vya uzalishaji",
+        "Tunaratibu vifurushi vya vifaa kulingana na brief ya ubunifu, vipimo vya kiufundi, mazingira ya upigaji picha na bajeti inayopatikana.",
+        "Hii inaweza kujumuisha kamera, lenzi, taa, sauti, grip, ufuatiliaji, usimamizi wa data na vifaa maalum vya uzalishaji.",
+        "Pale timu inayotembelea inapokuja na vifaa vyake, tunaweza kusaidia nyongeza za ndani, vifaa vya akiba na mahitaji ya kiufundi.",
+        "Uratibu wa vifaa unaweza kujumuisha:",
+        "Vifurushi vya kamera za sinema | Mifumo ya kamera za matangazo na makala | Lenzi na optiki maalum | Taa na usambazaji wa umeme | Vifaa vya kurekodi sauti | Grip na mifumo ya usaidizi wa kamera | Droni, kwa kuzingatia idhini | Usimamizi wa data na mtiririko wa backup | Teleprompter, monitor na playback | Mifumo ya video isiyo na waya | Mifumo ya mawasiliano ya uzalishaji | Vifaa maalum vya uzalishaji",
+        "Lengo letu si kupendekeza kifurushi kikubwa zaidi.",
+        "Ni kuunda kifurushi sahihi kwa ajili ya simulizi, ratiba na mazingira ya upigaji picha.",
+        "Utafutaji na usimamizi wa maeneo",
+        "Misri ina mahekalu ya kale, maeneo ya kiakiolojia, mandhari ya kisasa ya mijini, vituo vya viwanda, fukwe, jangwa, vijiji, mali za kifahari na mandhari asilia ya kipekee.",
+        "Mchakato wetu wa kutafuta maeneo unaunganisha utafiti wa ubunifu na tathmini ya kiutendaji ya uzalishaji.",
+        "Eneo lazima lifanye kazi kwa taswira, lakini pia lazima liweze kufikiwa, kudhibitiwa na liwe halisi ndani ya mpango wa uzalishaji.",
+        "Huduma za maeneo zinaweza kujumuisha:",
+        "Utafiti wa maeneo wa ubunifu | Picha za maeneo na video za marejeo | Upelelezi wa mtandaoni na wa ana kwa ana | Tathmini ya ufikiaji na vibali | Kuzingatia njia ya jua na muda | Tathmini ya umeme, maegesho na kituo cha uzalishaji | Uratibu wa eneo la karibu | Majadiliano na wamiliki wa mali | Makubaliano ya maeneo | Usimamizi wa eneo siku ya upigaji picha | Mapendekezo ya maeneo mbadala | Tathmini ya uratibu wa kikanda",
+        "Wakati eneo linalopendelewa halitekelezeki, tunatoa mbadala halisi badala ya kuruhusu uzalishaji upoteze muda ukifuatilia chaguo lisilowezekana."
+      ]
+    },
+    "art-department": {
+      "source_block_range": [60, 65],
+      "zh": [
+        "美术部门与布景支持",
+        "对于需要更强视觉构建的制作，我们可协调当地美术部门服务，涵盖制作设计、布景陈设、道具、服装、造型、发型和化妆。",
+        "我们与来访创意团队协作，理解预期的视觉语言，并将其转化为可执行的制作计划。",
+        "支持内容可包括：",
+        "制作设计 | 布景搭建与陈设 | 道具采购与制作 | 服装与造型 | 发型与化妆 | 图形与印刷布景材料 | 时代与文化研究 | 视觉连续性管理 | 场地改造 | 产品造型 | 专项制作",
+        "这项支持可从一位造型师或单项道具需求，扩展至完整的美术部门。"
+      ],
+      "ja": [
+        "美術部門とセットサポート",
+        "より強いビジュアル構築が必要な制作では、プロダクションデザイン、セット装飾、小道具、衣装、スタイリング、ヘア、メイクにわたる現地美術部門サービスを調整できます。",
+        "来訪するクリエイティブチームと連携して意図するビジュアル言語を理解し、それを実行可能な制作計画へと落とし込みます。",
+        "支援内容には、以下が含まれます。",
+        "プロダクションデザイン | セット建設と装飾 | 小道具の調達と制作 | 衣装とスタイリング | ヘアとメイク | グラフィックと印刷されたセット素材 | 時代・文化リサーチ | ビジュアル連続性の管理 | ロケーションの変換 | プロダクトスタイリング | 専門的な制作",
+        "この支援は、スタイリスト1名または小道具の単一要件から、完全な美術部門まで拡張できます。"
+      ],
+      "ko": [
+        "미술 부서 및 세트 지원",
+        "더 강한 시각적 구성이 필요한 제작을 위해 프로덕션 디자인, 세트 드레싱, 소품, 의상, 스타일링, 헤어 및 메이크업 전반의 현지 미술 부서 서비스를 조율할 수 있습니다.",
+        "방문 크리에이티브 팀과 협력하여 의도한 시각 언어를 이해하고 이를 실행 가능한 제작 계획으로 전환합니다.",
+        "지원 범위에는 다음이 포함될 수 있습니다.",
+        "프로덕션 디자인 | 세트 제작 및 드레싱 | 소품 조달 및 제작 | 의상 및 스타일링 | 헤어 및 메이크업 | 그래픽 및 인쇄 세트 자료 | 시대 및 문화 조사 | 시각적 연속성 관리 | 로케이션 변환 | 제품 스타일링 | 특수 제작",
+        "이 지원은 한 명의 스타일리스트 또는 소품 한 가지 요구 사항부터 완전한 미술 부서까지 확장할 수 있습니다."
+      ],
+      "pl": [
+        "Dział scenografii i wsparcie planu",
+        "W przypadku produkcji wymagających silniejszej oprawy wizualnej możemy koordynować lokalne usługi działu scenografii, obejmujące projekt produkcyjny, dekorację planu, rekwizyty, kostiumy, stylizację, fryzury i charakteryzację.",
+        "Współpracujemy z przyjezdnym zespołem kreatywnym, aby zrozumieć zamierzony język wizualny i przełożyć go na praktyczny plan produkcyjny.",
+        "Wsparcie może obejmować:",
+        "Projekt produkcyjny | Budowę i dekorację planu | Pozyskiwanie i wykonanie rekwizytów | Kostiumy i stylizację | Fryzury i charakteryzację | Grafikę i drukowane materiały scenograficzne | Badania epoki i kultury | Zarządzanie ciągłością wizualną | Przekształcanie lokacji | Stylizację produktów | Specjalistyczne wykonawstwo",
+        "Wsparcie to można skalować od jednego stylisty lub pojedynczego zapotrzebowania na rekwizyty aż po kompletny dział scenografii."
+      ],
+      "sw": [
+        "Idara ya sanaa na usaidizi wa seti",
+        "Kwa uzalishaji unaohitaji muundo wa taswira wenye nguvu zaidi, tunaweza kuratibu huduma za idara ya sanaa ya ndani katika muundo wa uzalishaji, upambaji wa seti, props, mavazi, styling, nywele na urembo.",
+        "Tunafanya kazi na timu ya ubunifu inayotembelea ili kuelewa lugha ya taswira inayokusudiwa na kuitafsiri kuwa mpango wa uzalishaji unaotekelezeka.",
+        "Usaidizi unaweza kujumuisha:",
+        "Muundo wa uzalishaji | Ujenzi na upambaji wa seti | Upataji na utengenezaji wa props | Mavazi na styling | Nywele na urembo | Michoro na vifaa vya seti vilivyochapishwa | Utafiti wa kipindi na utamaduni | Usimamizi wa mwendelezo wa taswira | Ubadilishaji wa maeneo | Styling ya bidhaa | Utengenezaji maalum",
+        "Usaidizi huu unaweza kupanuliwa kutoka kwa stylist mmoja au hitaji moja la props hadi idara kamili ya sanaa."
+      ]
+    },
+    "transport-and-logistics": {
+      "source_block_range": [66, 72],
+      "zh": [
+        "交通、住宿与制作物流",
+        "在埃及进行制作物流需要切实可行的规划。",
+        "交通状况、出行距离、设备调度、准入时段和区域运输都会影响拍摄日安排。",
+        "在整个制作期间，我们协调团队、演职人员和设备的移动与住宿。",
+        "服务可包括：",
+        "机场接送与协助 | 团队与演职人员交通 | 制作车辆与司机 | 设备运输 | 住宿预订 | 国内航班与区域出行 | 基地协调 | 餐饮协调 | VIP和高管接待 | 专项及画面用车辆 | 每日调度计划 | 区域制作物流 | 出行日程与清单",
+        "对于前往开罗以外地区的制作，我们依据真实行程时间和当地运营条件制定日程，而非理论上的地图距离。"
+      ],
+      "ja": [
+        "輸送、宿泊、制作ロジスティクス",
+        "エジプトでの制作ロジスティクスには、現実的な計画が必要です。",
+        "交通、移動距離、機材移動、アクセス可能な時間帯、地域輸送はすべて撮影日に影響します。",
+        "制作期間を通じて、クルー、出演者、機材の移動と宿泊を調整します。",
+        "サービスには、以下が含まれます。",
+        "空港での出迎えとサポート | クルー・出演者の輸送 | 制作車両とドライバー | 機材輸送 | 宿泊手配 | 国内線と地域移動 | ユニットベース調整 | ケータリング調整 | VIP・エグゼクティブ対応 | 特殊車両・撮影用車両 | 日々の移動計画 | 地域制作ロジスティクス | 渡航スケジュールとマニフェスト",
+        "カイロ以外へ移動する制作では、理論上の地図距離ではなく、実際の移動時間と現地の運用条件に基づいてスケジュールを組みます。"
+      ],
+      "ko": [
+        "운송, 숙박 및 제작 물류",
+        "이집트의 제작 물류에는 현실적인 계획이 필요합니다.",
+        "교통, 이동 거리, 장비 이동, 출입 가능 시간대 및 지역 운송은 모두 촬영일에 영향을 줄 수 있습니다.",
+        "제작 전반에 걸쳐 제작진, 출연진 및 장비의 이동과 숙박을 조율합니다.",
+        "서비스에는 다음이 포함될 수 있습니다.",
+        "공항 미팅 및 지원 | 제작진 및 출연진 이동 | 제작 차량 및 운전기사 | 장비 운송 | 숙박 예약 | 국내선 및 지역 이동 | 유닛 베이스 조율 | 케이터링 조율 | VIP 및 임원 의전 | 특수 및 촬영용 차량 | 일일 이동 계획 | 지역 제작 물류 | 여행 일정 및 명단",
+        "카이로 밖으로 이동하는 제작의 경우 이론적인 지도상 거리 대신 실제 이동 시간과 현지 운영 조건을 기준으로 일정을 구성합니다."
+      ],
+      "pl": [
+        "Transport, zakwaterowanie i logistyka produkcji",
+        "Logistyka produkcji w Egipcie wymaga realistycznego planowania.",
+        "Ruch drogowy, odległości, przemieszczanie sprzętu, okna dostępu i transport regionalny mogą wpływać na dzień zdjęciowy.",
+        "Przez cały okres produkcji koordynujemy przemieszczanie się i zakwaterowanie ekipy, talentów oraz sprzętu.",
+        "Usługi mogą obejmować:",
+        "Spotkanie i pomoc na lotnisku | Transport ekipy i talentów | Pojazdy produkcyjne i kierowców | Transport sprzętu | Rezerwacje zakwaterowania | Loty krajowe i podróże regionalne | Koordynację bazy produkcyjnej | Koordynację cateringu | Obsługę VIP i kadry zarządzającej | Pojazdy specjalistyczne i do zdjęć | Dzienne plany przejazdów | Regionalną logistykę produkcji | Harmonogramy podróży i manifesty",
+        "W przypadku produkcji wyjeżdżających poza Kair budujemy harmonogramy wokół rzeczywistych czasów podróży i lokalnych warunków operacyjnych, a nie teoretycznych odległości na mapie."
+      ],
+      "sw": [
+        "Usafiri, malazi na uratibu wa uzalishaji",
+        "Uratibu wa uzalishaji nchini Misri unahitaji upangaji wa kweli.",
+        "Msongamano wa magari, umbali wa safari, uhamishaji wa vifaa, muda wa ufikiaji na usafiri wa kikanda vyote vinaweza kuathiri siku ya upigaji picha.",
+        "Katika uzalishaji wote, tunaratibu harakati na malazi ya timu, vipaji na vifaa.",
+        "Huduma zinaweza kujumuisha:",
+        "Mapokezi na usaidizi uwanjani | Usafiri wa timu na vipaji | Magari ya uzalishaji na madereva | Usafirishaji wa vifaa | Uwekaji wa malazi | Ndege za ndani na safari za kikanda | Uratibu wa kituo cha uzalishaji | Uratibu wa catering | Huduma kwa VIP na wakuu | Magari maalum na ya picha | Mipango ya kila siku ya harakati | Uratibu wa uzalishaji wa kikanda | Ratiba za safari na orodha za wasafiri",
+        "Kwa uzalishaji unaosafiri nje ya Cairo, tunaunda ratiba kulingana na muda halisi wa safari na hali za uendeshaji za ndani, badala ya umbali wa kinadharia kwenye ramani."
+      ]
+    },
+    "post-production": {
+      "source_block_range": [73, 78],
+      "zh": [
+        "后期制作与最终交付",
+        "在埃及拍摄的制作也可通过我们的后期制作团队完成。",
+        "我们为广告、纪录片、企业影片、品牌内容、电视节目、数字营销活动和活动制作提供剪辑与成片服务。",
+        "后期制作服务可包括：",
+        "离线和在线剪辑 | 故事塑造与叙事重构 | 调色与色彩分级 | 声音设计与混音 | 音乐监制 | 动态图形与字幕标题 | CGI与视觉特效 | 适当情况下的AI辅助视觉工作流程 | 母版制作与质量控制 | 多格式交付 | 多版本交付 | 广播及平台母版",
+        "我们可以管理完整的后期制作流程，也可以与客户现有的剪辑和成片团队协作。"
+      ],
+      "ja": [
+        "ポストプロダクションと最終納品",
+        "エジプトで撮影した作品は、当社のポストプロダクションチームで完成させることもできます。",
+        "コマーシャル、ドキュメンタリー、企業映像、ブランドコンテンツ、テレビ、デジタルキャンペーン、イベント制作に向けた編集と仕上げを提供します。",
+        "ポストプロダクションサービスには、以下が含まれます。",
+        "オフライン・オンライン編集 | ストーリー構成とナラティブの再構築 | カラーコレクションとグレーディング | サウンドデザインとミキシング | 音楽監修 | モーショングラフィックスとタイトル | CGIとVFX | 適切な場合のAI支援ビジュアルワークフロー | マスタリングと品質管理 | 複数フォーマットでの納品 | 複数バージョンでの納品 | 放送・プラットフォーム用マスター",
+        "ポストプロダクション全体を管理することも、クライアントの既存の編集・仕上げチームと協業することも可能です。"
+      ],
+      "ko": [
+        "후반 제작 및 최종 납품",
+        "이집트에서 촬영한 제작물은 저희 후반 제작팀을 통해 완성할 수도 있습니다.",
+        "광고, 다큐멘터리, 기업 영상, 브랜드 콘텐츠, 텔레비전, 디지털 캠페인 및 이벤트 제작을 위한 편집과 마무리 작업을 제공합니다.",
+        "후반 제작 서비스에는 다음이 포함될 수 있습니다.",
+        "오프라인 및 온라인 편집 | 스토리 구성 및 내러티브 재구성 | 색 보정 및 그레이딩 | 사운드 디자인 및 믹싱 | 음악 감독 | 모션 그래픽 및 타이틀 | CGI 및 시각 효과 | 적절한 경우 AI 지원 시각 워크플로 | 마스터링 및 품질 관리 | 다중 포맷 납품 | 다중 버전 납품 | 방송 및 플랫폼용 마스터",
+        "전체 후반 제작 과정을 관리하거나 고객의 기존 편집 및 마무리 팀과 협업할 수 있습니다."
+      ],
+      "pl": [
+        "Postprodukcja i finalne dostarczenie",
+        "Produkcję realizowaną w Egipcie można również ukończyć z naszym zespołem postprodukcyjnym.",
+        "Zapewniamy montaż i finalizację reklam, dokumentów, filmów korporacyjnych, treści markowych, telewizji, kampanii cyfrowych i produkcji eventowych.",
+        "Usługi postprodukcyjne mogą obejmować:",
+        "Montaż offline i online | Kształtowanie historii i restrukturyzację narracji | Korekcję kolorów i grading | Projektowanie dźwięku i miks | Nadzór muzyczny | Motion graphics i tytuły | CGI i efekty wizualne | Wspomagane przez AI procesy wizualne, gdy jest to właściwe | Mastering i kontrolę jakości | Dostarczanie w wielu formatach | Dostarczanie wielu wersji | Materiały master dla telewizji i platform",
+        "Możemy zarządzać całym procesem postprodukcji lub współpracować z istniejącymi zespołami montażowymi i finalizacyjnymi klienta."
+      ],
+      "sw": [
+        "Post production na utoaji wa mwisho",
+        "Uzalishaji uliorekodiwa nchini Misri unaweza pia kukamilishwa kupitia timu yetu ya post production.",
+        "Tunatoa editing na finishing kwa matangazo, filamu za makala, filamu za kampuni, maudhui ya chapa, televisheni, kampeni za kidijitali na uzalishaji wa matukio.",
+        "Huduma za post production zinaweza kujumuisha:",
+        "Editing ya offline na online | Uundaji wa simulizi na urekebishaji wa muundo wa hadithi | Usahihishaji na grading ya rangi | Ubunifu wa sauti na mixing | Usimamizi wa muziki | Motion graphics na vichwa | CGI na athari za taswira | Mtiririko wa kazi wa taswira unaosaidiwa na AI panapofaa | Mastering na udhibiti wa ubora | Utoaji wa miundo mingi | Utoaji wa matoleo mengi | Master za matangazo na majukwaa",
+        "Tunaweza kusimamia mchakato mzima wa post production au kushirikiana na timu za mteja zilizopo za uhariri na finishing."
+      ]
+    },
+    "subtitling-dubbing-and-localization": {
+      "source_block_range": [79, 83],
+      "zh": [
+        "字幕、配音与本地化",
+        "对于计划在区域或国际市场发行的项目，我们提供本地化服务，确保原作的含义、语气和节奏得到保留。",
+        "服务可包括：",
+        "阿拉伯语和英语字幕 | 多语言字幕及说明文字 | 配音录制 | 配音及对白替换 | 剧本翻译与改编 | 声音选角与指导 | 音频混音与母带制作 | 画面文字替换 | 无文字母版 | 面向多市场的交付包装",
+        "本地化可从制作初期开始规划，使后续版本的制作更快速、更整洁且更一致。"
+      ],
+      "ja": [
+        "字幕、吹き替え、ローカライゼーション",
+        "地域または国際的な配給を予定するプロジェクトに向けて、原作の意味、トーン、リズムを損なわないローカライゼーションを提供します。",
+        "サービス内容：",
+        "アラビア語・英語字幕 | 多言語字幕・キャプション | ボイスオーバー収録 | 吹き替え・台詞差し替え | 台本翻訳・翻案 | 声のキャスティング・演出 | オーディオミキシング・マスタリング | 画面内テキストの差し替え | テキストなしマスター | 複数市場向け納品パッケージ",
+        "ローカライゼーションは制作開始時から計画できるため、後続バージョンをより迅速に、整然と、一貫して仕上げられます。"
+      ],
+      "ko": [
+        "자막, 더빙 및 현지화",
+        "지역 또는 국제 배급을 목표로 하는 프로젝트를 위해 원작의 의미, 톤, 리듬을 지키는 현지화 서비스를 제공합니다.",
+        "서비스에는 다음이 포함될 수 있습니다.",
+        "아랍어 및 영어 자막 | 다국어 자막 및 캡션 | 보이스오버 녹음 | 더빙 및 대사 교체 | 대본 번역 및 각색 | 성우 캐스팅 및 디렉팅 | 오디오 믹싱 및 마스터링 | 그래픽 내 텍스트 교체 | 텍스트 없는 마스터 | 다중 시장용 납품 패키징",
+        "현지화는 제작 초기부터 계획할 수 있어 이후 버전을 더 빠르고 깔끔하며 일관되게 만들 수 있습니다."
+      ],
+      "pl": [
+        "Napisy, dubbing i lokalizacja",
+        "W przypadku projektów przeznaczonych do dystrybucji regionalnej lub międzynarodowej zapewniamy lokalizację, która chroni znaczenie, ton i rytm oryginalnego materiału.",
+        "Usługi mogą obejmować:",
+        "Napisy arabskie i angielskie | Wielojęzyczne napisy i podpisy | Nagrania lektorskie | Dubbing i zastępowanie dialogów | Tłumaczenie i adaptację scenariusza | Casting i reżyserię głosów | Miks i mastering dźwięku | Zastępowanie grafiki z tekstem | Mastery bez tekstu | Pakiety dostaw dla wielu rynków",
+        "Lokalizację można zaplanować od początku produkcji, dzięki czemu późniejsze wersje powstają szybciej, czyściej i bardziej konsekwentnie."
+      ],
+      "sw": [
+        "Manukuu, dubbing na ujanibishaji",
+        "Kwa miradi inayokusudiwa kusambazwa kikanda au kimataifa, tunatoa ujanibishaji unaolinda maana, sauti na mdundo wa kazi asili.",
+        "Huduma zinaweza kujumuisha:",
+        "Manukuu ya Kiarabu na Kiingereza | Manukuu na maelezo katika lugha nyingi | Kurekodi voice-over | Dubbing na ubadilishaji wa mazungumzo | Tafsiri na urekebishaji wa script | Uchaguzi na uongozaji wa sauti | Mixing na mastering ya sauti | Ubadilishaji wa maandishi kwenye michoro | Master zisizo na maandishi | Ufungashaji wa utoaji kwa masoko mengi",
+        "Ujanibishaji unaweza kupangwa tangu mwanzo wa uzalishaji, hivyo matoleo ya baadaye hutayarishwa kwa haraka zaidi, kwa usafi zaidi na kwa uthabiti zaidi."
+      ]
+    },
+    "production-support-for-different-formats": {
+      "source_block_range": [84, 88],
+      "zh": [
+        "不同内容形式的制作支持",
+        "我们在埃及的制作服务可根据以下类型进行调整：",
+        "纪录片和纪实系列 | 埃及学、考古与遗产类制作 | 电视广告和数字营销活动 | 企业和工业影片 | 品牌内容 | 新闻与时事制作 | 旅行和文化节目 | 访谈及以受访者为主的拍摄 | 现场活动和广播制作 | 摄影宣传项目 | 社交媒体与表演型内容 | 电视和流媒体内容形式 | 机构和政府制作 | 国际联合制作",
+        "每种内容形式都需要不同的制作架构。",
+        "我们不会把同一种模式套用到每一份项目需求上。"
+      ],
+      "ja": [
+        "さまざまな形式に対応する制作サポート",
+        "エジプトでの当社の制作サービスは、次の形式に合わせて組み立てられます。",
+        "ドキュメンタリー映画・ファクチュアルシリーズ | エジプト学、考古学、遺産関連の制作 | テレビCM・デジタルキャンペーン | 企業・産業映像 | ブランドコンテンツ | ニュース・時事制作 | 旅行・文化番組 | インタビュー・出演者主導の撮影 | ライブイベント・放送制作 | 写真キャンペーン | ソーシャル・パフォーマンスコンテンツ | テレビ・ストリーミング形式 | 機関・政府向け制作 | 国際共同制作",
+        "形式ごとに必要な制作体制は異なります。",
+        "すべてのブリーフに同じモデルを当てはめることはありません。"
+      ],
+      "ko": [
+        "다양한 형식을 위한 제작 지원",
+        "이집트에서 제공하는 제작 서비스는 다음 형식에 맞춰 조정할 수 있습니다.",
+        "다큐멘터리 영화 및 팩추얼 시리즈 | 이집트학, 고고학 및 문화유산 제작 | TV 광고 및 디지털 캠페인 | 기업 및 산업 영화 | 브랜드 콘텐츠 | 뉴스 및 시사 제작 | 여행 및 문화 프로그램 | 인터뷰 및 출연자 중심 촬영 | 라이브 이벤트 및 방송 제작 | 사진 캠페인 | 소셜 및 퍼포먼스 콘텐츠 | 텔레비전 및 스트리밍 형식 | 기관 및 정부 제작 | 국제 공동 제작",
+        "형식마다 서로 다른 제작 구조가 필요합니다.",
+        "모든 브리프에 동일한 모델을 적용하지 않습니다."
+      ],
+      "pl": [
+        "Wsparcie produkcyjne dla różnych formatów",
+        "Nasze usługi produkcyjne w Egipcie można dostosować do następujących formatów:",
+        "Filmy dokumentalne i seriale faktograficzne | Produkcje z zakresu egiptologii, archeologii i dziedzictwa | Reklamy telewizyjne i kampanie cyfrowe | Filmy korporacyjne i przemysłowe | Treści markowe | Produkcje informacyjne i publicystyczne | Programy podróżnicze i kulturalne | Wywiady i zdjęcia prowadzone przez uczestników | Wydarzenia na żywo i produkcje transmisyjne | Kampanie fotograficzne | Treści społecznościowe i performance | Formaty telewizyjne i streamingowe | Produkcje instytucjonalne i rządowe | Międzynarodowe koprodukcje",
+        "Każdy format wymaga innej struktury produkcyjnej.",
+        "Nie stosujemy tego samego modelu do każdego briefu."
+      ],
+      "sw": [
+        "Usaidizi wa uzalishaji kwa miundo mbalimbali",
+        "Huduma zetu za uzalishaji nchini Misri zinaweza kubadilishwa kwa ajili ya:",
+        "Filamu za makala na mfululizo wa uhalisia | Uzalishaji wa Egyptology, akiolojia na urithi | Matangazo ya televisheni na kampeni za kidijitali | Filamu za kampuni na viwanda | Maudhui ya chapa | Uzalishaji wa habari na masuala ya sasa | Vipindi vya usafiri na utamaduni | Mahojiano na upigaji unaoongozwa na washiriki | Matukio ya moja kwa moja na uzalishaji wa matangazo | Kampeni za upigaji picha | Maudhui ya mitandao ya kijamii na maonyesho | Miundo ya televisheni na streaming | Uzalishaji wa taasisi na serikali | Ushirikiano wa kimataifa wa uzalishaji",
+        "Kila muundo unahitaji muundo tofauti wa uzalishaji.",
+        "Hatutumii mfano mmoja kwa kila brief."
+      ]
+    },
+    "documentary-and-egyptian-heritage-production": {
+      "source_block_range": [89, 95],
+      "zh": [
+        "纪录片与埃及文化遗产制作",
+        "埃及为纪录片、纪实内容和文化遗产叙事提供了非凡的创作机会。",
+        "我们支持国际团队围绕考古学、埃及学、博物馆、古迹、古代信仰体系、发掘历史、建筑、文化及当代埃及生活开展制作。",
+        "支持可包括：",
+        "前期调研与可行性评估 | 本地研究员与制片协调人 | 专家和受访者协调 | 考古地点申请 | 博物馆与文化遗产地点准入 | 区域行程规划 | 纪录片团队与设备 | 访谈制作 | 翻译与口译 | 档案与参考资料协调 | 后期制作与本地化",
+        "考古、政府和文化遗产地点的准入仍须取得官方批准，并受各地点具体条件限制。",
+        "强烈建议尽早规划。"
+      ],
+      "ja": [
+        "ドキュメンタリーとエジプト文化遺産の制作",
+        "エジプトは、ドキュメンタリー、ファクチュアル作品、文化遺産を題材とするストーリーテリングに格別の可能性をもたらします。",
+        "考古学、エジプト学、博物館、史跡、古代の信仰体系、発掘の歴史、建築、文化、そして現代エジプトの暮らしをテーマにした制作を進める国際チームを支援します。",
+        "支援内容：",
+        "初期リサーチと実現可能性の検討 | 現地リサーチャーとフィクサー | 専門家・出演協力者の調整 | 考古学的ロケーションの申請 | 博物館・文化遺産へのアクセス | 地方への移動計画 | ドキュメンタリーのクルーと機材 | インタビュー制作 | 翻訳・通訳 | アーカイブ・参考資料の調整 | ポストプロダクションとローカライゼーション",
+        "考古学的施設、政府関連施設、文化遺産施設へのアクセスには、公式な承認と各ロケーション固有の条件が引き続き適用されます。",
+        "早期の計画を強くお勧めします。"
+      ],
+      "ko": [
+        "다큐멘터리 및 이집트 문화유산 제작",
+        "이집트는 다큐멘터리, 팩추얼 콘텐츠 및 문화유산 스토리텔링을 위한 탁월한 기회를 제공합니다.",
+        "고고학, 이집트학, 박물관, 기념물, 고대 신앙 체계, 발굴의 역사, 건축, 문화, 그리고 현대 이집트인의 삶을 다루는 제작을 준비하는 국제 팀을 지원합니다.",
+        "지원에는 다음이 포함될 수 있습니다.",
+        "초기 조사 및 실현 가능성 검토 | 현지 연구원 및 픽서 | 전문가 및 출연 협력자 조율 | 고고학 촬영지 신청 | 박물관 및 문화유산 접근 | 지역 이동 계획 | 다큐멘터리 제작진 및 장비 | 인터뷰 제작 | 번역 및 통역 | 아카이브 및 참고자료 조율 | 후반 제작 및 현지화",
+        "고고학적 장소, 정부 시설 및 문화유산 장소에 대한 접근은 공식 승인과 장소별 조건의 적용을 받습니다.",
+        "조기 계획을 강력히 권장합니다."
+      ],
+      "pl": [
+        "Produkcje dokumentalne i dziedzictwo Egiptu",
+        "Egipt oferuje wyjątkowe możliwości dla dokumentów, produkcji faktograficznych i opowieści o dziedzictwie.",
+        "Wspieramy międzynarodowe zespoły rozwijające produkcje dotyczące archeologii, egiptologii, muzeów, zabytków, starożytnych systemów wierzeń, historii wykopalisk, architektury, kultury i współczesnego życia Egiptu.",
+        "Wsparcie może obejmować:",
+        "Wczesny research i ocenę wykonalności | Lokalnych badaczy i fixerów | Koordynację ekspertów i uczestników | Wnioski dotyczące lokalizacji archeologicznych | Dostęp do muzeów i miejsc dziedzictwa | Planowanie podróży regionalnych | Ekipy i sprzęt dokumentalny | Produkcję wywiadów | Tłumaczenie i interpretację | Koordynację archiwów i materiałów referencyjnych | Postprodukcję i lokalizację",
+        "Dostęp do stanowisk archeologicznych, obiektów rządowych i miejsc dziedzictwa nadal wymaga oficjalnego zatwierdzenia oraz spełnienia warunków właściwych dla danej lokalizacji.",
+        "Zdecydowanie zalecamy wczesne planowanie."
+      ],
+      "sw": [
+        "Uzalishaji wa makala na urithi wa Misri",
+        "Misri inatoa fursa za kipekee kwa filamu za makala, vipindi vya uhalisia na usimulizi kuhusu urithi.",
+        "Tunasaidia timu za kimataifa zinazoendeleza uzalishaji kuhusu akiolojia, masomo ya Misri ya kale, makumbusho, makaburi ya kihistoria, mifumo ya imani ya kale, historia ya uchimbaji, usanifu, utamaduni na maisha ya kisasa ya Misri.",
+        "Usaidizi unaweza kujumuisha:",
+        "Utafiti wa awali na tathmini ya uwezekano | Watafiti wa ndani na fixer | Uratibu wa wataalamu na washiriki | Maombi ya maeneo ya akiolojia | Ufikiaji wa makumbusho na maeneo ya urithi | Upangaji wa safari za kikanda | Timu na vifaa vya filamu za makala | Uzalishaji wa mahojiano | Tafsiri ya maandishi na ukalimani | Uratibu wa nyaraka za kumbukumbu na marejeo | Post production na ujanibishaji",
+        "Ufikiaji wa maeneo ya akiolojia, serikali na urithi bado unategemea idhini rasmi na masharti mahususi ya kila eneo.",
+        "Tunapendekeza sana kupanga mapema."
+      ]
+    },
+    "planning-to-film-in-egypt": {
+      "source_block_range": [96, 101],
+      "zh": [
+        "计划在埃及拍摄？",
+        "我们越早了解项目，就越能准确地就可行性、成本和筹备周期提供建议。",
+        "为了准备初步制作方案或报价，以下资料会很有帮助：",
+        "剧本、创作提案、梗概或创意简报 | 拟定拍摄日期 | 拍摄天数 | 计划拍摄地点 | 随行团队人数 | 所需本地团队岗位 | 摄影机和设备需求 | 演员或受访者需求 | 许可和准入需求 | 交付成果及后期制作范围 | 所需语言 | 如可能，提供可用预算指引",
+        "完整成熟的简报很有帮助，但并非必需。",
+        "我们也支持仍处于调研、开发或早期可行性评估阶段的项目。"
+      ],
+      "ja": [
+        "エジプトでの撮影を計画していますか？",
+        "プロジェクトを早く理解できるほど、実現可能性、費用、準備期間についてより正確にご案内できます。",
+        "初期の制作計画または見積もりを作成するために、次の情報があると役立ちます。",
+        "脚本、トリートメント、あらすじ、またはクリエイティブブリーフ | 撮影予定日 | 撮影日数 | 想定ロケーション | 帯同クルーの人数 | 必要な現地クルーの役割 | カメラ・機材の要件 | 出演者または協力者の要件 | 許可・アクセスの要件 | 納品物とポストプロダクションの範囲 | 必要言語 | 可能な場合は利用可能な予算の目安",
+        "完成度の高いブリーフは有用ですが、必須ではありません。",
+        "リサーチ、開発、または初期の実現可能性検討段階にあるプロジェクトも支援します。"
+      ],
+      "ko": [
+        "이집트 촬영을 계획하고 계신가요?",
+        "프로젝트를 일찍 파악할수록 실현 가능성, 비용 및 준비 기간에 대해 더 정확하게 안내할 수 있습니다.",
+        "초기 제작 계획 또는 견적을 준비하기 위해 다음 정보를 알려주시면 도움이 됩니다.",
+        "대본, 트리트먼트, 시놉시스 또는 크리에이티브 브리프 | 제안 촬영일 | 촬영 일수 | 예정 로케이션 | 동행 제작진 규모 | 필요한 현지 제작진 역할 | 카메라 및 장비 요구 사항 | 출연자 또는 협력자 요구 사항 | 허가 및 접근 요구 사항 | 납품물 및 후반 제작 범위 | 필요한 언어 | 가능하다면 사용 가능한 예산 가이드",
+        "완성된 브리프가 있으면 유용하지만 필수는 아닙니다.",
+        "조사, 개발 또는 초기 실현 가능성 검토 단계에 있는 프로젝트도 지원합니다."
+      ],
+      "pl": [
+        "Planujesz zdjęcia w Egipcie?",
+        "Im wcześniej poznamy projekt, tym trafniej możemy doradzić w kwestii wykonalności, kosztów i czasu przygotowań.",
+        "Aby przygotować wstępny plan produkcji lub wycenę, pomocne jest otrzymanie:",
+        "Scenariusza, treatmentu, streszczenia lub briefu kreatywnego | Proponowanych dat zdjęciowych | Liczby dni zdjęciowych | Planowanych lokalizacji | Wielkości ekipy przyjeżdżającej | Wymaganych stanowisk lokalnej ekipy | Wymagań dotyczących kamer i sprzętu | Wymagań dotyczących talentów lub uczestników | Wymagań dotyczących pozwoleń i dostępu | Zakresu materiałów końcowych i postprodukcji | Wymaganych języków | Jeśli to możliwe, orientacyjnego budżetu",
+        "W pełni rozwinięty brief jest przydatny, ale nie jest niezbędny.",
+        "Wspieramy także projekty pozostające na etapie researchu, rozwoju lub wczesnej oceny wykonalności."
+      ],
+      "sw": [
+        "Unapanga kurekodi nchini Misri?",
+        "Kadiri tunavyoielewa mapema zaidi mradi, ndivyo tunavyoweza kushauri kwa usahihi zaidi kuhusu uwezekano, gharama na muda wa maandalizi.",
+        "Ili kuandaa mpango wa awali wa uzalishaji au nukuu ya bei, ni muhimu kupokea:",
+        "Script, treatment, muhtasari au creative brief | Tarehe zinazopendekezwa za kurekodi | Idadi ya siku za kurekodi | Maeneo yaliyokusudiwa | Idadi ya timu inayosafiri | Nafasi za timu ya ndani zinazohitajika | Mahitaji ya kamera na vifaa | Mahitaji ya waigizaji au washiriki | Mahitaji ya vibali na ufikiaji | Vitu vitakavyowasilishwa na wigo wa post production | Lugha zinazohitajika | Mwongozo wa bajeti inayopatikana inapowezekana",
+        "Brief iliyokamilika kikamilifu husaidia, lakini si lazima.",
+        "Pia tunaunga mkono miradi ambayo bado iko katika hatua ya utafiti, maendeleo au tathmini ya awali ya uwezekano."
+      ]
+    },
+    "why-work-with-global-untold-story": {
+      "source_block_range": [102, 109],
+      "zh": [
+        "为什么与 GLOBAL UNTOLD STORY 合作？",
+        "我们将本地制作知识与国际客户的期望结合在一起。",
+        "衡量优质制作支持的标准，不止是镜头前发生的事情。",
+        "它同样体现在清晰的沟通、诚实的预算、充分的准备、及时的响应，以及在不为创作团队制造不必要干扰的前提下解决问题的能力。",
+        "客户在需要以下支持时会选择与我们合作：",
+        "在埃及有一位全程负责的制作伙伴 | 清晰的英语和阿拉伯语沟通 | 现实可行的计划与预算逻辑 | 可靠的本地团队和供应商 | 纪录片、商业和机构类项目经验 | 从前期开发到最终交付的支持 | 对拍摄地点和制作物流的深入了解 | 关于可行性、准入和时间安排的诚实建议 | 由同一团队负责后期制作和本地化 | 愿意在现场承担责任的合作伙伴",
+        "我们选择客户时，同样谨慎。",
+        "最出色的制作建立在共同的标准、透明的沟通和相互信任之上。"
+      ],
+      "ja": [
+        "なぜ GLOBAL UNTOLD STORY と組むのか？",
+        "私たちは現地の制作知識と、国際的なクライアントが求める水準を結び付けます。",
+        "優れた制作サポートは、カメラの前で起きることだけで測られるものではありません。",
+        "明確なコミュニケーション、誠実な予算設計、準備、対応力、そしてクリエイティブチームに不要な混乱を生じさせずに問題を解決する力にも表れます。",
+        "クライアントが私たちを選ぶのは、次のような支援が必要なときです。",
+        "エジプトで責任を持つ一つの制作パートナー | 明確な英語・アラビア語でのコミュニケーション | 現実的な計画と予算の考え方 | 信頼できる現地クルーとサプライヤー | ドキュメンタリー、商業、機関向け制作の経験 | 初期開発から最終納品までの支援 | ロケーションと制作ロジスティクスへの深い理解 | 実現可能性、アクセス、スケジュールに関する率直な助言 | 一つのチームによるポストプロダクションとローカライゼーション | 現場で主体的に責任を担うパートナー",
+        "私たちも、クライアントが私たちを選ぶのと同じくらい慎重にクライアントを選びます。",
+        "最も強い制作は、共通の基準、透明なコミュニケーション、相互の信頼によって築かれます。"
+      ],
+      "ko": [
+        "왜 GLOBAL UNTOLD STORY와 함께해야 할까요?",
+        "저희는 현지 제작 지식과 국제 고객의 기대를 결합합니다.",
+        "좋은 제작 지원은 카메라 앞에서 일어나는 일만으로 평가되지 않습니다.",
+        "명확한 소통, 정직한 예산 책정, 준비, 대응력, 그리고 크리에이티브 팀에 불필요한 혼선을 만들지 않고 문제를 해결하는 능력으로도 평가됩니다.",
+        "고객은 다음과 같은 지원이 필요할 때 저희와 협업합니다.",
+        "이집트에서 책임을 지는 단일 제작 파트너 | 명확한 영어 및 아랍어 소통 | 현실적인 계획과 예산 논리 | 신뢰할 수 있는 현지 제작진과 공급업체 | 다큐멘터리, 상업 및 기관 프로젝트 전반의 경험 | 초기 개발부터 최종 납품까지의 지원 | 로케이션과 제작 물류에 대한 깊은 이해 | 실현 가능성, 접근 및 일정에 대한 정직한 조언 | 한 팀이 제공하는 후반 제작 및 현지화 | 현장에서 주도적으로 책임을 맡을 준비가 된 파트너",
+        "저희는 고객이 저희를 선택하는 만큼 신중하게 고객을 선택합니다.",
+        "가장 탄탄한 제작은 공동의 기준, 투명한 소통, 상호 신뢰 위에서 만들어집니다."
+      ],
+      "pl": [
+        "Dlaczego warto współpracować z GLOBAL UNTOLD STORY?",
+        "Łączymy lokalną wiedzę produkcyjną z oczekiwaniami międzynarodowych klientów.",
+        "Dobre wsparcie produkcyjne mierzy się czymś więcej niż tym, co dzieje się przed kamerą.",
+        "Mierzy się je również jasną komunikacją, uczciwym budżetowaniem, przygotowaniem, szybkością reakcji i zdolnością rozwiązywania problemów bez tworzenia niepotrzebnego zamieszania wokół zespołu kreatywnego.",
+        "Klienci współpracują z nami, gdy potrzebują:",
+        "Jednego odpowiedzialnego partnera produkcyjnego w Egipcie | Jasnej komunikacji po angielsku i arabsku | Realistycznego planowania i logiki budżetowej | Niezawodnych lokalnych ekip i dostawców | Doświadczenia w produkcjach dokumentalnych, komercyjnych i instytucjonalnych | Wsparcia od wczesnego rozwoju do końcowego dostarczenia | Dogłębnego zrozumienia lokalizacji i logistyki produkcji | Uczciwych porad dotyczących wykonalności, dostępu i terminów | Postprodukcji i lokalizacji w ramach jednego zespołu | Partnera gotowego wziąć odpowiedzialność na miejscu",
+        "Dobieramy klientów równie starannie, jak oni wybierają nas.",
+        "Najsilniejsze produkcje powstają dzięki wspólnym standardom, przejrzystej komunikacji i wzajemnemu zaufaniu."
+      ],
+      "sw": [
+        "Kwa nini ufanye kazi na GLOBAL UNTOLD STORY?",
+        "Tunaunganisha maarifa ya uzalishaji wa ndani na matarajio ya wateja wa kimataifa.",
+        "Usaidizi mzuri wa uzalishaji haupimwi tu kwa yale yanayotokea mbele ya kamera.",
+        "Pia hupimwa kwa mawasiliano ya wazi, upangaji wa bajeti wa uaminifu, maandalizi, uwezo wa kuitikia haraka na uwezo wa kutatua matatizo bila kuleta usumbufu usio wa lazima kwa timu ya ubunifu.",
+        "Wateja hufanya kazi nasi wanapohitaji:",
+        "Mshirika mmoja wa uzalishaji anayewajibika nchini Misri | Mawasiliano wazi kwa Kiingereza na Kiarabu | Upangaji halisi na mantiki ya bajeti | Timu na wasambazaji wa ndani wanaotegemewa | Uzoefu katika kazi za makala, kibiashara na kitaasisi | Usaidizi kuanzia maendeleo ya awali hadi utoaji wa mwisho | Uelewa mkubwa wa maeneo na logistics za uzalishaji | Ushauri wa uaminifu kuhusu uwezekano, ufikiaji na muda | Post production na ujanibishaji chini ya timu moja | Mshirika aliye tayari kuchukua umiliki wa kazi akiwa uwanjani",
+        "Tunachagua wateja wetu kwa umakini sawa na wao wanavyotuchagua.",
+        "Uzalishaji imara zaidi hujengwa juu ya viwango vya pamoja, mawasiliano ya uwazi na kuaminiana."
+      ]
+    },
+    "faq-production-permits-and-lead-time": {
+      "source_block_range": [110, 122],
+      "zh": [
+        "常见问题",
+        "你们是否提供埃及的完整制作服务？",
+        "是的。我们可以从早期规划和许可开始，管理拍摄、物流、后期制作和本地化在内的整个制作流程。",
+        "也可以单独委托具体服务。",
+        "你们能支持国际纪录片团队吗？",
+        "可以。我们为纪录片和纪实制作团队提供调研协调、制片协调人、许可、受访者、团队、设备、地点、物流和后期制作支持。",
+        "你们能协调在埃及拍摄的许可吗？",
+        "可以。我们协调许可申请及所需的支持文件。",
+        "最终批准由相关主管部门作出，取决于项目、内容、地点、团队和所申请的设备。",
+        "需要多长的筹备时间？",
+        "筹备时间因项目而异。",
+        "简单的私有场地拍摄可能所需准备较少，而在考古地点、政府地点、使用无人机或敏感地点拍摄通常需要更多时间。",
+        "尽早联系会带来更多选择。"
+      ],
+      "ja": [
+        "よくあるご質問",
+        "エジプトでの包括的な制作サービスを提供していますか？",
+        "はい。初期計画と許可取得から、撮影、ロジスティクス、ポストプロダクション、ローカライゼーションまで、制作全体を管理できます。",
+        "個別のサービスを単独でご依頼いただくことも可能です。",
+        "国際的なドキュメンタリークルーを支援できますか？",
+        "はい。リサーチ調整、フィクサー、許可、出演協力者、クルー、機材、ロケーション、ロジスティクス、ポストプロダクションにおいて、ドキュメンタリーおよびファクチュアル制作チームを支援します。",
+        "エジプトでの撮影許可を調整できますか？",
+        "はい。許可申請と必要な補足書類を調整します。",
+        "最終的な承認は関係当局が発行し、プロジェクト、内容、ロケーション、クルー、申請する機材によって異なります。",
+        "どのくらいの準備期間が必要ですか？",
+        "準備期間はプロジェクトによって異なります。",
+        "一般的な私有地での撮影は準備が少なくて済む場合がありますが、考古学的施設、政府関連施設、ドローン、またはデリケートなロケーションでの撮影は通常より多くの時間を要します。",
+        "早めにご相談いただくことで、選択肢が広がります。"
+      ],
+      "ko": [
+        "자주 묻는 질문",
+        "이집트에서 종합 제작 서비스를 제공하나요?",
+        "네. 초기 계획과 허가부터 촬영, 물류, 후반 제작 및 현지화까지 제작 전 과정을 관리할 수 있습니다.",
+        "개별 서비스만 별도로 의뢰하실 수도 있습니다.",
+        "국제 다큐멘터리 제작진을 지원할 수 있나요?",
+        "네. 조사 조율, 픽서, 허가, 출연 협력자, 제작진, 장비, 로케이션, 물류 및 후반 제작을 통해 다큐멘터리와 팩추얼 제작팀을 지원합니다.",
+        "이집트 촬영 허가를 조율할 수 있나요?",
+        "네. 허가 신청과 필요한 증빙 서류를 조율합니다.",
+        "최종 승인은 관련 당국이 내리며 프로젝트, 콘텐츠, 로케이션, 제작진 및 신청 장비에 따라 달라집니다.",
+        "얼마의 준비 기간이 필요한가요?",
+        "준비 기간은 프로젝트에 따라 다릅니다.",
+        "일반적인 사유지 촬영은 준비 시간이 덜 필요할 수 있지만, 고고학적 장소, 정부 시설, 드론 또는 민감한 장소에서의 촬영은 대체로 더 많은 시간이 필요합니다.",
+        "일찍 문의하실수록 선택지가 더 많아집니다."
+      ],
+      "pl": [
+        "Często zadawane pytania",
+        "Czy zapewniacie kompleksowe usługi produkcyjne w Egipcie?",
+        "Tak. Możemy zarządzać produkcją od wczesnego planowania i pozwoleń, przez zdjęcia i logistykę, aż po postprodukcję i lokalizację.",
+        "Poszczególne usługi można również zamówić oddzielnie.",
+        "Czy możecie wspierać międzynarodowe ekipy dokumentalne?",
+        "Tak. Wspieramy zespoły dokumentalne i faktograficzne w koordynacji researchu, fixerach, pozwoleniach, uczestnikach, ekipach, sprzęcie, lokalizacjach, logistyce i postprodukcji.",
+        "Czy możecie koordynować pozwolenia na filmowanie w Egipcie?",
+        "Tak. Koordynujemy wnioski o pozwolenia oraz wymaganą dokumentację pomocniczą.",
+        "Ostateczną zgodę wydają właściwe organy; zależy ona od projektu, treści, lokalizacji, ekipy i wnioskowanego sprzętu.",
+        "Jaki czas przygotowań jest potrzebny?",
+        "Czas przygotowań zależy od projektu.",
+        "Proste zdjęcia na prywatnych lokalizacjach mogą wymagać mniej przygotowań, natomiast filmowanie w miejscach archeologicznych, rządowych, z użyciem dronów lub w lokalizacjach wrażliwych zwykle wymaga więcej czasu.",
+        "Wczesny kontakt daje więcej możliwości."
+      ],
+      "sw": [
+        "Maswali yanayoulizwa mara kwa mara",
+        "Je, mnatoa huduma kamili za uzalishaji nchini Misri?",
+        "Ndiyo. Tunaweza kusimamia uzalishaji kuanzia upangaji wa awali na vibali hadi kurekodi, logistics, post production na ujanibishaji.",
+        "Huduma binafsi zinaweza pia kuagizwa kivyake.",
+        "Je, mnaweza kusaidia timu za kimataifa za filamu za makala?",
+        "Ndiyo. Tunaunga mkono timu za makala na uhalisia kwa uratibu wa utafiti, fixer, vibali, washiriki, timu, vifaa, maeneo, logistics na post production.",
+        "Je, mnaweza kuratibu vibali vya kurekodi nchini Misri?",
+        "Ndiyo. Tunaratibu maombi ya vibali na nyaraka za usaidizi zinazohitajika.",
+        "Idhini ya mwisho hutolewa na mamlaka husika na hutegemea mradi, maudhui, maeneo, timu na vifaa vinavyoombwa.",
+        "Ni muda gani wa maandalizi unaohitajika?",
+        "Muda wa maandalizi hutofautiana kulingana na mradi.",
+        "Upigaji picha wa moja kwa moja katika maeneo binafsi unaweza kuhitaji maandalizi machache, ilhali kurekodi kwenye maeneo ya akiolojia, serikali, kwa drone au maeneo nyeti kwa kawaida huhitaji muda zaidi.",
+        "Kuwasiliana nasi mapema kunaleta chaguo zaidi."
+      ]
+    },
+    "faq-crews-sites-and-production-support": {
+      "source_block_range": [123, 140],
+      "zh": [
+        "你们能安排本地拍摄团队和设备吗？",
+        "可以。我们可以提供完整的本地团队和设备方案，也可以为来访团队补充特定部门、岗位和技术需求。",
+        "你们提供制片协调人和执行制片服务吗？",
+        "可以。我们的本地制作团队可以管理日程、供应商、许可、地点、团队协调、交通和每日拍摄运营。",
+        "你们能支持在考古地点或文化遗产地点拍摄吗？",
+        "我们可以评估可行性，并协调相关申请、文件和与地点方的沟通。",
+        "准入仍须取得官方批准，并受各地点具体条件限制。",
+        "你们能支持在埃及进行无人机拍摄吗？",
+        "在无人机拍摄可行的情况下，我们可以协调所需流程。",
+        "无人机操作仍须遵守单独的许可、地点限制、安全要求和安全审批。",
+        "你们能支持开罗以外的制作吗？",
+        "可以。我们协调埃及各地的制作，包括亚历山大、卢克索、阿斯旺、红海地区、沙漠地区及其他地点，但须符合准入和批准要求。",
+        "你们能提供选角、受访者和本地专家吗？",
+        "可以。我们可根据项目支持选角、受访者调研、专家联络、主持人、演员、模特、群众演员和配音人才。",
+        "你们可以与来访团队自带的设备合作吗？",
+        "可以。我们可以评估本地制作需求，并在需要时协调补充设备、技术支持、运输和备用方案。",
+        "你们提供后期制作吗？",
+        "提供。我们的服务包括剪辑、调色、声音、动态图形、CGI、母带制作、版本制作和最终交付。"
+      ],
+      "ja": [
+        "現地の撮影クルーと機材を手配できますか？",
+        "はい。現地クルーと機材の一式を提供するほか、来訪クルーに特定の部門、人員、技術要件を追加することもできます。",
+        "フィクサーおよびラインプロダクションのサービスを提供していますか？",
+        "はい。現地制作チームが、スケジュール、ベンダー、許可、ロケーション、クルー調整、輸送、日々の撮影オペレーションを管理できます。",
+        "考古学的施設または文化遺産施設での撮影を支援できますか？",
+        "実現可能性を評価し、関連する申請、書類、現地とのコミュニケーションを調整できます。",
+        "アクセスには引き続き公式な承認と、ロケーション固有の条件が必要です。",
+        "エジプトでのドローン撮影を支援できますか？",
+        "ドローン撮影が実現可能な場合、必要な手続きを調整できます。",
+        "ドローンの運用には、別途の許可、ロケーション制限、安全要件、セキュリティ承認が引き続き適用されます。",
+        "カイロ以外での制作も支援できますか？",
+        "はい。アクセスと承認の要件を前提に、アレクサンドリア、ルクソール、アスワン、紅海地域、砂漠地域など、エジプト全土での制作を調整します。",
+        "キャスティング、出演協力者、現地の専門家を手配できますか？",
+        "はい。プロジェクトに応じて、キャスティング、協力者のリサーチ、専門家へのアプローチ、司会者、俳優、モデル、エキストラ、声の出演者を支援できます。",
+        "来訪クルーが持ち込む機材と組み合わせて作業できますか？",
+        "はい。現地制作の要件を評価し、必要に応じて補助機材、技術サポート、輸送、バックアップを調整できます。",
+        "ポストプロダクションを提供していますか？",
+        "はい。編集、カラーグレーディング、サウンド、モーショングラフィックス、CGI、マスタリング、バージョン制作、最終納品を含みます。"
+      ],
+      "ko": [
+        "현지 촬영 제작진과 장비를 준비할 수 있나요?",
+        "네. 완전한 현지 제작진 및 장비 패키지를 제공하거나, 방문 제작진에 특정 부서, 역할 및 기술 요구 사항을 보완할 수 있습니다.",
+        "픽서 및 라인 프로덕션 서비스를 제공하나요?",
+        "네. 현지 제작팀이 일정, 공급업체, 허가, 로케이션, 제작진 조율, 운송 및 일일 촬영 운영을 관리할 수 있습니다.",
+        "고고학적 장소 또는 문화유산 장소에서의 촬영을 지원할 수 있나요?",
+        "실현 가능성을 검토하고 관련 신청, 서류 및 장소 측과의 소통을 조율할 수 있습니다.",
+        "접근은 여전히 공식 승인과 장소별 조건의 적용을 받습니다.",
+        "이집트에서 드론 촬영을 지원할 수 있나요?",
+        "드론 촬영이 가능한 경우 필요한 절차를 조율할 수 있습니다.",
+        "드론 운용은 별도의 허가, 장소 제한, 안전 요건 및 보안 승인을 계속해서 따라야 합니다.",
+        "카이로 외 지역의 제작도 지원할 수 있나요?",
+        "네. 접근 및 승인 요건을 전제로 알렉산드리아, 룩소르, 아스완, 홍해 지역, 사막 지역 및 기타 지역을 포함한 이집트 전역의 제작을 조율합니다.",
+        "캐스팅, 출연 협력자 및 현지 전문가를 제공할 수 있나요?",
+        "네. 프로젝트에 따라 캐스팅, 협력자 조사, 전문가 섭외, 진행자, 배우, 모델, 엑스트라 및 성우 지원이 가능합니다.",
+        "방문 제작진이 가져오는 장비와 함께 작업할 수 있나요?",
+        "네. 현지 제작 요건을 검토하고 필요에 따라 보조 장비, 기술 지원, 운송 및 백업을 조율할 수 있습니다.",
+        "후반 제작을 제공하나요?",
+        "네. 편집, 색 보정, 사운드, 모션 그래픽, CGI, 마스터링, 버전 제작 및 최종 납품을 포함합니다."
+      ],
+      "pl": [
+        "Czy możecie zorganizować lokalne ekipy filmowe i sprzęt?",
+        "Tak. Możemy zapewnić kompletne lokalne ekipy i pakiety sprzętowe albo uzupełnić ekipę przyjezdną o konkretne działy, stanowiska i wymagania techniczne.",
+        "Czy zapewniacie usługi fixera i line production?",
+        "Tak. Nasz lokalny zespół produkcyjny może zarządzać harmonogramami, dostawcami, pozwoleniami, lokalizacjami, koordynacją ekip, transportem i codziennymi operacjami na planie.",
+        "Czy możecie wspierać filmowanie w miejscach archeologicznych lub miejscach dziedzictwa?",
+        "Możemy ocenić wykonalność i koordynować odpowiednie wnioski, dokumentację oraz komunikację z lokalizacją.",
+        "Dostęp nadal podlega oficjalnemu zatwierdzeniu i warunkom właściwym dla danej lokalizacji.",
+        "Czy możecie wspierać filmowanie dronem w Egipcie?",
+        "Możemy koordynować wymagany proces tam, gdzie filmowanie dronem jest wykonalne.",
+        "Operacje dronowe nadal podlegają odrębnym pozwoleniom, ograniczeniom lokalizacyjnym, wymogom bezpieczeństwa i zatwierdzeniu przez służby bezpieczeństwa.",
+        "Czy możecie wspierać produkcje poza Kairem?",
+        "Tak. Koordynujemy produkcje w całym Egipcie, w tym w Aleksandrii, Luksorze, Asuanie, nad Morzem Czerwonym, w regionach pustynnych i innych lokalizacjach, z zastrzeżeniem wymogów dostępu i zatwierdzeń.",
+        "Czy możecie zapewnić casting, uczestników i lokalnych ekspertów?",
+        "Tak. W zależności od projektu możemy wesprzeć casting, research uczestników, kontakt z ekspertami, prezenterów, aktorów, modeli, statystów i talenty głosowe.",
+        "Czy możecie pracować ze sprzętem przywiezionym przez ekipę odwiedzającą?",
+        "Tak. Możemy ocenić lokalne potrzeby produkcyjne i w razie potrzeby koordynować dodatkowy sprzęt, wsparcie techniczne, transport i rozwiązania zapasowe.",
+        "Czy zapewniacie postprodukcję?",
+        "Tak. Nasze usługi obejmują montaż, grading kolorystyczny, dźwięk, motion graphics, CGI, mastering, przygotowanie wersji i końcowe dostarczenie."
+      ],
+      "sw": [
+        "Je, mnaweza kupanga timu za filamu za ndani na vifaa?",
+        "Ndiyo. Tunaweza kutoa timu kamili za ndani na vifurushi vya vifaa, au kuongeza idara, nafasi na mahitaji mahususi ya kiufundi kwa timu inayotembelea.",
+        "Je, mnatoa huduma za fixer na line production?",
+        "Ndiyo. Timu yetu ya uzalishaji wa ndani inaweza kusimamia ratiba, wasambazaji, vibali, maeneo, uratibu wa timu, usafiri na shughuli za kila siku za kurekodi.",
+        "Je, mnaweza kusaidia kurekodi katika maeneo ya akiolojia au urithi?",
+        "Tunaweza kutathmini uwezekano na kuratibu maombi yanayohusika, nyaraka na mawasiliano na eneo husika.",
+        "Ufikiaji bado unategemea idhini rasmi na masharti mahususi ya eneo.",
+        "Je, mnaweza kusaidia kurekodi kwa drone nchini Misri?",
+        "Tunaweza kuratibu mchakato unaohitajika pale kurekodi kwa drone kunapowezekana.",
+        "Uendeshaji wa drone bado unategemea vibali tofauti, vikwazo vya maeneo, mahitaji ya usalama na idhini ya kiusalama.",
+        "Je, mnaweza kusaidia uzalishaji nje ya Cairo?",
+        "Ndiyo. Tunaratibu uzalishaji kote Misri, ikijumuisha Alexandria, Luxor, Aswan, Bahari Nyekundu, maeneo ya jangwa na maeneo mengine, kwa kuzingatia mahitaji ya ufikiaji na idhini.",
+        "Je, mnaweza kutoa casting, washiriki na wataalamu wa ndani?",
+        "Ndiyo. Tunaweza kusaidia casting, utafiti wa washiriki, kuwafikia wataalamu, watangazaji, waigizaji, wanamitindo, waigizaji wa ziada na vipaji vya sauti kulingana na mradi.",
+        "Je, mnaweza kufanya kazi na vifaa vinavyoletwa na timu inayotembelea?",
+        "Ndiyo. Tunaweza kutathmini mahitaji ya uzalishaji wa ndani na kuratibu vifaa vya ziada, msaada wa kiufundi, usafiri na mbadala za akiba inapohitajika.",
+        "Je, mnatoa post production?",
+        "Ndiyo. Huduma zetu zinajumuisha editing, color grading, sauti, motion graphics, CGI, mastering, utayarishaji wa matoleo na utoaji wa mwisho."
+      ]
+    },
+    "faq-localization-budget-and-cta": {
+      "source_block_range": [141, 149],
+      "zh": [
+        "你们可以将最终内容进行本地化吗？",
+        "可以。我们提供字幕、配音、吹替、对白替换、翻译和多语言交付包装。",
+        "在埃及进行影视制作的成本是多少？",
+        "预算取决于拍摄天数、地点、团队、设备、许可、出行、物流、人才和后期制作需求。",
+        "分享项目简报后，我们可以准备一套现实可行的制作架构和预算方向。",
+        "将您的制作带到埃及",
+        "无论您正在开发纪录片、商业广告、纪实系列、企业影片还是品牌活动，我们都可以围绕您的项目简报搭建合适的本地制作架构。",
+        "请分享项目详情、预定日期、地点和所需支持。我们的团队将审核制作需求，并在一个工作日内回复适当的问题和后续步骤。",
+        "发送您的制作简报"
+      ],
+      "ja": [
+        "最終コンテンツのローカライゼーションはできますか？",
+        "はい。字幕、ボイスオーバー、吹き替え、台詞差し替え、翻訳、多言語向け納品パッケージを提供します。",
+        "エジプトでの映像制作にはどのくらいの費用がかかりますか？",
+        "予算は、撮影日数、ロケーション、クルー、機材、許可、渡航、ロジスティクス、出演者、ポストプロダクションの要件によって決まります。",
+        "ブリーフを共有いただくことで、現実的な制作体制と予算の方向性を準備できます。",
+        "あなたの制作をエジプトへ",
+        "ドキュメンタリー、CM、ファクチュアルシリーズ、企業映像、ブランドキャンペーンのいずれを開発している場合でも、ブリーフに沿った適切な現地制作体制を構築できます。",
+        "プロジェクトの詳細、予定日、ロケーション、必要な支援をお送りください。チームが制作内容を確認し、適切な質問と次のステップを一営業日以内にご返信します。",
+        "制作ブリーフを送る"
+      ],
+      "ko": [
+        "최종 콘텐츠를 현지화할 수 있나요?",
+        "네. 자막, 보이스오버, 더빙, 대사 교체, 번역 및 다국어 납품 패키징을 제공합니다.",
+        "이집트에서의 영상 제작 비용은 얼마인가요?",
+        "예산은 촬영 일수, 로케이션, 제작진, 장비, 허가, 이동, 물류, 출연진 및 후반 제작 요구 사항에 따라 달라집니다.",
+        "브리프를 공유해 주시면 현실적인 제작 구조와 예산 방향을 준비할 수 있습니다.",
+        "이집트에서 당신의 제작을 실현하세요",
+        "다큐멘터리, 광고, 팩추얼 시리즈, 기업 영화 또는 브랜드 캠페인을 개발하고 계시다면, 귀하의 브리프에 맞는 현지 제작 구조를 만들 수 있습니다.",
+        "프로젝트 세부 사항, 예정일, 로케이션 및 필요한 지원을 공유해 주세요. 저희 팀이 제작 내용을 검토한 뒤 적절한 질문과 다음 단계를 영업일 기준 하루 안에 안내해 드립니다.",
+        "제작 브리프 보내기"
+      ],
+      "pl": [
+        "Czy możecie zlokalizować finalne treści?",
+        "Tak. Zapewniamy napisy, nagrania lektorskie, dubbing, zastępowanie dialogów, tłumaczenie i pakiety dostaw wielojęzycznych.",
+        "Ile kosztuje produkcja filmowa w Egipcie?",
+        "Budżet zależy od liczby dni zdjęciowych, lokalizacji, ekipy, sprzętu, pozwoleń, podróży, logistyki, talentów i wymagań postprodukcyjnych.",
+        "Udostępnienie briefu pozwala nam przygotować realistyczną strukturę produkcji i kierunek budżetowy.",
+        "Zrealizuj swoją produkcję w Egipcie",
+        "Niezależnie od tego, czy rozwijasz dokument, reklamę, serial faktograficzny, film korporacyjny czy kampanię marki, możemy zbudować odpowiednią lokalną strukturę produkcji wokół Twojego briefu.",
+        "Prześlij szczegóły projektu, planowane daty, lokalizacje i wymagane wsparcie. Nasz zespół przeanalizuje produkcję i odpowie w ciągu jednego dnia roboczego z odpowiednimi pytaniami i kolejnymi krokami.",
+        "Wyślij brief produkcyjny"
+      ],
+      "sw": [
+        "Je, mnaweza kujanibisha maudhui ya mwisho?",
+        "Ndiyo. Tunatoa manukuu, voice-over, dubbing, ubadilishaji wa mazungumzo, tafsiri na ufungashaji wa utoaji wa lugha nyingi.",
+        "Uzalishaji wa filamu nchini Misri unagharimu kiasi gani?",
+        "Bajeti inategemea idadi ya siku za kurekodi, maeneo, timu, vifaa, vibali, safari, logistics, vipaji na mahitaji ya post production.",
+        "Kushiriki brief kunatuwezesha kuandaa muundo halisi wa uzalishaji na mwelekeo wa bajeti.",
+        "Leta uzalishaji wako Misri",
+        "Iwe unatengeneza filamu ya makala, tangazo, mfululizo wa uhalisia, filamu ya kampuni au kampeni ya chapa, tunaweza kujenga muundo sahihi wa uzalishaji wa ndani kulingana na brief yako.",
+        "Shiriki maelezo ya mradi, tarehe zilizokusudiwa, maeneo na usaidizi unaohitajika. Timu yetu itapitia uzalishaji na kujibu ndani ya siku moja ya kazi kwa maswali sahihi na hatua zinazofuata.",
+        "Tuma brief yako ya uzalishaji"
+      ]
+    }
+  }
+}
