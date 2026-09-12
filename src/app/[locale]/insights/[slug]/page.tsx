@@ -5,7 +5,7 @@ import StructuredData from "@/components/StructuredData";
 import { applySeoOverrides } from "@/data/seo-overrides";
 import { api } from "@/lib/api";
 import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
-import { findPostAnyLocale, postDetailWithFallback } from "@/lib/page-data";
+import { IS_PRODUCTION_BUILD, findPostAnyLocale, postDetailWithFallback } from "@/lib/page-data";
 import { POSTS as FALLBACK_POSTS } from "@/data/content";
 import { postStaticParams, relatedPostSlugs } from "@/lib/legacy-redirects";
 import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo } from "@/lib/seo";
@@ -55,6 +55,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const path = `/insights/${slug}`;
   const fallbackTitle = buildTitle(slug.replace(/-/g, " "), slug);
 
+  if (IS_PRODUCTION_BUILD) {
+    const detail = await postDetailWithFallback(slug, locale);
+    const post = detail?.status === "ok" ? detail.data.post : null;
+    if (post) {
+      const meta = cmsSeo(post.seo as Record<string, unknown> | undefined);
+      return postMeta(path, locale, buildTitle(meta.metaTitle || post.title, slug), buildDescription(meta.metaDescription || post.excerpt, post.title), meta.ogImageUrl || post.featuredImage, post.publishedAt);
+    }
+    return postMeta(path, locale, fallbackTitle, fallbackTitle);
+  }
+
   try {
     const post = await api.getBlogPostBySlug(slug, locale);
     const meta = cmsSeo(post.seo as Record<string, unknown> | undefined);
@@ -78,14 +88,15 @@ export default async function Page({ params }: Props) {
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   let name = "";
   let schema;
+  const initialData = await postDetailWithFallback(slug, locale);
   const publisher = {
     "@type": "Organization",
     name: "Global Untold Story",
     logo: { "@type": "ImageObject", url: absoluteUrl("/images/logo-white.png") },
   };
 
-  try {
-    const post = await api.getBlogPostBySlug(slug, locale);
+  if (initialData?.status === "ok") {
+    const post = initialData.data.post;
     name = cleanHeadline(post.title, slug);
     const articleImage = post.featuredImage ? absoluteUrl(post.featuredImage) : absoluteUrl("/images/cinema-camera-red-dragon.jpg");
     schema = {
@@ -100,29 +111,8 @@ export default async function Page({ params }: Props) {
       author: { "@type": "Organization", name: "Global Untold Story" },
       publisher,
     };
-  } catch (e) {
-    console.error("Error fetching post for page:", e);
-    const live = await findPostAnyLocale(slug, locale);
-    const post = live ?? FALLBACK_POSTS.find((item) => relatedPostSlugs(slug).includes(item.slug));
-    if (post) {
-      name = cleanHeadline(post.title, slug);
-      const rawImage = live ? live.featuredImage : (post as { image?: string }).image;
-      schema = {
-        "@context": "https://schema.org",
-        "@type": "Article",
-        headline: post.title,
-        description: buildDescription(post.excerpt, post.title),
-        datePublished: live ? live.publishedAt : (post as { date: string }).date,
-        dateModified: live ? live.publishedAt : (post as { date: string }).date,
-        image: rawImage ? absoluteUrl(rawImage) : absoluteUrl("/images/cinema-camera-red-dragon.jpg"),
-        mainEntityOfPage: absoluteUrl(localizedPath(`/insights/${slug}`, locale)),
-        author: { "@type": "Organization", name: "Global Untold Story" },
-        publisher,
-      };
-    }
   }
 
-  const initialData = await postDetailWithFallback(slug, locale);
   if (initialData?.status === "notFound") notFound();
 
   const crumbs = breadcrumbSchema([

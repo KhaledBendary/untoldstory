@@ -9,6 +9,16 @@ import { isUnreadable, nameFromSlug } from "@/lib/seo";
 import type { About, BlogPost, LayoutData, PortfolioItem, Service } from "@/types/api";
 
 /**
+ * Vercel renders every locale and detail page during a production build. The
+ * CMS is a shared service and cannot reliably handle one detail request per
+ * generated service or project page, so those builds use the cached collection
+ * data below. Articles keep their full body from either the detail endpoint or
+ * their version-controlled fallback. Browser visits and on-demand server
+ * renders still request fresh detail data.
+ */
+export const IS_PRODUCTION_BUILD = process.env.NEXT_PHASE === "phase-production-build";
+
+/**
  * Per-page data fetchers, written so the same function runs on the server
  * (during render, to produce crawlable HTML) and in the browser (after a
  * language switch). Each returns a plain serialisable object.
@@ -152,7 +162,7 @@ export async function getServicesData(locale?: string): Promise<Service[]> {
     const list = await api.getServices(locale);
     return list?.length ? list : mappedFallbackServices();
   } catch (e) {
-    console.error("Failed to fetch services:", e);
+    console.warn("Using fallback services:", e instanceof Error ? e.message : e);
     return mappedFallbackServices();
   }
 }
@@ -190,7 +200,7 @@ export async function getInsightsData(locale?: string): Promise<BlogPost[]> {
     const seen = new Set(items.map((p) => p.slug));
     return [...items, ...extras.filter((p) => !seen.has(p.slug))];
   } catch (e) {
-    console.error("Failed to fetch insights:", e);
+    console.warn("Using fallback insights:", e instanceof Error ? e.message : e);
     return extras;
   }
 }
@@ -200,7 +210,7 @@ export async function getWorkData(locale?: string): Promise<PortfolioItem[]> {
     const { items } = await api.getPortfolio({ per_page: 100, locale });
     return items?.length ? items.map(withDisplayTitle) : mappedFallbackProjects();
   } catch (e) {
-    console.error("Failed to fetch work:", e);
+    console.warn("Using fallback work:", e instanceof Error ? e.message : e);
     return mappedFallbackProjects();
   }
 }
@@ -257,6 +267,31 @@ export type ServiceDetailData = {
 
 export function getServiceDetailData(slug: string, locale?: string) {
   return asDetail<ServiceDetailData>(async () => {
+    if (IS_PRODUCTION_BUILD) {
+      const [allServices, portfolio] = await Promise.all([
+        getServicesData(locale),
+        getWorkData(locale),
+      ]);
+      const service = allServices.find((item) => item.slug === slug);
+      if (!service) throw new ApiError(`Service not found: ${slug}`, 404);
+
+      const firstWord = (value?: string) => (value || "").split(" ")[0].toLowerCase();
+      const relatedProjects = portfolio
+        .filter((p) =>
+          p.category && service.title && (
+            p.category.toLowerCase().includes(firstWord(service.title)) ||
+            service.title.toLowerCase().includes(firstWord(p.category))
+          ),
+        )
+        .slice(0, 3);
+
+      return {
+        service,
+        allServices: allServices.map(({ slug: serviceSlug, title }) => ({ slug: serviceSlug, title })),
+        relatedProjects,
+      };
+    }
+
     const [service, allServices, portfolio] = await Promise.all([
       api.getServiceBySlug(slug, locale),
       api.getServices(locale),
@@ -281,6 +316,13 @@ export type ProjectDetailData = { project: PortfolioItem; allProjects: Portfolio
 
 export function getProjectDetailData(slug: string, locale?: string) {
   return asDetail<ProjectDetailData>(async () => {
+    if (IS_PRODUCTION_BUILD) {
+      const allProjects = await getWorkData(locale);
+      const project = allProjects.find((item) => item.slug === slug);
+      if (!project) throw new ApiError(`Project not found: ${slug}`, 404);
+      return { project: withDisplayTitle(project), allProjects: allProjects.map(withDisplayTitle) };
+    }
+
     const [project, portfolio] = await Promise.all([
       api.getPortfolioBySlug(slug, locale),
       api.getPortfolio({ per_page: 100, locale }),
@@ -405,6 +447,14 @@ export async function postDetailWithFallback(
   slug: string,
   locale?: string,
 ): Promise<DetailResult<PostDetailData> | null> {
+  // The collection endpoint intentionally omits article bodies. For the
+  // version-controlled articles, use their complete local copy while building
+  // rather than producing a page with a title but no article text.
+  if (IS_PRODUCTION_BUILD) {
+    const fallback = findFallbackPost(slug, locale);
+    if (fallback) return { status: "ok", data: { post: fallback, allPosts: mappedFallbackPosts(locale) } };
+  }
+
   const direct = await safeFetch(() => getPostDetailData(slug, locale), `post:${slug}`);
   if (direct?.status === "ok") return direct;
 

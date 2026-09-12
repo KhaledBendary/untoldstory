@@ -5,7 +5,7 @@ import StructuredData from "@/components/StructuredData";
 import { applySeoOverrides } from "@/data/seo-overrides";
 import { api } from "@/lib/api";
 import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
-import { findProjectAnyLocale, projectDetailWithFallback } from "@/lib/page-data";
+import { IS_PRODUCTION_BUILD, findProjectAnyLocale, projectDetailWithFallback } from "@/lib/page-data";
 import { PROJECTS as FALLBACK_PROJECTS } from "@/data/content";
 import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, pageSeo } from "@/lib/seo";
 
@@ -44,7 +44,7 @@ export async function generateStaticParams() {
 async function slugList() {
   const extras = FALLBACK_PROJECTS.map(({ slug }) => ({ slug }));
   try {
-    const portfolioData = await api.getPortfolio({ page: 1, per_page: 50 });
+    const portfolioData = await api.getPortfolio({ page: 1, per_page: 100 });
     const seen = new Set(portfolioData.items.map((project) => project.slug));
     return [
       ...portfolioData.items.map((project) => ({ slug: project.slug })),
@@ -65,6 +65,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const path = `/work/${slug}`;
   const fallbackTitle = buildTitle(slug.replace(/-/g, " "), slug);
+
+  if (IS_PRODUCTION_BUILD) {
+    const detail = await projectDetailWithFallback(slug, locale);
+    const project = detail?.status === "ok" ? detail.data.project : null;
+    if (project) {
+      const headline = projectHeadline(project.title, project.client, slug);
+      return projectMeta(path, locale, buildTitle(headline, slug), buildDescription(project.results, headline), project.image);
+    }
+    return projectMeta(path, locale, fallbackTitle, fallbackTitle);
+  }
 
   try {
     const project = await api.getPortfolioBySlug(slug, locale);
@@ -91,9 +101,10 @@ export default async function Page({ params }: Props) {
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   let name = "";
   let schema: Record<string, unknown>[] | undefined;
+  const initialData = await projectDetailWithFallback(slug, locale);
 
-  try {
-    const project = await api.getPortfolioBySlug(slug, locale);
+  if (initialData?.status === "ok") {
+    const project = initialData.data.project;
     name = cleanHeadline(project.title, slug);
     const blocks: Record<string, unknown>[] = [{
       "@context": "https://schema.org",
@@ -114,36 +125,8 @@ export default async function Page({ params }: Props) {
       });
     }
     schema = blocks;
-  } catch (e) {
-    console.error("Error fetching project for page:", e);
-    const live = await findProjectAnyLocale(slug, locale);
-    const project = live ?? FALLBACK_PROJECTS.find((item) => item.slug === slug);
-    if (project) {
-      name = cleanHeadline(project.title, slug);
-      const desc = buildDescription(live ? live.results : (project as { description: string }).description, name);
-      const blocks: Record<string, unknown>[] = [{
-        "@context": "https://schema.org",
-        "@type": "CreativeWork",
-        name,
-        description: desc,
-        creator: { "@type": "Organization", name: "Global Untold Story" },
-        image: project.image ? absoluteUrl(project.image) : undefined,
-      }];
-      if ("video" in project && project.video) {
-        blocks.push({
-          "@context": "https://schema.org",
-          "@type": "VideoObject",
-          name,
-          description: desc,
-          thumbnailUrl: project.image ? absoluteUrl(project.image) : absoluteUrl("/images/on-ground-production-giza.jpg"),
-          contentUrl: absoluteUrl(String(project.video)),
-        });
-      }
-      schema = blocks;
-    }
   }
 
-  const initialData = await projectDetailWithFallback(slug, locale);
   if (initialData?.status === "notFound") notFound();
 
   const crumbs = breadcrumbSchema([
