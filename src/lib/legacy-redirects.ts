@@ -232,21 +232,23 @@ function uniqueSlugParams(slugs: Iterable<string>) {
   return [...new Set(slugs)].filter(Boolean).map((slug) => ({ slug }));
 }
 
-/** Prerender every slug Google or the sitemap might still request. */
+/**
+ * Prerender current CMS pages only. Legacy slugs are redirected by proxy
+ * before they reach this route, so building them would only ask the CMS for
+ * records it intentionally no longer has and produce misleading 404 logs.
+ */
 export function serviceStaticParams(apiSlugs: string[] = [], fallbackSlugs: string[] = []) {
   return uniqueSlugParams([
-    ...apiSlugs,
-    ...fallbackSlugs,
-    ...Object.keys(SERVICE_SLUG_ALIASES),
+    ...apiSlugs.map((slug) => SERVICE_SLUG_ALIASES[slug] || slug),
+    ...fallbackSlugs.map((slug) => SERVICE_SLUG_ALIASES[slug] || slug),
     ...Object.values(SERVICE_SLUG_ALIASES),
   ]);
 }
 
 export function postStaticParams(apiSlugs: string[] = [], fallbackSlugs: string[] = []) {
   return uniqueSlugParams([
-    ...apiSlugs,
-    ...fallbackSlugs,
-    ...Object.keys(POST_SLUG_ALIASES),
+    ...apiSlugs.map((slug) => POST_SLUG_ALIASES[slug] || slug),
+    ...fallbackSlugs.map((slug) => POST_SLUG_ALIASES[slug] || slug),
     ...Object.values(POST_SLUG_ALIASES),
   ]);
 }
