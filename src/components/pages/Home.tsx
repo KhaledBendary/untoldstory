@@ -123,7 +123,7 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
             <source src={HERO_MP4} type="video/mp4" />
           </motion.video>
         ) : (
-          <img src={HERO_POSTER} alt="image?url=%2Fimages%2Fclients row 5 — Global Untold Story" className="absolute inset-0 h-full w-full object-cover brightness-[0.75]" />
+          <img src={HERO_POSTER} alt="" className="absolute inset-0 h-full w-full object-cover brightness-[0.75]" />
         )}
       </motion.div>
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-[#0a0a0a]/65" />
