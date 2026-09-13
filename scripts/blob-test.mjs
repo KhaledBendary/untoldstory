@@ -1,0 +1,10 @@
+import { put, del } from "@vercel/blob";
+import { readFileSync } from "node:fs";
+const env = readFileSync(new URL("../.env.local", import.meta.url), "utf-8");
+process.env.BLOB_READ_WRITE_TOKEN = (env.match(/^BLOB_READ_WRITE_TOKEN=(.+)$/m)||[])[1]?.trim();
+const blob = await put("media/connection-test.txt", "ok " + new Date().toISOString(), { access: "public", addRandomSuffix: true });
+console.log("uploaded:", blob.url);
+const res = await fetch(blob.url);
+console.log("fetch back:", res.status, "|", (await res.text()).slice(0, 30));
+await del(blob.pathname);
+console.log("cleaned up:", "deleted");
