@@ -70,29 +70,60 @@ export async function counts() {
   return row;
 }
 
+// ---- reads by type (dashboard) ----
+
+const TABLES = { services: getServices, projects: getProjects, posts: getPosts } as const;
+
+export async function listByType(type: keyof typeof TABLES) {
+  return TABLES[type]();
+}
+
+export async function getByType(type: keyof typeof TABLES, slug: string) {
+  if (type === "services") return getService(slug);
+  if (type === "projects") return getProject(slug);
+  return getPost(slug);
+}
+
 // ---- writes ----
 
 /**
- * Save an edit. The dashboard sends the fixed columns and the { en, ar }
- * values it edited; the other languages already in `data` are preserved by
- * merging field-by-field, so saving Arabic never wipes a French translation.
+ * Save an edit. The dashboard sends the fixed columns for this type and the
+ * { en, ar } values it edited; the other languages already in `data` are kept
+ * by merging field-by-field, so saving Arabic never wipes a French translation.
+ *
+ * Fixed columns are written per table with their real names — no dynamic
+ * column names reach SQL, so a type's column set is fixed in code, not input.
  */
-export async function saveService(
+export async function saveByType(
+  type: keyof typeof TABLES,
   slug: string,
-  fixed: { icon: string | null; image_url: string | null; price: string | null; is_featured: boolean },
+  fixed: Record<string, string | boolean | number | null>,
   editedData: Record<string, Dict>,
 ) {
-  const current = await getService(slug);
-  const data = mergeI18n(current?.data as Record<string, Dict> | undefined, editedData);
-  await sql`
-    update services set
-      icon = ${fixed.icon}, image_url = ${fixed.image_url}, price = ${fixed.price},
-      is_featured = ${fixed.is_featured}, data = ${sql.json(data as Parameters<typeof sql.json>[0])}, updated_at = now()
-    where slug = ${slug}
-  `;
+  const current = await getByType(type, slug);
+  const merged = mergeI18n(current?.data as Record<string, Dict> | undefined, editedData);
+  const data = sql.json(merged as Parameters<typeof sql.json>[0]);
+  const f = fixed;
+
+  if (type === "services") {
+    await sql`update services set icon=${str(f.icon)}, price=${str(f.price)},
+      image_url=${str(f.image_url)}, is_featured=${bool(f.is_featured)},
+      data=${data}, updated_at=now() where slug=${slug}`;
+  } else if (type === "projects") {
+    await sql`update projects set image=${str(f.image)}, video=${str(f.video)},
+      category_slug=${str(f.category_slug)}, is_featured=${bool(f.is_featured)},
+      data=${data}, updated_at=now() where slug=${slug}`;
+  } else {
+    await sql`update posts set featured_image=${str(f.featured_image)}, author_name=${str(f.author_name)},
+      category_slug=${str(f.category_slug)}, read_minutes=${num(f.read_minutes)}, is_featured=${bool(f.is_featured)},
+      data=${data}, updated_at=now() where slug=${slug}`;
+  }
 }
 
-/** Merge edited { field: { en, ar } } into existing { field: { en, ar, fr… } }. */
+const str = (v: unknown) => (typeof v === "string" && v !== "" ? v : null);
+const bool = (v: unknown) => Boolean(v);
+const num = (v: unknown) => (v === "" || v == null ? null : Number(v));
+
 function mergeI18n(existing: Record<string, Dict> = {}, edited: Record<string, Dict>): Record<string, unknown> {
   const out: Record<string, unknown> = { ...existing };
   for (const [field, dict] of Object.entries(edited)) {
