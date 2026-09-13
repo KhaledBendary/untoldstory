@@ -84,6 +84,12 @@ export function proxy(request: NextRequest) {
 
   const [, first, ...rest] = pathname.split("/");
 
+  // The dashboard is not a locale. Let /admin through untouched, or the
+  // locale rewrite below would send it to /en/admin and 404 it.
+  if (first === "admin") {
+    return markNonProduction(NextResponse.next(), request);
+  }
+
   // /en/services is a duplicate of /services — send it to the canonical form.
   if (first === DEFAULT_LOCALE) {
     const url = request.nextUrl.clone();

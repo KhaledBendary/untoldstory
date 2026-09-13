@@ -13,3 +13,4 @@ pnpm-debug.log*
 next-env.d.ts
 
 .vercel
+content-snapshot/
