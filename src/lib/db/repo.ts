@@ -58,6 +58,27 @@ export type Singleton = Record<string, Record<string, unknown>>; // { en: {...},
 export const getSingleton = async (key: string): Promise<Singleton | null> =>
   (await sql<{ data: Singleton }[]>`select data from singletons where key = ${key}`)[0]?.data ?? null;
 
+/**
+ * Save edits to specific paths inside a singleton, for English and Arabic only.
+ * The whole document is read, the given paths are written into the en and ar
+ * copies, and it is written back — so every other language and every untouched
+ * field is preserved exactly.
+ */
+export async function saveSingletonPaths(
+  key: string,
+  edits: { path: string; en: string; ar: string }[],
+  setPath: (obj: Record<string, unknown>, path: string, value: unknown) => void,
+) {
+  const doc = (await getSingleton(key)) ?? {};
+  const en = (doc.en as Record<string, unknown>) ?? (doc.en = {});
+  const ar = (doc.ar as Record<string, unknown>) ?? (doc.ar = {});
+  for (const e of edits) {
+    setPath(en, e.path, e.en);
+    setPath(ar, e.path, e.ar);
+  }
+  await sql`update singletons set data = ${sql.json(doc as Parameters<typeof sql.json>[0])}, updated_at = now() where key = ${key}`;
+}
+
 // ---- dashboard overview ----
 
 export async function counts() {
