@@ -79,6 +79,32 @@ export async function saveSingletonPaths(
   await sql`update singletons set data = ${sql.json(doc as Parameters<typeof sql.json>[0])}, updated_at = now() where key = ${key}`;
 }
 
+// ---- media ----
+
+export type MediaRow = {
+  id: number; url: string; pathname: string; filename: string;
+  content_type: string | null; size_bytes: number | null; uploaded_at: Date;
+};
+
+export const getMedia = () =>
+  sql<MediaRow[]>`select * from media order by uploaded_at desc`;
+
+export async function addMedia(m: {
+  url: string; pathname: string; filename: string; content_type: string | null; size_bytes: number | null;
+}) {
+  const [row] = await sql<MediaRow[]>`
+    insert into media (url, pathname, filename, content_type, size_bytes)
+    values (${m.url}, ${m.pathname}, ${m.filename}, ${m.content_type}, ${m.size_bytes})
+    returning *
+  `;
+  return row;
+}
+
+export async function deleteMedia(id: number): Promise<string | null> {
+  const [row] = await sql<{ pathname: string }[]>`delete from media where id = ${id} returning pathname`;
+  return row?.pathname ?? null;
+}
+
 // ---- dashboard overview ----
 
 export async function counts() {
