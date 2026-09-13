@@ -70,5 +70,33 @@ export async function counts() {
   return row;
 }
 
-// Writes (save/publish) are added with the editing UI, where the field shapes
-// they accept are defined alongside the forms that produce them.
+// ---- writes ----
+
+/**
+ * Save an edit. The dashboard sends the fixed columns and the { en, ar }
+ * values it edited; the other languages already in `data` are preserved by
+ * merging field-by-field, so saving Arabic never wipes a French translation.
+ */
+export async function saveService(
+  slug: string,
+  fixed: { icon: string | null; image_url: string | null; price: string | null; is_featured: boolean },
+  editedData: Record<string, Dict>,
+) {
+  const current = await getService(slug);
+  const data = mergeI18n(current?.data as Record<string, Dict> | undefined, editedData);
+  await sql`
+    update services set
+      icon = ${fixed.icon}, image_url = ${fixed.image_url}, price = ${fixed.price},
+      is_featured = ${fixed.is_featured}, data = ${sql.json(data as Parameters<typeof sql.json>[0])}, updated_at = now()
+    where slug = ${slug}
+  `;
+}
+
+/** Merge edited { field: { en, ar } } into existing { field: { en, ar, fr… } }. */
+function mergeI18n(existing: Record<string, Dict> = {}, edited: Record<string, Dict>): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...existing };
+  for (const [field, dict] of Object.entries(edited)) {
+    out[field] = { ...(existing[field] as Dict | undefined), ...dict };
+  }
+  return out;
+}
