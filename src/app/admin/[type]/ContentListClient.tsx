@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export type Row = { slug: string; title: string; sub: string; icon?: string | null; arMissing: boolean; draft?: boolean };
 
@@ -14,10 +15,29 @@ export type Row = { slug: string; title: string; sub: string; icon?: string | nu
 export default function ContentListClient({ type, orderable, initial }: {
   type: string; orderable: boolean; initial: Row[];
 }) {
+  const router = useRouter();
   const [rows, setRows] = useState<Row[]>(initial);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [q, setQ] = useState("");
+  const [dupBusy, setDupBusy] = useState<string | null>(null);
+
+  const query = q.trim().toLowerCase();
+  const shown = useMemo(
+    () => (query ? rows.filter((r) => `${r.title} ${r.sub}`.toLowerCase().includes(query)) : rows),
+    [rows, query],
+  );
+  const canReorder = orderable && !query; // reordering only makes sense on the full list
+
+  async function duplicate(slug: string) {
+    setDupBusy(slug);
+    try {
+      const res = await fetch(`/api/admin/content/${type}/${slug}/duplicate`, { method: "POST" });
+      const out = await res.json().catch(() => ({}));
+      if (res.ok && out.slug) router.push(`/admin/${type}/${out.slug}`);
+    } finally { setDupBusy(null); }
+  }
 
   const move = (i: number, dir: -1 | 1) => {
     const j = i + dir;
@@ -39,14 +59,20 @@ export default function ContentListClient({ type, orderable, initial }: {
 
   return (
     <>
+      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="بحث…"
+        style={{ marginBottom: 12 }} />
+
+      {shown.length === 0 ? (
+        <p style={{ color: "var(--faint)", fontSize: 14 }}>مفيش نتائج.</p>
+      ) : (
       <div style={{ display: "grid", gap: 8 }}>
-        {rows.map((r, i) => (
+        {shown.map((r, i) => (
           <div key={r.slug} style={{ display: "flex", alignItems: "stretch", gap: 8 }}>
-            {orderable && (
+            {canReorder && (
               <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <button onClick={() => move(i, -1)} disabled={i === 0} title="لأعلى"
                   style={{ flex: 1, fontSize: 12, padding: "0 8px" }}>↑</button>
-                <button onClick={() => move(i, 1)} disabled={i === rows.length - 1} title="لأسفل"
+                <button onClick={() => move(i, 1)} disabled={i === shown.length - 1} title="لأسفل"
                   style={{ flex: 1, fontSize: 12, padding: "0 8px" }}>↓</button>
               </div>
             )}
@@ -68,11 +94,13 @@ export default function ContentListClient({ type, orderable, initial }: {
                 <span style={{ fontSize: 11, color: "var(--faint)", border: "1px solid var(--line)",
                   borderRadius: 20, padding: "2px 8px", whiteSpace: "nowrap" }}>ناقص عربي</span>
               )}
-              <span style={{ color: "var(--faint)" }}>‹</span>
             </Link>
+            <button onClick={() => duplicate(r.slug)} disabled={dupBusy === r.slug} title="نسخ"
+              style={{ fontSize: 12, padding: "0 12px" }}>{dupBusy === r.slug ? "…" : "نسخ"}</button>
           </div>
         ))}
       </div>
+      )}
 
       {orderable && (dirty || saved) && (
         <div style={{ position: "sticky", bottom: 0, marginTop: 16, paddingTop: 12, background: "var(--bg)",

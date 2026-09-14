@@ -319,6 +319,20 @@ export async function deleteByType(type: keyof typeof TABLES, slug: string) {
   else await sql`delete from posts where slug=${slug}`;
 }
 
+/** Copy a row to a new slug (as a draft), duplicating every column and its data. */
+export async function duplicateByType(type: keyof typeof TABLES, srcSlug: string, newSlug: string) {
+  if (type === "services") {
+    await sql`insert into services (slug, icon, image_url, price, is_featured, sort_order, status, data)
+      select ${newSlug}, icon, image_url, price, is_featured, sort_order, 'draft', data from services where slug=${srcSlug}`;
+  } else if (type === "projects") {
+    await sql`insert into projects (slug, image, video, video_embed, video_type, category_slug, grid_size, duration, budget, is_featured, sort_order, status, data)
+      select ${newSlug}, image, video, video_embed, video_type, category_slug, grid_size, duration, budget, is_featured, sort_order, 'draft', data from projects where slug=${srcSlug}`;
+  } else {
+    await sql`insert into posts (slug, featured_image, author_name, author_image, category_slug, read_minutes, tags, is_featured, sort_order, status, published_at, data)
+      select ${newSlug}, featured_image, author_name, author_image, category_slug, read_minutes, tags, is_featured, sort_order, 'draft', now(), data from posts where slug=${srcSlug}`;
+  }
+}
+
 /** Set sort_order to match the given slug order (position 0..n). */
 export async function reorderByType(type: keyof typeof TABLES, slugs: string[]) {
   for (let i = 0; i < slugs.length; i++) {

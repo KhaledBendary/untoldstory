@@ -18,6 +18,7 @@ const ICONS = {
   mail: "M4 6h16v12H4zM4 7l8 6 8-6",
   photo: "M4 5h16v14H4zM8 11a2 2 0 100-4 2 2 0 000 4zM4 17l5-5 4 4 3-3 4 4",
   chart: "M4 20V4M4 20h16M8 20v-6M13 20V9M18 20v-9",
+  globe: "M12 3a9 9 0 100 18 9 9 0 000-18zM3 12h18M12 3c2.6 2.7 2.6 15.3 0 18M12 3c-2.6 2.7-2.6 15.3 0 18",
 } as const;
 
 function Icon({ name }: { name: keyof typeof ICONS }) {
@@ -51,6 +52,7 @@ export default function AdminShell({
     { href: "/admin/projects", label: "الأعمال", icon: "image" },
     { href: "/admin/posts", label: "المقالات", icon: "file" },
     { href: "/admin/pages", label: "الصفحات", icon: "layout" },
+    { href: "/admin/translations", label: "الترجمة", icon: "globe" },
     { href: "/admin/messages", label: "الرسائل", icon: "mail", badge: newMessages },
     { href: "/admin/visits", label: "الزيارات", icon: "chart" },
     { href: "/admin/media", label: "الصور", icon: "photo" },

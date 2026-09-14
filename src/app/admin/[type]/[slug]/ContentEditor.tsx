@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FixedField, I18nField } from "@/lib/admin/content-types";
@@ -22,6 +22,13 @@ export function deployMessage(deploy?: { triggered?: boolean; reason?: string })
   if (deploy.reason === "cooldown") return "⏳ فيه نشر شغّال — تعديلاتك هتلحق البناء الحالي، أو اضغط «نشر الموقع» من اللوحة";
   if (deploy.reason === "not-configured") return "";
   return "⚠️ اتحفظ، بس النشر التلقائي ما اشتغلش — اضغط «نشر الموقع» من اللوحة";
+}
+
+/** Recommended max length for the SEO fields, so the counter can flag overflow. */
+function seoIdeal(key: string): number | null {
+  if (key === "seo.metaTitle") return 60;
+  if (key === "seo.metaDescription") return 160;
+  return null;
 }
 
 /**
@@ -52,11 +59,24 @@ export default function ContentEditor({
   const [saved, setSaved] = useState(false);
   const [transWarn, setTransWarn] = useState<string>("");
   const [deployNote, setDeployNote] = useState<string>("");
+  const [dirty, setDirty] = useState(false);
 
-  const setText = (key: string, v: string) =>
+  // Warn before leaving with unsaved changes.
+  useEffect(() => {
+    if (!dirty) return;
+    const h = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ""; };
+    window.addEventListener("beforeunload", h);
+    return () => window.removeEventListener("beforeunload", h);
+  }, [dirty]);
+
+  const setText = (key: string, v: string) => {
+    setDirty(true);
     setI18n((prev) => ({ ...prev, [key]: { ...prev[key], [lang]: v } }));
-  const setFixedVal = (key: string, v: unknown) =>
+  };
+  const setFixedVal = (key: string, v: unknown) => {
+    setDirty(true);
     setFixed((prev) => ({ ...prev, [key]: v }));
+  };
 
   async function save() {
     setSaving(true); setSaved(false); setIssues([]); setTransWarn(""); setDeployNote("");
@@ -71,6 +91,7 @@ export default function ContentEditor({
       );
       const out = await res.json();
       if (!res.ok) { setIssues(out.issues || [{ field: "", message: out.error || "خطأ", level: "error" }]); return; }
+      setDirty(false);
       if (create) { router.push(`/admin/${type}/${out.slug}`); return; }
       setIssues(out.issues || []);
       setTransWarn(out.translationWarning || "");
@@ -130,7 +151,7 @@ export default function ContentEditor({
           border: `1px solid ${status === "published" ? "var(--ok)" : "var(--warn)"}` }}>
           {status === "published" ? "منشور" : "مسودّة"}
         </span>
-        <button onClick={() => setStatus((s) => (s === "published" ? "draft" : "published"))}
+        <button onClick={() => { setDirty(true); setStatus((s) => (s === "published" ? "draft" : "published")); }}
           style={{ marginInlineStart: "auto", fontSize: 12, padding: "6px 12px" }}>
           {status === "published" ? "رجّعها مسودّة" : "علّمها للنشر"}
         </button>
@@ -140,7 +161,7 @@ export default function ContentEditor({
         <div style={{ display: "grid", gap: 6, marginBottom: 18 }}>
           <span style={lbl}>المعرّف (slug) *</span>
           <input dir="ltr" placeholder="my-new-service" value={newSlug}
-            onChange={(e) => setNewSlug(e.target.value.toLowerCase())} />
+            onChange={(e) => { setDirty(true); setNewSlug(e.target.value.toLowerCase()); }} />
         </div>
       )}
 
@@ -167,6 +188,14 @@ export default function ContentEditor({
           ) : (
             <textarea dir={dir} rows={3} value={i18n[f.key]?.[lang] || ""} onChange={(e) => setText(f.key, e.target.value)} />
           )}
+          {seoIdeal(f.key) && (() => {
+            const len = (i18n[f.key]?.[lang] || "").length;
+            const max = seoIdeal(f.key)!;
+            const ok = len > 0 && len <= max;
+            return <span style={{ fontSize: 11, color: len > max ? "var(--warn)" : ok ? "var(--ok)" : "var(--faint)", textAlign: "start" }}>
+              {len} / {max} حرف {len > max ? "· أطول من المفضّل" : ""}
+            </span>;
+          })()}
         </div>
       ))}
 
