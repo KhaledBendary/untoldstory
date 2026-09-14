@@ -40,9 +40,11 @@ export function localizeService(r: ServiceRow, loc: string) {
 
 export function localizeProject(r: ProjectRow, loc: string) {
   const d = r.data;
+  const seo = (d.seo as Record<string, unknown>)?.[loc] ?? (d.seo as Record<string, unknown>)?.en;
   return {
     slug: r.slug,
     title: pick(d.title, loc),
+    ...(seo ? { seo } : {}),
     shortDescription: pickN(d.shortDescription, loc),
     description: pickN(d.description, loc),
     client: pickN(d.client, loc),

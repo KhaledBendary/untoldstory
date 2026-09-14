@@ -8,7 +8,7 @@ import { api } from "@/lib/api";
 import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
 import { IS_PRODUCTION_BUILD, findProjectAnyLocale, projectDetailWithFallback } from "@/lib/page-data";
 import { PROJECTS as FALLBACK_PROJECTS } from "@/data/content";
-import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, pageSeo } from "@/lib/seo";
+import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -72,7 +72,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const project = detail?.status === "ok" ? detail.data.project : null;
     if (project) {
       const headline = projectHeadline(project.title, project.client, slug);
-      return projectMeta(path, locale, buildTitle(headline, slug), buildDescription(project.results, headline), project.image);
+      const m = cmsSeo((project as { seo?: Record<string, unknown> }).seo);
+      return projectMeta(path, locale, buildTitle(m.metaTitle || headline, slug), buildDescription(m.metaDescription || project.results, headline), m.ogImageUrl || project.image);
     }
     return projectMeta(path, locale, fallbackTitle, fallbackTitle);
   }
@@ -80,13 +81,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const project = await api.getPortfolioBySlug(slug, locale);
     const headline = projectHeadline(project.title, project.client, slug);
-    return projectMeta(path, locale, buildTitle(headline, slug), buildDescription(project.results, headline), project.image);
+    const m = cmsSeo((project as { seo?: Record<string, unknown> }).seo);
+    return projectMeta(path, locale, buildTitle(m.metaTitle || headline, slug), buildDescription(m.metaDescription || project.results, headline), m.ogImageUrl || project.image);
   } catch (e) {
     console.error("Error fetching project for metadata:", e);
     const live = await findProjectAnyLocale(slug, locale);
     if (live) {
       const headline = projectHeadline(live.title, live.client, slug);
-      return projectMeta(path, locale, buildTitle(headline, slug), buildDescription(live.results, headline), live.image);
+      const m = cmsSeo((live as { seo?: Record<string, unknown> }).seo);
+      return projectMeta(path, locale, buildTitle(m.metaTitle || headline, slug), buildDescription(m.metaDescription || live.results, headline), m.ogImageUrl || live.image);
     }
 
     const project = FALLBACK_PROJECTS.find((item) => item.slug === slug);

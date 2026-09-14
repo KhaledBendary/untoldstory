@@ -47,7 +47,7 @@ export const CONTENT_TYPES: Record<string, ContentType> = {
   },
   projects: {
     key: "projects", table: "projects", labelAr: "الأعمال", singularAr: "مشروع",
-    titleField: "title", orderable: true, seo: false,
+    titleField: "title", orderable: true, seo: true,
     fixed: [
       { key: "image", label: "الصورة", type: "image" },
       { key: "video", label: "رابط الفيديو", type: "text" },
@@ -62,6 +62,8 @@ export const CONTENT_TYPES: Record<string, ContentType> = {
       { key: "description", label: "الوصف الكامل", type: "html" },
       { key: "results", label: "النتائج", type: "textarea" },
       { key: "metric", label: "المؤشر", type: "text" },
+      { key: "seo.metaTitle", label: "عنوان محرّكات البحث (SEO)", type: "text" },
+      { key: "seo.metaDescription", label: "وصف محرّكات البحث (SEO)", type: "textarea" },
     ],
   },
   posts: {

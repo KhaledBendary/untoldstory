@@ -22,7 +22,7 @@ export type ProjectRow = {
   video_embed: string | null; video_type: string | null; category_slug: string | null;
   grid_size: string | null; duration: string | null; budget: string | null;
   is_featured: boolean; sort_order: number; status: string;
-  data: { title?: Dict; client?: Dict; category?: Dict; shortDescription?: Dict; description?: Dict; results?: Dict; metric?: Dict };
+  data: { title?: Dict; client?: Dict; category?: Dict; shortDescription?: Dict; description?: Dict; results?: Dict; metric?: Dict; seo?: Record<string, unknown> };
 };
 
 export type PostRow = {
