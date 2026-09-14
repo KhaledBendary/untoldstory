@@ -2,12 +2,14 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { currentSession } from "@/lib/admin-session";
 import { getServices, getProjects, getPosts } from "@/lib/db/repo";
-import { INDEXABLE_LOCALES } from "@/lib/i18n";
+import { LOCALE_CODES } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
+const LOCALES = LOCALE_CODES;
 const LOCALE_LABEL: Record<string, string> = {
-  en: "EN", ar: "AR", fr: "FR", de: "DE", es: "ES", it: "IT", pt: "PT", ru: "RU", tr: "TR",
+  en: "EN", ar: "AR", fr: "FR", de: "DE", es: "ES", it: "IT", pt: "PT",
+  tr: "TR", ru: "RU", zh: "ZH", ja: "JA", ko: "KO", pl: "PL", sw: "SW",
 };
 
 type Dict = Record<string, string> | undefined;
@@ -19,7 +21,7 @@ function analyze(rows: { slug: string; data: { title?: Dict } }[]): Item[] {
     const t = r.data.title ?? {};
     const present: Record<string, boolean> = {};
     let done = 0;
-    for (const l of INDEXABLE_LOCALES) {
+    for (const l of LOCALES) {
       const ok = Boolean((t[l] ?? "").trim());
       present[l] = ok;
       if (ok) done++;
@@ -29,7 +31,7 @@ function analyze(rows: { slug: string; data: { title?: Dict } }[]): Item[] {
 }
 
 function Section({ label, type, items }: { label: string; type: string; items: Item[] }) {
-  const total = items.length * INDEXABLE_LOCALES.length;
+  const total = items.length * LOCALES.length;
   const filled = items.reduce((a, i) => a + i.done, 0);
   const pct = total ? Math.round((filled / total) * 100) : 100;
   return (
@@ -43,7 +45,7 @@ function Section({ label, type, items }: { label: string; type: string; items: I
           <thead>
             <tr>
               <th style={{ textAlign: "start", padding: "10px 12px", fontWeight: 500, color: "var(--faint)", borderBottom: "1px solid var(--line)" }}>العنصر</th>
-              {INDEXABLE_LOCALES.map((l) => (
+              {LOCALES.map((l) => (
                 <th key={l} style={{ padding: "10px 4px", fontWeight: 600, color: "var(--faint)", fontSize: 11, borderBottom: "1px solid var(--line)" }}>{LOCALE_LABEL[l] ?? l.toUpperCase()}</th>
               ))}
             </tr>
@@ -54,7 +56,7 @@ function Section({ label, type, items }: { label: string; type: string; items: I
                 <td style={{ padding: "8px 12px", maxWidth: 260, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   <Link href={`/admin/${type}/${it.slug}`} style={{ color: "var(--ink)" }}>{it.title}</Link>
                 </td>
-                {INDEXABLE_LOCALES.map((l) => (
+                {LOCALES.map((l) => (
                   <td key={l} style={{ textAlign: "center", padding: "8px 4px" }}>
                     <span title={it.present[l] ? "مترجم" : "ناقص"} style={{
                       display: "inline-block", width: 9, height: 9, borderRadius: 9,

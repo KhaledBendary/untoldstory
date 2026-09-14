@@ -23,6 +23,9 @@ function create() {
     max: 5,
     idle_timeout: 20,
     connect_timeout: 15,
+    // Supabase's transaction pooler (and pgbouncer in general) doesn't support
+    // prepared statements — disable them so the pooled connection works.
+    prepare: false,
     onnotice: () => {},
   });
 }

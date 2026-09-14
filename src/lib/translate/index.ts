@@ -13,7 +13,7 @@ import "server-only";
  * caller saves the English/Arabic anyway. Translation never blocks a save.
  */
 
-export const MACHINE_LOCALES = ["fr", "de", "es", "it", "pt", "ru", "tr"] as const;
+export const MACHINE_LOCALES = ["fr", "de", "es", "it", "pt", "ru", "tr", "zh", "ja", "ko", "pl", "sw"] as const;
 export type MachineLocale = (typeof MACHINE_LOCALES)[number];
 
 const ENDPOINT = "https://translation.googleapis.com/language/translate/v2";
