@@ -13,21 +13,22 @@ export type Dict = Record<string, string>;
 
 export type ServiceRow = {
   id: number; slug: string; icon: string | null; image_url: string | null;
-  price: string | null; is_featured: boolean; sort_order: number;
-  data: { title?: Dict; shortDesc?: Dict; fullDesc?: Dict; features?: Record<string, unknown> };
+  price: string | null; is_featured: boolean; sort_order: number; status: string;
+  data: { title?: Dict; shortDesc?: Dict; fullDesc?: Dict; features?: Record<string, unknown>; seo?: Record<string, unknown> };
 };
 
 export type ProjectRow = {
   id: number; slug: string; image: string | null; video: string | null;
   video_embed: string | null; video_type: string | null; category_slug: string | null;
-  grid_size: string | null; is_featured: boolean; sort_order: number;
+  grid_size: string | null; duration: string | null; budget: string | null;
+  is_featured: boolean; sort_order: number; status: string;
   data: { title?: Dict; client?: Dict; category?: Dict; shortDescription?: Dict; description?: Dict; results?: Dict; metric?: Dict };
 };
 
 export type PostRow = {
   id: number; slug: string; featured_image: string | null; author_name: string | null;
   author_image: string | null; category_slug: string | null; read_minutes: number | null;
-  tags: string[]; is_featured: boolean; sort_order: number; published_at: Date | null;
+  tags: string[]; is_featured: boolean; sort_order: number; published_at: Date | null; status: string;
   data: { title?: Dict; excerpt?: Dict; body?: Dict; category?: Dict; seo?: Record<string, unknown> };
 };
 
@@ -59,22 +60,45 @@ export const getSingleton = async (key: string): Promise<Singleton | null> =>
   (await sql<{ data: Singleton }[]>`select data from singletons where key = ${key}`)[0]?.data ?? null;
 
 /**
- * Save edits to specific paths inside a singleton, for English and Arabic only.
- * The whole document is read, the given paths are written into the en and ar
- * copies, and it is written back — so every other language and every untouched
- * field is preserved exactly.
+ * Save edits to specific paths inside a singleton, per language. Each edit
+ * carries a { locale: value } map (English and Arabic always, plus any machine
+ * translations the caller generated). The whole document is read, the given
+ * paths are written into each locale's copy, and it is written back — so every
+ * other language and every untouched field is preserved exactly.
  */
 export async function saveSingletonPaths(
   key: string,
-  edits: { path: string; en: string; ar: string }[],
+  edits: { path: string; values: Record<string, string> }[],
   setPath: (obj: Record<string, unknown>, path: string, value: unknown) => void,
 ) {
   const doc = (await getSingleton(key)) ?? {};
-  const en = (doc.en as Record<string, unknown>) ?? (doc.en = {});
-  const ar = (doc.ar as Record<string, unknown>) ?? (doc.ar = {});
-  for (const e of edits) {
-    setPath(en, e.path, e.en);
-    setPath(ar, e.path, e.ar);
+  const locales = new Set<string>();
+  for (const e of edits) for (const loc of Object.keys(e.values)) locales.add(loc);
+  for (const loc of locales) {
+    const bag = (doc[loc] as Record<string, unknown>) ?? (doc[loc] = {});
+    for (const e of edits) {
+      if (e.values[loc] !== undefined) setPath(bag, e.path, e.values[loc]);
+    }
+  }
+  await sql`update singletons set data = ${sql.json(doc as Parameters<typeof sql.json>[0])}, updated_at = now() where key = ${key}`;
+}
+
+/**
+ * Replace a repeating block (an array at `path`) inside a singleton, per language.
+ * The caller supplies the fully-built array for each locale — every language is
+ * rewritten together so the items stay index-aligned across all of them. Other
+ * fields in the document are untouched.
+ */
+export async function saveSingletonArray(
+  key: string,
+  path: string,
+  arraysByLocale: Record<string, unknown[]>,
+  setPath: (obj: Record<string, unknown>, path: string, value: unknown) => void,
+) {
+  const doc = (await getSingleton(key)) ?? {};
+  for (const [loc, arr] of Object.entries(arraysByLocale)) {
+    const bag = (doc[loc] as Record<string, unknown>) ?? (doc[loc] = {});
+    setPath(bag, path, arr);
   }
   await sql`update singletons set data = ${sql.json(doc as Parameters<typeof sql.json>[0])}, updated_at = now() where key = ${key}`;
 }
@@ -103,6 +127,92 @@ export async function addMedia(m: {
 export async function deleteMedia(id: number): Promise<string | null> {
   const [row] = await sql<{ pathname: string }[]>`delete from media where id = ${id} returning pathname`;
   return row?.pathname ?? null;
+}
+
+// ---- contact messages (leads inbox) ----
+
+export type MessageRow = {
+  id: number; name: string; email: string; phone: string | null; service: string | null;
+  message: string; locale: string | null; status: string; emailed: boolean; created_at: Date;
+};
+
+export async function addMessage(m: {
+  name: string; email: string; phone?: string | null; service?: string | null; message: string; locale?: string | null;
+}): Promise<number> {
+  const [row] = await sql<{ id: number }[]>`
+    insert into messages (name, email, phone, service, message, locale)
+    values (${m.name}, ${m.email}, ${m.phone ?? null}, ${m.service ?? null}, ${m.message}, ${m.locale ?? null})
+    returning id`;
+  return row.id;
+}
+
+export const markMessageEmailed = (id: number) =>
+  sql`update messages set emailed = true where id = ${id}`;
+
+export const getMessages = (status?: string) =>
+  status
+    ? sql<MessageRow[]>`select * from messages where status = ${status} order by created_at desc`
+    : sql<MessageRow[]>`select * from messages order by created_at desc`;
+
+export const getMessage = async (id: number) =>
+  (await sql<MessageRow[]>`select * from messages where id = ${id}`)[0] ?? null;
+
+export const setMessageStatus = (id: number, status: string) =>
+  sql`update messages set status = ${status} where id = ${id}`;
+
+export const deleteMessage = (id: number) =>
+  sql`delete from messages where id = ${id}`;
+
+export async function newMessageCount(): Promise<number> {
+  const [row] = await sql<{ n: number }[]>`select count(*)::int as n from messages where status = 'new'`;
+  return row.n;
+}
+
+// ---- anonymous visit log ----
+
+export type VisitRow = {
+  id: number; session: string | null; path: string; referrer: string | null;
+  utm_source: string | null; utm_medium: string | null; utm_campaign: string | null;
+  country: string | null; city: string | null; device: string | null; locale: string | null;
+  created_at: Date;
+};
+
+export async function addVisit(v: {
+  session?: string | null; path: string; referrer?: string | null;
+  utm_source?: string | null; utm_medium?: string | null; utm_campaign?: string | null;
+  country?: string | null; city?: string | null; device?: string | null; locale?: string | null;
+}) {
+  await sql`insert into visits (session, path, referrer, utm_source, utm_medium, utm_campaign, country, city, device, locale)
+    values (${v.session ?? null}, ${v.path}, ${v.referrer ?? null}, ${v.utm_source ?? null}, ${v.utm_medium ?? null},
+      ${v.utm_campaign ?? null}, ${v.country ?? null}, ${v.city ?? null}, ${v.device ?? null}, ${v.locale ?? null})`;
+}
+
+export const getRecentVisits = (limit = 100) =>
+  sql<VisitRow[]>`select * from visits order by created_at desc limit ${limit}`;
+
+/** Aggregates for the traffic dashboard over the last `days` days. */
+export async function visitStats(days = 30) {
+  const since = sql`now() - (${days} || ' days')::interval`;
+  const [totals] = await sql<{ views: number; sessions: number; today: number }[]>`
+    select
+      count(*)::int as views,
+      count(distinct session)::int as sessions,
+      count(*) filter (where created_at >= current_date)::int as today
+    from visits where created_at >= ${since}`;
+  const topPages = await sql<{ path: string; n: number }[]>`
+    select path, count(*)::int as n from visits where created_at >= ${since}
+    group by path order by n desc limit 8`;
+  const sources = await sql<{ source: string; n: number }[]>`
+    select coalesce(nullif(utm_source,''), 'مباشر/غير معروف') as source, count(*)::int as n
+    from visits where created_at >= ${since} group by source order by n desc limit 8`;
+  const campaigns = await sql<{ campaign: string; n: number }[]>`
+    select utm_campaign as campaign, count(*)::int as n from visits
+    where created_at >= ${since} and utm_campaign is not null and utm_campaign <> ''
+    group by campaign order by n desc limit 8`;
+  const countries = await sql<{ country: string; n: number }[]>`
+    select coalesce(nullif(country,''), '—') as country, count(*)::int as n
+    from visits where created_at >= ${since} group by country order by n desc limit 8`;
+  return { totals, topPages, sources, campaigns, countries };
 }
 
 // ---- dashboard overview ----
@@ -146,23 +256,26 @@ export async function saveByType(
   slug: string,
   fixed: Record<string, string | boolean | number | null>,
   editedData: Record<string, Dict>,
+  status?: "published" | "draft",
 ) {
   const current = await getByType(type, slug);
   const merged = mergeI18n(current?.data as Record<string, Dict> | undefined, editedData);
   const data = sql.json(merged as Parameters<typeof sql.json>[0]);
   const f = fixed;
+  const st = status ?? (current?.status as string | undefined) ?? "published";
 
   if (type === "services") {
     await sql`update services set icon=${str(f.icon)}, price=${str(f.price)},
-      image_url=${str(f.image_url)}, is_featured=${bool(f.is_featured)},
+      image_url=${str(f.image_url)}, is_featured=${bool(f.is_featured)}, status=${st},
       data=${data}, updated_at=now() where slug=${slug}`;
   } else if (type === "projects") {
     await sql`update projects set image=${str(f.image)}, video=${str(f.video)},
-      category_slug=${str(f.category_slug)}, is_featured=${bool(f.is_featured)},
+      category_slug=${str(f.category_slug)}, duration=${str(f.duration)}, budget=${str(f.budget)},
+      is_featured=${bool(f.is_featured)}, status=${st},
       data=${data}, updated_at=now() where slug=${slug}`;
   } else {
     await sql`update posts set featured_image=${str(f.featured_image)}, author_name=${str(f.author_name)},
-      category_slug=${str(f.category_slug)}, read_minutes=${num(f.read_minutes)}, is_featured=${bool(f.is_featured)},
+      category_slug=${str(f.category_slug)}, read_minutes=${num(f.read_minutes)}, is_featured=${bool(f.is_featured)}, status=${st},
       data=${data}, updated_at=now() where slug=${slug}`;
   }
 }
@@ -170,6 +283,51 @@ export async function saveByType(
 const str = (v: unknown) => (typeof v === "string" && v !== "" ? v : null);
 const bool = (v: unknown) => Boolean(v);
 const num = (v: unknown) => (v === "" || v == null ? null : Number(v));
+
+/**
+ * Create a new content row. The slug is the record's identity and must be unique
+ * (the caller checks first); the fixed columns are written by their real names,
+ * the translatable fields go into `data`. A post is published now so it appears.
+ */
+export async function createByType(
+  type: keyof typeof TABLES,
+  slug: string,
+  fixed: Record<string, string | boolean | number | null>,
+  data: Record<string, Dict>,
+  status: "published" | "draft" = "draft",
+) {
+  const d = sql.json(data as Parameters<typeof sql.json>[0]);
+  const f = fixed;
+
+  if (type === "services") {
+    await sql`insert into services (slug, icon, price, image_url, is_featured, status, data)
+      values (${slug}, ${str(f.icon)}, ${str(f.price)}, ${str(f.image_url)}, ${bool(f.is_featured)}, ${status}, ${d})`;
+  } else if (type === "projects") {
+    await sql`insert into projects (slug, image, video, category_slug, is_featured, status, data)
+      values (${slug}, ${str(f.image)}, ${str(f.video)}, ${str(f.category_slug)}, ${bool(f.is_featured)}, ${status}, ${d})`;
+  } else {
+    await sql`insert into posts (slug, featured_image, author_name, category_slug, read_minutes, is_featured, status, published_at, data)
+      values (${slug}, ${str(f.featured_image)}, ${str(f.author_name)}, ${str(f.category_slug)},
+        ${num(f.read_minutes)}, ${bool(f.is_featured)}, ${status}, now(), ${d})`;
+  }
+}
+
+/** Delete a content row by slug. */
+export async function deleteByType(type: keyof typeof TABLES, slug: string) {
+  if (type === "services") await sql`delete from services where slug=${slug}`;
+  else if (type === "projects") await sql`delete from projects where slug=${slug}`;
+  else await sql`delete from posts where slug=${slug}`;
+}
+
+/** Set sort_order to match the given slug order (position 0..n). */
+export async function reorderByType(type: keyof typeof TABLES, slugs: string[]) {
+  for (let i = 0; i < slugs.length; i++) {
+    const s = slugs[i];
+    if (type === "services") await sql`update services set sort_order=${i}, updated_at=now() where slug=${s}`;
+    else if (type === "projects") await sql`update projects set sort_order=${i}, updated_at=now() where slug=${s}`;
+    else await sql`update posts set sort_order=${i}, updated_at=now() where slug=${s}`;
+  }
+}
 
 function mergeI18n(existing: Record<string, Dict> = {}, edited: Record<string, Dict>): Record<string, unknown> {
   const out: Record<string, unknown> = { ...existing };

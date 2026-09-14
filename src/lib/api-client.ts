@@ -34,6 +34,12 @@ function isRetryable(status?: number): boolean {
 const IS_BUILD = process.env.NEXT_PHASE === "phase-production-build";
 const RETRY_ATTEMPTS = IS_BUILD ? 2 : 6;
 const RETRY_DELAYS_MS = IS_BUILD ? [400, 1000] : [500, 1500, 3000, 6000, 10000];
+
+// Hard ceiling on a single upstream request. Short during build (a prerender
+// worker is killed at ~60s and must have time to retry and fall back), a little
+// longer at runtime. fetch() has no default timeout, so without this a stalled
+// Laravel connection hangs the whole render.
+const REQUEST_TIMEOUT_MS = IS_BUILD ? 8000 : 15000;
 const CIRCUIT_AFTER = 3;
 const CIRCUIT_MS = 60_000;
 
@@ -265,6 +271,11 @@ class ApiClient {
           ...cacheInit,
           ...options,
           headers,
+          // A hung upstream must not stall a prerender until the framework's
+          // per-page export timeout kills it — abort a slow request so the
+          // caller's fallback (now the database, or editorial content) runs
+          // while there is still time. Browser reads keep their own budget.
+          signal: options.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS),
         });
 
         if (!response.ok) {

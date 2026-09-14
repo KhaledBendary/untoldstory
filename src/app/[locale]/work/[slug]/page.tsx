@@ -1,3 +1,4 @@
+import "@/lib/db/register"; // server-only: publishes the DB content-source for api.ts
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ProjectDetail from "@/components/pages/ProjectDetail";

@@ -27,12 +27,13 @@ export default function PageEditor({
   const [saving, setSaving] = useState(false);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [saved, setSaved] = useState(false);
+  const [transWarn, setTransWarn] = useState("");
 
   const set = (path: string, v: string) =>
     setValues((prev) => ({ ...prev, [path]: { ...prev[path], [lang]: v } }));
 
   async function save() {
-    setSaving(true); setSaved(false); setIssues([]);
+    setSaving(true); setSaved(false); setIssues([]); setTransWarn("");
     try {
       const res = await fetch(`/api/admin/pages/${keyName}`, {
         method: "PUT", headers: { "Content-Type": "application/json" },
@@ -40,7 +41,7 @@ export default function PageEditor({
       });
       const out = await res.json();
       if (!res.ok) { setIssues(out.issues || [{ field: "", message: out.error || "خطأ", level: "error" }]); return; }
-      setIssues(out.issues || []); setSaved(true);
+      setIssues(out.issues || []); setTransWarn(out.translationWarning || ""); setSaved(true);
     } catch {
       setIssues([{ field: "", message: "تعذّر الاتصال بالخادم", level: "error" }]);
     } finally { setSaving(false); }
@@ -52,10 +53,10 @@ export default function PageEditor({
   const lbl = { fontSize: 13, color: "var(--muted)" } as const;
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: "24px 20px 80px" }}>
+    <div style={{ padding: "14px 0 22px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
         <Link href="/admin/pages" style={{ fontSize: 13, color: "var(--muted)" }}>← الصفحات</Link>
-        <h1 style={{ fontSize: 20, fontWeight: 600, margin: 0 }}>{labelAr}</h1>
+        <h1 style={{ fontSize: 21, fontWeight: 700, margin: 0 }}>{labelAr}</h1>
       </div>
 
       <div style={{ display: "flex", gap: 6, marginBottom: 18 }}>
@@ -66,9 +67,6 @@ export default function PageEditor({
               color: lang === l.code ? "var(--accent-ink)" : "var(--ink)",
               borderColor: lang === l.code ? "var(--accent)" : "var(--line)" }}>{l.label}</button>
         ))}
-        <span style={{ marginInlineStart: "auto", alignSelf: "center", fontSize: 12, color: "var(--faint)" }}>
-          باقي اللغات بتترجم آلياً من الإنجليزي
-        </span>
       </div>
 
       {groups.map((g) => (
@@ -106,9 +104,20 @@ export default function PageEditor({
         </div>
       )}
 
+      {saved && transWarn && (
+        <div style={{ marginTop: 12, background: "color-mix(in srgb, var(--warn) 14%, transparent)",
+          border: "1px solid var(--warn)", borderRadius: 8, padding: "12px 14px", fontSize: 13, color: "var(--warn)" }}>
+          {transWarn}
+        </div>
+      )}
+
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 22 }}>
-        <button className="primary" onClick={save} disabled={saving}>{saving ? "بيتحفظ…" : "حفظ"}</button>
-        {saved && errors.length === 0 && <span style={{ color: "var(--ok)", fontSize: 14 }}>✓ اتحفظ</span>}
+        <button className="primary" onClick={save} disabled={saving}>{saving ? "بيتحفظ ويترجم…" : "حفظ"}</button>
+        {saved && errors.length === 0 && (
+          <span style={{ color: "var(--ok)", fontSize: 14 }}>
+            {transWarn ? "✓ اتحفظ" : "✓ اتحفظ واتترجم للغات السبعة"}
+          </span>
+        )}
       </div>
     </div>
   );

@@ -17,7 +17,7 @@ export type SingletonDef = { key: string; labelAr: string; groups: SingletonGrou
 
 export const SINGLETONS: Record<string, SingletonDef> = {
   layout: {
-    key: "layout", labelAr: "الترويسة والفوتر",
+    key: "layout", labelAr: "إعدادات الموقع",
     groups: [
       { title: "معلومات الموقع", fields: [
         { path: "site_config.name", label: "اسم الموقع", type: "text" },

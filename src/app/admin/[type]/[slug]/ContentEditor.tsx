@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { FixedField, I18nField } from "@/lib/admin/content-types";
+import ImagePicker from "@/app/admin/ImagePicker";
+import RichTextEditor from "@/app/admin/RichTextEditor";
 
 type Dict = Record<string, string>;
 type Issue = { field: string; locale?: string; message: string; level: "error" | "warning" };
@@ -12,6 +15,15 @@ const LANGS = [
   { code: "ar", label: "عربي", dir: "rtl" as const },
 ];
 
+/** Turn the server's deploy result into a friendly line for the editor. */
+export function deployMessage(deploy?: { triggered?: boolean; reason?: string }): string {
+  if (!deploy) return "";
+  if (deploy.triggered) return "🚀 بدأ نشر الموقع — التعديلات هتظهر خلال دقيقة–دقيقتين";
+  if (deploy.reason === "cooldown") return "⏳ فيه نشر شغّال — تعديلاتك هتلحق البناء الحالي، أو اضغط «نشر الموقع» من اللوحة";
+  if (deploy.reason === "not-configured") return "";
+  return "⚠️ اتحفظ، بس النشر التلقائي ما اشتغلش — اضغط «نشر الموقع» من اللوحة";
+}
+
 /**
  * One editor for every content type, drawn from the type's field definition.
  * Two language tabs for the text you write; the fixed fields (images, flags)
@@ -19,19 +31,27 @@ const LANGS = [
  * reasons, in Arabic, before anything is written.
  */
 export default function ContentEditor({
-  type, slug, fixedFields, i18nFields, labelAr, initialFixed, initialI18n,
+  type, slug, fixedFields, i18nFields, labelAr, initialFixed, initialI18n, create = false, initialStatus = "published",
 }: {
   type: string; slug: string;
   fixedFields: FixedField[]; i18nFields: I18nField[]; labelAr: string;
   initialFixed: Record<string, unknown>;
   initialI18n: Record<string, Dict>;
+  create?: boolean;
+  initialStatus?: string;
 }) {
+  const router = useRouter();
   const [lang, setLang] = useState("en");
+  const [newSlug, setNewSlug] = useState("");
   const [fixed, setFixed] = useState<Record<string, unknown>>(initialFixed);
   const [i18n, setI18n] = useState<Record<string, Dict>>(initialI18n);
+  const [status, setStatus] = useState<"published" | "draft">(create ? "draft" : (initialStatus === "draft" ? "draft" : "published"));
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [saved, setSaved] = useState(false);
+  const [transWarn, setTransWarn] = useState<string>("");
+  const [deployNote, setDeployNote] = useState<string>("");
 
   const setText = (key: string, v: string) =>
     setI18n((prev) => ({ ...prev, [key]: { ...prev[key], [lang]: v } }));
@@ -39,16 +59,22 @@ export default function ContentEditor({
     setFixed((prev) => ({ ...prev, [key]: v }));
 
   async function save() {
-    setSaving(true); setSaved(false); setIssues([]);
+    setSaving(true); setSaved(false); setIssues([]); setTransWarn(""); setDeployNote("");
     try {
-      const res = await fetch(`/api/admin/content/${type}/${slug}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fixed, data: i18n }),
-      });
+      const res = await fetch(
+        create ? `/api/admin/content/${type}` : `/api/admin/content/${type}/${slug}`,
+        {
+          method: create ? "POST" : "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(create ? { slug: newSlug, fixed, data: i18n, status } : { fixed, data: i18n, status }),
+        },
+      );
       const out = await res.json();
       if (!res.ok) { setIssues(out.issues || [{ field: "", message: out.error || "خطأ", level: "error" }]); return; }
+      if (create) { router.push(`/admin/${type}/${out.slug}`); return; }
       setIssues(out.issues || []);
+      setTransWarn(out.translationWarning || "");
+      setDeployNote(deployMessage(out.deploy));
       setSaved(true);
     } catch {
       setIssues([{ field: "", message: "تعذّر الاتصال بالخادم", level: "error" }]);
@@ -57,19 +83,66 @@ export default function ContentEditor({
     }
   }
 
+  async function del() {
+    if (!confirm(`متأكد إنك عايز تمسح "${title}" نهائياً؟ مش هينفع ترجع فيها.`)) return;
+    setDeleting(true); setIssues([]);
+    try {
+      const res = await fetch(`/api/admin/content/${type}/${slug}`, { method: "DELETE" });
+      if (!res.ok) {
+        const out = await res.json().catch(() => ({}));
+        setIssues([{ field: "", message: out.error || "فشل الحذف", level: "error" }]);
+        return;
+      }
+      router.push(`/admin/${type}`);
+    } catch {
+      setIssues([{ field: "", message: "تعذّر الاتصال بالخادم", level: "error" }]);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   const dir = LANGS.find((l) => l.code === lang)!.dir;
   const errors = issues.filter((i) => i.level === "error");
   const warnings = issues.filter((i) => i.level === "warning");
   const lbl = { fontSize: 13, color: "var(--muted)" } as const;
-  const title = i18n.title?.ar || i18n.title?.en || slug;
+  const title = create ? `${labelAr} — جديد` : (i18n.title?.ar || i18n.title?.en || slug);
 
   return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: "24px 20px 80px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
         <Link href={`/admin/${type}`} style={{ fontSize: 13, color: "var(--muted)" }}>← {labelAr}</Link>
         <h1 style={{ fontSize: 20, fontWeight: 600, margin: 0, flex: 1,
           whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</h1>
+        {!create && (
+          <Link href={`/admin/${type}/${slug}/preview`} target="_blank"
+            style={{ fontSize: 13, color: "var(--muted)", border: "1px solid var(--line)", borderRadius: 8, padding: "6px 12px" }}>
+            معاينة ↗
+          </Link>
+        )}
       </div>
+
+      {/* publish state */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18,
+        background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 10, padding: "10px 12px" }}>
+        <span style={{ fontSize: 13, color: "var(--muted)" }}>الحالة:</span>
+        <span style={{ fontSize: 12, fontWeight: 600, borderRadius: 20, padding: "3px 10px",
+          color: status === "published" ? "var(--ok)" : "var(--warn)",
+          border: `1px solid ${status === "published" ? "var(--ok)" : "var(--warn)"}` }}>
+          {status === "published" ? "منشور" : "مسودّة"}
+        </span>
+        <button onClick={() => setStatus((s) => (s === "published" ? "draft" : "published"))}
+          style={{ marginInlineStart: "auto", fontSize: 12, padding: "6px 12px" }}>
+          {status === "published" ? "رجّعها مسودّة" : "علّمها للنشر"}
+        </button>
+      </div>
+
+      {create && (
+        <div style={{ display: "grid", gap: 6, marginBottom: 18 }}>
+          <span style={lbl}>المعرّف (slug) *</span>
+          <input dir="ltr" placeholder="my-new-service" value={newSlug}
+            onChange={(e) => setNewSlug(e.target.value.toLowerCase())} />
+        </div>
+      )}
 
       <div style={{ display: "flex", gap: 6, marginBottom: 18 }}>
         {LANGS.map((l) => (
@@ -81,9 +154,6 @@ export default function ContentEditor({
             {l.label}
           </button>
         ))}
-        <span style={{ marginInlineStart: "auto", alignSelf: "center", fontSize: 12, color: "var(--faint)" }}>
-          باقي اللغات بتترجم آلياً من الإنجليزي
-        </span>
       </div>
 
       {/* translatable fields */}
@@ -92,10 +162,10 @@ export default function ContentEditor({
           <span style={lbl}>{f.label}{f.required && lang === "en" ? " *" : ""}</span>
           {f.type === "text" ? (
             <input dir={dir} value={i18n[f.key]?.[lang] || ""} onChange={(e) => setText(f.key, e.target.value)} />
+          ) : f.type === "html" ? (
+            <RichTextEditor dir={dir} value={i18n[f.key]?.[lang] || ""} onChange={(html) => setText(f.key, html)} />
           ) : (
-            <textarea dir={dir} rows={f.type === "html" ? 12 : 3}
-              style={f.type === "html" ? { fontFamily: "ui-monospace, monospace", fontSize: 13 } : undefined}
-              value={i18n[f.key]?.[lang] || ""} onChange={(e) => setText(f.key, e.target.value)} />
+            <textarea dir={dir} rows={3} value={i18n[f.key]?.[lang] || ""} onChange={(e) => setText(f.key, e.target.value)} />
           )}
         </div>
       ))}
@@ -109,6 +179,11 @@ export default function ContentEditor({
                 onChange={(e) => setFixedVal(f.key, e.target.checked)} style={{ width: 18, height: 18 }} />
               {f.label}
             </label>
+          ) : f.type === "image" ? (
+            <div key={f.key} style={{ display: "grid", gap: 6 }}>
+              <span style={lbl}>{f.label}</span>
+              <ImagePicker value={String(fixed[f.key] ?? "")} onChange={(url) => setFixedVal(f.key, url)} />
+            </div>
           ) : (
             <div key={f.key} style={{ display: "grid", gap: 6 }}>
               <span style={lbl}>{f.label}</span>
@@ -139,9 +214,31 @@ export default function ContentEditor({
         </div>
       )}
 
+      {saved && transWarn && (
+        <div style={{ marginTop: 12, background: "color-mix(in srgb, var(--warn) 14%, transparent)",
+          border: "1px solid var(--warn)", borderRadius: 8, padding: "12px 14px", fontSize: 13, color: "var(--warn)" }}>
+          {transWarn}
+        </div>
+      )}
+
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 22 }}>
-        <button className="primary" onClick={save} disabled={saving}>{saving ? "بيتحفظ…" : "حفظ"}</button>
-        {saved && errors.length === 0 && <span style={{ color: "var(--ok)", fontSize: 14 }}>✓ اتحفظ</span>}
+        <button className="primary" onClick={save} disabled={saving || deleting}>
+          {saving ? (create ? "بيتنشئ ويترجم…" : "بيتحفظ ويترجم…") : (create ? "إنشاء" : "حفظ")}
+        </button>
+        {saved && errors.length === 0 && (
+          <span style={{ color: "var(--ok)", fontSize: 14 }}>
+            {transWarn ? "✓ اتحفظ" : "✓ اتحفظ واتترجم للغات السبعة"}
+          </span>
+        )}
+        {saved && deployNote && (
+          <span style={{ fontSize: 13, color: "var(--muted)", width: "100%", order: 9 }}>{deployNote}</span>
+        )}
+        {!create && (
+          <button onClick={del} disabled={saving || deleting}
+            style={{ marginInlineStart: "auto", color: "var(--danger)", borderColor: "var(--danger)" }}>
+            {deleting ? "بيتمسح…" : "حذف"}
+          </button>
+        )}
       </div>
     </div>
   );

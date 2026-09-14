@@ -1,3 +1,4 @@
+import "@/lib/db/register"; // server-only: publishes the DB content-source for api.ts
 import type { Metadata } from "next";
 import Work from "@/components/pages/Work";
 import StructuredData from "@/components/StructuredData";

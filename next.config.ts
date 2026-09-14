@@ -78,9 +78,13 @@ const GOOGLE_COUNTRY_DOMAINS = [
 
 const META = "https://www.facebook.com https://connect.facebook.net";
 
+// React's dev server needs eval() for fast-refresh/debugging; production never
+// does. Allow it only in development so the live CSP stays strict.
+const DEV_SCRIPT = process.env.NODE_ENV !== "production" ? " 'unsafe-eval'" : "";
+
 const CSP = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net`,
+  `script-src 'self' 'unsafe-inline'${DEV_SCRIPT} https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net`,
   // framer-motion and GSAP animate via inline style attributes.
   "style-src 'self' 'unsafe-inline'",
   // Fonts are self-hosted through next/font, so no third-party origin here.

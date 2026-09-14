@@ -6,8 +6,8 @@ export default function LogoutButton() {
     window.location.href = "/admin/login";
   }
   return (
-    <button onClick={logout} style={{ fontSize: 13, padding: "7px 12px" }}>
-      خروج
+    <button onClick={logout} style={{ fontSize: 13, padding: "8px 12px", width: "100%" }}>
+      تسجيل الخروج
     </button>
   );
 }

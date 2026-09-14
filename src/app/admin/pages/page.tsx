@@ -6,9 +6,9 @@ import { SINGLETONS } from "@/lib/admin/singleton-fields";
 export const dynamic = "force-dynamic";
 
 const DESC: Record<string, string> = {
-  layout: "بيانات الاتصال · السوشيال · الفوتر · الإعلان",
-  home: "الواجهة · بانر الدعوة · السيو",
-  about: "رأس صفحة من نحن",
+  layout: "بيانات الاتصال · السوشيال · الفوتر · المكاتب",
+  home: "الواجهة · الإحصائيات · خطوات الإنتاج · الجوائز",
+  about: "رأس الصفحة · الفريق · الشركاء",
 };
 
 /** The one-off pages, each opening its own field editor. */

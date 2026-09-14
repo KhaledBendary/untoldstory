@@ -21,6 +21,8 @@ export type ContentType = {
   labelAr: string;      // "الخدمات"
   singularAr: string;   // "خدمة"
   titleField: string;   // which i18n field is the row's name
+  orderable: boolean;   // whether the site orders this type by sort_order (posts go by date)
+  seo: boolean;         // whether the detail page reads metaTitle/metaDescription
   fixed: FixedField[];
   i18n: I18nField[];
 };
@@ -28,7 +30,7 @@ export type ContentType = {
 export const CONTENT_TYPES: Record<string, ContentType> = {
   services: {
     key: "services", table: "services", labelAr: "الخدمات", singularAr: "خدمة",
-    titleField: "title",
+    titleField: "title", orderable: true, seo: true,
     fixed: [
       { key: "icon", label: "الأيقونة", type: "emoji" },
       { key: "price", label: "السعر", type: "text" },
@@ -39,11 +41,13 @@ export const CONTENT_TYPES: Record<string, ContentType> = {
       { key: "title", label: "العنوان", type: "text", required: true },
       { key: "shortDesc", label: "الوصف المختصر", type: "textarea" },
       { key: "fullDesc", label: "الوصف الكامل", type: "html" },
+      { key: "seo.metaTitle", label: "عنوان محرّكات البحث (SEO)", type: "text" },
+      { key: "seo.metaDescription", label: "وصف محرّكات البحث (SEO)", type: "textarea" },
     ],
   },
   projects: {
     key: "projects", table: "projects", labelAr: "الأعمال", singularAr: "مشروع",
-    titleField: "title",
+    titleField: "title", orderable: true, seo: false,
     fixed: [
       { key: "image", label: "الصورة", type: "image" },
       { key: "video", label: "رابط الفيديو", type: "text" },
@@ -62,7 +66,7 @@ export const CONTENT_TYPES: Record<string, ContentType> = {
   },
   posts: {
     key: "posts", table: "posts", labelAr: "المقالات", singularAr: "مقالة",
-    titleField: "title",
+    titleField: "title", orderable: false, seo: true,
     fixed: [
       { key: "featured_image", label: "الصورة", type: "image" },
       { key: "author_name", label: "الكاتب", type: "text" },
@@ -74,6 +78,8 @@ export const CONTENT_TYPES: Record<string, ContentType> = {
       { key: "title", label: "العنوان", type: "text", required: true },
       { key: "excerpt", label: "المقتطف", type: "textarea" },
       { key: "body", label: "نص المقالة", type: "html" },
+      { key: "seo.metaTitle", label: "عنوان محرّكات البحث (SEO)", type: "text" },
+      { key: "seo.metaDescription", label: "وصف محرّكات البحث (SEO)", type: "textarea" },
     ],
   },
 };

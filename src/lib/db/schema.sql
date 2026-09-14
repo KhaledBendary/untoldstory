@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS services (
   price       TEXT,
   is_featured BOOLEAN NOT NULL DEFAULT FALSE,
   sort_order  INTEGER NOT NULL DEFAULT 0,
+  status      TEXT NOT NULL DEFAULT 'published',   -- 'published' | 'draft'
   -- title, shortDesc, fullDesc, features, seo — each { en, ar, fr, ... }
   data        JSONB   NOT NULL DEFAULT '{}'::jsonb,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -41,8 +42,11 @@ CREATE TABLE IF NOT EXISTS projects (
   video_type    TEXT,
   category_slug TEXT,
   grid_size     TEXT,
+  duration      TEXT,             -- e.g. "Multi Day Documentary Shoot" (not translated)
+  budget        TEXT,
   is_featured   BOOLEAN NOT NULL DEFAULT FALSE,
   sort_order    INTEGER NOT NULL DEFAULT 0,
+  status        TEXT NOT NULL DEFAULT 'published',   -- 'published' | 'draft'
   -- title, client, category, description, results, metric — each { en, ar, ... }
   data          JSONB   NOT NULL DEFAULT '{}'::jsonb,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -60,6 +64,7 @@ CREATE TABLE IF NOT EXISTS posts (
   tags           TEXT[] NOT NULL DEFAULT '{}',
   is_featured    BOOLEAN NOT NULL DEFAULT FALSE,
   sort_order     INTEGER NOT NULL DEFAULT 0,
+  status         TEXT NOT NULL DEFAULT 'published',   -- 'published' | 'draft'
   published_at   TIMESTAMPTZ,
   -- title, excerpt, body, category, seo — each { en, ar, ... }
   data           JSONB   NOT NULL DEFAULT '{}'::jsonb,
@@ -97,6 +102,49 @@ CREATE TABLE IF NOT EXISTS media (
   alt         JSONB NOT NULL DEFAULT '{}'::jsonb,   -- { en, ar } alt text
   uploaded_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- ---------------------------------------------------------------------------
+-- Contact-form submissions. Stored first so a lead is never lost, even when the
+-- notification email fails. The dashboard inbox lists them and tracks a status.
+-- ---------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS messages (
+  id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  name        TEXT NOT NULL,
+  email       TEXT NOT NULL,
+  phone       TEXT,
+  service     TEXT,
+  message     TEXT NOT NULL,
+  locale      TEXT,
+  status      TEXT NOT NULL DEFAULT 'new',    -- new | read | replied | archived
+  emailed     BOOLEAN NOT NULL DEFAULT FALSE, -- did the notification email send
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS messages_created ON messages (created_at DESC);
+
+-- ---------------------------------------------------------------------------
+-- Anonymous visit log — one row per page view. No personal data: a per-tab
+-- session id (ephemeral), the path, where they came from (referrer + UTM),
+-- coarse geo from the edge, and device class. Powers the dashboard's traffic view.
+-- ---------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS visits (
+  id           BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  session      TEXT,
+  path         TEXT NOT NULL,
+  referrer     TEXT,
+  utm_source   TEXT,
+  utm_medium   TEXT,
+  utm_campaign TEXT,
+  country      TEXT,
+  city         TEXT,
+  device       TEXT,
+  locale       TEXT,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS visits_created ON visits (created_at DESC);
 
 -- ---------------------------------------------------------------------------
 -- Dashboard accounts. One or a few people, so no roles — an account can do

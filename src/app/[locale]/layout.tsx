@@ -1,9 +1,11 @@
+import "@/lib/db/register"; // server-only: publishes the DB content-source for api.ts
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import "../globals.css";
 import { Alexandria, Archivo, Inter, JetBrains_Mono } from "next/font/google";
 import SiteShell from "@/components/SiteShell";
+import Tracker from "@/components/Tracker";
 import StructuredData from "@/components/StructuredData";
 import { DEFAULT_LOCALE, PRERENDER_LOCALES, LOCALE_TAGS, OG_LOCALES, isLocale, localeDir, INDEXABLE_LOCALES, isIndexableLocale } from "@/lib/i18n";
 import { getCommandCenterSchemas } from "@/data/seo-command-schema";
@@ -377,6 +379,7 @@ return (
         {children}
       </SiteShell>
 
+      <Tracker />
     </body>
   </html>
 );

@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { currentSession } from "@/lib/admin-session";
 import { contentType } from "@/lib/admin/content-types";
 import { getByType } from "@/lib/db/repo";
+import { extractSeoForEditor } from "@/lib/admin/seo-fields";
 import ContentEditor from "./ContentEditor";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +21,8 @@ export default async function EditContent({ params }: { params: Promise<{ type: 
   for (const f of def.fixed) fixed[f.key] = row[f.key] ?? (f.type === "bool" ? false : "");
   const i18n: Record<string, Record<string, string>> = {};
   for (const f of def.i18n) i18n[f.key] = data[f.key] ?? {};
+  // seo.* fields live under the nested data.seo, not as flat keys.
+  Object.assign(i18n, extractSeoForEditor(data.seo as unknown as Record<string, Record<string, string>> | undefined, def));
 
   return (
     <ContentEditor
@@ -30,6 +33,7 @@ export default async function EditContent({ params }: { params: Promise<{ type: 
       labelAr={def.labelAr}
       initialFixed={fixed}
       initialI18n={i18n}
+      initialStatus={(row.status as string) ?? "published"}
     />
   );
 }
