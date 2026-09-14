@@ -38,7 +38,7 @@ function seoIdeal(key: string): number | null {
  * reasons, in Arabic, before anything is written.
  */
 export default function ContentEditor({
-  type, slug, fixedFields, i18nFields, labelAr, initialFixed, initialI18n, create = false, initialStatus = "published",
+  type, slug, fixedFields, i18nFields, labelAr, initialFixed, initialI18n, create = false, initialStatus = "published", aiEnabled = false,
 }: {
   type: string; slug: string;
   fixedFields: FixedField[]; i18nFields: I18nField[]; labelAr: string;
@@ -46,6 +46,7 @@ export default function ContentEditor({
   initialI18n: Record<string, Dict>;
   create?: boolean;
   initialStatus?: string;
+  aiEnabled?: boolean;
 }) {
   const router = useRouter();
   const [lang, setLang] = useState("en");
@@ -60,6 +61,14 @@ export default function ContentEditor({
   const [transWarn, setTransWarn] = useState<string>("");
   const [deployNote, setDeployNote] = useState<string>("");
   const [dirty, setDirty] = useState(false);
+  const [aiBusy, setAiBusy] = useState<string>("");   // "<action>:<key>" while running
+  const [aiError, setAiError] = useState<string>("");
+
+  // The main long-form field (for SEO/summary context) and the title field.
+  const bodyKey = i18nFields.find((f) => f.type === "html")?.key
+    ?? i18nFields.find((f) => f.type === "textarea")?.key ?? "";
+  const titleKey = i18nFields.find((f) => f.key === "title")?.key
+    ?? i18nFields.find((f) => f.type === "text")?.key ?? "";
 
   // Warn before leaving with unsaved changes.
   useEffect(() => {
@@ -77,6 +86,59 @@ export default function ContentEditor({
     setDirty(true);
     setFixed((prev) => ({ ...prev, [key]: v }));
   };
+
+  /** Call the writing assistant; returns the JSON payload or null on failure. */
+  async function callAi(payload: Record<string, unknown>): Promise<Record<string, string> | null> {
+    setAiError("");
+    try {
+      const res = await fetch("/api/admin/ai", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...payload, lang }),
+      });
+      const out = await res.json();
+      if (!res.ok) { setAiError(out.error || "خطأ في مساعد الكتابة"); return null; }
+      return out;
+    } catch {
+      setAiError("تعذّر الاتصال بمساعد الكتابة");
+      return null;
+    }
+  }
+
+  // Draft both SEO fields from the title + main body, for the current language.
+  async function aiGenerateSeo() {
+    setAiBusy("seo");
+    const out = await callAi({ action: "seo", title: i18n[titleKey]?.[lang] || "", body: i18n[bodyKey]?.[lang] || "" });
+    setAiBusy("");
+    if (!out) return;
+    setDirty(true);
+    setI18n((prev) => ({
+      ...prev,
+      "seo.metaTitle": { ...prev["seo.metaTitle"], [lang]: out.title || prev["seo.metaTitle"]?.[lang] || "" },
+      "seo.metaDescription": { ...prev["seo.metaDescription"], [lang]: out.description || prev["seo.metaDescription"]?.[lang] || "" },
+    }));
+  }
+
+  // Improve (polish) one field's own text in place.
+  async function aiImprove(key: string) {
+    const cur = i18n[key]?.[lang] || "";
+    if (!cur.trim()) { setAiError("اكتب نص الأول عشان أحسّنه"); return; }
+    setAiBusy(`improve:${key}`);
+    const out = await callAi({ action: "improve", text: cur });
+    setAiBusy("");
+    if (out?.text) setText(key, out.text);
+  }
+
+  // Summarize the main body into a shorter field (excerpt / short description).
+  async function aiSummarizeInto(key: string) {
+    const src = i18n[bodyKey]?.[lang] || "";
+    if (!src.trim()) { setAiError("اكتب المحتوى الأساسي الأول عشان ألخّصه"); return; }
+    setAiBusy(`summarize:${key}`);
+    const out = await callAi({ action: "summarize", text: src });
+    setAiBusy("");
+    if (out?.text) setText(key, out.text);
+  }
+
+  const aiBtn = { fontSize: 11, padding: "3px 9px", borderRadius: 6, borderColor: "var(--line)", color: "var(--accent)", cursor: "pointer" } as const;
 
   async function save() {
     setSaving(true); setSaved(false); setIssues([]); setTransWarn(""); setDeployNote("");
@@ -178,9 +240,33 @@ export default function ContentEditor({
       </div>
 
       {/* translatable fields */}
-      {i18nFields.map((f) => (
+      {i18nFields.map((f) => {
+        const isBody = f.type === "html" || f.type === "textarea";
+        const isExcerpt = /excerpt|short|summary/i.test(f.key);
+        return (
         <div key={f.key} style={{ display: "grid", gap: 6, marginBottom: 16 }}>
-          <span style={lbl}>{f.label}{f.required && lang === "en" ? " *" : ""}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={lbl}>{f.label}{f.required && lang === "en" ? " *" : ""}</span>
+            {aiEnabled && (
+              <span style={{ marginInlineStart: "auto", display: "flex", gap: 6 }}>
+                {f.key === "seo.metaTitle" && (
+                  <button type="button" onClick={aiGenerateSeo} disabled={!!aiBusy} style={aiBtn}>
+                    {aiBusy === "seo" ? "…بيكتب" : "✨ توليد السيو"}
+                  </button>
+                )}
+                {isBody && (
+                  <button type="button" onClick={() => aiImprove(f.key)} disabled={!!aiBusy} style={aiBtn}>
+                    {aiBusy === `improve:${f.key}` ? "…بيحسّن" : "✨ تحسين"}
+                  </button>
+                )}
+                {isExcerpt && bodyKey && bodyKey !== f.key && (
+                  <button type="button" onClick={() => aiSummarizeInto(f.key)} disabled={!!aiBusy} style={aiBtn}>
+                    {aiBusy === `summarize:${f.key}` ? "…بيلخّص" : "✨ تلخيص"}
+                  </button>
+                )}
+              </span>
+            )}
+          </div>
           {f.type === "text" ? (
             <input dir={dir} value={i18n[f.key]?.[lang] || ""} onChange={(e) => setText(f.key, e.target.value)} />
           ) : f.type === "html" ? (
@@ -197,7 +283,12 @@ export default function ContentEditor({
             </span>;
           })()}
         </div>
-      ))}
+        );
+      })}
+
+      {aiEnabled && aiError && (
+        <p style={{ color: "var(--danger)", fontSize: 12, margin: "-6px 2px 14px" }}>{aiError}</p>
+      )}
 
       {/* fixed fields */}
       <div style={{ borderTop: "1px solid var(--line)", marginTop: 8, paddingTop: 18, display: "grid", gap: 16 }}>

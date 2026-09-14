@@ -6,6 +6,7 @@ import { validateField, hasErrors, type Dict } from "@/lib/content-validate";
 import { applyMachineTranslations } from "@/lib/translate/apply";
 import { assembleSeo } from "@/lib/admin/seo-fields";
 import { triggerDeploy } from "@/lib/deploy";
+import { pingIndexNow, contentUrls } from "@/lib/indexnow";
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -57,5 +58,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   await logActivity({ actor: auth.session.email, action: "create", entity: type, ref: slug, detail: `الحالة: ${status}` });
   // Only a published new item changes the live site; a draft doesn't need a build.
   const deploy = status === "published" ? await triggerDeploy() : { triggered: false as const };
+  // Tell IndexNow about a newly published, indexable item. Best-effort.
+  if (status === "published" && !fixed.noindex) await pingIndexNow(contentUrls(type, slug));
   return NextResponse.json({ ok: true, slug, status, issues, translationWarning: warning, deploy });
 }

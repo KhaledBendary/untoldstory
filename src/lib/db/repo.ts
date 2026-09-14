@@ -117,10 +117,11 @@ export const getMedia = () =>
 
 export async function addMedia(m: {
   url: string; pathname: string; filename: string; content_type: string | null; size_bytes: number | null;
+  width?: number | null; height?: number | null;
 }) {
   const [row] = await sql<MediaRow[]>`
-    insert into media (url, pathname, filename, content_type, size_bytes)
-    values (${m.url}, ${m.pathname}, ${m.filename}, ${m.content_type}, ${m.size_bytes})
+    insert into media (url, pathname, filename, content_type, size_bytes, width, height)
+    values (${m.url}, ${m.pathname}, ${m.filename}, ${m.content_type}, ${m.size_bytes}, ${m.width ?? null}, ${m.height ?? null})
     returning *
   `;
   return row;
@@ -264,6 +265,37 @@ export async function dueScheduledCount(): Promise<number> {
   )::int as n`;
   return r.n;
 }
+
+// ---- redirects + 404 log ----
+
+export type RedirectRow = { id: number; from_path: string; to_path: string; created_at: Date };
+export type NotFoundRow = { path: string; hits: number; referrer: string | null; last_seen: Date };
+
+export async function recordNotFound(path: string, referrer: string | null) {
+  await sql`
+    insert into not_found_log (path, referrer, hits, last_seen)
+    values (${path}, ${referrer}, 1, now())
+    on conflict (path) do update set hits = not_found_log.hits + 1, last_seen = now(),
+      referrer = coalesce(excluded.referrer, not_found_log.referrer)`;
+}
+
+export const getNotFounds = (limit = 100) =>
+  sql<NotFoundRow[]>`select * from not_found_log order by hits desc, last_seen desc limit ${limit}`;
+
+export const clearNotFound = (path: string) =>
+  sql`delete from not_found_log where path = ${path}`;
+
+export const getRedirects = () =>
+  sql<RedirectRow[]>`select * from redirects order by created_at desc`;
+
+export async function addRedirect(fromPath: string, toPath: string) {
+  await sql`insert into redirects (from_path, to_path) values (${fromPath}, ${toPath})
+    on conflict (from_path) do update set to_path = excluded.to_path`;
+  await clearNotFound(fromPath); // it's handled now
+}
+
+export const deleteRedirect = (id: number) =>
+  sql`delete from redirects where id = ${id}`;
 
 // ---- dashboard overview ----
 

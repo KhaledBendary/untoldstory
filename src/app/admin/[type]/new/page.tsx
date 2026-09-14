@@ -1,6 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { currentSession } from "@/lib/admin-session";
 import { contentType } from "@/lib/admin/content-types";
+import { aiConfigured } from "@/lib/ai";
 import ContentEditor from "../[slug]/ContentEditor";
 
 export const dynamic = "force-dynamic";
@@ -27,6 +28,7 @@ export default async function NewContent({ params }: { params: Promise<{ type: s
       labelAr={def.labelAr}
       initialFixed={fixed}
       initialI18n={i18n}
+      aiEnabled={aiConfigured()}
     />
   );
 }

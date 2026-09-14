@@ -6,6 +6,7 @@ import { validateField, hasErrors, type Dict } from "@/lib/content-validate";
 import { applyMachineTranslations } from "@/lib/translate/apply";
 import { assembleSeo, extractSeoForEditor } from "@/lib/admin/seo-fields";
 import { triggerDeploy } from "@/lib/deploy";
+import { pingIndexNow, contentUrls } from "@/lib/indexnow";
 
 /** Save any content type. Guarded, then validated against that type's fields. */
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ type: string; slug: string }> }) {
@@ -56,6 +57,13 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   await saveByType(def.table, slug, fixed, data, status);
   await logActivity({ actor: auth.session.email, action: "update", entity: type, ref: slug, detail: status ? `الحالة: ${status}` : null });
   const deploy = await triggerDeploy();
+
+  // Tell IndexNow the moment a live, indexable item changes. Best-effort.
+  const effectiveStatus = status ?? existing.status;
+  const scheduled = fixed.scheduled_at ? new Date(String(fixed.scheduled_at)).getTime() : 0;
+  const isLive = effectiveStatus === "published" && !fixed.noindex && (!scheduled || scheduled <= Date.now());
+  if (isLive) await pingIndexNow(contentUrls(type, slug));
+
   return NextResponse.json({ ok: true, issues, translationWarning: warning, deploy });
 }
 

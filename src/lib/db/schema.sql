@@ -192,6 +192,25 @@ ALTER TABLE projects ADD COLUMN IF NOT EXISTS og_image TEXT;
 ALTER TABLE posts    ADD COLUMN IF NOT EXISTS og_image TEXT;
 
 -- ---------------------------------------------------------------------------
+-- Redirects (301) managed from the dashboard, applied at build via next.config,
+-- and a log of 404s so broken/missing URLs can be found and redirected.
+-- ---------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS redirects (
+  id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  from_path  TEXT NOT NULL UNIQUE,   -- e.g. /old-page
+  to_path    TEXT NOT NULL,          -- e.g. /work/new-slug
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS not_found_log (
+  path       TEXT PRIMARY KEY,
+  hits       INTEGER NOT NULL DEFAULT 1,
+  referrer   TEXT,
+  last_seen  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ---------------------------------------------------------------------------
 -- Indexes for the reads the site and dashboard actually make.
 -- ---------------------------------------------------------------------------
 

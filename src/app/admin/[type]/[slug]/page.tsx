@@ -3,6 +3,7 @@ import { currentSession } from "@/lib/admin-session";
 import { contentType } from "@/lib/admin/content-types";
 import { getByType } from "@/lib/db/repo";
 import { extractSeoForEditor } from "@/lib/admin/seo-fields";
+import { aiConfigured } from "@/lib/ai";
 import ContentEditor from "./ContentEditor";
 
 export const dynamic = "force-dynamic";
@@ -39,6 +40,7 @@ export default async function EditContent({ params }: { params: Promise<{ type: 
       initialFixed={fixed}
       initialI18n={i18n}
       initialStatus={(row.status as string) ?? "published"}
+      aiEnabled={aiConfigured()}
     />
   );
 }

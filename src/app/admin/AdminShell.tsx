@@ -21,6 +21,7 @@ const ICONS = {
   globe: "M12 3a9 9 0 100 18 9 9 0 000-18zM3 12h18M12 3c2.6 2.7 2.6 15.3 0 18M12 3c-2.6 2.7-2.6 15.3 0 18",
   clock: "M12 3a9 9 0 100 18 9 9 0 000-18zM12 7v5l4 2",
   search: "M11 4a7 7 0 100 14 7 7 0 000-14zM21 21l-4.3-4.3",
+  redirect: "M4 8h11a4 4 0 010 8H9M4 8l4-4M4 8l4 4",
 } as const;
 
 function Icon({ name }: { name: keyof typeof ICONS }) {
@@ -56,6 +57,7 @@ export default function AdminShell({
     { href: "/admin/pages", label: "الصفحات", icon: "layout" },
     { href: "/admin/translations", label: "الترجمة", icon: "globe" },
     { href: "/admin/seo", label: "السيو والفهرسة", icon: "search" },
+    { href: "/admin/redirects", label: "التحويلات", icon: "redirect" },
     { href: "/admin/messages", label: "الرسائل", icon: "mail", badge: newMessages },
     { href: "/admin/visits", label: "الزيارات", icon: "chart" },
     { href: "/admin/activity", label: "سجل النشاط", icon: "clock" },

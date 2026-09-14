@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { LOCALE_CODES, localeDir, localizedPath, type Locale } from "@/lib/i18n";
+import Track404 from "@/components/Track404";
 
 export const metadata: Metadata = {
   title: "Page not found | Global Untold Story",
@@ -41,6 +42,8 @@ export default function NotFoundPage() {
   const copy = COPY.en;
 
   return (
+    <>
+      <Track404 />
     <div className="grain bg-[#0a0a0a] min-h-screen text-[#fafafa] flex flex-col items-center justify-center px-5 text-center">
       <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/55 mb-6">( {copy.eyebrow} )</p>
 
@@ -85,5 +88,6 @@ export default function NotFoundPage() {
         ))}
       </nav>
     </div>
+    </>
   );
 }
