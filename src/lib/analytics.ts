@@ -68,6 +68,15 @@ export function trackLead(method: LeadMethod, params: Record<string, unknown> = 
   meta("Lead", { content_name: method, ...params });
 }
 
+/**
+ * The contact-form conversion is emitted only after its API request succeeds.
+ * The data-layer shape is kept explicit because the advertising container uses
+ * it to identify a completed form submission.
+ */
+export function trackContactFormSuccess(service?: string) {
+  trackLead("form", { service: service || "not specified" });
+}
+
 /** Someone started typing. The gap between this and generate_lead is the
  *  drop-off rate, which is the number worth watching on a long form. */
 export function trackFormStart() {

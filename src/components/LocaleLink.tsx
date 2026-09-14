@@ -20,5 +20,8 @@ export default function LocaleLink({ href, ...rest }: Props) {
   if (typeof href === "string" && href.startsWith("/") && !href.startsWith("//")) {
     return <NextLink href={localizedPath(href, locale)} {...rest} />;
   }
+  if (typeof href === 'object' && href.pathname?.startsWith('/') && !href.pathname.startsWith('//')) {
+    return <NextLink href={{ ...href, pathname: localizedPath(href.pathname, locale) }} {...rest} />;
+  }
   return <NextLink href={href} {...rest} />;
 }

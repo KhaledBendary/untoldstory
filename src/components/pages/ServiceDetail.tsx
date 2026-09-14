@@ -7,7 +7,7 @@ import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { SplitWords, Reveal } from '../Reveal';
 import Magnetic from '../Magnetic';
 import RetryState from '../RetryState';
-import { getServiceImage, getProjectImage } from '@/lib/utils';
+import { getServiceImagePosition, getServiceImage, getProjectImage } from '@/lib/utils';
 import type { Service, PortfolioItem } from '@/types/api';
 import { useLanguage } from '../LanguageContext';
 import { cleanHeadline, renderCmsHtml } from '@/lib/seo';
@@ -98,7 +98,7 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
       <section className="px-5 md:px-10 pb-14 md:pb-20">
         <Reveal>
           <div className="relative aspect-[16/8] overflow-hidden">
-            <Image src={getServiceImage(service)} alt={`${service.title} — Global Untold Story`} fill className="object-cover" />
+            <Image src={getServiceImage(service)} style={{ objectPosition: getServiceImagePosition(service) }} alt={`${service.title} — Global Untold Story`} fill className="object-cover" />
           </div>
         </Reveal>
       </section>

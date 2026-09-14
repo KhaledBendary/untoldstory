@@ -15,23 +15,22 @@ import { getAboutData } from '@/lib/page-data';
 // The /about API currently returns a single team member with corrupted
 // role/bio encoding. These fallback members keep the team section full and
 // polished in every language; any members returned by the API are merged in.
-const FALLBACK_TEAM = [
-  {
-    name: 'Khaled Bendary',
-    role: 'CEO',
-    slug: 'khaled-bendary',
-    bio: 'Founder of Global Untold Story, working across film, advertising, documentary and live production in Egypt, the Gulf and beyond.',
-  },
-];
-
-const FALLBACK_TEAM_AR = [
-  {
-    name: 'خالد بنداري',
-    role: 'الرئيس التنفيذي',
-    slug: 'khaled-bendary',
-    bio: 'مؤسس Global Untold Story، ويعمل في الأفلام والإعلانات والأفلام الوثائقية والإنتاج المباشر في مصر والخليج وخارجهما.',
-  },
-];
+const FALLBACK_TEAM_BY_LOCALE: Record<string, TeamMember[]> = {
+  en: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Founder of Global Untold Story, working across film, advertising, documentary and live production in Egypt, the Gulf and beyond.' }],
+  ar: [{ name: 'خالد بنداري', role: 'الرئيس التنفيذي', slug: 'khaled-bendary', bio: 'مؤسس Global Untold Story، ويعمل في الأفلام والإعلانات والأفلام الوثائقية والإنتاج المباشر في مصر والخليج وخارجهما.' }],
+  de: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Gründer von Global Untold Story und tätig in Film, Werbung, Dokumentarfilm und Live-Produktion in Ägypten, der Golfregion und darüber hinaus.' }],
+  es: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Fundador de Global Untold Story, trabaja en cine, publicidad, documentales y producción en directo en Egipto, el Golfo y otros mercados.' }],
+  fr: [{ name: 'Khaled Bendary', role: 'PDG', slug: 'khaled-bendary', bio: 'Fondateur de Global Untold Story, il travaille dans le cinéma, la publicité, le documentaire et la production en direct en Égypte, dans le Golfe et au-delà.' }],
+  it: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Fondatore di Global Untold Story, lavora nel cinema, nella pubblicità, nei documentari e nelle produzioni dal vivo in Egitto, nel Golfo e oltre.' }],
+  pt: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Fundador da Global Untold Story, trabalha em cinema, publicidade, documentários e produção em direto no Egito, no Golfo e além.' }],
+  tr: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Global Untold Story’nin kurucusu; Mısır, Körfez bölgesi ve ötesinde film, reklam, belgesel ve canlı prodüksiyon alanlarında çalışır.' }],
+  ru: [{ name: 'Khaled Bendary', role: 'Генеральный директор', slug: 'khaled-bendary', bio: 'Основатель Global Untold Story, работающий в кино, рекламе, документальных фильмах и прямых эфирах в Египте, странах Персидского залива и за их пределами.' }],
+  zh: [{ name: 'Khaled Bendary', role: '首席执行官', slug: 'khaled-bendary', bio: 'Global Untold Story 创始人，业务涵盖埃及、海湾地区及其他市场的电影、广告、纪录片和现场直播制作。' }],
+  ja: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Global Untold Storyの創設者。エジプト、湾岸地域、その先で映画、広告、ドキュメンタリー、ライブ制作に携わっています。' }],
+  ko: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Global Untold Story의 창립자로서 이집트와 걸프 지역을 비롯한 시장에서 영화, 광고, 다큐멘터리 및 라이브 제작을 이끌고 있습니다.' }],
+  pl: [{ name: 'Khaled Bendary', role: 'Dyrektor generalny', slug: 'khaled-bendary', bio: 'Założyciel Global Untold Story, działający w obszarze filmu, reklamy, dokumentu i produkcji na żywo w Egipcie, krajach Zatoki i poza nimi.' }],
+  sw: [{ name: 'Khaled Bendary', role: 'Mkurugenzi Mkuu', slug: 'khaled-bendary', bio: 'Mwanzilishi wa Global Untold Story, anayefanya kazi katika filamu, matangazo, filamu za uhalisia na utayarishaji wa moja kwa moja nchini Misri, Ghuba na kwingineko.' }],
+};
 
 /** Shape shared by the API's team records and the editorial fallback list. */
 type TeamMember = {
@@ -55,7 +54,7 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
   }
 
   const apiTeam = aboutData?.team || [];
-  const fallbackTeam = locale === 'ar' ? FALLBACK_TEAM_AR : FALLBACK_TEAM;
+  const fallbackTeam = FALLBACK_TEAM_BY_LOCALE[locale] ?? FALLBACK_TEAM_BY_LOCALE.en;
   // If the API's team member role/bio came back as mojibake (????), prefer
   // the clean fallback role while keeping the API's photo when available.
   const cleanRole = (m: TeamMember | undefined, fb: TeamMember) => {
@@ -98,11 +97,11 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
   return (
     <>
       <section className="px-5 md:px-10 pt-32 md:pt-44 pb-16 md:pb-24">
-        <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-6">( {aboutData?.page?.badge || t('About')} )</p>
+        <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-6">( {t(aboutData?.page?.badge || 'About')} )</p>
         <SplitWords
           as="h1"
           text={t("About Global Untold Story")}
-          className="font-display font-black uppercase tracking-tight leading-[0.9] text-[12vw] md:text-[7.5vw] max-w-6xl"
+          className="font-display font-black uppercase tracking-tight leading-[0.9] text-[5vw] w-full whitespace-nowrap"
         />
       </section>
 
@@ -119,7 +118,7 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
             />
             <Reveal>
               <p className="text-white/60 leading-relaxed max-w-2xl">
-                {aboutData?.page?.subtitle || t('Under the leadership of CEO Khaled Bendary, our team owns the complete production cycle: strategy and planning, filming, live execution, post-production, delivery and localization. Brands, platforms, broadcasters, institutions and international crews trust us with the stories that matter most to them — and 90% come back for the next one.')}
+                {t(aboutData?.page?.subtitle || 'Under the leadership of CEO Khaled Bendary, our team owns the complete production cycle: strategy and planning, filming, live execution, post-production, delivery and localization. Brands, platforms, broadcasters, institutions and international crews trust us with the stories that matter most to them — and 90% come back for the next one.')}
               </p>
             </Reveal>
             <Reveal>
@@ -189,7 +188,7 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
           <Marquee duration={45}>
             {partnerLabels.map((label: string, i: number) => (
               <span key={i} className="font-display font-extrabold uppercase text-3xl md:text-5xl mx-6 text-outline whitespace-nowrap">
-                {label}
+                {t(label)}
               </span>
             ))}
           </Marquee>

@@ -1,17 +1,19 @@
 "use client";
 
 import { trackContactClick } from "@/lib/analytics";
+import { useLanguage } from "./LanguageContext";
 
 const WHATSAPP_NUMBER = "201001299639";
 
 export default function WhatsAppButton() {
+  const { t } = useLanguage();
   return (
     <a
       href={`https://wa.me/${WHATSAPP_NUMBER}`}
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => trackContactClick("whatsapp")}
-      aria-label="Chat with us on WhatsApp"
+      aria-label={t('Chat with us on WhatsApp')}
       className="fixed bottom-5 right-5 md:bottom-8 md:right-8 z-[200] w-14 h-14 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform duration-300"
     >
       <svg viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7">
