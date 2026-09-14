@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/admin-guard";
 import { contentType } from "@/lib/admin/content-types";
-import { getByType, saveByType, deleteByType } from "@/lib/db/repo";
+import { getByType, saveByType, deleteByType, logActivity } from "@/lib/db/repo";
 import { validateField, hasErrors, type Dict } from "@/lib/content-validate";
 import { applyMachineTranslations } from "@/lib/translate/apply";
 import { assembleSeo, extractSeoForEditor } from "@/lib/admin/seo-fields";
@@ -54,6 +54,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   const status = body.status === "published" || body.status === "draft" ? body.status : undefined;
   await saveByType(def.table, slug, fixed, data, status);
+  await logActivity({ actor: auth.session.email, action: "update", entity: type, ref: slug, detail: status ? `الحالة: ${status}` : null });
   const deploy = await triggerDeploy();
   return NextResponse.json({ ok: true, issues, translationWarning: warning, deploy });
 }
@@ -71,6 +72,7 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
   }
 
   await deleteByType(def.table, slug);
+  await logActivity({ actor: auth.session.email, action: "delete", entity: type, ref: slug });
   const deploy = await triggerDeploy();
   return NextResponse.json({ ok: true, deploy });
 }

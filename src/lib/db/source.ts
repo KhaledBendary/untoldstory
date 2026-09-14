@@ -41,8 +41,11 @@ function cached<T>(key: string, load: () => Promise<T>): Promise<T> {
   return value;
 }
 
-// The public site only ever sees published rows; drafts exist only in the dashboard.
-const isPublished = <T extends { status: string }>(r: T) => r.status === "published";
+// The public site only ever sees published rows whose schedule (if any) has
+// arrived; drafts and not-yet-due scheduled items exist only in the dashboard.
+const isLive = <T extends { status: string; scheduled_at?: Date | null }>(r: T) =>
+  r.status === "published" && (!r.scheduled_at || new Date(r.scheduled_at).getTime() <= Date.now());
+const isPublished = isLive;
 const allServices = async () => (await cached<ServiceRow[]>("services", getServices)).filter(isPublished);
 const allProjects = async () => (await cached<ProjectRow[]>("projects", getProjects)).filter(isPublished);
 const allPosts = async () => (await cached<PostRow[]>("posts", getPosts)).filter(isPublished);

@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/admin-guard";
 import { contentType } from "@/lib/admin/content-types";
-import { getByType, duplicateByType } from "@/lib/db/repo";
+import { getByType, duplicateByType, logActivity } from "@/lib/db/repo";
 
 /** Duplicate an item as a new draft with a free "-copy" slug. */
 export async function POST(_request: NextRequest, { params }: { params: Promise<{ type: string; slug: string }> }) {
@@ -18,5 +18,6 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
   for (let i = 2; await getByType(def.table, newSlug); i++) newSlug = `${slug}-copy-${i}`;
 
   await duplicateByType(def.table, slug, newSlug);
+  await logActivity({ actor: auth.session.email, action: "duplicate", entity: type, ref: newSlug, detail: `من ${slug}` });
   return NextResponse.json({ ok: true, slug: newSlug });
 }

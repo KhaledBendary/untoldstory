@@ -36,6 +36,9 @@ export const CONTENT_TYPES: Record<string, ContentType> = {
       { key: "price", label: "السعر", type: "text" },
       { key: "image_url", label: "رابط الصورة", type: "image" },
       { key: "is_featured", label: "خدمة مميّزة", type: "bool" },
+      { key: "og_image", label: "صورة المشاركة (OG)", type: "image" },
+      { key: "noindex", label: "إخفاء من محركات البحث", type: "bool" },
+      { key: "scheduled_at", label: "موعد النشر (اختياري)", type: "date" },
     ],
     i18n: [
       { key: "title", label: "العنوان", type: "text", required: true },
@@ -53,6 +56,9 @@ export const CONTENT_TYPES: Record<string, ContentType> = {
       { key: "video", label: "رابط الفيديو", type: "text" },
       { key: "category_slug", label: "تصنيف (بالإنجليزي)", type: "text" },
       { key: "is_featured", label: "مشروع مميّز", type: "bool" },
+      { key: "og_image", label: "صورة المشاركة (OG)", type: "image" },
+      { key: "noindex", label: "إخفاء من محركات البحث", type: "bool" },
+      { key: "scheduled_at", label: "موعد النشر (اختياري)", type: "date" },
     ],
     i18n: [
       { key: "title", label: "العنوان", type: "text", required: true },
@@ -75,6 +81,9 @@ export const CONTENT_TYPES: Record<string, ContentType> = {
       { key: "category_slug", label: "تصنيف (بالإنجليزي)", type: "text" },
       { key: "read_minutes", label: "دقائق القراءة", type: "number" },
       { key: "is_featured", label: "مقالة مميّزة", type: "bool" },
+      { key: "og_image", label: "صورة المشاركة (OG)", type: "image" },
+      { key: "noindex", label: "إخفاء من محركات البحث", type: "bool" },
+      { key: "scheduled_at", label: "موعد النشر (اختياري)", type: "date" },
     ],
     i18n: [
       { key: "title", label: "العنوان", type: "text", required: true },

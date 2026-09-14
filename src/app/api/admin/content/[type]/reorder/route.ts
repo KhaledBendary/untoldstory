@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/admin-guard";
 import { contentType } from "@/lib/admin/content-types";
-import { reorderByType } from "@/lib/db/repo";
+import { reorderByType, logActivity } from "@/lib/db/repo";
 import { triggerDeploy } from "@/lib/deploy";
 
 /** Save a new display order for a content type (writes sort_order per slug). */
@@ -21,6 +21,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   await reorderByType(def.table, slugs);
+  await logActivity({ actor: auth.session.email, action: "reorder", entity: type, detail: `${slugs.length} عنصر` });
   const deploy = await triggerDeploy();
   return NextResponse.json({ ok: true, deploy });
 }

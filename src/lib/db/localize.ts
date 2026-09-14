@@ -18,9 +18,17 @@ const pickArr = (d: Record<string, unknown> | undefined, loc: string): unknown[]
   return Array.isArray(v) ? v : [];
 };
 
+// Per-locale seo object, merged with a custom OG image column when set.
+function seoWith(seoDoc: unknown, loc: string, ogImage: string | null): Record<string, unknown> | undefined {
+  const doc = seoDoc as Record<string, unknown> | undefined;
+  const base = (doc?.[loc] ?? doc?.en) as Record<string, unknown> | undefined;
+  if (ogImage) return { ...(base ?? {}), ogImageUrl: ogImage };
+  return base;
+}
+
 export function localizeService(r: ServiceRow, loc: string) {
   const d = r.data;
-  const seo = (d.seo as Record<string, unknown>)?.[loc] ?? (d.seo as Record<string, unknown>)?.en;
+  const seo = seoWith(d.seo, loc, r.og_image);
   return {
     id: r.slug,
     slug: r.slug,
@@ -28,6 +36,7 @@ export function localizeService(r: ServiceRow, loc: string) {
     imageUrl: r.image_url ?? "",
     price: r.price ?? "",
     isFeatured: r.is_featured,
+    noindex: r.noindex,
     title: pick(d.title, loc),
     shortDesc: pick(d.shortDesc, loc),
     fullDesc: pick(d.fullDesc, loc),
@@ -40,10 +49,11 @@ export function localizeService(r: ServiceRow, loc: string) {
 
 export function localizeProject(r: ProjectRow, loc: string) {
   const d = r.data;
-  const seo = (d.seo as Record<string, unknown>)?.[loc] ?? (d.seo as Record<string, unknown>)?.en;
+  const seo = seoWith(d.seo, loc, r.og_image);
   return {
     slug: r.slug,
     title: pick(d.title, loc),
+    noindex: r.noindex,
     ...(seo ? { seo } : {}),
     shortDescription: pickN(d.shortDescription, loc),
     description: pickN(d.description, loc),
@@ -87,17 +97,13 @@ export function localizePostCard(r: PostRow, loc: string) {
 
 /** Blog detail — the card plus the article body and per-locale seo. */
 export function localizePost(r: PostRow, loc: string) {
-  const seo = d_seo(r, loc);
+  const seo = seoWith(r.data.seo, loc, r.og_image);
   return {
     ...localizePostCard(r, loc),
+    noindex: r.noindex,
     body: pick(r.data.body, loc),
     ...(seo ? { seo } : {}),
   };
-}
-
-function d_seo(r: PostRow, loc: string): Record<string, unknown> | null {
-  const seo = r.data.seo as Record<string, unknown> | undefined;
-  return (seo?.[loc] as Record<string, unknown>) ?? (seo?.en as Record<string, unknown>) ?? null;
 }
 
 /** A singleton is stored as { en: doc, ar: doc, … }; return one locale's doc. */

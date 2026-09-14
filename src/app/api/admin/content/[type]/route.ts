@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/admin-guard";
 import { contentType } from "@/lib/admin/content-types";
-import { getByType, createByType } from "@/lib/db/repo";
+import { getByType, createByType, logActivity } from "@/lib/db/repo";
 import { validateField, hasErrors, type Dict } from "@/lib/content-validate";
 import { applyMachineTranslations } from "@/lib/translate/apply";
 import { assembleSeo } from "@/lib/admin/seo-fields";
@@ -54,6 +54,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const status = body.status === "published" ? "published" : "draft";
   await createByType(def.table, slug, fixed, data, status);
+  await logActivity({ actor: auth.session.email, action: "create", entity: type, ref: slug, detail: `الحالة: ${status}` });
   // Only a published new item changes the live site; a draft doesn't need a build.
   const deploy = status === "published" ? await triggerDeploy() : { triggered: false as const };
   return NextResponse.json({ ok: true, slug, status, issues, translationWarning: warning, deploy });

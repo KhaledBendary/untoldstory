@@ -9,7 +9,7 @@ import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/li
 import { IS_PRODUCTION_BUILD, findPostAnyLocale, postDetailWithFallback } from "@/lib/page-data";
 import { POSTS as FALLBACK_POSTS } from "@/data/content";
 import { postStaticParams, relatedPostSlugs } from "@/lib/legacy-redirects";
-import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo } from "@/lib/seo";
+import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo, withNoindex } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const post = detail?.status === "ok" ? detail.data.post : null;
     if (post) {
       const meta = cmsSeo(post.seo as Record<string, unknown> | undefined);
-      return postMeta(path, locale, buildTitle(meta.metaTitle || post.title, slug), buildDescription(meta.metaDescription || post.excerpt, post.title), meta.ogImageUrl || post.featuredImage, post.publishedAt);
+      return withNoindex(postMeta(path, locale, buildTitle(meta.metaTitle || post.title, slug), buildDescription(meta.metaDescription || post.excerpt, post.title), meta.ogImageUrl || post.featuredImage, post.publishedAt), (post as { noindex?: boolean }).noindex);
     }
     return postMeta(path, locale, fallbackTitle, fallbackTitle);
   }

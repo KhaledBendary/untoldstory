@@ -10,7 +10,7 @@ import { IS_PRODUCTION_BUILD, findServiceAnyLocale, serviceDetailWithFallback } 
 import { SERVICES as FALLBACK_SERVICES } from "@/data/content";
 import { relatedServiceSlugs, serviceStaticParams } from "@/lib/legacy-redirects";
 import { getServiceFaqs } from "@/data/service-faqs";
-import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo } from "@/lib/seo";
+import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo, withNoindex } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -59,12 +59,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const service = detail?.status === "ok" ? detail.data.service : null;
     if (service) {
       const meta = cmsSeo(service.seo);
-      return serviceMeta(
+      return withNoindex(serviceMeta(
         path, locale,
         buildTitle(meta.metaTitle || service.title, slug),
         buildDescription(meta.metaDescription || service.shortDesc),
         meta.ogImageUrl || service.imageUrl,
-      );
+      ), (service as { noindex?: boolean }).noindex);
     }
     return serviceMeta(path, locale, fallbackTitle, fallbackTitle);
   }

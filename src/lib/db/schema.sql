@@ -161,6 +161,37 @@ CREATE TABLE IF NOT EXISTS admin_users (
 );
 
 -- ---------------------------------------------------------------------------
+-- Activity log — who changed / published / deleted what, and when.
+-- ---------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS audit_log (
+  id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  actor       TEXT,                 -- admin email
+  action      TEXT NOT NULL,        -- create | update | delete | publish | unpublish | reorder | duplicate
+  entity      TEXT NOT NULL,        -- services | projects | posts | pages | blocks | message
+  ref         TEXT,                 -- slug / key / id
+  detail      TEXT,                 -- short human note
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS audit_created ON audit_log (created_at DESC);
+
+-- ---------------------------------------------------------------------------
+-- Per-item SEO/scheduling controls added after the initial schema.
+--   noindex      — keep this item's page out of search engines
+--   scheduled_at — if set in the future, the item stays hidden until then
+-- ---------------------------------------------------------------------------
+
+ALTER TABLE services ADD COLUMN IF NOT EXISTS noindex BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS noindex BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE posts    ADD COLUMN IF NOT EXISTS noindex BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE services ADD COLUMN IF NOT EXISTS scheduled_at TIMESTAMPTZ;
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS scheduled_at TIMESTAMPTZ;
+ALTER TABLE posts    ADD COLUMN IF NOT EXISTS scheduled_at TIMESTAMPTZ;
+ALTER TABLE services ADD COLUMN IF NOT EXISTS og_image TEXT;   -- custom social-share image
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS og_image TEXT;
+ALTER TABLE posts    ADD COLUMN IF NOT EXISTS og_image TEXT;
+
+-- ---------------------------------------------------------------------------
 -- Indexes for the reads the site and dashboard actually make.
 -- ---------------------------------------------------------------------------
 

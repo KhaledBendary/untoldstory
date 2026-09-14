@@ -8,7 +8,7 @@ import { api } from "@/lib/api";
 import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
 import { IS_PRODUCTION_BUILD, findProjectAnyLocale, projectDetailWithFallback } from "@/lib/page-data";
 import { PROJECTS as FALLBACK_PROJECTS } from "@/data/content";
-import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo } from "@/lib/seo";
+import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo, withNoindex } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -73,7 +73,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     if (project) {
       const headline = projectHeadline(project.title, project.client, slug);
       const m = cmsSeo((project as { seo?: Record<string, unknown> }).seo);
-      return projectMeta(path, locale, buildTitle(m.metaTitle || headline, slug), buildDescription(m.metaDescription || project.results, headline), m.ogImageUrl || project.image);
+      return withNoindex(projectMeta(path, locale, buildTitle(m.metaTitle || headline, slug), buildDescription(m.metaDescription || project.results, headline), m.ogImageUrl || project.image), (project as { noindex?: boolean }).noindex);
     }
     return projectMeta(path, locale, fallbackTitle, fallbackTitle);
   }

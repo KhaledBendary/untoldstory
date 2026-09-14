@@ -213,6 +213,12 @@ export default function ContentEditor({
               <span style={lbl}>{f.label}</span>
               <ImagePicker value={String(fixed[f.key] ?? "")} onChange={(url) => setFixedVal(f.key, url)} />
             </div>
+          ) : f.type === "date" ? (
+            <div key={f.key} style={{ display: "grid", gap: 6 }}>
+              <span style={lbl}>{f.label}</span>
+              <input type="date" dir="ltr" style={{ maxWidth: 200 }}
+                value={String(fixed[f.key] ?? "")} onChange={(e) => setFixedVal(f.key, e.target.value)} />
+            </div>
           ) : (
             <div key={f.key} style={{ display: "grid", gap: 6 }}>
               <span style={lbl}>{f.label}</span>

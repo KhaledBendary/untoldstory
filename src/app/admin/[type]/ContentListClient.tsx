@@ -22,6 +22,30 @@ export default function ContentListClient({ type, orderable, initial }: {
   const [saved, setSaved] = useState(false);
   const [q, setQ] = useState("");
   const [dupBusy, setDupBusy] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+
+  const toggle = (slug: string) => setSelected((prev) => {
+    const n = new Set(prev); n.has(slug) ? n.delete(slug) : n.add(slug); return n;
+  });
+
+  async function bulk(action: "publish" | "unpublish" | "delete") {
+    const slugs = [...selected];
+    if (!slugs.length) return;
+    if (action === "delete" && !confirm(`متأكد إنك عايز تمسح ${slugs.length} عنصر نهائياً؟`)) return;
+    setBulkBusy(true);
+    try {
+      const res = await fetch(`/api/admin/content/${type}/bulk`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slugs, action }),
+      });
+      if (res.ok) {
+        if (action === "delete") setRows((prev) => prev.filter((r) => !selected.has(r.slug)));
+        else setRows((prev) => prev.map((r) => (selected.has(r.slug) ? { ...r, draft: action === "unpublish" } : r)));
+        setSelected(new Set());
+      }
+    } finally { setBulkBusy(false); }
+  }
 
   const query = q.trim().toLowerCase();
   const shown = useMemo(
@@ -68,6 +92,10 @@ export default function ContentListClient({ type, orderable, initial }: {
       <div style={{ display: "grid", gap: 8 }}>
         {shown.map((r, i) => (
           <div key={r.slug} style={{ display: "flex", alignItems: "stretch", gap: 8 }}>
+            <label style={{ display: "flex", alignItems: "center", paddingInline: 2 }}>
+              <input type="checkbox" checked={selected.has(r.slug)} onChange={() => toggle(r.slug)}
+                style={{ width: 17, height: 17 }} />
+            </label>
             {canReorder && (
               <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <button onClick={() => move(i, -1)} disabled={i === 0} title="لأعلى"
@@ -100,6 +128,18 @@ export default function ContentListClient({ type, orderable, initial }: {
           </div>
         ))}
       </div>
+      )}
+
+      {selected.size > 0 && (
+        <div style={{ position: "sticky", bottom: 0, marginTop: 12, padding: "10px 12px", background: "var(--panel)",
+          border: "1px solid var(--accent)", borderRadius: 10, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>{selected.size} مختار</span>
+          <button onClick={() => bulk("publish")} disabled={bulkBusy} style={{ fontSize: 13, padding: "6px 12px" }}>نشر</button>
+          <button onClick={() => bulk("unpublish")} disabled={bulkBusy} style={{ fontSize: 13, padding: "6px 12px" }}>تحويل لمسودّة</button>
+          <button onClick={() => bulk("delete")} disabled={bulkBusy}
+            style={{ fontSize: 13, padding: "6px 12px", color: "var(--danger)", borderColor: "var(--line)" }}>حذف</button>
+          <button onClick={() => setSelected(new Set())} style={{ marginInlineStart: "auto", fontSize: 13, padding: "6px 10px" }}>إلغاء التحديد</button>
+        </div>
       )}
 
       {orderable && (dirty || saved) && (

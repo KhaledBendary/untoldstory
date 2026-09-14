@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/admin-guard";
 import { singletonBlock, type SingletonBlock } from "@/lib/admin/blocks";
 import { setPath } from "@/lib/admin/singleton-fields";
-import { getSingleton, saveSingletonArray } from "@/lib/db/repo";
+import { getSingleton, saveSingletonArray, logActivity } from "@/lib/db/repo";
 import { validateField, hasErrors, type Dict } from "@/lib/content-validate";
 import { translateBlockItems } from "@/lib/translate/apply";
 import { LOCALE_CODES } from "@/lib/i18n";
@@ -87,6 +87,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   }
 
   await saveSingletonArray(def.singleton, def.path, arrays, setPath);
+  await logActivity({ actor: auth.session.email, action: "update", entity: "blocks", ref: def.key });
   const deploy = await triggerDeploy();
   return NextResponse.json({ ok: true, translationWarning: warning, deploy });
 }

@@ -11,13 +11,15 @@ import { sql } from "@/lib/db/client";
 
 export type Dict = Record<string, string>;
 
-export type ServiceRow = {
+type Meta = { noindex: boolean; scheduled_at: Date | null; og_image: string | null };
+
+export type ServiceRow = Meta & {
   id: number; slug: string; icon: string | null; image_url: string | null;
   price: string | null; is_featured: boolean; sort_order: number; status: string;
   data: { title?: Dict; shortDesc?: Dict; fullDesc?: Dict; features?: Record<string, unknown>; seo?: Record<string, unknown> };
 };
 
-export type ProjectRow = {
+export type ProjectRow = Meta & {
   id: number; slug: string; image: string | null; video: string | null;
   video_embed: string | null; video_type: string | null; category_slug: string | null;
   grid_size: string | null; duration: string | null; budget: string | null;
@@ -25,7 +27,7 @@ export type ProjectRow = {
   data: { title?: Dict; client?: Dict; category?: Dict; shortDescription?: Dict; description?: Dict; results?: Dict; metric?: Dict; seo?: Record<string, unknown> };
 };
 
-export type PostRow = {
+export type PostRow = Meta & {
   id: number; slug: string; featured_image: string | null; author_name: string | null;
   author_image: string | null; category_slug: string | null; read_minutes: number | null;
   tags: string[]; is_featured: boolean; sort_order: number; published_at: Date | null; status: string;
@@ -215,6 +217,54 @@ export async function visitStats(days = 30) {
   return { totals, topPages, sources, campaigns, countries };
 }
 
+// ---- activity log ----
+
+export type AuditRow = {
+  id: number; actor: string | null; action: string; entity: string;
+  ref: string | null; detail: string | null; created_at: Date;
+};
+
+export async function logActivity(a: {
+  actor?: string | null; action: string; entity: string; ref?: string | null; detail?: string | null;
+}) {
+  try {
+    await sql`insert into audit_log (actor, action, entity, ref, detail)
+      values (${a.actor ?? null}, ${a.action}, ${a.entity}, ${a.ref ?? null}, ${a.detail ?? null})`;
+  } catch (e) {
+    console.error("audit log failed:", e); // never block the real action on logging
+  }
+}
+
+export const getActivity = (limit = 100) =>
+  sql<AuditRow[]>`select * from audit_log order by created_at desc limit ${limit}`;
+
+// ---- bulk actions ----
+
+export async function bulkSetStatus(type: keyof typeof TABLES, slugs: string[], status: "published" | "draft") {
+  if (!slugs.length) return;
+  if (type === "services") await sql`update services set status=${status}, updated_at=now() where slug in ${sql(slugs)}`;
+  else if (type === "projects") await sql`update projects set status=${status}, updated_at=now() where slug in ${sql(slugs)}`;
+  else await sql`update posts set status=${status}, updated_at=now() where slug in ${sql(slugs)}`;
+}
+
+export async function bulkDelete(type: keyof typeof TABLES, slugs: string[]) {
+  if (!slugs.length) return;
+  if (type === "services") await sql`delete from services where slug in ${sql(slugs)}`;
+  else if (type === "projects") await sql`delete from projects where slug in ${sql(slugs)}`;
+  else await sql`delete from posts where slug in ${sql(slugs)}`;
+}
+
+/** How many items became due (their schedule passed) in the last ~day — for the rebuild cron. */
+export async function dueScheduledCount(): Promise<number> {
+  const cond = `status='published' and scheduled_at is not null and scheduled_at <= now() and scheduled_at > now() - interval '2 days'`;
+  const [r] = await sql<{ n: number }[]>`select (
+    (select count(*) from services where ${sql.unsafe(cond)}) +
+    (select count(*) from projects where ${sql.unsafe(cond)}) +
+    (select count(*) from posts    where ${sql.unsafe(cond)})
+  )::int as n`;
+  return r.n;
+}
+
 // ---- dashboard overview ----
 
 export async function counts() {
@@ -264,18 +314,19 @@ export async function saveByType(
   const f = fixed;
   const st = status ?? (current?.status as string | undefined) ?? "published";
 
+  const meta = sql`noindex=${bool(f.noindex)}, scheduled_at=${dt(f.scheduled_at)}, og_image=${str(f.og_image)}`;
   if (type === "services") {
     await sql`update services set icon=${str(f.icon)}, price=${str(f.price)},
-      image_url=${str(f.image_url)}, is_featured=${bool(f.is_featured)}, status=${st},
+      image_url=${str(f.image_url)}, is_featured=${bool(f.is_featured)}, status=${st}, ${meta},
       data=${data}, updated_at=now() where slug=${slug}`;
   } else if (type === "projects") {
     await sql`update projects set image=${str(f.image)}, video=${str(f.video)},
       category_slug=${str(f.category_slug)}, duration=${str(f.duration)}, budget=${str(f.budget)},
-      is_featured=${bool(f.is_featured)}, status=${st},
+      is_featured=${bool(f.is_featured)}, status=${st}, ${meta},
       data=${data}, updated_at=now() where slug=${slug}`;
   } else {
     await sql`update posts set featured_image=${str(f.featured_image)}, author_name=${str(f.author_name)},
-      category_slug=${str(f.category_slug)}, read_minutes=${num(f.read_minutes)}, is_featured=${bool(f.is_featured)}, status=${st},
+      category_slug=${str(f.category_slug)}, read_minutes=${num(f.read_minutes)}, is_featured=${bool(f.is_featured)}, status=${st}, ${meta},
       data=${data}, updated_at=now() where slug=${slug}`;
   }
 }
@@ -283,6 +334,7 @@ export async function saveByType(
 const str = (v: unknown) => (typeof v === "string" && v !== "" ? v : null);
 const bool = (v: unknown) => Boolean(v);
 const num = (v: unknown) => (v === "" || v == null ? null : Number(v));
+const dt = (v: unknown) => (typeof v === "string" && v.trim() ? v : null);
 
 /**
  * Create a new content row. The slug is the record's identity and must be unique
@@ -300,15 +352,15 @@ export async function createByType(
   const f = fixed;
 
   if (type === "services") {
-    await sql`insert into services (slug, icon, price, image_url, is_featured, status, data)
-      values (${slug}, ${str(f.icon)}, ${str(f.price)}, ${str(f.image_url)}, ${bool(f.is_featured)}, ${status}, ${d})`;
+    await sql`insert into services (slug, icon, price, image_url, is_featured, status, noindex, scheduled_at, og_image, data)
+      values (${slug}, ${str(f.icon)}, ${str(f.price)}, ${str(f.image_url)}, ${bool(f.is_featured)}, ${status}, ${bool(f.noindex)}, ${dt(f.scheduled_at)}, ${str(f.og_image)}, ${d})`;
   } else if (type === "projects") {
-    await sql`insert into projects (slug, image, video, category_slug, is_featured, status, data)
-      values (${slug}, ${str(f.image)}, ${str(f.video)}, ${str(f.category_slug)}, ${bool(f.is_featured)}, ${status}, ${d})`;
+    await sql`insert into projects (slug, image, video, category_slug, is_featured, status, noindex, scheduled_at, og_image, data)
+      values (${slug}, ${str(f.image)}, ${str(f.video)}, ${str(f.category_slug)}, ${bool(f.is_featured)}, ${status}, ${bool(f.noindex)}, ${dt(f.scheduled_at)}, ${str(f.og_image)}, ${d})`;
   } else {
-    await sql`insert into posts (slug, featured_image, author_name, category_slug, read_minutes, is_featured, status, published_at, data)
+    await sql`insert into posts (slug, featured_image, author_name, category_slug, read_minutes, is_featured, status, noindex, scheduled_at, og_image, published_at, data)
       values (${slug}, ${str(f.featured_image)}, ${str(f.author_name)}, ${str(f.category_slug)},
-        ${num(f.read_minutes)}, ${bool(f.is_featured)}, ${status}, now(), ${d})`;
+        ${num(f.read_minutes)}, ${bool(f.is_featured)}, ${status}, ${bool(f.noindex)}, ${dt(f.scheduled_at)}, ${str(f.og_image)}, now(), ${d})`;
   }
 }
 

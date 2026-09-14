@@ -18,7 +18,12 @@ export default async function EditContent({ params }: { params: Promise<{ type: 
 
   const data = (row.data ?? {}) as Record<string, Record<string, string>>;
   const fixed: Record<string, unknown> = {};
-  for (const f of def.fixed) fixed[f.key] = row[f.key] ?? (f.type === "bool" ? false : "");
+  for (const f of def.fixed) {
+    const v = row[f.key];
+    if (f.type === "bool") fixed[f.key] = Boolean(v);
+    else if (f.type === "date") fixed[f.key] = v ? new Date(v as string).toISOString().slice(0, 10) : "";
+    else fixed[f.key] = v ?? "";
+  }
   const i18n: Record<string, Record<string, string>> = {};
   for (const f of def.i18n) i18n[f.key] = data[f.key] ?? {};
   // seo.* fields live under the nested data.seo, not as flat keys.
