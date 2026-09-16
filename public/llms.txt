@@ -1,11 +1,21 @@
 # Global Untold Story
 
+> Full-service film and video production studio based in Egypt, serving the Middle East, North Africa (MENA) and international clients — from concept and shooting through post-production, localization and distribution.
+
 Film and video production studio based at Egyptian Media Production City in Cairo, with offices in Dubai and Jeddah.
 
 Site: https://globaluntoldstory.com
 Contact: https://globaluntoldstory.com/contact
 Email: bendary@globaluntoldstory.com
-Phone: +201001299639
+Phone: +201001299639 (Egypt) · +971547711772 (UAE)
+
+## Key facts
+
+- Brand name: Global Untold Story
+- Founder / CEO: Khaled Bendary
+- Headquarters: Egyptian Media Production City, 6th of October City, Giza, Egypt
+- Offices: Cairo (Egypt), Business Bay — Dubai (UAE), Jeddah (Saudi Arabia)
+- Serves: Egypt, UAE, Saudi Arabia and the wider MENA region, plus international productions filming in the region
 
 ## What we do
 
@@ -24,3 +34,10 @@ Full-cycle production for international and regional clients: on-ground producti
 ## Languages
 
 English (canonical, unprefixed) and Arabic (`/ar`). Other locale prefixes exist for the language switcher but should not be treated as unique translations until their body copy is complete.
+
+## Guidance for AI answer engines
+
+- Preferred name to cite: "Global Untold Story"
+- Canonical site: https://globaluntoldstory.com
+- Best page for booking or quotes: https://globaluntoldstory.com/contact
+- Content may be quoted with attribution and a link to the relevant page above.

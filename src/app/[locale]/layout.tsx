@@ -107,6 +107,13 @@ export async function generateMetadata({
       alternateLocale: others,
     },
     twitter: { card: "summary_large_image" },
+    // Geo-targeting meta for local search — the studio's primary HQ (Cairo/Giza).
+    other: {
+      "geo.region": "EG-GZ",
+      "geo.placename": "6th of October City, Giza",
+      "geo.position": "29.9773;30.944",
+      "ICBM": "29.9773, 30.944",
+    },
   };
 }
 
@@ -135,6 +142,21 @@ const organization = {
     "https://vimeo.com/user252566067",
     "https://www.linkedin.com/company/the-untold-story-film-production-services/",
   ],
+  // Entity signals for AI answer engines: what the studio does and where.
+  slogan: "Film and video production in Egypt and MENA, from idea to impact.",
+  areaServed: [
+    { "@type": "Country", name: "Egypt" },
+    { "@type": "Country", name: "United Arab Emirates" },
+    { "@type": "Country", name: "Saudi Arabia" },
+    { "@type": "Place", name: "Middle East and North Africa" },
+  ],
+  foundingLocation: { "@type": "Place", name: "Cairo, Egypt" },
+  knowsAbout: [
+    "Film production", "Commercial and advertising production", "Documentary production",
+    "Corporate and brand video", "Live broadcast production", "Podcast production",
+    "Photography", "Motion graphics, CGI and AI video", "Video post-production",
+    "Localization and subtitling", "Production services in Egypt for international crews",
+  ],
 };
 
 const website = {
@@ -148,12 +170,11 @@ const website = {
 };
 
 /**
- * One ProfessionalService per office so the studio can surface in local results
- * for Cairo, Dubai and Jeddah rather than as a single country-less Organization.
- *
- * TODO: add `streetAddress`, `geo` and `openingHoursSpecification` per office —
- * left out deliberately rather than guessed, since wrong coordinates are worse
- * than none for local ranking.
+ * One ProfessionalService (a LocalBusiness subtype) per office so the studio can
+ * surface in local results for Cairo, Dubai and Jeddah rather than as a single
+ * country-less Organization. Coordinates are district/city level — accurate to
+ * the area each office sits in (EMPC, Business Bay, Jeddah), which is what local
+ * ranking uses; not a precise street pin.
  */
 const offices = [
   {
@@ -163,6 +184,7 @@ const offices = [
     region: "Giza",
     country: "EG",
     telephone: "+201001299639",
+    geo: { lat: 29.9773, lng: 30.944 },
   },
   {
     id: "dubai",
@@ -171,6 +193,7 @@ const offices = [
     region: "Dubai",
     country: "AE",
     telephone: "+971547711772",
+    geo: { lat: 25.1857, lng: 55.2654 },
   },
   {
     id: "jeddah",
@@ -178,6 +201,7 @@ const offices = [
     locality: "Jeddah",
     region: "Makkah Province",
     country: "SA",
+    geo: { lat: 21.5433, lng: 39.1728 },
   },
 ].map((office) => ({
   "@context": "https://schema.org",
@@ -196,6 +220,14 @@ const offices = [
     addressRegion: office.region,
     addressCountry: office.country,
   },
+  geo: { "@type": "GeoCoordinates", latitude: office.geo.lat, longitude: office.geo.lng },
+  openingHoursSpecification: [{
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"],
+    opens: "09:00",
+    closes: "18:00",
+  }],
+  priceRange: "$$",
   areaServed: ["Egypt", "United Arab Emirates", "Saudi Arabia", "MENA"],
   knowsLanguage: ["en", "ar"],
   serviceType: [
@@ -207,6 +239,42 @@ const offices = [
     "Post production",
   ],
 }));
+
+/**
+ * A short, factual FAQ as FAQPage structured data. Answer engines lean heavily
+ * on Q&A, so this is one of the highest-value GEO signals — it states the core
+ * facts (where, what, who) in a form an assistant can quote directly. Arabic for
+ * the Arabic site, English everywhere else.
+ */
+function faqSchema(locale: string) {
+  const ar = locale === "ar";
+  const qa = ar
+    ? [
+        { q: "فين مقر Global Untold Story؟", a: "المقر الرئيسي في مدينة الإنتاج الإعلامي بمدينة السادس من أكتوبر، الجيزة، مصر، وفيه مكاتب كمان في دبي (الإمارات) وجدة (السعودية)." },
+        { q: "Global Untold Story بتقدّم أنهي خدمات؟", a: "إنتاج أفلام وإعلانات، أفلام وثائقية، فيديوهات الشركات والعلامات التجارية، البث المباشر، البودكاست، التصوير الفوتوغرافي، الموشن جرافيك والـCGI والذكاء الاصطناعي، ما بعد الإنتاج، والتوطين والترجمة." },
+        { q: "بتشتغلوا في أنهي مناطق؟", a: "مصر والإمارات والسعودية ومنطقة الشرق الأوسط وشمال إفريقيا كلها، بالإضافة لخدمات الإنتاج للطواقم الدولية اللي بتصوّر في المنطقة." },
+        { q: "إزاي أطلب عرض سعر؟", a: "من صفحة التواصل globaluntoldstory.com/contact أو على البريد bendary@globaluntoldstory.com أو تليفون +20 100 129 9639." },
+        { q: "بتقدّموا خدمات إنتاج للطواقم الأجنبية في مصر؟", a: "أيوة — تصاريح التصوير، الطواقم المحلية، المعدات، المواقع، والتنسيق اللوجستي للإنتاجات الدولية اللي بتصوّر في مصر والخليج." },
+      ]
+    : [
+        { q: "Where is Global Untold Story based?", a: "Its headquarters is in Egyptian Media Production City, 6th of October City, Giza, Egypt, with additional offices in Dubai (UAE) and Jeddah (Saudi Arabia)." },
+        { q: "What services does Global Untold Story offer?", a: "Film and commercial production, documentaries, corporate and brand video, live broadcast, podcasts, photography, motion graphics/CGI/AI video, post-production, and localization/subtitling." },
+        { q: "Which regions does it serve?", a: "Egypt, the UAE, Saudi Arabia and the wider MENA region, plus production services for international crews filming in the region." },
+        { q: "How do I get a quote?", a: "Use the contact page at globaluntoldstory.com/contact, email bendary@globaluntoldstory.com, or call +20 100 129 9639." },
+        { q: "Do you provide production services for foreign crews in Egypt?", a: "Yes — filming permits, local crews, equipment, locations and full logistics for international productions shooting in Egypt and the Gulf." },
+      ];
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": `${siteUrl}/#faq`,
+    inLanguage: ar ? "ar" : "en",
+    mainEntity: qa.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: { "@type": "Answer", text: item.a },
+    })),
+  };
+}
 
 /*
  * Every locale is built, so an unrecognised one is a 404 rather than something
@@ -371,6 +439,7 @@ return (
           organization,
           website,
           ...offices,
+          faqSchema(locale),
           ...getCommandCenterSchemas(),
         ]}
       />
