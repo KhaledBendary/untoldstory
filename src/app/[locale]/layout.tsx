@@ -234,6 +234,8 @@ return (
             'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
             })(window,document,'script','dataLayer','${GTM_CONTAINER_ID}');
           }` }} />
+      {/* RSS auto-discovery for feed readers and aggregators. */}
+      <link rel="alternate" type="application/rss+xml" title="Global Untold Story — Insights" href="/feed.xml" />
     </head>
     <body suppressHydrationWarning>
 

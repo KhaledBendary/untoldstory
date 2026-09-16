@@ -221,7 +221,25 @@ export async function visitStats(days = 30) {
   const countries = await sql<{ country: string; n: number }[]>`
     select coalesce(nullif(country,''), '—') as country, count(*)::int as n
     from visits where created_at >= ${since} group by country order by n desc limit 8`;
-  return { totals, topPages, sources, campaigns, countries };
+  // Views per day, gaps filled with zeros so the trend line is continuous.
+  const daily = await sql<{ day: string; n: number }[]>`
+    select to_char(d.day, 'YYYY-MM-DD') as day, coalesce(v.n, 0)::int as n
+    from generate_series(current_date - ((${days} - 1) || ' days')::interval, current_date, '1 day') d(day)
+    left join (
+      select date_trunc('day', created_at) as day, count(*) as n
+      from visits where created_at >= ${since} group by 1
+    ) v on v.day = d.day
+    order by d.day`;
+  const deviceRows = await sql<{ device: string; n: number }[]>`
+    select coalesce(nullif(device,''), 'غير معروف') as device, count(*)::int as n
+    from visits where created_at >= ${since} group by device`;
+  const devices = { mobile: 0, desktop: 0, other: 0 };
+  for (const r of deviceRows) {
+    if (r.device === "mobile") devices.mobile = r.n;
+    else if (r.device === "desktop") devices.desktop = r.n;
+    else devices.other += r.n;
+  }
+  return { totals, topPages, sources, campaigns, countries, daily, devices };
 }
 
 // ---- activity log ----
