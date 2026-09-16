@@ -61,6 +61,12 @@ export type Singleton = Record<string, Record<string, unknown>>; // { en: {...},
 export const getSingleton = async (key: string): Promise<Singleton | null> =>
   (await sql<{ data: Singleton }[]>`select data from singletons where key = ${key}`)[0]?.data ?? null;
 
+/** Replace a whole singleton document (used for settings docs like seo_settings). */
+export async function putSingleton(key: string, data: unknown) {
+  await sql`insert into singletons (key, data) values (${key}, ${sql.json(data as Parameters<typeof sql.json>[0])})
+    on conflict (key) do update set data = excluded.data, updated_at = now()`;
+}
+
 /**
  * Save edits to specific paths inside a singleton, per language. Each edit
  * carries a { locale: value } map (English and Arabic always, plus any machine

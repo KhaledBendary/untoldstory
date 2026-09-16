@@ -79,6 +79,7 @@ export default async function SeoPage() {
     <div style={{ maxWidth: 1000, margin: "0 auto", padding: "22px 24px 56px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6, flexWrap: "wrap" }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0, flex: 1 }}>السيو والفهرسة</h1>
+        <Link href="/admin/seo-settings" style={{ fontSize: 12.5 }}>إعدادات SEO/GEO ⚙</Link>
         <a href="https://globaluntoldstory.com/sitemap.xml" target="_blank" dir="ltr" style={{ fontSize: 12.5 }}>sitemap.xml ↗</a>
         <a href="https://search.google.com/search-console" target="_blank" style={{ fontSize: 12.5 }}>Search Console ↗</a>
       </div>

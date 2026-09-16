@@ -11,6 +11,8 @@ import { DEFAULT_LOCALE, PRERENDER_LOCALES, LOCALE_TAGS, OG_LOCALES, isLocale, l
 import { getCommandCenterSchemas } from "@/data/seo-command-schema";
 import { getShellData } from "@/lib/page-data";
 import { BRAND, DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/seo";
+import { getGeoSettings } from "@/lib/seo/geo-store";
+import { organizationSchema, officeSchemas, faqSchema, geoMeta } from "@/lib/seo/geo";
 import { pageMeta } from "@/data/page-meta";
 
 /**
@@ -107,57 +109,10 @@ export async function generateMetadata({
       alternateLocale: others,
     },
     twitter: { card: "summary_large_image" },
-    // Geo-targeting meta for local search — the studio's primary HQ (Cairo/Giza).
-    other: {
-      "geo.region": "EG-GZ",
-      "geo.placename": "6th of October City, Giza",
-      "geo.position": "29.9773;30.944",
-      "ICBM": "29.9773, 30.944",
-    },
+    // Geo-targeting meta for local search — from the primary office in settings.
+    other: geoMeta(await getGeoSettings()),
   };
 }
-
-const organization = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "@id": `${siteUrl}/#organization`,
-  name: "Global Untold Story",
-  url: `${siteUrl}/`,
-  logo: `${siteUrl}/images/logo-white.png`,
-  description: "Full-service film, video, advertising, documentary, corporate, live, podcast, photography, motion/CGI/AI, localization, marketing and original-IP studio serving Egypt, MENA and international clients.",
-  email: "bendary@globaluntoldstory.com",
-  founder: { "@type": "Person", name: "Khaled Bendary", jobTitle: "CEO" },
-  address: [
-    { "@type": "PostalAddress", addressLocality: "Egyptian Media Production City", addressCountry: "EG" },
-    { "@type": "PostalAddress", addressLocality: "Business Bay, Dubai", addressCountry: "AE" },
-    { "@type": "PostalAddress", addressLocality: "Jeddah", addressCountry: "SA" },
-  ],
-  contactPoint: [
-    { "@type": "ContactPoint", telephone: "+201001299639", contactType: "sales", areaServed: "EG", availableLanguage: ["en", "ar"] },
-    { "@type": "ContactPoint", telephone: "+971547711772", contactType: "sales", areaServed: "AE", availableLanguage: ["en", "ar"] },
-  ],
-  sameAs: [
-    "https://www.facebook.com/theuntoldstory.adv",
-    "https://www.instagram.com/globaluntoldstory",
-    "https://vimeo.com/user252566067",
-    "https://www.linkedin.com/company/the-untold-story-film-production-services/",
-  ],
-  // Entity signals for AI answer engines: what the studio does and where.
-  slogan: "Film and video production in Egypt and MENA, from idea to impact.",
-  areaServed: [
-    { "@type": "Country", name: "Egypt" },
-    { "@type": "Country", name: "United Arab Emirates" },
-    { "@type": "Country", name: "Saudi Arabia" },
-    { "@type": "Place", name: "Middle East and North Africa" },
-  ],
-  foundingLocation: { "@type": "Place", name: "Cairo, Egypt" },
-  knowsAbout: [
-    "Film production", "Commercial and advertising production", "Documentary production",
-    "Corporate and brand video", "Live broadcast production", "Podcast production",
-    "Photography", "Motion graphics, CGI and AI video", "Video post-production",
-    "Localization and subtitling", "Production services in Egypt for international crews",
-  ],
-};
 
 const website = {
   "@context": "https://schema.org",
@@ -168,113 +123,6 @@ const website = {
   publisher: { "@id": `${siteUrl}/#organization` },
   inLanguage: [...INDEXABLE_LOCALES],
 };
-
-/**
- * One ProfessionalService (a LocalBusiness subtype) per office so the studio can
- * surface in local results for Cairo, Dubai and Jeddah rather than as a single
- * country-less Organization. Coordinates are district/city level — accurate to
- * the area each office sits in (EMPC, Business Bay, Jeddah), which is what local
- * ranking uses; not a precise street pin.
- */
-const offices = [
-  {
-    id: "cairo",
-    name: "Global Untold Story — Cairo",
-    locality: "Egyptian Media Production City, 6th of October City",
-    region: "Giza",
-    country: "EG",
-    telephone: "+201001299639",
-    geo: { lat: 29.9773, lng: 30.944 },
-  },
-  {
-    id: "dubai",
-    name: "Global Untold Story — Dubai",
-    locality: "Business Bay",
-    region: "Dubai",
-    country: "AE",
-    telephone: "+971547711772",
-    geo: { lat: 25.1857, lng: 55.2654 },
-  },
-  {
-    id: "jeddah",
-    name: "Global Untold Story — Jeddah",
-    locality: "Jeddah",
-    region: "Makkah Province",
-    country: "SA",
-    geo: { lat: 21.5433, lng: 39.1728 },
-  },
-].map((office) => ({
-  "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  "@id": `${siteUrl}/#office-${office.id}`,
-  name: office.name,
-  url: `${siteUrl}/contact`,
-  image: `${siteUrl}/images/on-ground-production-giza.jpg`,
-  logo: `${siteUrl}/images/logo-white.png`,
-  email: "bendary@globaluntoldstory.com",
-  ...(office.telephone ? { telephone: office.telephone } : {}),
-  parentOrganization: { "@id": `${siteUrl}/#organization` },
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: office.locality,
-    addressRegion: office.region,
-    addressCountry: office.country,
-  },
-  geo: { "@type": "GeoCoordinates", latitude: office.geo.lat, longitude: office.geo.lng },
-  openingHoursSpecification: [{
-    "@type": "OpeningHoursSpecification",
-    dayOfWeek: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"],
-    opens: "09:00",
-    closes: "18:00",
-  }],
-  priceRange: "$$",
-  areaServed: ["Egypt", "United Arab Emirates", "Saudi Arabia", "MENA"],
-  knowsLanguage: ["en", "ar"],
-  serviceType: [
-    "Film production",
-    "Commercial advertising production",
-    "Documentary production",
-    "Corporate video production",
-    "Live broadcast production",
-    "Post production",
-  ],
-}));
-
-/**
- * A short, factual FAQ as FAQPage structured data. Answer engines lean heavily
- * on Q&A, so this is one of the highest-value GEO signals — it states the core
- * facts (where, what, who) in a form an assistant can quote directly. Arabic for
- * the Arabic site, English everywhere else.
- */
-function faqSchema(locale: string) {
-  const ar = locale === "ar";
-  const qa = ar
-    ? [
-        { q: "فين مقر Global Untold Story؟", a: "المقر الرئيسي في مدينة الإنتاج الإعلامي بمدينة السادس من أكتوبر، الجيزة، مصر، وفيه مكاتب كمان في دبي (الإمارات) وجدة (السعودية)." },
-        { q: "Global Untold Story بتقدّم أنهي خدمات؟", a: "إنتاج أفلام وإعلانات، أفلام وثائقية، فيديوهات الشركات والعلامات التجارية، البث المباشر، البودكاست، التصوير الفوتوغرافي، الموشن جرافيك والـCGI والذكاء الاصطناعي، ما بعد الإنتاج، والتوطين والترجمة." },
-        { q: "بتشتغلوا في أنهي مناطق؟", a: "مصر والإمارات والسعودية ومنطقة الشرق الأوسط وشمال إفريقيا كلها، بالإضافة لخدمات الإنتاج للطواقم الدولية اللي بتصوّر في المنطقة." },
-        { q: "إزاي أطلب عرض سعر؟", a: "من صفحة التواصل globaluntoldstory.com/contact أو على البريد bendary@globaluntoldstory.com أو تليفون +20 100 129 9639." },
-        { q: "بتقدّموا خدمات إنتاج للطواقم الأجنبية في مصر؟", a: "أيوة — تصاريح التصوير، الطواقم المحلية، المعدات، المواقع، والتنسيق اللوجستي للإنتاجات الدولية اللي بتصوّر في مصر والخليج." },
-      ]
-    : [
-        { q: "Where is Global Untold Story based?", a: "Its headquarters is in Egyptian Media Production City, 6th of October City, Giza, Egypt, with additional offices in Dubai (UAE) and Jeddah (Saudi Arabia)." },
-        { q: "What services does Global Untold Story offer?", a: "Film and commercial production, documentaries, corporate and brand video, live broadcast, podcasts, photography, motion graphics/CGI/AI video, post-production, and localization/subtitling." },
-        { q: "Which regions does it serve?", a: "Egypt, the UAE, Saudi Arabia and the wider MENA region, plus production services for international crews filming in the region." },
-        { q: "How do I get a quote?", a: "Use the contact page at globaluntoldstory.com/contact, email bendary@globaluntoldstory.com, or call +20 100 129 9639." },
-        { q: "Do you provide production services for foreign crews in Egypt?", a: "Yes — filming permits, local crews, equipment, locations and full logistics for international productions shooting in Egypt and the Gulf." },
-      ];
-  return {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "@id": `${siteUrl}/#faq`,
-    inLanguage: ar ? "ar" : "en",
-    mainEntity: qa.map((item) => ({
-      "@type": "Question",
-      name: item.q,
-      acceptedAnswer: { "@type": "Answer", text: item.a },
-    })),
-  };
-}
 
 /*
  * Every locale is built, so an unrecognised one is a 404 rather than something
@@ -304,7 +152,7 @@ export default async function RootLayout({
   // matching [locale]). 404 unless middleware already redirected them.
   if (raw && !isLocale(raw)) notFound();
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
-  const shell = await getShellData(locale);
+  const [shell, geo] = await Promise.all([getShellData(locale), getGeoSettings()]);
 
 return (
   <html
@@ -436,12 +284,12 @@ return (
 
       <StructuredData
         data={[
-          organization,
+          organizationSchema(geo),
           website,
-          ...offices,
-          faqSchema(locale),
+          ...officeSchemas(geo),
+          faqSchema(geo, locale),
           ...getCommandCenterSchemas(),
-        ]}
+        ].filter((x): x is Record<string, unknown> => Boolean(x))}
       />
 
       <SiteShell shell={shell} locale={locale}>

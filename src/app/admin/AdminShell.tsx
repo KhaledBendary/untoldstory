@@ -22,6 +22,7 @@ const ICONS = {
   clock: "M12 3a9 9 0 100 18 9 9 0 000-18zM12 7v5l4 2",
   search: "M11 4a7 7 0 100 14 7 7 0 000-14zM21 21l-4.3-4.3",
   redirect: "M4 8h11a4 4 0 010 8H9M4 8l4-4M4 8l4 4",
+  settings: "M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 13a1.7 1.7 0 00.3 1.9l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-2.9 1.2V21a2 2 0 11-4 0v-.1A1.7 1.7 0 006 19.4l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00-1.2-2.9H2a2 2 0 110-4h.1A1.7 1.7 0 003.3 6l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.9.3H8a1.7 1.7 0 001-1.6V2a2 2 0 114 0v.1a1.7 1.7 0 001 1.6 1.7 1.7 0 001.9-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.9V8a1.7 1.7 0 001.6 1H22a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z",
 } as const;
 
 function Icon({ name }: { name: keyof typeof ICONS }) {
@@ -57,6 +58,7 @@ export default function AdminShell({
     { href: "/admin/pages", label: "الصفحات", icon: "layout" },
     { href: "/admin/translations", label: "الترجمة", icon: "globe" },
     { href: "/admin/seo", label: "السيو والفهرسة", icon: "search" },
+    { href: "/admin/seo-settings", label: "إعدادات SEO/GEO", icon: "settings" },
     { href: "/admin/redirects", label: "التحويلات", icon: "redirect" },
     { href: "/admin/messages", label: "الرسائل", icon: "mail", badge: newMessages },
     { href: "/admin/visits", label: "الزيارات", icon: "chart" },
