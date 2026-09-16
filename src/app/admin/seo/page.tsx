@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { currentSession } from "@/lib/admin-session";
 import { getServices, getProjects, getPosts } from "@/lib/db/repo";
+import { LOCALE_CODES, INDEXABLE_LOCALES } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -67,6 +68,13 @@ export default async function SeoPage() {
     { n: noindex, l: "مخفي (noindex)" }, { n: missingSeo, l: "ناقص وصف SEO" },
   ];
 
+  // Each item is published in every language, but only the indexable locales are
+  // meant to appear in Google — the rest are English shells kept out on purpose.
+  // This is the main reason Google reports many "not indexed" URLs.
+  const shellLocales = LOCALE_CODES.filter((l) => !INDEXABLE_LOCALES.includes(l));
+  const indexablePages = indexable * INDEXABLE_LOCALES.length;
+  const shellPages = indexable * shellLocales.length;
+
   return (
     <div style={{ maxWidth: 1000, margin: "0 auto", padding: "22px 24px 56px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6, flexWrap: "wrap" }}>
@@ -85,6 +93,18 @@ export default async function SeoPage() {
             <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 4 }}>{c.l}</div>
           </div>
         ))}
+      </div>
+
+      <div className="card" style={{ padding: "14px 16px", marginBottom: 22 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 700, margin: "0 0 8px" }}>الفهرسة حسب اللغة</h2>
+        <p style={{ fontSize: 12.5, color: "var(--muted)", margin: "0 0 8px", lineHeight: 1.7 }}>
+          كل عنصر منشور موجود بكل الـ{LOCALE_CODES.length} لغة، بس <strong>{INDEXABLE_LOCALES.length} لغات بس هي المسموح لجوجل يفهرسها</strong>
+          {" "}({INDEXABLE_LOCALES.join("، ")}). الباقي ({shellLocales.join("، ")}) نسخ إنجليزية متعلّمة <code>noindex</code> عمداً لحد ما تتترجم فعلاً.
+        </p>
+        <p style={{ fontSize: 12.5, color: "var(--faint)", margin: 0 }}>
+          يعني المفروض جوجل يفهرس ≈ <strong>{indexablePages}</strong> رابط، و≈ <strong>{shellPages}</strong> رابط بيظهروا في GSC كـ
+          «Excluded by noindex» — وده <strong>طبيعي ومقصود</strong>، مش خطأ. لما نترجم الـ{shellLocales.length} لغات دي هنفتح فهرستها.
+        </p>
       </div>
 
       <Section label="الخدمات" base="services" rows={services as unknown as Row[]} />

@@ -11,12 +11,20 @@ export const runtime = "nodejs";
  */
 const s = (v: unknown, max: number) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null);
 
+// Known crawlers/automation. Tracking is client-side so most bots never reach
+// here, but headless/JS-capable ones can — drop them so the numbers are humans.
+const BOT_RE = /bot|crawl|spider|slurp|bing|yandex|baidu|duckduck|facebookexternal|embedly|quora|pinterest|semrush|ahrefs|mj12|dotbot|petal|bytespider|headless|phantom|puppeteer|playwright|lighthouse|gtmetrix|pingdom|uptime|monitor|curl|wget|python-requests|node-fetch|axios|go-http/i;
+
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   if (!body || typeof body.path !== "string") return NextResponse.json({ ok: false }, { status: 400 });
 
   const h = request.headers;
   const ua = h.get("user-agent") || "";
+  // Exclude bots and our own dashboard visits so analytics reflects real visitors.
+  if (!ua || BOT_RE.test(ua)) return NextResponse.json({ ok: true, skipped: "bot" });
+  if (/^\/(?:[a-z]{2}\/)?admin(?:\/|$)/i.test(body.path)) return NextResponse.json({ ok: true, skipped: "admin" });
+
   const device = /Mobi|Android|iPhone|iPad|Windows Phone/i.test(ua) ? "mobile" : "desktop";
   const city = h.get("x-vercel-ip-city");
 

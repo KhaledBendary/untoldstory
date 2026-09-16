@@ -1,19 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FixedField, I18nField } from "@/lib/admin/content-types";
 import ImagePicker from "@/app/admin/ImagePicker";
 import RichTextEditor from "@/app/admin/RichTextEditor";
+import { LOCALE_CODES, localeDir } from "@/lib/i18n";
 
 type Dict = Record<string, string>;
 type Issue = { field: string; locale?: string; message: string; level: "error" | "warning" };
 
-const LANGS = [
-  { code: "en", label: "إنجليزي", dir: "ltr" as const },
-  { code: "ar", label: "عربي", dir: "rtl" as const },
-];
+// en/ar are hand-authored; the rest are machine-translated but still viewable
+// and editable here so every language can be inspected and corrected.
+const LANG_LABEL: Record<string, string> = {
+  en: "إنجليزي", ar: "عربي", fr: "فرنسي", de: "ألماني", es: "إسباني", it: "إيطالي",
+  pt: "برتغالي", ru: "روسي", tr: "تركي", zh: "صيني", ja: "ياباني", ko: "كوري", pl: "بولندي", sw: "سواحيلي",
+};
+const LANGS = LOCALE_CODES.map((code) => ({ code, label: LANG_LABEL[code] || code.toUpperCase(), dir: localeDir(code) }));
+
+const SITE = "https://globaluntoldstory.com";
+// The public URL base + the structured-data types each content type emits.
+const PUBLIC_SEO: Record<string, { base: string; schema: string }> = {
+  services: { base: "/services", schema: "Service + BreadcrumbList" },
+  projects: { base: "/work", schema: "CreativeWork + BreadcrumbList" },
+  posts: { base: "/insights", schema: "Article + BreadcrumbList" },
+};
 
 /** Turn the server's deploy result into a friendly line for the editor. */
 export function deployMessage(deploy?: { triggered?: boolean; reason?: string }): string {
@@ -227,7 +239,7 @@ export default function ContentEditor({
         </div>
       )}
 
-      <div style={{ display: "flex", gap: 6, marginBottom: 18 }}>
+      <div style={{ display: "flex", gap: 6, marginBottom: 18, flexWrap: "wrap" }}>
         {LANGS.map((l) => (
           <button key={l.code} onClick={() => setLang(l.code)}
             style={{ padding: "7px 18px", fontSize: 14,
@@ -321,6 +333,43 @@ export default function ContentEditor({
           )
         ))}
       </div>
+
+      {/* Technical SEO preview — what search engines actually receive for this item */}
+      {PUBLIC_SEO[type] && (() => {
+        const effSlug = (create ? newSlug : slug) || "…";
+        const canonical = `${SITE}${PUBLIC_SEO[type].base}/${effSlug}`;
+        const published = status === "published";
+        const noindex = Boolean(fixed["noindex"]);
+        const indexed = published && !noindex;
+        const metaTitle = i18n["seo.metaTitle"]?.en || i18n["title"]?.en || effSlug;
+        const metaDesc = i18n["seo.metaDescription"]?.en || i18n["excerpt"]?.en || i18n["shortDesc"]?.en || i18n["shortDescription"]?.en || "—";
+        const ogImage = String(fixed["og_image"] || "") || "الصورة الافتراضية للموقع";
+        const row = (k: string, v: ReactNode) => (
+          <div style={{ display: "grid", gridTemplateColumns: "130px 1fr", gap: 10, padding: "6px 0", borderTop: "1px solid var(--line)", fontSize: 12.5 }}>
+            <span style={{ color: "var(--faint)" }}>{k}</span>
+            <span style={{ minWidth: 0, wordBreak: "break-word" }}>{v}</span>
+          </div>
+        );
+        return (
+          <details style={{ marginTop: 20, background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 10, padding: "12px 14px" }}>
+            <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 600 }}>معاينة SEO التقنية — اللي بيوصل جوجل</summary>
+            <div style={{ marginTop: 8 }}>
+              {row("Canonical URL", <span dir="ltr">{canonical}</span>)}
+              {row("Robots", indexed
+                ? <span style={{ color: "var(--ok)" }}>index, follow ✓</span>
+                : <span style={{ color: "var(--warn)" }}>noindex{published ? " (مخفي يدوياً)" : " (مسودّة)"}, follow</span>)}
+              {row("Meta title", <span>{metaTitle} <span style={{ color: "var(--faint)" }}>({metaTitle.length} حرف)</span></span>)}
+              {row("Meta description", <span>{metaDesc}</span>)}
+              {row("OG / Twitter", <span>العنوان والوصف بيتاخدوا من الميتا فوق · الصورة: <span dir="ltr">{ogImage}</span> · بطاقة تويتر: summary_large_image</span>)}
+              {row("Structured data", <span>{PUBLIC_SEO[type].schema} (JSON-LD تلقائي)</span>)}
+              {row("hreflang", <span>روابط بديلة لكل اللغات المفهرسة (تلقائي)</span>)}
+            </div>
+            <p style={{ fontSize: 11.5, color: "var(--faint)", margin: "10px 0 0" }}>
+              دي معاينة تقريبية للغة الإنجليزية. القيم الفعلية بتتولّد وقت النشر لكل لغة.
+            </p>
+          </details>
+        );
+      })()}
 
       {errors.length > 0 && (
         <div style={{ marginTop: 18, background: "color-mix(in srgb, var(--danger) 15%, transparent)",

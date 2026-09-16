@@ -3,6 +3,7 @@ import Link from "next/link";
 import { currentSession } from "@/lib/admin-session";
 import { getServices, getProjects, getPosts } from "@/lib/db/repo";
 import { LOCALE_CODES } from "@/lib/i18n";
+import TranslateAllButton from "./TranslateAllButton";
 
 export const dynamic = "force-dynamic";
 
@@ -13,22 +14,47 @@ const LOCALE_LABEL: Record<string, string> = {
 };
 
 type Dict = Record<string, string> | undefined;
-type Item = { slug: string; title: string; present: Record<string, boolean>; done: number };
+type State = "ok" | "fallback" | "missing";
+type Item = { slug: string; title: string; state: Record<string, State>; done: number };
 
-/** How complete each item is across the indexed languages — checked on the title. */
+const norm = (s: string) => s.replace(/\s+/g, " ").trim().toLowerCase();
+
+/**
+ * How real the translation of each item is, per language — judged on the title.
+ *
+ * The old check called any non-empty value "translated", so a language that
+ * merely inherited the English text (which the upstream API returns as a
+ * fallback) lit up green even though nothing was actually translated. Here a
+ * language counts as truly translated only when its text differs from the
+ * English; a value equal to English is flagged as an English fallback, and an
+ * empty one as missing. en/ar are the hand-authored languages and count as
+ * done whenever present.
+ */
 function analyze(rows: { slug: string; data: { title?: Dict } }[]): Item[] {
   return rows.map((r) => {
     const t = r.data.title ?? {};
-    const present: Record<string, boolean> = {};
+    const en = norm(t.en ?? "");
+    const state: Record<string, State> = {};
     let done = 0;
     for (const l of LOCALES) {
-      const ok = Boolean((t[l] ?? "").trim());
-      present[l] = ok;
-      if (ok) done++;
+      const val = norm(t[l] ?? "");
+      let s: State;
+      if (!val) s = "missing";
+      else if (l === "en" || l === "ar") s = "ok";        // authored languages
+      else if (en && val === en) s = "fallback";           // just the English text
+      else s = "ok";                                       // genuinely different
+      state[l] = s;
+      if (s === "ok") done++;
     }
-    return { slug: r.slug, title: (t.ar || t.en || r.slug), present, done };
+    return { slug: r.slug, title: (t.ar || t.en || r.slug), state, done };
   });
 }
+
+const DOT: Record<State, { color: string; title: string }> = {
+  ok: { color: "var(--ok)", title: "مترجم فعلاً" },
+  fallback: { color: "var(--warn)", title: "نسخة إنجليزي (مش مترجم)" },
+  missing: { color: "color-mix(in srgb, var(--danger) 55%, transparent)", title: "ناقص" },
+};
 
 function Section({ label, type, items }: { label: string; type: string; items: Item[] }) {
   const total = items.length * LOCALES.length;
@@ -58,9 +84,9 @@ function Section({ label, type, items }: { label: string; type: string; items: I
                 </td>
                 {LOCALES.map((l) => (
                   <td key={l} style={{ textAlign: "center", padding: "8px 4px" }}>
-                    <span title={it.present[l] ? "مترجم" : "ناقص"} style={{
+                    <span title={DOT[it.state[l]].title} style={{
                       display: "inline-block", width: 9, height: 9, borderRadius: 9,
-                      background: it.present[l] ? "var(--ok)" : "color-mix(in srgb, var(--danger) 55%, transparent)" }} />
+                      background: DOT[it.state[l]].color }} />
                   </td>
                 ))}
               </tr>
@@ -80,10 +106,16 @@ export default async function TranslationsPage() {
     <div style={{ maxWidth: 1000, margin: "0 auto", padding: "22px 24px 56px" }}>
       <h1 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 6px" }}>اكتمال الترجمة</h1>
       <p style={{ fontSize: 12.5, color: "var(--faint)", margin: "0 0 8px" }}>
-        <span style={{ display: "inline-block", width: 9, height: 9, borderRadius: 9, background: "var(--ok)", marginInlineEnd: 5 }} /> مترجم
+        <span style={{ display: "inline-block", width: 9, height: 9, borderRadius: 9, background: "var(--ok)", marginInlineEnd: 5 }} /> مترجم فعلاً
+        <span style={{ display: "inline-block", width: 9, height: 9, borderRadius: 9, background: "var(--warn)", margin: "0 5px 0 14px" }} /> نسخة إنجليزي
         <span style={{ display: "inline-block", width: 9, height: 9, borderRadius: 9, background: "color-mix(in srgb, var(--danger) 55%, transparent)", margin: "0 5px 0 14px" }} /> ناقص
       </p>
-      <div style={{ marginBottom: 20 }} />
+      <p style={{ fontSize: 12, color: "var(--faint)", margin: "0 0 4px" }}>
+        النسبة بتحسب الترجمة الحقيقية بس (اللي مختلفة عن الإنجليزي). اللغات اللي لسه نسخة إنجليزي محتاجة ترجمة فعلية.
+      </p>
+      <div style={{ margin: "14px 0 22px" }}>
+        <TranslateAllButton />
+      </div>
       <Section label="الخدمات" type="services" items={analyze(services)} />
       <Section label="الأعمال" type="projects" items={analyze(projects)} />
       <Section label="المقالات" type="posts" items={analyze(posts)} />
