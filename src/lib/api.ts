@@ -1,4 +1,4 @@
-import { apiClient } from './api-client';
+import { apiClient, ApiError } from './api-client';
 import { documentaryBodyFor } from "@/data/documentary-body";
 import { stripTranslatorNote, unwrapPastedEditorMarkup } from "@/lib/seo";
 import type {
@@ -123,15 +123,74 @@ function unwrap<T>(res: ApiEnvelope<T>): T {
   return repairCmsText(scrubUnreadable(res.data));
 }
 
+/*
+ * The new database is the source of truth; Laravel is the safety net.
+ *
+ * On the server we read content straight from Postgres, in the exact shape the
+ * Laravel API returned (see lib/db/source.ts and scripts/db-parity.mjs). The DB
+ * layer is server-only and node-only (the postgres driver), so this file — which
+ * is also bundled for the browser through page-data.ts — must never import it,
+ * or the whole DB graph (and node built-ins) would be pulled into the client
+ * bundle and the build would fail.
+ *
+ * Instead the server registers the source on globalThis (see lib/db/register.ts,
+ * imported only from server-only code), and we read it here through a plain
+ * global lookup — no import, so nothing DB-related enters the client graph. In
+ * the browser the global is undefined and the existing HTTP path runs unchanged.
+ * Any DB miss or error also leaves us on Laravel, so a misconfigured database
+ * can never blank the site.
+ *
+ * Rollback without a redeploy: set CONTENT_SOURCE=laravel; register.ts then
+ * declines to register and every read uses the old API again.
+ */
+import type * as DbSource from "@/lib/db/source"; // type-only: erased, never bundled
+type ContentDb = typeof DbSource;
+
+const DB_KEY = Symbol.for("globaluntoldstory.content-db");
+function dbSource(): ContentDb | null {
+  if (typeof window !== "undefined") return null;
+  return (globalThis as unknown as Record<symbol, ContentDb | undefined>)[DB_KEY] ?? null;
+}
+
+/**
+ * Read one record by slug. When the database is the source, a missing row is a
+ * genuine 404 and Laravel is never called — so a build (and every render) is
+ * independent of the old API. Only an actual database error falls through to
+ * Laravel as a safety net. When the DB isn't registered, Laravel is used as before.
+ */
+async function bySlug<T>(
+  dbRead: (src: ContentDb) => Promise<unknown> | undefined,
+  fromLaravel: () => Promise<T>,
+  process: (raw: unknown) => T,
+  label: string,
+): Promise<T> {
+  const src = dbSource();
+  if (src) {
+    try {
+      const item = await dbRead(src);
+      if (item) return process(item);
+      throw new ApiError(`${label} not found`, 404);
+    } catch (e) {
+      if (e instanceof ApiError) throw e; // 404 (or our own) — do not touch Laravel
+      console.error(`DB read failed for ${label}, trying Laravel:`, e);
+    }
+  }
+  return fromLaravel();
+}
+
 // ==================== PUBLIC CONTENT ENDPOINTS ====================
 
 export const api = {
   getHome: async (locale?: string): Promise<HomeData> => {
+    const db = await dbSource()?.home(locale);
+    if (db) return repairCmsText(scrubUnreadable(db)) as unknown as HomeData;
     const res = await apiClient.get<ApiEnvelope<HomeData>>('/home', {}, { locale });
     return unwrap(res);
   },
 
   getLayout: async (locale?: string): Promise<LayoutData> => {
+    const db = await dbSource()?.layout(locale);
+    if (db) return repairCmsText(scrubUnreadable(db)) as unknown as LayoutData;
     const res = await apiClient.get<ApiEnvelope<LayoutData>>('/layout', {}, { locale });
     return unwrap(res);
   },
@@ -142,14 +201,18 @@ export const api = {
   },
 
   getServices: async (locale?: string): Promise<Service[]> => {
-    const res = await apiClient.get<ApiEnvelope<CollectionData<Service>>>('/services', {}, { locale });
-    return correctKnownBadBodies(scrubUnreadable(res.data.items), locale);
+    const db = await dbSource()?.services(locale);
+    const items = (db as unknown as Service[] | null) ?? (await apiClient.get<ApiEnvelope<CollectionData<Service>>>('/services', {}, { locale })).data.items;
+    return correctKnownBadBodies(scrubUnreadable(items), locale);
   },
 
-  getServiceBySlug: async (slug: string, locale?: string): Promise<Service> => {
-    const res = await apiClient.get<ApiEnvelope<Service>>(`/services/${slug}`, {}, { locale });
-    return correctKnownBadBodies(unwrap(res), locale);
-  },
+  getServiceBySlug: (slug: string, locale?: string): Promise<Service> =>
+    bySlug<Service>(
+      (s) => s.service(slug, locale),
+      async () => correctKnownBadBodies(unwrap(await apiClient.get<ApiEnvelope<Service>>(`/services/${slug}`, {}, { locale })), locale),
+      (raw) => correctKnownBadBodies(scrubUnreadable(raw) as unknown as Service, locale),
+      `service ${slug}`,
+    ),
 
   getPortfolio: async (params?: {
     locale?: string;
@@ -157,14 +220,19 @@ export const api = {
     page?: number;
     per_page?: number;
   }): Promise<{ items: PortfolioItem[]; pagination: { current_page: number; last_page: number; per_page: number; total: number } }> => {
+    const db = await dbSource()?.portfolio(params ?? {});
+    if (db) return { items: repairCmsText(scrubUnreadable(db.items)) as unknown as PortfolioItem[], pagination: db.pagination };
     const res = await apiClient.get<ApiEnvelope<PaginatedData<PortfolioItem>>>('/portfolio', params);
     return { items: repairCmsText(scrubUnreadable(res.data.items)), pagination: res.data.pagination };
   },
 
-  getPortfolioBySlug: async (slug: string, locale?: string): Promise<PortfolioItem> => {
-    const res = await apiClient.get<ApiEnvelope<PortfolioItem>>(`/portfolio/${slug}`, {}, { locale });
-    return unwrap(res);
-  },
+  getPortfolioBySlug: (slug: string, locale?: string): Promise<PortfolioItem> =>
+    bySlug<PortfolioItem>(
+      (s) => s.portfolioItem(slug, locale),
+      async () => unwrap(await apiClient.get<ApiEnvelope<PortfolioItem>>(`/portfolio/${slug}`, {}, { locale })),
+      (raw) => repairCmsText(scrubUnreadable(raw)) as unknown as PortfolioItem,
+      `project ${slug}`,
+    ),
 
   getBlogPosts: async (params?: {
     locale?: string;
@@ -174,16 +242,23 @@ export const api = {
     page?: number;
     per_page?: number;
   }): Promise<{ items: BlogPost[]; pagination: { current_page: number; last_page: number; per_page: number; total: number } }> => {
+    const db = await dbSource()?.blog(params ?? {});
+    if (db) return { items: repairCmsText(scrubUnreadable(db.items)) as unknown as BlogPost[], pagination: db.pagination };
     const res = await apiClient.get<ApiEnvelope<PaginatedData<BlogPost>>>('/blog', params);
     return { items: repairCmsText(scrubUnreadable(res.data.items)), pagination: res.data.pagination };
   },
 
-  getBlogPostBySlug: async (slug: string, locale?: string): Promise<BlogPost> => {
-    const res = await apiClient.get<ApiEnvelope<BlogPost>>(`/blog/${slug}`, {}, { locale });
-    return unwrap(res);
-  },
+  getBlogPostBySlug: (slug: string, locale?: string): Promise<BlogPost> =>
+    bySlug<BlogPost>(
+      (s) => s.blogPost(slug, locale),
+      async () => unwrap(await apiClient.get<ApiEnvelope<BlogPost>>(`/blog/${slug}`, {}, { locale })),
+      (raw) => repairCmsText(scrubUnreadable(raw)) as unknown as BlogPost,
+      `post ${slug}`,
+    ),
 
   getAbout: async (locale?: string): Promise<About> => {
+    const db = await dbSource()?.about(locale);
+    if (db) return repairCmsText(scrubUnreadable(db)) as unknown as About;
     const res = await apiClient.get<ApiEnvelope<About>>('/about', {}, { locale });
     return unwrap(res);
   },

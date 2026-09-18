@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { ArrowUpRight, Mail, Phone, MapPin, Check } from 'lucide-react';
 import { SplitWords, Reveal } from '../Reveal';
 import Magnetic from '../Magnetic';
@@ -24,6 +24,23 @@ export default function ContactPage({ initialData, initialLocale, formToken }: {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pendingMailto, setPendingMailto] = useState<string | null>(null);
+
+  // The server-rendered token is stamped at build time and only lives 30 min,
+  // so on a static page it expires soon after each deploy. Fetch a fresh one
+  // tied to this visit — on mount and whenever they return to the tab.
+  const [liveToken, setLiveToken] = useState(formToken);
+  useEffect(() => {
+    let alive = true;
+    const refresh = () => {
+      fetch('/api/form-token', { cache: 'no-store' })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((j) => { if (alive && j?.token) setLiveToken(j.token); })
+        .catch(() => {});
+    };
+    refresh();
+    window.addEventListener('focus', refresh);
+    return () => { alive = false; window.removeEventListener('focus', refresh); };
+  }, []);
   const { locale, t } = useLanguage();
   const { data, loading } = usePageData(initialData, initialLocale, getContactData);
   const services = data?.services ?? [];
@@ -62,7 +79,7 @@ export default function ContactPage({ initialData, initialLocale, formToken }: {
         body: JSON.stringify({
           ...formData,
           website: String(data.get('website') || ''),
-          formToken: String(data.get('formToken') || formToken),
+          formToken: String(data.get('formToken') || liveToken),
         }),
       });
       if (!response.ok) {
@@ -128,7 +145,7 @@ export default function ContactPage({ initialData, initialLocale, formToken }: {
           ) : (
             <form onSubmit={onSubmit} onInput={onFirstInput} className="space-y-10">
               <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
-              <input type="hidden" name="formToken" value={formToken} />
+              <input type="hidden" name="formToken" value={liveToken} />
               {error && (
                 <div className="border border-red-500/30 bg-red-500/10 p-4 text-red-200 text-sm space-y-3">
                   <p>{t(error)}</p>

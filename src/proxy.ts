@@ -84,6 +84,12 @@ export function proxy(request: NextRequest) {
 
   const [, first, ...rest] = pathname.split("/");
 
+  // The dashboard is not a locale. Let /admin through untouched, or the
+  // locale rewrite below would send it to /en/admin and 404 it.
+  if (first === "admin") {
+    return markNonProduction(NextResponse.next(), request);
+  }
+
   // /en/services is a duplicate of /services — send it to the canonical form.
   if (first === DEFAULT_LOCALE) {
     const url = request.nextUrl.clone();
@@ -119,9 +125,10 @@ export const config = {
      * `xml` is deliberately NOT in that extension list. It was, so middleware
      * never saw /sitemap_index.xml or /wp-sitemap.xml and their redirect rules
      * were dead — the first line of this comment claimed they ran while the
-     * pattern excluded them. Our own sitemaps are named explicitly instead, so
-     * they stay untouched and every other .xml reaches the redirect table.
+     * pattern excluded them. Our own sitemaps and feed are named explicitly
+     * instead, so they stay untouched and every other .xml reaches the redirect
+     * table.
      */
-    "/((?!_next/|api/|images/|favicon|robots.txt|sitemap.xml|sitemap-[a-z]{2}.xml|.*\\.(?:ico|png|jpe?g|gif|webp|svg|avif|woff2?|ttf|eot|css|js|map|mp4|webm|txt|json|pdf|webmanifest|ics|mp3|wav|zip)$).*)",
+    "/((?!_next/|api/|images/|favicon|robots.txt|sitemap.xml|sitemap-[a-z]{2}.xml|feed.xml|.*\\.(?:ico|png|jpe?g|gif|webp|svg|avif|woff2?|ttf|eot|css|js|map|mp4|webm|txt|json|pdf|webmanifest|ics|mp3|wav|zip)$).*)",
   ],
 };

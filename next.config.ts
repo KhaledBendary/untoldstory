@@ -78,9 +78,13 @@ const GOOGLE_COUNTRY_DOMAINS = [
 
 const META = "https://www.facebook.com https://connect.facebook.net";
 
+// React's dev server needs eval() for fast-refresh/debugging; production never
+// does. Allow it only in development so the live CSP stays strict.
+const DEV_SCRIPT = process.env.NODE_ENV !== "production" ? " 'unsafe-eval'" : "";
+
 const CSP = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net`,
+  `script-src 'self' 'unsafe-inline'${DEV_SCRIPT} https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net`,
   // framer-motion and GSAP animate via inline style attributes.
   "style-src 'self' 'unsafe-inline'",
   // Fonts are self-hosted through next/font, so no third-party origin here.
@@ -114,6 +118,30 @@ const SECURITY_HEADERS = [
   },
 ];
 
+/**
+ * Redirects managed from the dashboard. Read straight from Postgres at build
+ * time (next.config runs in Node, never in the browser) and turned into 301s.
+ * Fails safe to no extra redirects if the database is unreachable, so a DB blip
+ * can never break the build.
+ */
+async function dbRedirects() {
+  const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  if (!url) return [];
+  try {
+    const { default: postgres } = await import("postgres");
+    const sql = postgres(url, { ssl: "require", max: 1, connect_timeout: 15, prepare: false, onnotice: () => {} });
+    try {
+      const rows = await sql<{ from_path: string; to_path: string }[]>`select from_path, to_path from redirects`;
+      return rows.map((r) => ({ source: r.from_path, destination: r.to_path, permanent: true }));
+    } finally {
+      await sql.end({ timeout: 5 });
+    }
+  } catch (e) {
+    console.warn("dbRedirects: could not load redirects from DB —", (e as Error).message);
+    return [];
+  }
+}
+
 const nextConfig: NextConfig = {
   // Hostinger runs the app under Passenger, which starts a plain Node process
   // and needs the self-contained server bundle. Gated so Vercel keeps using
@@ -127,7 +155,7 @@ const nextConfig: NextConfig = {
   // Renamed in Next 16; the old name still works but warns on every build.
   skipProxyUrlNormalize: true,
   outputFileTracingRoot: root,
-  serverExternalPackages: ["nodemailer"],
+  serverExternalPackages: ["nodemailer", "sharp"],
   // Static generation defaults to one worker per core. Against the shared-host
   // Laravel API that burst returns 500s, and pages then prerender with fallback
   // metadata. Fewer workers make the build slower but deterministic.
@@ -176,6 +204,7 @@ const nextConfig: NextConfig = {
         destination: "https://globaluntoldstory.com/:path*",
         permanent: true,
       },
+      ...(await dbRedirects()),
     ];
   },
   async rewrites() {

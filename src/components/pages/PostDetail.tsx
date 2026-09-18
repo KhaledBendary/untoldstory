@@ -58,7 +58,13 @@ export default function PostDetail({ slug, initialData, initialLocale }: { slug:
   }
 
   const idx = allPosts.findIndex(p => p.slug === slug);
-  const next = allPosts[(idx + 1) % allPosts.length];
+  // Related first by shared category, then filled with the newest others — better
+  // internal linking (SEO/GEO) than a purely sequential "next".
+  const others = allPosts.filter(p => p.slug !== slug);
+  const sameCat = others.filter(p => (p as { categorySlug?: string }).categorySlug && (p as { categorySlug?: string }).categorySlug === (post as { categorySlug?: string }).categorySlug);
+  const related = [...sameCat, ...others.filter(p => !sameCat.includes(p))].slice(0, 3);
+  const next = related[0] ?? allPosts[(idx + 1) % allPosts.length];
+  const moreRelated = related.slice(1); // shown as a compact list; related[0] is the big "next"
   const postImage = getPostImage(post);
 
   return (
@@ -108,9 +114,26 @@ export default function PostDetail({ slug, initialData, initialLocale }: { slug:
               {t('Written by Global Untold Story — Film Production Services, Egypt · UAE · KSA')}
             </p>
           </Reveal>
+
+          {moreRelated.length > 0 && (
+            <Reveal className="pt-8 mt-8 border-t border-white/10">
+              <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-5">( {t('Related articles')} )</p>
+              <ul className="space-y-3">
+                {moreRelated.map((r) => (
+                  <li key={r.slug}>
+                    <Link href={`/insights/${r.slug}`} className="group flex items-center gap-3 text-white/75 hover:text-white transition-colors">
+                      <ArrowRight className="w-4 h-4 shrink-0 rtl:rotate-180 opacity-50 group-hover:opacity-100 transition-opacity" />
+                      <span className="font-display text-lg md:text-xl leading-snug">{r.title}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+          )}
         </div>
       </article>
 
+      {next && (
       <Link href={`/insights/${next.slug}`} className="group block border-t border-white/10">
         <div className="px-5 md:px-10 py-16 md:py-20 flex items-center justify-between gap-6 max-w-none">
           <div>
@@ -126,6 +149,7 @@ export default function PostDetail({ slug, initialData, initialLocale }: { slug:
           </Magnetic>
         </div>
       </Link>
+      )}
     </>
   );
 }

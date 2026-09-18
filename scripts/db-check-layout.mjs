@@ -1,0 +1,13 @@
+import { connect } from "./db-connect.mjs";
+const sql = connect();
+const [r] = await sql`select data from singletons where key='layout'`;
+const d = r.data;
+console.log("edited: footer.brandDesc.ar:", JSON.stringify(d.ar?.footer?.brandDesc));
+console.log("edited: announcement.text.ar:", JSON.stringify(d.ar?.announcement?.text));
+console.log("edited: site_config.email.en:", JSON.stringify(d.en?.site_config?.email));
+console.log("--- preserved (not edited) ---");
+console.log("fr copy still present:", !!d.fr, "| fr brandDesc:", JSON.stringify(d.fr?.footer?.brandDesc)?.slice(0,40));
+console.log("nav_links kept:", Array.isArray(d.en?.nav_links), d.en?.nav_links?.length, "links");
+console.log("offices kept:", Array.isArray(d.en?.footer?.offices), d.en?.footer?.offices?.length, "offices");
+console.log("common_labels kept:", !!d.en?.common_labels?.submitBtn);
+await sql.end();
