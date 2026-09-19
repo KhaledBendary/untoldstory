@@ -116,7 +116,17 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
             {service.fullDesc && (
               <Reveal className="mt-8 border-s-2 border-white/20 ps-6">
                 <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-2">{t('Full Description')}</p>
-                <div className="text-white/70 leading-relaxed" dangerouslySetInnerHTML={{ __html: renderCmsHtml(service.fullDesc) }} />
+                <div
+                  className="prose prose-invert prose-lg max-w-none text-white/70
+                    prose-headings:font-display prose-headings:uppercase prose-headings:tracking-tight prose-headings:text-white
+                    prose-h2:text-2xl prose-h2:md:text-3xl prose-h2:mt-12 prose-h2:mb-5
+                    prose-h3:text-xl prose-h3:md:text-2xl prose-h3:mt-9 prose-h3:mb-4
+                    prose-p:text-white/70 prose-p:leading-relaxed prose-p:text-lg prose-p:mb-5
+                    prose-ul:my-6 prose-li:text-white/70 prose-li:marker:text-white/40
+                    prose-a:text-white prose-a:underline prose-a:decoration-white/30 hover:prose-a:decoration-white
+                    prose-strong:text-white prose-strong:font-bold"
+                  dangerouslySetInnerHTML={{ __html: renderCmsHtml(service.fullDesc) }}
+                />
               </Reveal>
             )}
           </div>
