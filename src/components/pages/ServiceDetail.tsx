@@ -124,7 +124,8 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
                     prose-p:text-white/70 prose-p:leading-relaxed prose-p:text-lg prose-p:mb-5
                     prose-ul:my-6 prose-li:text-white/70 prose-li:marker:text-white/40
                     prose-a:text-white prose-a:underline prose-a:decoration-white/30 hover:prose-a:decoration-white
-                    prose-strong:text-white prose-strong:font-bold"
+                    prose-strong:text-white prose-strong:font-bold
+                    [&_.markdown-main-panel_p>span]:block [&_.markdown-main-panel_p>span]:mb-5"
                   dangerouslySetInnerHTML={{ __html: renderCmsHtml(service.fullDesc) }}
                 />
               </Reveal>
