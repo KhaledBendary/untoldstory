@@ -403,6 +403,24 @@ export function unwrapPastedEditorMarkup(html?: string | null) {
     out = out.replace(container, "").replace(/<\/div>\s*$/i, "");
   }
 
+  /*
+   * One Arabic service was copied from the chat panel as a single <p> holding
+   * more than a hundred empty-class spans. Removing those spans (as we do for
+   * ordinary pasted editor markup) left one enormous paragraph for readers.
+   * When that exact export shape appears, each existing span is already a
+   * content unit, so restore it as its own paragraph. This changes structure
+   * only — never the translated words inside the spans.
+   */
+  const collapsedSpans = out.match(
+    /^\s*<p\b[^>]*>((?:\s*<span class="">[\s\S]*?<\/span>\s*){8,})<\/p>\s*$/i,
+  );
+  if (collapsedSpans) {
+    const blocks = [...collapsedSpans[1].matchAll(/<span class="">([\s\S]*?)<\/span>/gi)]
+      .map((match) => match[1].trim())
+      .filter((block) => block.replace(/<[^>]+>/g, "").replace(/&nbsp;/gi, " ").trim());
+    if (blocks.length >= 8) return blocks.map((block) => `<p>${block}</p>`).join("\n");
+  }
+
   return out
     .replace(/\sdata-path-to-node\s*=\s*("[^"]*"|'[^']*')/gi, "")
     .replace(/<span class="">([\s\S]*?)<\/span>/gi, "$1")

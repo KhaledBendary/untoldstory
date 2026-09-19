@@ -241,7 +241,6 @@ export function serviceStaticParams(apiSlugs: string[] = [], fallbackSlugs: stri
   return uniqueSlugParams([
     ...apiSlugs.map((slug) => SERVICE_SLUG_ALIASES[slug] || slug),
     ...fallbackSlugs.map((slug) => SERVICE_SLUG_ALIASES[slug] || slug),
-    ...Object.values(SERVICE_SLUG_ALIASES),
   ]);
 }
 
