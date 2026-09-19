@@ -34,10 +34,6 @@ function isRetryable(status?: number): boolean {
 const IS_BUILD = process.env.NEXT_PHASE === "phase-production-build";
 const RETRY_ATTEMPTS = IS_BUILD ? 2 : 6;
 const RETRY_DELAYS_MS = IS_BUILD ? [400, 1000] : [500, 1500, 3000, 6000, 10000];
-// Shared hosting can accept a connection and then never answer. During a
-// static build, an unbounded fetch leaves every worker frozen at 0 pages.
-// Let the existing retry/fallback path take over instead of waiting forever.
-const BUILD_REQUEST_TIMEOUT_MS = 15_000;
 const CIRCUIT_AFTER = 3;
 const CIRCUIT_MS = 60_000;
 
@@ -262,16 +258,11 @@ class ApiClient {
 
     for (let attempt = 0; attempt < RETRY_ATTEMPTS; attempt++) {
       const release = isCacheableServerRead ? await acquireSlot() : null;
-      const controller = isCacheableServerRead && IS_BUILD ? new AbortController() : null;
-      const timeout = controller
-        ? setTimeout(() => controller.abort(), BUILD_REQUEST_TIMEOUT_MS)
-        : null;
       try {
         const response = await fetch(url, {
           ...cacheInit,
           ...options,
           headers,
-          signal: controller?.signal ?? options.signal,
         });
 
         if (!response.ok) {
@@ -291,7 +282,6 @@ class ApiClient {
           error instanceof Error ? error.message : 'Network request failed',
         );
       } finally {
-        if (timeout) clearTimeout(timeout);
         // Released before the backoff wait so a sleeping retry doesn't hold a
         // slot another request could be using.
         release?.();
