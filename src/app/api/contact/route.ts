@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isMailConfigured, sendContactEmail } from "@/lib/mail";
 import { formTokenError } from "@/lib/form-token";
+import { addMessage, markMessageEmailed } from "@/lib/db/repo";
 
 export const runtime = "nodejs";
 
@@ -82,50 +83,34 @@ export async function POST(request: NextRequest) {
   if (!isEmail(payload.email)) {
     return NextResponse.json({ error: "Invalid email" }, { status: 422 });
   }
-  if (!isMailConfigured()) {
-    return NextResponse.json(
-      { error: "Email is not configured on the server" },
-      { status: 503 },
-    );
+
+  // Capture the lead in the database FIRST — it must survive even if the email
+  // notification fails or SMTP is misconfigured. This is the record of truth;
+  // the dashboard inbox reads it. The email is only a notification on top.
+  let messageId: number | null = null;
+  try {
+    messageId = await addMessage(payload);
+  } catch (error) {
+    console.error("Contact DB store failed:", error);
   }
 
-  try {
-    await sendContactEmail(payload);
-  } catch (error) {
-    console.error("Contact email failed:", error);
-    // Return the SMTP failure *kind* — not the message, which can echo the
-    // address and server banner. "Failed to send email" alone gives whoever
-    // is debugging no way to tell a wrong password from a blocked port.
-    const code = typeof error === "object" && error && "code" in error ? String((error as { code: unknown }).code) : undefined;
-    const reason =
-      code === "EAUTH" ? "authentication rejected"
-      : code === "ECONNECTION" || code === "ESOCKET" ? "could not connect"
-      : code === "ETIMEDOUT" || code === "ECONNRESET" ? "connection timed out"
-      : code === "EENVELOPE"
-        // nodemailer records which SMTP verb was refused: MAIL FROM carries the
-        // sender, RCPT TO the recipient. Knowing which one halves the search.
-        ? (typeof error === "object" && error && "command" in error && String((error as { command: unknown }).command) === "RCPT TO"
-            ? "recipient address refused"
-            : "sender address refused")
-      : undefined;
-    return NextResponse.json(
-      { error: "Failed to send email", ...(reason ? { reason, code } : {}) },
-      { status: 502 },
-    );
+  // Notify by email (best-effort). A failure here never loses the lead.
+  let emailed = false;
+  if (isMailConfigured()) {
+    try {
+      await sendContactEmail(payload);
+      emailed = true;
+    } catch (error) {
+      console.error("Contact email failed:", error);
+    }
+  }
+  if (emailed && messageId) {
+    try { await markMessageEmailed(messageId); } catch { /* the row exists; the flag is cosmetic */ }
   }
 
-  const apiBase = process.env.API_BASE_URL || "https://api.globaluntoldstory.com/api/v1";
-  try {
-    await fetch(`${apiBase}/contact`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-  } catch (error) {
-    console.error("Contact CMS copy failed:", error);
+  // Only if we could neither store nor email is the message truly lost.
+  if (messageId === null && !emailed) {
+    return NextResponse.json({ error: "Could not receive your message, please try again" }, { status: 502 });
   }
 
   return NextResponse.json({ ok: true });

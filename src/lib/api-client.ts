@@ -34,6 +34,12 @@ function isRetryable(status?: number): boolean {
 const IS_BUILD = process.env.NEXT_PHASE === "phase-production-build";
 const RETRY_ATTEMPTS = IS_BUILD ? 2 : 6;
 const RETRY_DELAYS_MS = IS_BUILD ? [400, 1000] : [500, 1500, 3000, 6000, 10000];
+
+// Hard ceiling on a single upstream request. Short during build (a prerender
+// worker is killed at ~60s and must have time to retry and fall back), a little
+// longer at runtime. fetch() has no default timeout, so without this a stalled
+// Laravel connection hangs the whole render.
+const REQUEST_TIMEOUT_MS = IS_BUILD ? 8000 : 15000;
 const CIRCUIT_AFTER = 3;
 const CIRCUIT_MS = 60_000;
 
@@ -53,7 +59,7 @@ function circuitOpen() {
   return true;
 }
 
-function noteNetworkFailure() {
+function noteUpstreamFailure() {
   circuit.fails += 1;
   if (circuit.fails >= CIRCUIT_AFTER) circuit.openedAt = Date.now();
 }
@@ -115,6 +121,7 @@ type ApiRuntimeState = {
   cache: Map<string, { at: number; value: Promise<unknown> }>;
   inFlight: number;
   waiting: Array<() => void>;
+  reportedFailures: Set<string>;
 };
 
 const RUNTIME_KEY = Symbol.for("globaluntoldstory.api-client.runtime");
@@ -122,9 +129,16 @@ const globalScope = globalThis as unknown as Record<symbol, ApiRuntimeState | un
 
 const runtime: ApiRuntimeState =
   globalScope[RUNTIME_KEY] ??
-  (globalScope[RUNTIME_KEY] = { cache: new Map(), inFlight: 0, waiting: [] });
+  (globalScope[RUNTIME_KEY] = { cache: new Map(), inFlight: 0, waiting: [], reportedFailures: new Set() });
 
 const responseCache = runtime.cache;
+
+function reportServerFailure(url: string, error: ApiError) {
+  const key = `${error.status ?? "network"}:${url}`;
+  if (runtime.reportedFailures.has(key)) return;
+  runtime.reportedFailures.add(key);
+  console.warn(`API request failed [${url}]: ${error.message}`);
+}
 
 function cachedRead<T>(url: string, load: () => Promise<T>): Promise<T> {
   const hit = responseCache.get(url);
@@ -263,6 +277,11 @@ class ApiClient {
           ...cacheInit,
           ...options,
           headers,
+          // A hung upstream must not stall a prerender until the framework's
+          // per-page export timeout kills it — abort a slow request so the
+          // caller's fallback (now the database, or editorial content) runs
+          // while there is still time. Browser reads keep their own budget.
+          signal: options.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS),
         });
 
         if (!response.ok) {
@@ -270,6 +289,7 @@ class ApiClient {
             `API request failed: ${response.status} ${response.statusText}`,
             response.status,
           );
+          if (isRetryable(response.status)) noteUpstreamFailure();
         } else {
           noteSuccess();
           return await response.json();
@@ -277,7 +297,7 @@ class ApiClient {
       } catch (error) {
         // fetch() itself threw (network error, DNS failure, etc.) — no
         // status available, treated as retryable below.
-        noteNetworkFailure();
+        noteUpstreamFailure();
         lastError = new ApiError(
           error instanceof Error ? error.message : 'Network request failed',
         );
@@ -294,7 +314,8 @@ class ApiClient {
 
     // Name the URL: "API request failed: 500" alone gives no way to tell which
     // endpoint, locale or slug actually broke.
-    console.error(`API request error [${url}]:`, lastError.message);
+    if (isCacheableServerRead) reportServerFailure(url, lastError);
+    else console.error(`API request error [${url}]:`, lastError.message);
     throw lastError;
   }
 

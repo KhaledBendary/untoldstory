@@ -1,14 +1,18 @@
+import "@/lib/db/register"; // server-only: publishes the DB content-source for api.ts
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import "../globals.css";
 import { Alexandria, Archivo, Inter, JetBrains_Mono } from "next/font/google";
 import SiteShell from "@/components/SiteShell";
+import Tracker from "@/components/Tracker";
 import StructuredData from "@/components/StructuredData";
 import { DEFAULT_LOCALE, PRERENDER_LOCALES, LOCALE_TAGS, OG_LOCALES, isLocale, localeDir, INDEXABLE_LOCALES, isIndexableLocale } from "@/lib/i18n";
 import { getCommandCenterSchemas } from "@/data/seo-command-schema";
 import { getShellData } from "@/lib/page-data";
 import { BRAND, DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/seo";
+import { getGeoSettings } from "@/lib/seo/geo-store";
+import { organizationSchema, officeSchemas, faqSchema, geoMeta } from "@/lib/seo/geo";
 import { pageMeta } from "@/data/page-meta";
 
 /**
@@ -105,35 +109,10 @@ export async function generateMetadata({
       alternateLocale: others,
     },
     twitter: { card: "summary_large_image" },
+    // Geo-targeting meta for local search — from the primary office in settings.
+    other: geoMeta(await getGeoSettings()),
   };
 }
-
-const organization = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "@id": `${siteUrl}/#organization`,
-  name: "Global Untold Story",
-  url: `${siteUrl}/`,
-  logo: `${siteUrl}/images/logo-white.png`,
-  description: "Full-service film, video, advertising, documentary, corporate, live, podcast, photography, motion/CGI/AI, localization, marketing and original-IP studio serving Egypt, MENA and international clients.",
-  email: "bendary@globaluntoldstory.com",
-  founder: { "@type": "Person", name: "Khaled Bendary", jobTitle: "CEO" },
-  address: [
-    { "@type": "PostalAddress", addressLocality: "Egyptian Media Production City", addressCountry: "EG" },
-    { "@type": "PostalAddress", addressLocality: "Business Bay, Dubai", addressCountry: "AE" },
-    { "@type": "PostalAddress", addressLocality: "Jeddah", addressCountry: "SA" },
-  ],
-  contactPoint: [
-    { "@type": "ContactPoint", telephone: "+201001299639", contactType: "sales", areaServed: "EG", availableLanguage: ["en", "ar"] },
-    { "@type": "ContactPoint", telephone: "+971547711772", contactType: "sales", areaServed: "AE", availableLanguage: ["en", "ar"] },
-  ],
-  sameAs: [
-    "https://www.facebook.com/theuntoldstory.adv",
-    "https://www.instagram.com/globaluntoldstory",
-    "https://vimeo.com/user252566067",
-    "https://www.linkedin.com/company/the-untold-story-film-production-services/",
-  ],
-};
 
 const website = {
   "@context": "https://schema.org",
@@ -144,67 +123,6 @@ const website = {
   publisher: { "@id": `${siteUrl}/#organization` },
   inLanguage: [...INDEXABLE_LOCALES],
 };
-
-/**
- * One ProfessionalService per office so the studio can surface in local results
- * for Cairo, Dubai and Jeddah rather than as a single country-less Organization.
- *
- * TODO: add `streetAddress`, `geo` and `openingHoursSpecification` per office —
- * left out deliberately rather than guessed, since wrong coordinates are worse
- * than none for local ranking.
- */
-const offices = [
-  {
-    id: "cairo",
-    name: "Global Untold Story — Cairo",
-    locality: "Egyptian Media Production City, 6th of October City",
-    region: "Giza",
-    country: "EG",
-    telephone: "+201001299639",
-  },
-  {
-    id: "dubai",
-    name: "Global Untold Story — Dubai",
-    locality: "Business Bay",
-    region: "Dubai",
-    country: "AE",
-    telephone: "+971547711772",
-  },
-  {
-    id: "jeddah",
-    name: "Global Untold Story — Jeddah",
-    locality: "Jeddah",
-    region: "Makkah Province",
-    country: "SA",
-  },
-].map((office) => ({
-  "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  "@id": `${siteUrl}/#office-${office.id}`,
-  name: office.name,
-  url: `${siteUrl}/contact`,
-  image: `${siteUrl}/images/on-ground-production-giza.jpg`,
-  logo: `${siteUrl}/images/logo-white.png`,
-  email: "bendary@globaluntoldstory.com",
-  ...(office.telephone ? { telephone: office.telephone } : {}),
-  parentOrganization: { "@id": `${siteUrl}/#organization` },
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: office.locality,
-    addressRegion: office.region,
-    addressCountry: office.country,
-  },
-  areaServed: ["Egypt", "United Arab Emirates", "Saudi Arabia", "MENA"],
-  knowsLanguage: ["en", "ar"],
-  serviceType: [
-    "Film production",
-    "Commercial advertising production",
-    "Documentary production",
-    "Corporate video production",
-    "Live broadcast production",
-    "Post production",
-  ],
-}));
 
 /*
  * Every locale is built, so an unrecognised one is a 404 rather than something
@@ -234,7 +152,7 @@ export default async function RootLayout({
   // matching [locale]). 404 unless middleware already redirected them.
   if (raw && !isLocale(raw)) notFound();
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
-  const shell = await getShellData(locale);
+  const [shell, geo] = await Promise.all([getShellData(locale), getGeoSettings()]);
 
 return (
   <html
@@ -316,6 +234,8 @@ return (
             'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
             })(window,document,'script','dataLayer','${GTM_CONTAINER_ID}');
           }` }} />
+      {/* RSS auto-discovery for feed readers and aggregators. */}
+      <link rel="alternate" type="application/rss+xml" title="Global Untold Story — Insights" href="/feed.xml" />
     </head>
     <body suppressHydrationWarning>
 
@@ -366,17 +286,19 @@ return (
 
       <StructuredData
         data={[
-          organization,
+          organizationSchema(geo),
           website,
-          ...offices,
+          ...officeSchemas(geo),
+          faqSchema(geo, locale),
           ...getCommandCenterSchemas(),
-        ]}
+        ].filter((x): x is Record<string, unknown> => Boolean(x))}
       />
 
       <SiteShell shell={shell} locale={locale}>
         {children}
       </SiteShell>
 
+      <Tracker />
     </body>
   </html>
 );

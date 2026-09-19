@@ -157,7 +157,8 @@
     "Satisfied clients": "عملاء راضون",
     "Repeat business": "تعاون متكرر",
     "N/A": "غير متاح",
-    "We couldn't load this right now.": "تعذّر تحميل هذا الآن."
+    "We couldn't load this right now.": "تعذّر تحميل هذا الآن.",
+    "Related articles": "مقالات مرتبطة"
   },
   "de": {
     "Home": "Startseite",
@@ -317,7 +318,8 @@
     "This page didn't load. It's not you — try again.": "Diese Seite wurde nicht geladen. Es liegt nicht an Ihnen — versuchen Sie es erneut.",
     "This project didn't load. It's not you — try again.": "Dieses Projekt wurde nicht geladen. Es liegt nicht an Ihnen — versuchen Sie es erneut.",
     "This service didn't load. It's not you — try again.": "Diese Leistung wurde nicht geladen. Es liegt nicht an Ihnen — versuchen Sie es erneut.",
-    "This article didn't load. It's not you — try again.": "Dieser Artikel wurde nicht geladen. Es liegt nicht an Ihnen — versuchen Sie es erneut."
+    "This article didn't load. It's not you — try again.": "Dieser Artikel wurde nicht geladen. Es liegt nicht an Ihnen — versuchen Sie es erneut.",
+    "Related articles": "Ähnliche Artikel"
   },
   "es": {
     "Home": "Inicio",
@@ -477,7 +479,8 @@
     "This page didn't load. It's not you — try again.": "Esta página no se ha cargado. No es culpa tuya: inténtalo de nuevo.",
     "This project didn't load. It's not you — try again.": "Este proyecto no se ha cargado. No es culpa tuya: inténtalo de nuevo.",
     "This service didn't load. It's not you — try again.": "Este servicio no se ha cargado. No es culpa tuya: inténtalo de nuevo.",
-    "This article didn't load. It's not you — try again.": "Este artículo no se ha cargado. No es culpa tuya: inténtalo de nuevo."
+    "This article didn't load. It's not you — try again.": "Este artículo no se ha cargado. No es culpa tuya: inténtalo de nuevo.",
+    "Related articles": "Artículos relacionados"
   },
   "fr": {
     "Home": "Accueil",
@@ -637,7 +640,8 @@
     "This page didn't load. It's not you — try again.": "Cette page n'a pas été chargée. Vous n'y êtes pour rien — réessayez.",
     "This project didn't load. It's not you — try again.": "Ce projet n'a pas été chargé. Vous n'y êtes pour rien — réessayez.",
     "This service didn't load. It's not you — try again.": "Ce service n'a pas été chargé. Vous n'y êtes pour rien — réessayez.",
-    "This article didn't load. It's not you — try again.": "Cet article n'a pas été chargé. Vous n'y êtes pour rien — réessayez."
+    "This article didn't load. It's not you — try again.": "Cet article n'a pas été chargé. Vous n'y êtes pour rien — réessayez.",
+    "Related articles": "Articles liés"
   },
   "it": {
     "Home": "Home",
@@ -797,7 +801,8 @@
     "This page didn't load. It's not you — try again.": "Questa pagina non è stata caricata. Non dipende da te: riprova.",
     "This project didn't load. It's not you — try again.": "Questo progetto non è stato caricato. Non dipende da te: riprova.",
     "This service didn't load. It's not you — try again.": "Questo servizio non è stato caricato. Non dipende da te: riprova.",
-    "This article didn't load. It's not you — try again.": "Questo articolo non è stato caricato. Non dipende da te: riprova."
+    "This article didn't load. It's not you — try again.": "Questo articolo non è stato caricato. Non dipende da te: riprova.",
+    "Related articles": "Articoli correlati"
   },
   "pt": {
     "Home": "Início",
@@ -957,7 +962,8 @@
     "This page didn't load. It's not you — try again.": "Esta página não carregou. Não é culpa sua — tente novamente.",
     "This project didn't load. It's not you — try again.": "Este projeto não carregou. Não é culpa sua — tente novamente.",
     "This service didn't load. It's not you — try again.": "Este serviço não carregou. Não é culpa sua — tente novamente.",
-    "This article didn't load. It's not you — try again.": "Este artigo não carregou. Não é culpa sua — tente novamente."
+    "This article didn't load. It's not you — try again.": "Este artigo não carregou. Não é culpa sua — tente novamente.",
+    "Related articles": "Artigos relacionados"
   },
   "tr": {
     "Home": "Ana Sayfa",
@@ -1117,7 +1123,8 @@
     "This page didn't load. It's not you — try again.": "Bu sayfa yüklenemedi. Sorun sizden kaynaklanmıyor — tekrar deneyin.",
     "This project didn't load. It's not you — try again.": "Bu proje yüklenemedi. Sorun sizden kaynaklanmıyor — tekrar deneyin.",
     "This service didn't load. It's not you — try again.": "Bu hizmet yüklenemedi. Sorun sizden kaynaklanmıyor — tekrar deneyin.",
-    "This article didn't load. It's not you — try again.": "Bu yazı yüklenemedi. Sorun sizden kaynaklanmıyor — tekrar deneyin."
+    "This article didn't load. It's not you — try again.": "Bu yazı yüklenemedi. Sorun sizden kaynaklanmıyor — tekrar deneyin.",
+    "Related articles": "İlgili makaleler"
   },
   "ru": {
     "Home": "Главная",
@@ -1277,7 +1284,8 @@
     "This page didn't load. It's not you — try again.": "Эта страница не загрузилась. Вы ни при чём — попробуйте снова.",
     "This project didn't load. It's not you — try again.": "Этот проект не загрузился. Вы ни при чём — попробуйте снова.",
     "This service didn't load. It's not you — try again.": "Эта услуга не загрузилась. Вы ни при чём — попробуйте снова.",
-    "This article didn't load. It's not you — try again.": "Эта статья не загрузилась. Вы ни при чём — попробуйте снова."
+    "This article didn't load. It's not you — try again.": "Эта статья не загрузилась. Вы ни при чём — попробуйте снова.",
+    "Related articles": "Похожие статьи"
   },
   "zh": {
     "Home": "首页",
@@ -1437,7 +1445,8 @@
     "This page didn't load. It's not you — try again.": "此页面未能加载。不是你的问题，请重试。",
     "This project didn't load. It's not you — try again.": "此项目未能加载。不是你的问题，请重试。",
     "This service didn't load. It's not you — try again.": "此服务未能加载。不是你的问题，请重试。",
-    "This article didn't load. It's not you — try again.": "此文章未能加载。不是你的问题，请重试。"
+    "This article didn't load. It's not you — try again.": "此文章未能加载。不是你的问题，请重试。",
+    "Related articles": "Related articles"
   },
   "en": {
     "Home": "Home",
@@ -1465,7 +1474,8 @@
     "Loading...": "Loading...",
     "Failed to load data": "Failed to load data",
     "Learn more →": "Learn more →",
-    "Film & Video Production": "Film & Video Production"
+    "Film & Video Production": "Film & Video Production",
+    "Related articles": "Related articles"
   },
   "ja": {
     "Home": "ホーム",
@@ -1625,7 +1635,8 @@
     "This page didn't load. It's not you — try again.": "このページを読み込めませんでした。お客様側の問題ではありません。再試行してください。",
     "This project didn't load. It's not you — try again.": "このプロジェクトを読み込めませんでした。お客様側の問題ではありません。再試行してください。",
     "This service didn't load. It's not you — try again.": "このサービスを読み込めませんでした。お客様側の問題ではありません。再試行してください。",
-    "This article didn't load. It's not you — try again.": "この記事を読み込めませんでした。お客様側の問題ではありません。再試行してください。"
+    "This article didn't load. It's not you — try again.": "この記事を読み込めませんでした。お客様側の問題ではありません。再試行してください。",
+    "Related articles": "Related articles"
   },
   "ko": {
     "Home": "홈",
@@ -1785,7 +1796,8 @@
     "This page didn't load. It's not you — try again.": "페이지를 불러오지 못했습니다. 사용자 문제는 아닙니다. 다시 시도해 주세요.",
     "This project didn't load. It's not you — try again.": "프로젝트를 불러오지 못했습니다. 사용자 문제는 아닙니다. 다시 시도해 주세요.",
     "This service didn't load. It's not you — try again.": "서비스를 불러오지 못했습니다. 사용자 문제는 아닙니다. 다시 시도해 주세요.",
-    "This article didn't load. It's not you — try again.": "기사를 불러오지 못했습니다. 사용자 문제는 아닙니다. 다시 시도해 주세요."
+    "This article didn't load. It's not you — try again.": "기사를 불러오지 못했습니다. 사용자 문제는 아닙니다. 다시 시도해 주세요.",
+    "Related articles": "Related articles"
   },
   "pl": {
     "Home": "Start",
@@ -1945,7 +1957,8 @@
     "This page didn't load. It's not you — try again.": "Ta strona się nie załadowała. To nie Twoja wina — spróbuj ponownie.",
     "This project didn't load. It's not you — try again.": "Ten projekt się nie załadował. To nie Twoja wina — spróbuj ponownie.",
     "This service didn't load. It's not you — try again.": "Ta usługa się nie załadowała. To nie Twoja wina — spróbuj ponownie.",
-    "This article didn't load. It's not you — try again.": "Ten artykuł się nie załadował. To nie Twoja wina — spróbuj ponownie."
+    "This article didn't load. It's not you — try again.": "Ten artykuł się nie załadował. To nie Twoja wina — spróbuj ponownie.",
+    "Related articles": "Related articles"
   },
   "sw": {
     "Home": "Nyumbani",
@@ -2105,6 +2118,7 @@
     "This page didn't load. It's not you — try again.": "Ukurasa huu haujapakiwa. Si kosa lako — jaribu tena.",
     "This project didn't load. It's not you — try again.": "Mradi huu haujapakiwa. Si kosa lako — jaribu tena.",
     "This service didn't load. It's not you — try again.": "Huduma hii haijapakiwa. Si kosa lako — jaribu tena.",
-    "This article didn't load. It's not you — try again.": "Makala haya hayajapakiwa. Si kosa lako — jaribu tena."
+    "This article didn't load. It's not you — try again.": "Makala haya hayajapakiwa. Si kosa lako — jaribu tena.",
+    "Related articles": "Related articles"
   }
 }

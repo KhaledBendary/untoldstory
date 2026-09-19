@@ -238,6 +238,12 @@ export function cmsSeo(seo?: Record<string, unknown> | null) {
   };
 }
 
+/** Apply a per-item noindex to a Metadata object (used when the CMS flags an item hidden). */
+export function withNoindex<T extends object>(meta: T, noindex?: boolean): T {
+  if (!noindex) return meta;
+  return { ...meta, robots: { index: false, follow: false } };
+}
+
 export function absoluteUrl(path: string) {
   return path.startsWith("http") ? path : `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }

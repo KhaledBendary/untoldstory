@@ -1,3 +1,4 @@
+import "@/lib/db/register"; // server-only: publishes the DB content-source for api.ts
 import type { Metadata } from "next";
 import Home from "@/components/pages/Home";
 import { applySeoOverrides } from "@/data/seo-overrides";

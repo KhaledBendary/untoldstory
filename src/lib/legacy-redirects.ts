@@ -233,25 +233,21 @@ function uniqueSlugParams(slugs: Iterable<string>) {
 }
 
 /**
- * Prerender real service pages only.
- *
- * Old service slugs are handled by `proxy.ts` before the route is rendered,
- * where `legacyDestination()` sends them to their canonical URL. Including
- * them here made each deployment ask the CMS for records it intentionally does
- * not have, producing hundreds of harmless-but-slow 404s during the build.
+ * Prerender current CMS pages only. Legacy slugs are redirected by proxy
+ * before they reach this route, so building them would only ask the CMS for
+ * records it intentionally no longer has and produce misleading 404 logs.
  */
 export function serviceStaticParams(apiSlugs: string[] = [], fallbackSlugs: string[] = []) {
   return uniqueSlugParams([
-    ...apiSlugs,
-    ...fallbackSlugs,
+    ...apiSlugs.map((slug) => SERVICE_SLUG_ALIASES[slug] || slug),
+    ...fallbackSlugs.map((slug) => SERVICE_SLUG_ALIASES[slug] || slug),
   ]);
 }
 
 export function postStaticParams(apiSlugs: string[] = [], fallbackSlugs: string[] = []) {
   return uniqueSlugParams([
-    ...apiSlugs,
-    ...fallbackSlugs,
-    ...Object.keys(POST_SLUG_ALIASES),
+    ...apiSlugs.map((slug) => POST_SLUG_ALIASES[slug] || slug),
+    ...fallbackSlugs.map((slug) => POST_SLUG_ALIASES[slug] || slug),
     ...Object.values(POST_SLUG_ALIASES),
   ]);
 }
