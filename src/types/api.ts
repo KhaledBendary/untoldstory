@@ -41,6 +41,8 @@ export interface PortfolioItem {
   categorySlug?: string;
   duration?: string | null;
   budget?: string | null;
+  shortDescription?: string;
+  description?: string;
   results?: string;
   metric?: string;
   gridSize?: string;
