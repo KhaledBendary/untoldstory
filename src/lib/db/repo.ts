@@ -347,6 +347,37 @@ export async function getByType(type: keyof typeof TABLES, slug: string) {
   return getPost(slug);
 }
 
+/**
+ * Merge per-locale translations into an item's `data`, writing only the JSONB
+ * (fixed columns and untouched languages/fields are preserved). `patch` is
+ * { fieldKey: { locale: value } } — used by the translation-file importer.
+ */
+export async function importLocaleData(
+  type: keyof typeof TABLES,
+  slug: string,
+  patch: Record<string, Record<string, string>>,
+): Promise<{ applied: number; locales: string[] }> {
+  const current = await getByType(type, slug);
+  if (!current) throw new Error(`not-found:${type}/${slug}`);
+  const data = ((current.data as Record<string, Dict>) ?? {}) as Record<string, Dict>;
+  let applied = 0;
+  const locales = new Set<string>();
+  for (const [field, byLoc] of Object.entries(patch)) {
+    for (const [loc, val] of Object.entries(byLoc)) {
+      if (typeof val === "string" && val.trim()) {
+        data[field] = { ...(data[field] ?? {}), [loc]: val };
+        applied++;
+        locales.add(loc);
+      }
+    }
+  }
+  const json = sql.json(data as Parameters<typeof sql.json>[0]);
+  if (type === "services") await sql`update services set data=${json}, updated_at=now() where slug=${slug}`;
+  else if (type === "projects") await sql`update projects set data=${json}, updated_at=now() where slug=${slug}`;
+  else await sql`update posts set data=${json}, updated_at=now() where slug=${slug}`;
+  return { applied, locales: [...locales] };
+}
+
 // ---- writes ----
 
 /**

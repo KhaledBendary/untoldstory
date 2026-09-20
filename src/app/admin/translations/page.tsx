@@ -4,6 +4,7 @@ import { currentSession } from "@/lib/admin-session";
 import { getServices, getProjects, getPosts } from "@/lib/db/repo";
 import { LOCALE_CODES } from "@/lib/i18n";
 import TranslateAllButton from "./TranslateAllButton";
+import ImportTranslationsButton from "./ImportTranslationsButton";
 
 export const dynamic = "force-dynamic";
 
@@ -113,8 +114,9 @@ export default async function TranslationsPage() {
       <p style={{ fontSize: 12, color: "var(--faint)", margin: "0 0 4px" }}>
         النسبة بتحسب الترجمة الحقيقية بس (اللي مختلفة عن الإنجليزي). اللغات اللي لسه نسخة إنجليزي محتاجة ترجمة فعلية.
       </p>
-      <div style={{ margin: "14px 0 22px" }}>
+      <div style={{ margin: "14px 0 22px", display: "grid", gap: 10 }}>
         <TranslateAllButton />
+        <ImportTranslationsButton />
       </div>
       <Section label="الخدمات" type="services" items={analyze(services)} />
       <Section label="الأعمال" type="projects" items={analyze(projects)} />
