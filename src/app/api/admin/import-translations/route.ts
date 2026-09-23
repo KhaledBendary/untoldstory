@@ -4,14 +4,15 @@ import { importLocaleData, logActivity } from "@/lib/db/repo";
 import { triggerDeploy } from "@/lib/deploy";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 /**
- * Import a translation file (the "*-locales-import.json" format) into an item.
- * Shape:
+ * Import translation file(s) — the "*-locales-import.json" format — into content.
+ * Accepts a single item, or an array of items (many in one upload):
  *   { service_slug|project_slug|post_slug: "...",
  *     translations: { <locale>: { title, short_desc, full_desc } } }
- * The source keys are mapped to each type's real data fields. English/Arabic and
- * any untouched languages are preserved.
+ * Source keys map to each type's real data fields; English/Arabic and untouched
+ * languages are preserved.
  */
 const TYPE_MAP: Record<string, { type: "services" | "projects" | "posts"; fields: Record<string, string> }> = {
   service_slug: { type: "services", fields: { title: "title", short_desc: "shortDesc", full_desc: "fullDesc" } },
@@ -19,58 +20,68 @@ const TYPE_MAP: Record<string, { type: "services" | "projects" | "posts"; fields
   post_slug: { type: "posts", fields: { title: "title", short_desc: "excerpt", full_desc: "body" } },
 };
 
-export async function POST(request: NextRequest) {
-  const auth = await requireAdmin();
-  if (!auth.session) return auth.response;
+type ItemResult = { slug: string; type?: string; ok: boolean; applied?: number; locales?: string[]; error?: string };
 
-  const doc = await request.json().catch(() => null);
-  if (!doc || typeof doc !== "object") {
-    return NextResponse.json({ error: "الملف مش JSON صالح" }, { status: 400 });
-  }
-
-  const kindKey = Object.keys(TYPE_MAP).find((k) => typeof doc[k] === "string" && doc[k]);
-  if (!kindKey) {
-    return NextResponse.json({ error: "الملف لازم يحتوي على service_slug أو project_slug أو post_slug" }, { status: 422 });
-  }
+async function applyDoc(doc: unknown): Promise<ItemResult> {
+  if (!doc || typeof doc !== "object") return { slug: "?", ok: false, error: "عنصر غير صالح" };
+  const d = doc as Record<string, unknown>;
+  const kindKey = Object.keys(TYPE_MAP).find((k) => typeof d[k] === "string" && d[k]);
+  if (!kindKey) return { slug: "?", ok: false, error: "مفيش service_slug/project_slug/post_slug" };
   const { type, fields } = TYPE_MAP[kindKey];
-  const slug = String(doc[kindKey]);
-  const translations = doc.translations;
-  if (!translations || typeof translations !== "object") {
-    return NextResponse.json({ error: "مفيش translations في الملف" }, { status: 422 });
-  }
+  const slug = String(d[kindKey]);
+  const translations = d.translations;
+  if (!translations || typeof translations !== "object") return { slug, type, ok: false, error: "مفيش translations" };
 
-  // Build patch { dbField: { locale: value } } from the file's per-locale blocks.
   const patch: Record<string, Record<string, string>> = {};
   for (const [loc, vals] of Object.entries(translations as Record<string, Record<string, unknown>>)) {
     if (!vals || typeof vals !== "object") continue;
     for (const [srcKey, dbKey] of Object.entries(fields)) {
-      const v = vals[srcKey];
+      const v = (vals as Record<string, unknown>)[srcKey];
       if (typeof v === "string" && v.trim()) {
         patch[dbKey] = patch[dbKey] || {};
         patch[dbKey][loc] = v;
       }
     }
   }
-  if (Object.keys(patch).length === 0) {
-    return NextResponse.json({ error: "مفيش أي نصوص صالحة في الملف" }, { status: 422 });
-  }
+  if (Object.keys(patch).length === 0) return { slug, type, ok: false, error: "مفيش نصوص صالحة" };
 
-  let result;
   try {
-    result = await importLocaleData(type, slug, patch);
+    const r = await importLocaleData(type, slug, patch);
+    return { slug, type, ok: true, applied: r.applied, locales: r.locales };
   } catch (e) {
     const msg = (e as Error).message;
-    if (msg.startsWith("not-found")) {
-      return NextResponse.json({ error: `مفيش عنصر بالمعرّف "${slug}" في ${type}` }, { status: 404 });
-    }
-    console.error("import-translations failed:", e);
-    return NextResponse.json({ error: "حصل خطأ أثناء الاستيراد" }, { status: 500 });
+    return { slug, type, ok: false, error: msg.startsWith("not-found") ? "العنصر مش موجود" : "خطأ في الحفظ" };
   }
+}
 
-  await logActivity({
-    actor: auth.session.email, action: "update", entity: type, ref: slug,
-    detail: `استيراد ترجمة: ${result.applied} حقل [${result.locales.join(", ")}]`,
+export async function POST(request: NextRequest) {
+  const auth = await requireAdmin();
+  if (!auth.session) return auth.response;
+
+  const body = await request.json().catch(() => null);
+  if (!body || (typeof body !== "object")) {
+    return NextResponse.json({ error: "الملف مش JSON صالح" }, { status: 400 });
+  }
+  const docs = Array.isArray(body) ? body : [body];
+  if (docs.length === 0) return NextResponse.json({ error: "الملف فاضي" }, { status: 422 });
+
+  const results: ItemResult[] = [];
+  for (const doc of docs) results.push(await applyDoc(doc));
+
+  const okItems = results.filter((r) => r.ok);
+  if (okItems.length) {
+    await logActivity({
+      actor: auth.session.email, action: "update", entity: "site", ref: "translations",
+      detail: `استيراد ترجمة: ${okItems.length} عنصر (${okItems.map((r) => r.slug).join(", ")})`,
+    });
+  }
+  const deploy = okItems.length ? await triggerDeploy() : { triggered: false as const };
+  return NextResponse.json({
+    ok: okItems.length > 0,
+    total: results.length,
+    succeeded: okItems.length,
+    failed: results.length - okItems.length,
+    results,
+    deploy,
   });
-  const deploy = await triggerDeploy();
-  return NextResponse.json({ ok: true, type, slug, ...result, deploy });
 }
