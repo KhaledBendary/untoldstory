@@ -13,7 +13,24 @@ export type FixedType = "text" | "image" | "bool" | "number" | "date" | "emoji";
 export type I18nType = "text" | "textarea" | "html";
 
 export type FixedField = { key: string; label: string; type: FixedType };
-export type I18nField = { key: string; label: string; type: I18nType; required?: boolean };
+export type I18nField = { key: string; label: string; type: I18nType; required?: boolean; noTranslate?: boolean };
+
+/**
+ * The full per-item SEO field set, shared by every content type. Stored nested
+ * in data.seo.<locale>. metaTitle/metaDescription and the social overrides are
+ * machine-translated; the focus keyword, canonical URL and robots flag are not.
+ */
+export const SEO_I18N: I18nField[] = [
+  { key: "seo.metaTitle", label: "عنوان محرّكات البحث (SEO)", type: "text" },
+  { key: "seo.metaDescription", label: "وصف محرّكات البحث (SEO)", type: "textarea" },
+  { key: "seo.ogTitle", label: "عنوان المشاركة (Open Graph)", type: "text" },
+  { key: "seo.ogDescription", label: "وصف المشاركة (Open Graph)", type: "textarea" },
+  { key: "seo.twitterTitle", label: "عنوان تويتر", type: "text" },
+  { key: "seo.twitterDescription", label: "وصف تويتر", type: "textarea" },
+  { key: "seo.focusKeyword", label: "الكلمة المفتاحية", type: "text", noTranslate: true },
+  { key: "seo.canonical", label: "الرابط الأساسي (Canonical)", type: "text", noTranslate: true },
+  { key: "seo.nofollow", label: "منع تتبّع الروابط (nofollow)", type: "text", noTranslate: true },
+];
 
 export type ContentType = {
   key: string;          // url + api segment
@@ -44,8 +61,7 @@ export const CONTENT_TYPES: Record<string, ContentType> = {
       { key: "title", label: "العنوان", type: "text", required: true },
       { key: "shortDesc", label: "الوصف المختصر", type: "textarea" },
       { key: "fullDesc", label: "الوصف الكامل", type: "html" },
-      { key: "seo.metaTitle", label: "عنوان محرّكات البحث (SEO)", type: "text" },
-      { key: "seo.metaDescription", label: "وصف محرّكات البحث (SEO)", type: "textarea" },
+      ...SEO_I18N,
     ],
   },
   projects: {
@@ -68,8 +84,7 @@ export const CONTENT_TYPES: Record<string, ContentType> = {
       { key: "description", label: "الوصف الكامل", type: "html" },
       { key: "results", label: "النتائج", type: "textarea" },
       { key: "metric", label: "المؤشر", type: "text" },
-      { key: "seo.metaTitle", label: "عنوان محرّكات البحث (SEO)", type: "text" },
-      { key: "seo.metaDescription", label: "وصف محرّكات البحث (SEO)", type: "textarea" },
+      ...SEO_I18N,
     ],
   },
   posts: {
@@ -89,8 +104,7 @@ export const CONTENT_TYPES: Record<string, ContentType> = {
       { key: "title", label: "العنوان", type: "text", required: true },
       { key: "excerpt", label: "المقتطف", type: "textarea" },
       { key: "body", label: "نص المقالة", type: "html" },
-      { key: "seo.metaTitle", label: "عنوان محرّكات البحث (SEO)", type: "text" },
-      { key: "seo.metaDescription", label: "وصف محرّكات البحث (SEO)", type: "textarea" },
+      ...SEO_I18N,
     ],
   },
 };

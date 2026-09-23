@@ -75,6 +75,41 @@ export default async function SeoPage() {
   const indexablePages = indexable * INDEXABLE_LOCALES.length;
   const shellPages = indexable * shellLocales.length;
 
+  // ---- SEO issues & recommendations (checked on the English metadata of the
+  // pages Google actually indexes) ----
+  type Typed = Row & { _type: string; _base: string };
+  const typed: Typed[] = [
+    ...services.map((r) => ({ ...r, _type: "الخدمات", _base: "services" })),
+    ...projects.map((r) => ({ ...r, _type: "الأعمال", _base: "projects" })),
+    ...posts.map((r) => ({ ...r, _type: "المقالات", _base: "posts" })),
+  ] as unknown as Typed[];
+  const live = typed.filter((r) => stateOf(r).indexed);
+
+  const titleCounts = new Map<string, number>();
+  for (const r of live) {
+    const t = ((r.data.seo as Record<string, Record<string, string>> | undefined)?.en?.metaTitle || "").trim().toLowerCase();
+    if (t) titleCounts.set(t, (titleCounts.get(t) ?? 0) + 1);
+  }
+  const seoIssues = (r: Typed): string[] => {
+    const seoEn = (r.data.seo as Record<string, Record<string, string>> | undefined)?.en ?? {};
+    const title = (seoEn.metaTitle || "").trim();
+    const desc = (seoEn.metaDescription || "").trim();
+    const out: string[] = [];
+    if (!title) out.push("عنوان SEO ناقص");
+    else if (title.length > 60) out.push(`عنوان SEO طويل (${title.length})`);
+    else if (title.length < 25) out.push(`عنوان SEO قصير (${title.length})`);
+    if (!desc) out.push("وصف SEO ناقص");
+    else if (desc.length > 160) out.push(`وصف SEO طويل (${desc.length})`);
+    else if (desc.length < 70) out.push(`وصف SEO قصير (${desc.length})`);
+    if (title && (titleCounts.get(title.toLowerCase()) ?? 0) > 1) out.push("عنوان SEO مكرّر");
+    return out;
+  };
+  const withIssues = live.map((r) => ({ r, issues: seoIssues(r) })).filter((x) => x.issues.length > 0);
+  const clean = live.length - withIssues.length;
+  const seoScore = live.length ? Math.round((clean / live.length) * 100) : 100;
+  const scoreColor = seoScore >= 80 ? "var(--ok)" : seoScore >= 50 ? "var(--warn)" : "var(--danger)";
+  const nameOf = (r: Typed) => (r.data.title as Record<string, string> | undefined)?.ar || (r.data.title as Record<string, string> | undefined)?.en || r.slug;
+
   return (
     <div style={{ maxWidth: 1000, margin: "0 auto", padding: "22px 24px 56px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6, flexWrap: "wrap" }}>
@@ -88,6 +123,10 @@ export default async function SeoPage() {
       </p>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 14, marginBottom: 22 }}>
+        <div className="card" style={{ padding: "16px 18px" }}>
+          <div style={{ fontSize: 28, fontWeight: 800, fontFamily: "ui-monospace, monospace", color: scoreColor }}>{seoScore}%</div>
+          <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 4 }}>درجة السيو العامة</div>
+        </div>
         {cards.map((c) => (
           <div key={c.l} className="card" style={{ padding: "16px 18px" }}>
             <div style={{ fontSize: 28, fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>{c.n}</div>
@@ -95,6 +134,42 @@ export default async function SeoPage() {
           </div>
         ))}
       </div>
+
+      <section style={{ marginBottom: 22 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 10px" }}>
+          مشاكل وتوصيات <span style={{ color: withIssues.length ? "var(--warn)" : "var(--ok)", fontWeight: 400, fontSize: 13 }}>
+            {withIssues.length ? `${withIssues.length} عنصر محتاج تحسين` : "كل العناصر المفهرسة سليمة ✓"}
+          </span>
+        </h2>
+        {withIssues.length > 0 && (
+          <div className="card" style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+              <thead><tr style={{ color: "var(--faint)" }}>
+                {["العنصر", "النوع", "المشاكل"].map((h) => (
+                  <th key={h} style={{ textAlign: "start", padding: "9px 12px", fontWeight: 500, borderBottom: "1px solid var(--line)" }}>{h}</th>
+                ))}
+              </tr></thead>
+              <tbody>
+                {withIssues.map(({ r, issues }) => (
+                  <tr key={`${r._base}-${r.slug}`}>
+                    <td style={{ padding: "8px 12px", maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <Link href={`/admin/${r._base}/${r.slug}`} style={{ color: "var(--ink)" }}>{nameOf(r)}</Link>
+                    </td>
+                    <td style={{ padding: "8px 12px", color: "var(--muted)" }}>{r._type}</td>
+                    <td style={{ padding: "8px 12px" }}>
+                      <span style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                        {issues.map((iss, n) => (
+                          <span key={n} style={{ fontSize: 11.5, padding: "2px 8px", borderRadius: 20, background: "color-mix(in srgb, var(--warn) 16%, transparent)", color: "var(--warn)" }}>{iss}</span>
+                        ))}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
       <div className="card" style={{ padding: "14px 16px", marginBottom: 22 }}>
         <h2 style={{ fontSize: 15, fontWeight: 700, margin: "0 0 8px" }}>الفهرسة حسب اللغة</h2>

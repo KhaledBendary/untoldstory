@@ -21,6 +21,7 @@ export async function applyMachineTranslations(
 ): Promise<{ warning?: string }> {
   const toTranslate: FieldToTranslate[] = [];
   for (const field of def.i18n) {
+    if (field.noTranslate) continue; // keywords, canonical URLs, flags — never translate
     const en = data[field.key]?.en?.trim();
     if (!en) continue;
     const prevEn = existing?.[field.key]?.en;

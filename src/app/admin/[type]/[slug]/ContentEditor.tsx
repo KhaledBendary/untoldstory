@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FixedField, I18nField } from "@/lib/admin/content-types";
 import ImagePicker from "@/app/admin/ImagePicker";
 import RichTextEditor from "@/app/admin/RichTextEditor";
+import SeoPanel from "./SeoPanel";
 import { LOCALE_CODES, localeDir } from "@/lib/i18n";
 
 type Dict = Record<string, string>;
@@ -19,13 +20,8 @@ const LANG_LABEL: Record<string, string> = {
 };
 const LANGS = LOCALE_CODES.map((code) => ({ code, label: LANG_LABEL[code] || code.toUpperCase(), dir: localeDir(code) }));
 
-const SITE = "https://globaluntoldstory.com";
-// The public URL base + the structured-data types each content type emits.
-const PUBLIC_SEO: Record<string, { base: string; schema: string }> = {
-  services: { base: "/services", schema: "Service + BreadcrumbList" },
-  projects: { base: "/work", schema: "CreativeWork + BreadcrumbList" },
-  posts: { base: "/insights", schema: "Article + BreadcrumbList" },
-};
+// Content types that have a public detail page (and therefore an SEO panel).
+const PUBLIC_SEO: Record<string, true> = { services: true, projects: true, posts: true };
 
 /** Turn the server's deploy result into a friendly line for the editor. */
 export function deployMessage(deploy?: { triggered?: boolean; reason?: string }): string {
@@ -81,6 +77,10 @@ export default function ContentEditor({
     ?? i18nFields.find((f) => f.type === "textarea")?.key ?? "";
   const titleKey = i18nFields.find((f) => f.key === "title")?.key
     ?? i18nFields.find((f) => f.type === "text")?.key ?? "";
+  // The short-form field (excerpt / short description) for SEO description fallback.
+  const shortKey = i18nFields.find((f) => /excerpt|short/i.test(f.key))?.key ?? "";
+  // SEO fields are edited in the dedicated SeoPanel, not the generic loop.
+  const contentFields = i18nFields.filter((f) => !f.key.startsWith("seo."));
 
   // Warn before leaving with unsaved changes.
   useEffect(() => {
@@ -252,7 +252,7 @@ export default function ContentEditor({
       </div>
 
       {/* translatable fields */}
-      {i18nFields.map((f) => {
+      {contentFields.map((f) => {
         const isBody = f.type === "html" || f.type === "textarea";
         const isExcerpt = /excerpt|short|summary/i.test(f.key);
         return (
@@ -302,9 +302,9 @@ export default function ContentEditor({
         <p style={{ color: "var(--danger)", fontSize: 12, margin: "-6px 2px 14px" }}>{aiError}</p>
       )}
 
-      {/* fixed fields */}
+      {/* fixed fields — og_image & noindex live in the SEO panel below */}
       <div style={{ borderTop: "1px solid var(--line)", marginTop: 8, paddingTop: 18, display: "grid", gap: 16 }}>
-        {fixedFields.map((f) => (
+        {fixedFields.filter((f) => f.key !== "og_image" && f.key !== "noindex").map((f) => (
           f.type === "bool" ? (
             <label key={f.key} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14 }}>
               <input type="checkbox" checked={Boolean(fixed[f.key])}
@@ -334,42 +334,22 @@ export default function ContentEditor({
         ))}
       </div>
 
-      {/* Technical SEO preview — what search engines actually receive for this item */}
-      {PUBLIC_SEO[type] && (() => {
-        const effSlug = (create ? newSlug : slug) || "…";
-        const canonical = `${SITE}${PUBLIC_SEO[type].base}/${effSlug}`;
-        const published = status === "published";
-        const noindex = Boolean(fixed["noindex"]);
-        const indexed = published && !noindex;
-        const metaTitle = i18n["seo.metaTitle"]?.en || i18n["title"]?.en || effSlug;
-        const metaDesc = i18n["seo.metaDescription"]?.en || i18n["excerpt"]?.en || i18n["shortDesc"]?.en || i18n["shortDescription"]?.en || "—";
-        const ogImage = String(fixed["og_image"] || "") || "الصورة الافتراضية للموقع";
-        const row = (k: string, v: ReactNode) => (
-          <div style={{ display: "grid", gridTemplateColumns: "130px 1fr", gap: 10, padding: "6px 0", borderTop: "1px solid var(--line)", fontSize: 12.5 }}>
-            <span style={{ color: "var(--faint)" }}>{k}</span>
-            <span style={{ minWidth: 0, wordBreak: "break-word" }}>{v}</span>
-          </div>
-        );
-        return (
-          <details style={{ marginTop: 20, background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 10, padding: "12px 14px" }}>
-            <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 600 }}>معاينة SEO التقنية — اللي بيوصل جوجل</summary>
-            <div style={{ marginTop: 8 }}>
-              {row("Canonical URL", <span dir="ltr">{canonical}</span>)}
-              {row("Robots", indexed
-                ? <span style={{ color: "var(--ok)" }}>index, follow ✓</span>
-                : <span style={{ color: "var(--warn)" }}>noindex{published ? " (مخفي يدوياً)" : " (مسودّة)"}, follow</span>)}
-              {row("Meta title", <span>{metaTitle} <span style={{ color: "var(--faint)" }}>({metaTitle.length} حرف)</span></span>)}
-              {row("Meta description", <span>{metaDesc}</span>)}
-              {row("OG / Twitter", <span>العنوان والوصف بيتاخدوا من الميتا فوق · الصورة: <span dir="ltr">{ogImage}</span> · بطاقة تويتر: summary_large_image</span>)}
-              {row("Structured data", <span>{PUBLIC_SEO[type].schema} (JSON-LD تلقائي)</span>)}
-              {row("hreflang", <span>روابط بديلة لكل اللغات المفهرسة (تلقائي)</span>)}
-            </div>
-            <p style={{ fontSize: 11.5, color: "var(--faint)", margin: "10px 0 0" }}>
-              دي معاينة تقريبية للغة الإنجليزية. القيم الفعلية بتتولّد وقت النشر لكل لغة.
-            </p>
-          </details>
-        );
-      })()}
+      {/* Full SEO workbench: analysis, previews, and all SEO fields */}
+      {PUBLIC_SEO[type] && (
+        <SeoPanel
+          type={type}
+          slug={(create ? newSlug : slug) || ""}
+          lang={lang}
+          dir={dir}
+          i18n={i18n}
+          fixed={fixed}
+          titleKey={titleKey}
+          bodyKey={bodyKey}
+          shortKey={shortKey}
+          setText={setText}
+          setFixedVal={setFixedVal}
+        />
+      )}
 
       {errors.length > 0 && (
         <div style={{ marginTop: 18, background: "color-mix(in srgb, var(--danger) 15%, transparent)",

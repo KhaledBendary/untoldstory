@@ -44,8 +44,13 @@ async function slugList() {
   }
 }
 
-function serviceMeta(path: string, locale: string, title: string, description: string, image?: string | null) {
-  return applySeoOverrides(path, pageSeo({ path, locale, title, description, image }), locale);
+function serviceMeta(path: string, locale: string, title: string, description: string, image?: string | null, extra?: ReturnType<typeof cmsSeo>) {
+  return applySeoOverrides(path, pageSeo({
+    path, locale, title, description, image,
+    ogTitle: extra?.ogTitle, ogDescription: extra?.ogDescription,
+    twitterTitle: extra?.twitterTitle, twitterDescription: extra?.twitterDescription,
+    canonical: extra?.canonical, nofollow: extra?.nofollow,
+  }), locale);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -63,7 +68,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         path, locale,
         buildTitle(meta.metaTitle || service.title, slug),
         buildDescription(meta.metaDescription || service.shortDesc),
-        meta.ogImageUrl || service.imageUrl,
+        meta.ogImageUrl || service.imageUrl, meta,
       ), (service as { noindex?: boolean }).noindex);
     }
     return serviceMeta(path, locale, fallbackTitle, fallbackTitle);
@@ -76,7 +81,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       path, locale,
       buildTitle(meta.metaTitle || service.title, slug),
       buildDescription(meta.metaDescription || service.shortDesc),
-      meta.ogImageUrl || service.imageUrl,
+      meta.ogImageUrl || service.imageUrl, meta,
     );
   } catch (e) {
     console.error("Error fetching service for metadata:", e);
@@ -87,7 +92,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         path, locale,
         buildTitle(meta.metaTitle || live.title, slug),
         buildDescription(meta.metaDescription || live.shortDesc),
-        meta.ogImageUrl || live.imageUrl,
+        meta.ogImageUrl || live.imageUrl, meta,
       );
     }
 

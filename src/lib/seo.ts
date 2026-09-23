@@ -230,11 +230,21 @@ export function buildDescription(raw?: string | null, fallback = "") {
 
 /** The CMS ships an untyped `seo` bag on most records. Read it safely. */
 export function cmsSeo(seo?: Record<string, unknown> | null) {
-  const read = (key: string) => (typeof seo?.[key] === "string" ? (seo[key] as string) : undefined);
+  const read = (key: string) => {
+    const v = seo?.[key];
+    return typeof v === "string" && v.trim() ? (v as string) : undefined;
+  };
+  const nf = read("nofollow");
   return {
     metaTitle: read("metaTitle"),
     metaDescription: read("metaDescription"),
     ogImageUrl: read("ogImageUrl"),
+    ogTitle: read("ogTitle"),
+    ogDescription: read("ogDescription"),
+    twitterTitle: read("twitterTitle"),
+    twitterDescription: read("twitterDescription"),
+    canonical: read("canonical"),
+    nofollow: nf === "true" || nf === "1",
   };
 }
 
@@ -494,6 +504,13 @@ type PageSeoInput = {
   image?: string | null;
   type?: "website" | "article";
   publishedTime?: string;
+  // Per-item overrides from the dashboard SEO panel (all optional).
+  ogTitle?: string;
+  ogDescription?: string;
+  twitterTitle?: string;
+  twitterDescription?: string;
+  canonical?: string;
+  nofollow?: boolean;
 };
 
 /**
@@ -508,33 +525,47 @@ export function pageSeo({
   image,
   type = "website",
   publishedTime,
+  ogTitle,
+  ogDescription,
+  twitterTitle,
+  twitterDescription,
+  canonical,
+  nofollow,
 }: PageSeoInput): Metadata {
   const safeTitle = clampTitle(title) || BRAND;
   const desc = buildDescription(description, safeTitle);
   const url = absoluteUrl(localizedPath(path, locale));
   const img = absoluteUrl(image || DEFAULT_OG_IMAGE);
   const indexable = isIndexableLocale(locale);
+  const follow = !nofollow;
+  // Per-item overrides fall back to the meta title/description.
+  const ogT = ogTitle?.trim() || safeTitle;
+  const ogD = ogDescription?.trim() || desc;
+  const twT = twitterTitle?.trim() || ogT;
+  const twD = twitterDescription?.trim() || ogD;
+  const alt = alternatesFor(path, locale);
+  if (canonical?.trim()) alt.canonical = canonical.trim();
   return {
     title: { absolute: safeTitle },
     description: desc,
-    alternates: alternatesFor(path, locale),
+    alternates: alt,
     robots: indexable
-      ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } }
-      : { index: false, follow: true, googleBot: { index: false, follow: true } },
+      ? { index: true, follow, googleBot: { index: true, follow, "max-image-preview": "large", "max-snippet": -1 } }
+      : { index: false, follow, googleBot: { index: false, follow } },
     openGraph: {
-      title: safeTitle,
-      description: desc,
+      title: ogT,
+      description: ogD,
       url,
       siteName: BRAND,
       locale: OG_LOCALES[(isLocale(locale) ? locale : DEFAULT_LOCALE) as Locale],
       type,
-      images: [{ url: img, width: 1200, height: 630, alt: safeTitle }],
+      images: [{ url: img, width: 1200, height: 630, alt: ogT }],
       ...(publishedTime ? { publishedTime } : {}),
     },
     twitter: {
       card: "summary_large_image",
-      title: safeTitle,
-      description: desc,
+      title: twT,
+      description: twD,
       images: [img],
     },
   };
