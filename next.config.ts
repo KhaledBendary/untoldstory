@@ -78,6 +78,14 @@ const GOOGLE_COUNTRY_DOMAINS = [
 
 const META = "https://www.facebook.com https://connect.facebook.net";
 
+// Images uploaded through the admin (media library, rich-text editor) are
+// stored in Vercel Blob, at a per-project random subdomain — not the same
+// "blob:" URL scheme already allowed below. Without this, every such image
+// loads fine directly (curl, the API) but is silently blocked in the browser
+// by this very policy, showing as a broken image with no console-visible error
+// on the page itself (only in devtools' CSP violation log).
+const VERCEL_BLOB = "https://*.public.blob.vercel-storage.com";
+
 // React's dev server needs eval() for fast-refresh/debugging; production never
 // does. Allow it only in development so the live CSP stays strict.
 const DEV_SCRIPT = process.env.NODE_ENV !== "production" ? " 'unsafe-eval'" : "";
@@ -89,8 +97,8 @@ const CSP = [
   "style-src 'self' 'unsafe-inline'",
   // Fonts are self-hosted through next/font, so no third-party origin here.
   "font-src 'self' data:",
-  `img-src 'self' data: blob: ${UPSTREAM_ORIGIN} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} ${GOOGLE_COUNTRY_DOMAINS} https://www.facebook.com`,
-  `media-src 'self' ${UPSTREAM_ORIGIN}`,
+  `img-src 'self' data: blob: ${UPSTREAM_ORIGIN} ${VERCEL_BLOB} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} ${GOOGLE_COUNTRY_DOMAINS} https://www.facebook.com`,
+  `media-src 'self' ${UPSTREAM_ORIGIN} ${VERCEL_BLOB}`,
   `connect-src 'self' ${UPSTREAM_ORIGIN} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} ${GOOGLE_COUNTRY_DOMAINS} ${META}`,
   "object-src 'none'",
   "base-uri 'self'",
