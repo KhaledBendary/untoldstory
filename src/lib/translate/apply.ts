@@ -13,7 +13,7 @@ import type { Singleton } from "@/lib/db/repo";
  * a person would always write both by hand). Runs before the machine-locale
  * pass, which needs English filled in to work from.
  */
-async function syncEnglishArabic(def: ContentType, data: Record<string, Dict>): Promise<void> {
+async function syncEnglishArabic(def: ContentType, data: Record<string, Dict>): Promise<{ warning?: string }> {
   const toAr: FieldToTranslate[] = [];
   const toEn: FieldToTranslate[] = [];
   for (const field of def.i18n) {
@@ -24,7 +24,7 @@ async function syncEnglishArabic(def: ContentType, data: Record<string, Dict>): 
     if (en && !ar) toAr.push({ key: field.key, format, text: en });
     else if (ar && !en) toEn.push({ key: field.key, format, text: ar });
   }
-  if (!toAr.length && !toEn.length) return;
+  if (!toAr.length && !toEn.length) return {};
   try {
     if (toAr.length) {
       const filled = await translatePair(toAr, "en", "ar");
@@ -34,11 +34,14 @@ async function syncEnglishArabic(def: ContentType, data: Record<string, Dict>): 
       const filled = await translatePair(toEn, "ar", "en");
       for (const [key, text] of Object.entries(filled)) data[key] = { ...data[key], en: text };
     }
+    return {};
   } catch (e) {
     // Best-effort: leave whichever language is still missing rather than fail
-    // the whole save. console.error only — the caller's own try/catch below
-    // covers the more important English→machine-locales pass.
+    // the whole save — but surface it, unlike before, so a broken key doesn't
+    // look like a silent no-op to the editor.
+    const detail = (e as Error).message || "";
     console.error("English/Arabic sync failed:", e);
+    return { warning: `فشلت مزامنة الإنجليزي/العربي — ${detail.slice(0, 300)}` };
   }
 }
 
@@ -61,8 +64,9 @@ export async function applyMachineTranslations(
 
   // Single-locale calls (the per-language "translate" button) target one
   // machine locale at a time and shouldn't re-run this on every call.
+  let arWarning: string | undefined;
   if ((!only || only.includes("ar") || only.includes("en")) && translationConfigured()) {
-    await syncEnglishArabic(def, data);
+    arWarning = (await syncEnglishArabic(def, data)).warning;
   }
 
   const toTranslate: FieldToTranslate[] = [];
@@ -75,18 +79,19 @@ export async function applyMachineTranslations(
     if (en === prevEn && !missing) continue; // unchanged and already translated
     toTranslate.push({ key: field.key, format: field.type === "html" ? "html" : "text", text: data[field.key].en });
   }
-  if (!toTranslate.length) return {};
+  if (!toTranslate.length) return { warning: arWarning };
   if (!translationConfigured()) {
-    return { warning: "الترجمة الآلية مش متظبطة — اتحفظ زي ما اتكتب بس" };
+    return { warning: arWarning || "الترجمة الآلية مش متظبطة — اتحفظ زي ما اتكتب بس" };
   }
   try {
     const results = await translateFields(toTranslate, only);
     for (const [key, dict] of Object.entries(results)) data[key] = { ...data[key], ...dict };
-    return {};
+    return { warning: arWarning };
   } catch (e) {
     const detail = (e as Error).message || "";
     console.error("Machine translation failed:", e);
-    return { warning: `فشلت الترجمة الآلية — ${detail.slice(0, 300)}` };
+    const warning = `فشلت الترجمة الآلية — ${detail.slice(0, 300)}`;
+    return { warning: arWarning ? `${arWarning} | ${warning}` : warning };
   }
 }
 
