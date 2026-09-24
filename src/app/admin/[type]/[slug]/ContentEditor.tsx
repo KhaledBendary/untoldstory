@@ -32,6 +32,16 @@ export function deployMessage(deploy?: { triggered?: boolean; reason?: string })
   return "⚠️ اتحفظ، بس النشر التلقائي ما اشتغلش — اضغط «نشر الموقع» من اللوحة";
 }
 
+/** English title → URL-safe slug (lowercase, ascii, dash-separated). */
+function slugify(input: string): string {
+  return input
+    .normalize("NFKD").replace(/[̀-ͯ]/g, "") // strip accents
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
 /** Recommended max length for the SEO fields, so the counter can flag overflow. */
 function seoIdeal(key: string): number | null {
   if (key === "seo.metaTitle") return 60;
@@ -59,6 +69,8 @@ export default function ContentEditor({
   const router = useRouter();
   const [lang, setLang] = useState("en");
   const [newSlug, setNewSlug] = useState(slug);
+  // Once the person edits the slug by hand, stop overwriting it as they keep typing the title.
+  const [slugTouched, setSlugTouched] = useState(false);
   const [fixed, setFixed] = useState<Record<string, unknown>>(initialFixed);
   const [i18n, setI18n] = useState<Record<string, Dict>>(initialI18n);
   const [status, setStatus] = useState<"published" | "draft">(create ? "draft" : (initialStatus === "draft" ? "draft" : "published"));
@@ -81,6 +93,14 @@ export default function ContentEditor({
   const shortKey = i18nFields.find((f) => /excerpt|short/i.test(f.key))?.key ?? "";
   // SEO fields are edited in the dedicated SeoPanel, not the generic loop.
   const contentFields = i18nFields.filter((f) => !f.key.startsWith("seo."));
+
+  // New items only: suggest the slug from the English title as it's typed,
+  // until the person edits the slug field themselves. Existing items keep
+  // their slug independent of title edits — changing it there is deliberate.
+  useEffect(() => {
+    if (!create || slugTouched || !titleKey) return;
+    setNewSlug(slugify(i18n[titleKey]?.en || ""));
+  }, [create, slugTouched, titleKey, i18n]);
 
   // Warn before leaving with unsaved changes.
   useEffect(() => {
@@ -235,7 +255,7 @@ export default function ContentEditor({
       <div style={{ display: "grid", gap: 6, marginBottom: 18 }}>
         <span style={lbl}>المعرّف (slug) *</span>
         <input dir="ltr" placeholder="my-new-service" value={newSlug}
-          onChange={(e) => { setDirty(true); setNewSlug(e.target.value.toLowerCase()); }} />
+          onChange={(e) => { setDirty(true); setSlugTouched(true); setNewSlug(e.target.value.toLowerCase()); }} />
         {!create && newSlug !== slug && (
           <span style={{ fontSize: 12, color: "var(--warn)" }}>
             هيتغيّر رابط الصفحة — هيتعمل تحويل (301) تلقائي من الرابط القديم بعد النشر الجاي.
