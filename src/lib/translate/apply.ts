@@ -38,8 +38,9 @@ export async function applyMachineTranslations(
     for (const [key, dict] of Object.entries(results)) data[key] = { ...data[key], ...dict };
     return {};
   } catch (e) {
+    const detail = (e as Error).message || "";
     console.error("Machine translation failed:", e);
-    return { warning: "فشلت الترجمة الآلية — اتحفظ الإنجليزي والعربي، تقدر تحفظ تاني بعد شوية عشان تتولّد" };
+    return { warning: `فشلت الترجمة الآلية — ${detail.slice(0, 300)}` };
   }
 }
 

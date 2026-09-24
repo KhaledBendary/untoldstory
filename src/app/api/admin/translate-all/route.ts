@@ -15,7 +15,7 @@ type Row = Record<string, unknown> & { slug: string; data: Record<string, Dict> 
 type CType = "services" | "projects" | "posts";
 
 /** (Re)generate every machine language for one item from its English. */
-async function translateOne(type: CType, def: ContentType, row: Row): Promise<boolean> {
+async function translateOne(type: CType, def: ContentType, row: Row): Promise<{ ok: boolean; warning?: string }> {
   const seo = (row.data as { seo?: Record<string, Record<string, string>> })?.seo;
   const data: Record<string, Dict> = {};
   for (const field of def.i18n) {
@@ -25,7 +25,7 @@ async function translateOne(type: CType, def: ContentType, row: Row): Promise<bo
   Object.assign(data, extractSeoForEditor(seo as never, def));
 
   const { warning } = await applyMachineTranslations(def, data, undefined);
-  if (warning) return false;
+  if (warning) return { ok: false, warning };
 
   assembleSeo(data, seo as never);
   const fixed: Record<string, string | boolean | number | null> = {};
@@ -36,7 +36,7 @@ async function translateOne(type: CType, def: ContentType, row: Row): Promise<bo
     else fixed[f.key] = (v as string | number | null) ?? "";
   }
   await saveByType(type, row.slug, fixed, data);
-  return true;
+  return { ok: true };
 }
 
 /**
@@ -66,10 +66,10 @@ export async function POST(request: NextRequest) {
     if (!def) return NextResponse.json({ error: "نوع غير معروف" }, { status: 404 });
     const row = (await getByType(reqType, reqSlug)) as unknown as Row | null;
     if (!row) return NextResponse.json({ error: "العنصر غير موجود" }, { status: 404 });
-    let ok = false;
-    try { ok = await translateOne(reqType, def, row); }
-    catch (e) { console.error(`translate ${reqType}/${reqSlug} failed:`, e); }
-    if (!ok) return NextResponse.json({ error: "فشلت الترجمة — جرّب تاني (اتأكد إن المفتاح صالح)" }, { status: 502 });
+    let result: { ok: boolean; warning?: string } = { ok: false };
+    try { result = await translateOne(reqType, def, row); }
+    catch (e) { result = { ok: false, warning: (e as Error).message }; console.error(`translate ${reqType}/${reqSlug} failed:`, e); }
+    if (!result.ok) return NextResponse.json({ error: result.warning || "فشلت الترجمة — جرّب تاني (اتأكد إن المفتاح صالح)" }, { status: 502 });
     await logActivity({ actor: auth.session.email, action: "update", entity: reqType, ref: reqSlug, detail: "ترجمة العنصر لكل اللغات" });
     const deploy = await triggerDeploy();
     return NextResponse.json({ ok: true, done: 1, failed: [], deploy });
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     const rows = (await listByType(type)) as unknown as Row[];
     for (const row of rows) {
       try {
-        if (await translateOne(type, def, row)) done++;
+        if ((await translateOne(type, def, row)).ok) done++;
         else failed.push(`${type}/${row.slug}`);
       } catch (e) {
         console.error(`translate-all ${type}/${row.slug} failed:`, e);
