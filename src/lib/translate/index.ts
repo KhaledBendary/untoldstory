@@ -140,15 +140,30 @@ export async function translateFields(fields: FieldToTranslate[]): Promise<Recor
   const out: Record<string, Record<string, string>> = {};
   const nonEmpty = fields.filter((f) => f.text && f.text.trim());
   if (!nonEmpty.length) return out as Record<string, Record<MachineLocale, string>>;
+  // Pre-create each field's bucket so parallel workers never race to init it.
+  for (const f of nonEmpty) out[f.key] = {};
 
+  // One task per (locale, format-chunk). Running them sequentially blows the
+  // serverless timeout (12 locales × slow LLM calls), so run with bounded
+  // concurrency instead — wall time drops to roughly the slowest single call.
+  type Task = { target: MachineLocale; format: "text" | "html"; part: FieldToTranslate[] };
+  const tasks: Task[] = [];
   for (const target of MACHINE_LOCALES) {
     for (const format of ["text", "html"] as const) {
       const group = nonEmpty.filter((f) => f.format === format);
-      for (const part of chunk(group)) {
-        const translated = await providerTranslate(part.map((f) => f.text), target, format);
-        part.forEach((f, i) => { (out[f.key] ??= {})[target] = translated[i]; });
-      }
+      for (const part of chunk(group)) tasks.push({ target, format, part });
     }
   }
+
+  const CONCURRENCY = 6;
+  let next = 0;
+  async function worker() {
+    while (next < tasks.length) {
+      const t = tasks[next++];
+      const translated = await providerTranslate(t.part.map((f) => f.text), t.target, t.format);
+      t.part.forEach((f, i) => { out[f.key][t.target] = translated[i]; });
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(CONCURRENCY, tasks.length) }, worker));
   return out as Record<string, Record<MachineLocale, string>>;
 }
