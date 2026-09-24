@@ -8,7 +8,7 @@ import { translationConfigured } from "@/lib/translate";
 import { triggerDeploy } from "@/lib/deploy";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 type Dict = Record<string, string>;
 type Row = Record<string, unknown> & { slug: string; data: Record<string, Dict> };

@@ -155,7 +155,7 @@ export async function translateFields(fields: FieldToTranslate[]): Promise<Recor
     }
   }
 
-  const CONCURRENCY = 6;
+  const CONCURRENCY = 12;
   let next = 0;
   async function worker() {
     while (next < tasks.length) {
