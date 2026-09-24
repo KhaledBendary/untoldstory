@@ -1,6 +1,6 @@
 import "server-only";
 import { SITE_URL } from "./seo";
-import { INDEXABLE_LOCALES, localizedPath } from "./i18n";
+import { INDEXABLE_LOCALES, LOCALE_CODES, localizedPath } from "./i18n";
 
 /**
  * IndexNow — tell Bing/Yandex/Seznam (and, through the shared protocol, others)
@@ -72,4 +72,16 @@ export function contentUrls(type: string, slug: string): string[] {
   if (!base || !slug) return [];
   const path = `${base}/${slug}`;
   return INDEXABLE_LOCALES.map((loc) => toAbsolute(localizedPath(path, loc)));
+}
+
+/**
+ * The relative public path for one content item across every site locale
+ * (not just the indexable ones — a shell-language page still resolves and
+ * needs the same redirect when a slug changes). Used to wire up 301s.
+ */
+export function contentPaths(type: string, slug: string): string[] {
+  const base = TYPE_PATH[type];
+  if (!base || !slug) return [];
+  const path = `${base}/${slug}`;
+  return LOCALE_CODES.map((loc) => localizedPath(path, loc));
 }

@@ -58,7 +58,7 @@ export default function ContentEditor({
 }) {
   const router = useRouter();
   const [lang, setLang] = useState("en");
-  const [newSlug, setNewSlug] = useState("");
+  const [newSlug, setNewSlug] = useState(slug);
   const [fixed, setFixed] = useState<Record<string, unknown>>(initialFixed);
   const [i18n, setI18n] = useState<Record<string, Dict>>(initialI18n);
   const [status, setStatus] = useState<"published" | "draft">(create ? "draft" : (initialStatus === "draft" ? "draft" : "published"));
@@ -160,13 +160,14 @@ export default function ContentEditor({
         {
           method: create ? "POST" : "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(create ? { slug: newSlug, fixed, data: i18n, status } : { fixed, data: i18n, status }),
+          body: JSON.stringify(create ? { slug: newSlug, fixed, data: i18n, status } : { newSlug, fixed, data: i18n, status }),
         },
       );
       const out = await res.json();
       if (!res.ok) { setIssues(out.issues || [{ field: "", message: out.error || "خطأ", level: "error" }]); return; }
       setDirty(false);
       if (create) { router.push(`/admin/${type}/${out.slug}`); return; }
+      if (out.slug && out.slug !== slug) { router.push(`/admin/${type}/${out.slug}`); return; }
       setIssues(out.issues || []);
       setTransWarn(out.translationWarning || "");
       setDeployNote(deployMessage(out.deploy));
@@ -231,13 +232,16 @@ export default function ContentEditor({
         </button>
       </div>
 
-      {create && (
-        <div style={{ display: "grid", gap: 6, marginBottom: 18 }}>
-          <span style={lbl}>المعرّف (slug) *</span>
-          <input dir="ltr" placeholder="my-new-service" value={newSlug}
-            onChange={(e) => { setDirty(true); setNewSlug(e.target.value.toLowerCase()); }} />
-        </div>
-      )}
+      <div style={{ display: "grid", gap: 6, marginBottom: 18 }}>
+        <span style={lbl}>المعرّف (slug) *</span>
+        <input dir="ltr" placeholder="my-new-service" value={newSlug}
+          onChange={(e) => { setDirty(true); setNewSlug(e.target.value.toLowerCase()); }} />
+        {!create && newSlug !== slug && (
+          <span style={{ fontSize: 12, color: "var(--warn)" }}>
+            هيتغيّر رابط الصفحة — هيتعمل تحويل (301) تلقائي من الرابط القديم بعد النشر الجاي.
+          </span>
+        )}
+      </div>
 
       <div style={{ display: "flex", gap: 6, marginBottom: 18, flexWrap: "wrap" }}>
         {LANGS.map((l) => (

@@ -451,6 +451,17 @@ export async function createByType(
   }
 }
 
+/**
+ * Rename a row's slug — its identity and its public URL. Throws on conflict
+ * (unique constraint) so the caller can show "that slug is taken" instead of
+ * silently overwriting another item.
+ */
+export async function renameSlugByType(type: keyof typeof TABLES, oldSlug: string, newSlug: string) {
+  if (type === "services") await sql`update services set slug=${newSlug}, updated_at=now() where slug=${oldSlug}`;
+  else if (type === "projects") await sql`update projects set slug=${newSlug}, updated_at=now() where slug=${oldSlug}`;
+  else await sql`update posts set slug=${newSlug}, updated_at=now() where slug=${oldSlug}`;
+}
+
 /** Delete a content row by slug. */
 export async function deleteByType(type: keyof typeof TABLES, slug: string) {
   if (type === "services") await sql`delete from services where slug=${slug}`;
