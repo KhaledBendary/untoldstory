@@ -51,7 +51,7 @@ export default function ImagePicker({ value, onChange }: { value: string; onChan
       <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
         {value ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={value} alt="" style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 8,
+          <img src={value} alt="image?url=%2Fimages%2Fclients row 5 — Global Untold Story" style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 8,
             border: "1px solid var(--line)", background: "var(--bg)", flexShrink: 0 }} />
         ) : (
           <div style={{ width: 64, height: 64, borderRadius: 8, border: "1px dashed var(--line)",
