@@ -72,7 +72,7 @@ export default function RichTextEditor({ value, onChange, dir = "ltr" }: {
     const el = ref.current;
     if (!el) return;
     el.focus();
-    const img = `<img src="${url}" alt="" style="max-width:100%;height:auto;border-radius:8px" />`;
+    const img = `<img src="${url}" alt="image — Global Untold Story" style="max-width:100%;height:auto;border-radius:8px" />`;
     const sel = window.getSelection();
     if (savedRange.current && sel) {
       sel.removeAllRanges();
