@@ -20,8 +20,9 @@ export default function TranslateAllButton() {
       const res = await fetch("/api/admin/translate-all", { method: "POST" });
       const out = await res.json();
       if (!res.ok) { setMsg({ kind: "err", text: out.error || "حصل خطأ" }); return; }
-      const failed = out.failed?.length ? ` — فشل ${out.failed.length}` : "";
-      setMsg({ kind: "ok", text: `تمت ترجمة ${out.done} عنصر${failed}. جاري نشر الموقع…` });
+      const firstError = out.failed?.[0]?.error;
+      const failed = out.failed?.length ? ` — فشل ${out.failed.length}${firstError ? ` (${firstError})` : ""}` : "";
+      setMsg({ kind: out.failed?.length ? "err" : "ok", text: `تمت ترجمة ${out.done} عنصر${failed}. جاري نشر الموقع…` });
       router.refresh();
     } catch {
       setMsg({ kind: "err", text: "تعذّر الاتصال بالخادم" });

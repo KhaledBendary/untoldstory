@@ -84,18 +84,21 @@ export async function POST(request: NextRequest) {
   // All-items mode.
   const TYPES = ["services", "projects", "posts"] as const;
   let done = 0;
-  const failed: string[] = [];
+  // Carries the real reason per item — a bare slug list gave no way to tell a
+  // dead key from a transient error from a genuinely bad translation.
+  const failed: { ref: string; error: string }[] = [];
   for (const type of TYPES) {
     const def = CONTENT_TYPES[type];
     if (!def) continue;
     const rows = (await listByType(type)) as unknown as Row[];
     for (const row of rows) {
       try {
-        if ((await translateOne(type, def, row)).ok) done++;
-        else failed.push(`${type}/${row.slug}`);
+        const result = await translateOne(type, def, row);
+        if (result.ok) done++;
+        else failed.push({ ref: `${type}/${row.slug}`, error: result.warning || "unknown" });
       } catch (e) {
         console.error(`translate-all ${type}/${row.slug} failed:`, e);
-        failed.push(`${type}/${row.slug}`);
+        failed.push({ ref: `${type}/${row.slug}`, error: (e as Error).message || "unknown" });
       }
     }
   }
