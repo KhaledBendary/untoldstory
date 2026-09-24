@@ -123,7 +123,7 @@ export default function SeoPanel({
           <div style={{ maxWidth: 480, border: "1px solid var(--line)", borderRadius: 10, overflow: "hidden", background: "var(--panel)" }}>
             <div style={{ aspectRatio: "1200 / 630", background: "var(--bg-2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               {ogImage
-                ? <img src={ogImage} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                ? <img src={ogImage} alt="image — Global Untold Story" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 : <span style={{ fontSize: 12, color: "var(--faint)" }}>مفيش صورة مشاركة</span>}
             </div>
             <div style={{ padding: "10px 12px" }}>
