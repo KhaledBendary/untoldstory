@@ -80,7 +80,7 @@ export default async function PreviewPage({
       {/* the content */}
       {image && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={image} alt="" style={{ width: "100%", maxHeight: 380, objectFit: "cover", borderRadius: 12, marginBottom: 20 }} />
+        <img src={image} alt="image — Global Untold Story" style={{ width: "100%", maxHeight: 380, objectFit: "cover", borderRadius: 12, marginBottom: 20 }} />
       )}
       <h1 style={{ fontSize: 30, fontWeight: 800, lineHeight: 1.2, margin: "0 0 14px" }}>{title}</h1>
       {blurb && <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.7, margin: "0 0 22px" }}>{blurb}</p>}
