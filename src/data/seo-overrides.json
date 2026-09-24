@@ -4,5 +4,8 @@
   },
   "/services/on-ground-egypt": {
     "canonical": "/"
+  },
+  "/services/documentary-production-egypt": {
+    "canonical": "/"
   }
 }
