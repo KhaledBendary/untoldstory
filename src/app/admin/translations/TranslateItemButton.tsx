@@ -48,7 +48,7 @@ export default function TranslateItemButton({ type, slug }: { type: string; slug
   }
 
   return (
-    <button type="button" onClick={run} disabled={state === "busy"} title="ترجمة العنصر ده لكل اللغات"
+    <button type="button" onClick={run} disabled={state === "busy"} title={msg || "ترجمة العنصر ده لكل اللغات"}
       style={{ fontSize: 11.5, padding: "4px 10px", borderColor: "var(--line)",
         color: state === "err" ? "var(--danger)" : state === "ok" ? "var(--ok)" : "var(--accent)",
         opacity: state === "busy" ? 0.6 : 1, whiteSpace: "nowrap", maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis" }}>
