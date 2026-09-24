@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/admin-guard";
-import { CONTENT_TYPES } from "@/lib/admin/content-types";
-import { listByType, saveByType, logActivity } from "@/lib/db/repo";
+import { CONTENT_TYPES, type ContentType } from "@/lib/admin/content-types";
+import { listByType, getByType, saveByType, logActivity } from "@/lib/db/repo";
 import { extractSeoForEditor, assembleSeo } from "@/lib/admin/seo-fields";
 import { applyMachineTranslations } from "@/lib/translate/apply";
 import { translationConfigured } from "@/lib/translate";
@@ -11,64 +11,88 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 type Dict = Record<string, string>;
+type Row = Record<string, unknown> & { slug: string; data: Record<string, Dict> };
+type CType = "services" | "projects" | "posts";
+
+/** (Re)generate every machine language for one item from its English. */
+async function translateOne(type: CType, def: ContentType, row: Row): Promise<boolean> {
+  const seo = (row.data as { seo?: Record<string, Record<string, string>> })?.seo;
+  const data: Record<string, Dict> = {};
+  for (const field of def.i18n) {
+    if (field.key.startsWith("seo.")) continue;
+    data[field.key] = { ...(row.data[field.key] || {}) };
+  }
+  Object.assign(data, extractSeoForEditor(seo as never, def));
+
+  const { warning } = await applyMachineTranslations(def, data, undefined);
+  if (warning) return false;
+
+  assembleSeo(data, seo as never);
+  const fixed: Record<string, string | boolean | number | null> = {};
+  for (const f of def.fixed) {
+    const v = row[f.key];
+    if (f.type === "bool") fixed[f.key] = Boolean(v);
+    else if (f.type === "date") fixed[f.key] = v ? new Date(v as string).toISOString().slice(0, 10) : "";
+    else fixed[f.key] = (v as string | number | null) ?? "";
+  }
+  await saveByType(type, row.slug, fixed, data);
+  return true;
+}
 
 /**
- * One-click: (re)generate every machine language for every service, project and
- * post from the English. Existing English/Arabic are never touched. Guarded so
- * that with no translation key configured it changes nothing and says so.
+ * Translate content into every machine language. Body may target ONE item —
+ * { type, slug } — or, with no body, all services/projects/posts. English/Arabic
+ * are never touched. Guarded so it does nothing (and says so) with no key.
  */
-export async function POST() {
+export async function POST(request: NextRequest) {
   const auth = await requireAdmin();
   if (!auth.session) return auth.response;
 
   if (!translationConfigured()) {
     return NextResponse.json(
-      { error: "الترجمة الآلية مش متظبطة — ضيف GOOGLE_TRANSLATE_API_KEY في المتغيرات وأعِد النشر، وبعدها الزر ده هيترجم كل حاجة." },
+      { error: "الترجمة الآلية مش متظبطة — ضيف GOOGLE_TRANSLATE_API_KEY في المتغيرات وأعِد النشر." },
       { status: 503 },
     );
   }
 
+  const body = await request.json().catch(() => null);
+  const rawType = typeof body?.type === "string" ? body.type : undefined;
+  const reqType = (rawType === "services" || rawType === "projects" || rawType === "posts") ? rawType : undefined;
+  const reqSlug = typeof body?.slug === "string" ? body.slug : undefined;
+
+  // Single-item mode.
+  if (reqType && reqSlug) {
+    const def = CONTENT_TYPES[reqType];
+    if (!def) return NextResponse.json({ error: "نوع غير معروف" }, { status: 404 });
+    const row = (await getByType(reqType, reqSlug)) as unknown as Row | null;
+    if (!row) return NextResponse.json({ error: "العنصر غير موجود" }, { status: 404 });
+    let ok = false;
+    try { ok = await translateOne(reqType, def, row); }
+    catch (e) { console.error(`translate ${reqType}/${reqSlug} failed:`, e); }
+    if (!ok) return NextResponse.json({ error: "فشلت الترجمة — جرّب تاني (اتأكد إن المفتاح صالح)" }, { status: 502 });
+    await logActivity({ actor: auth.session.email, action: "update", entity: reqType, ref: reqSlug, detail: "ترجمة العنصر لكل اللغات" });
+    const deploy = await triggerDeploy();
+    return NextResponse.json({ ok: true, done: 1, failed: [], deploy });
+  }
+
+  // All-items mode.
   const TYPES = ["services", "projects", "posts"] as const;
   let done = 0;
   const failed: string[] = [];
-
   for (const type of TYPES) {
     const def = CONTENT_TYPES[type];
     if (!def) continue;
-    const rows = (await listByType(type)) as unknown as Array<Record<string, unknown> & { slug: string; data: Record<string, Dict> }>;
+    const rows = (await listByType(type)) as unknown as Row[];
     for (const row of rows) {
       try {
-        const seo = (row.data as { seo?: Record<string, Record<string, string>> })?.seo;
-        const data: Record<string, Dict> = {};
-        for (const field of def.i18n) {
-          if (field.key.startsWith("seo.")) continue;
-          data[field.key] = { ...(row.data[field.key] || {}) };
-        }
-        Object.assign(data, extractSeoForEditor(seo as never, def));
-
-        // existing=undefined forces a full (re)translation, replacing any English
-        // fallbacks that were sitting in the other languages.
-        const { warning } = await applyMachineTranslations(def, data, undefined);
-        if (warning) { failed.push(`${type}/${row.slug}`); continue; }
-
-        assembleSeo(data, seo as never);
-
-        const fixed: Record<string, string | boolean | number | null> = {};
-        for (const f of def.fixed) {
-          const v = row[f.key];
-          if (f.type === "bool") fixed[f.key] = Boolean(v);
-          else if (f.type === "date") fixed[f.key] = v ? new Date(v as string).toISOString().slice(0, 10) : "";
-          else fixed[f.key] = (v as string | number | null) ?? "";
-        }
-        await saveByType(type, row.slug, fixed, data);
-        done++;
+        if (await translateOne(type, def, row)) done++;
+        else failed.push(`${type}/${row.slug}`);
       } catch (e) {
         console.error(`translate-all ${type}/${row.slug} failed:`, e);
         failed.push(`${type}/${row.slug}`);
       }
     }
   }
-
   await logActivity({ actor: auth.session.email, action: "update", entity: "site", detail: `ترجمة شاملة: ${done} عنصر` });
   const deploy = await triggerDeploy({ force: true });
   return NextResponse.json({ ok: true, done, failed, deploy });
