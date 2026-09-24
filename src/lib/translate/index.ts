@@ -1,16 +1,20 @@
 import "server-only";
 
 /**
- * Machine translation of the seven indexed languages from English.
+ * Machine translation of the site's languages.
  *
- * English and Arabic are authored by hand in the dashboard; fr, de, es, it, pt,
- * ru and tr are generated from the English on save so the whole site stays
- * translated without anyone touching them. Google Cloud Translation v2 is the
- * provider (set GOOGLE_TRANSLATE_API_KEY). HTML fields are sent with format:html
- * so tags survive; plain fields as text.
+ * English and Arabic are the two hand-authored languages — but "hand-authored"
+ * only means a person may write either one; if only one of them is filled in,
+ * the other is machine-translated too (see translatePair, used from apply.ts)
+ * so Arabic is never silently left as an English copy. The other twelve
+ * locales are always generated from the English on save.
+ *
+ * Provider is GPT, Claude or Google Translate — whichever key is configured
+ * (see providerTranslate below). HTML fields are translated with format:html so
+ * tags survive; plain fields as text.
  *
  * Everything here is best-effort: a missing key or a failed call throws, and the
- * caller saves the English/Arabic anyway. Translation never blocks a save.
+ * caller saves whatever the editor wrote anyway. Translation never blocks a save.
  */
 
 export const MACHINE_LOCALES = ["fr", "de", "es", "it", "pt", "ru", "tr", "zh", "ja", "ko", "pl", "sw"] as const;
@@ -32,15 +36,17 @@ export const translationConfigured = (): boolean =>
   Boolean(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY || process.env.GOOGLE_TRANSLATE_API_KEY);
 
 const LOCALE_NAMES: Record<string, string> = {
+  en: "English", ar: "Arabic",
   fr: "French", de: "German", es: "Spanish", it: "Italian", pt: "Portuguese", ru: "Russian",
   tr: "Turkish", zh: "Simplified Chinese", ja: "Japanese", ko: "Korean", pl: "Polish", sw: "Swahili",
 };
 
-/** Translate a batch of strings to one language via an LLM, preserving HTML. */
-function llmPrompt(q: string[], target: string, format: "text" | "html"): string {
-  const lang = LOCALE_NAMES[target] || target;
+/** Translate a batch of strings from one language to another via an LLM, preserving HTML. */
+function llmPrompt(q: string[], target: string, format: "text" | "html", source: string): string {
+  const from = LOCALE_NAMES[source] || source;
+  const to = LOCALE_NAMES[target] || target;
   return [
-    `Translate each string in the JSON array below from English to ${lang}.`,
+    `Translate each string in the JSON array below from ${from} to ${to}.`,
     format === "html" ? "The strings are HTML — translate only the human-readable text and keep every HTML tag, attribute and entity exactly as-is." : "The strings are plain text.",
     "Keep brand names, URLs and email addresses unchanged. Do not add or remove items.",
     `Return ONLY a JSON array of ${q.length} translated strings in the same order — no explanation, no code fence.`,
@@ -58,7 +64,7 @@ function parseArray(raw: string, n: number): string[] {
   return arr.map((x) => String(x));
 }
 
-async function openaiTranslate(q: string[], target: string, format: "text" | "html"): Promise<string[]> {
+async function openaiTranslate(q: string[], target: string, format: "text" | "html", source: string): Promise<string[]> {
   const key = process.env.OPENAI_API_KEY!;
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -68,7 +74,7 @@ async function openaiTranslate(q: string[], target: string, format: "text" | "ht
       temperature: 0.2,
       messages: [
         { role: "system", content: "You are a professional website localizer. Output only what is asked." },
-        { role: "user", content: llmPrompt(q, target, format) },
+        { role: "user", content: llmPrompt(q, target, format, source) },
       ],
     }),
   });
@@ -77,7 +83,7 @@ async function openaiTranslate(q: string[], target: string, format: "text" | "ht
   return parseArray(json.choices?.[0]?.message?.content || "", q.length);
 }
 
-async function anthropicTranslate(q: string[], target: string, format: "text" | "html"): Promise<string[]> {
+async function anthropicTranslate(q: string[], target: string, format: "text" | "html", source: string): Promise<string[]> {
   const key = process.env.ANTHROPIC_API_KEY!;
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -85,7 +91,7 @@ async function anthropicTranslate(q: string[], target: string, format: "text" | 
     body: JSON.stringify({
       model: process.env.ANTHROPIC_TRANSLATE_MODEL || "claude-haiku-4-5-20251001",
       max_tokens: 8000,
-      messages: [{ role: "user", content: llmPrompt(q, target, format) }],
+      messages: [{ role: "user", content: llmPrompt(q, target, format, source) }],
     }),
   });
   if (!res.ok) throw new Error(`Anthropic ${res.status}: ${(await res.text()).slice(0, 300)}`);
@@ -94,12 +100,12 @@ async function anthropicTranslate(q: string[], target: string, format: "text" | 
   return parseArray(text, q.length);
 }
 
-async function googleTranslate(q: string[], target: string, format: "text" | "html"): Promise<string[]> {
+async function googleTranslate(q: string[], target: string, format: "text" | "html", source: string): Promise<string[]> {
   const key = process.env.GOOGLE_TRANSLATE_API_KEY!;
   const res = await fetch(`${ENDPOINT}?key=${encodeURIComponent(key)}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ q, source: "en", target, format }),
+    body: JSON.stringify({ q, source, target, format }),
   });
   if (!res.ok) throw new Error(`Google Translate ${res.status}: ${(await res.text()).slice(0, 300)}`);
   const json = (await res.json()) as { data?: { translations?: { translatedText: string }[] } };
@@ -108,11 +114,11 @@ async function googleTranslate(q: string[], target: string, format: "text" | "ht
   return out;
 }
 
-/** Dispatch one batch to the configured provider. */
-function providerTranslate(q: string[], target: string, format: "text" | "html"): Promise<string[]> {
-  if (process.env.OPENAI_API_KEY) return openaiTranslate(q, target, format);
-  if (process.env.ANTHROPIC_API_KEY) return anthropicTranslate(q, target, format);
-  if (process.env.GOOGLE_TRANSLATE_API_KEY) return googleTranslate(q, target, format);
+/** Dispatch one batch to the configured provider. Source defaults to English. */
+function providerTranslate(q: string[], target: string, format: "text" | "html", source: string = "en"): Promise<string[]> {
+  if (process.env.OPENAI_API_KEY) return openaiTranslate(q, target, format, source);
+  if (process.env.ANTHROPIC_API_KEY) return anthropicTranslate(q, target, format, source);
+  if (process.env.GOOGLE_TRANSLATE_API_KEY) return googleTranslate(q, target, format, source);
   throw new Error("No translation provider configured (OPENAI_API_KEY / ANTHROPIC_API_KEY / GOOGLE_TRANSLATE_API_KEY)");
 }
 
@@ -170,4 +176,24 @@ export async function translateFields(
   }
   await Promise.all(Array.from({ length: Math.min(CONCURRENCY, tasks.length) }, worker));
   return out as Record<string, Record<MachineLocale, string>>;
+}
+
+/**
+ * Translate a batch of fields from one language to another (e.g. English→Arabic
+ * or Arabic→English), independent of the 12 machine locales above. Used to keep
+ * the two hand-authored languages in sync when only one was written.
+ * Returns { fieldKey: translatedText }.
+ */
+export async function translatePair(fields: FieldToTranslate[], source: string, target: string): Promise<Record<string, string>> {
+  const out: Record<string, string> = {};
+  const nonEmpty = fields.filter((f) => f.text && f.text.trim());
+  if (!nonEmpty.length) return out;
+  for (const format of ["text", "html"] as const) {
+    const group = nonEmpty.filter((f) => f.format === format);
+    for (const part of chunk(group)) {
+      const translated = await providerTranslate(part.map((f) => f.text), target, format, source);
+      part.forEach((f, i) => { out[f.key] = translated[i]; });
+    }
+  }
+  return out;
 }

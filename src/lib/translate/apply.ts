@@ -1,18 +1,55 @@
 import "server-only";
-import { MACHINE_LOCALES, translateFields, translationConfigured, type FieldToTranslate, type MachineLocale } from "@/lib/translate";
+import { MACHINE_LOCALES, translateFields, translatePair, translationConfigured, type FieldToTranslate, type MachineLocale } from "@/lib/translate";
 import type { ContentType } from "@/lib/admin/content-types";
 import type { Dict } from "@/lib/content-validate";
 import { getPath, type SingletonField } from "@/lib/admin/singleton-fields";
 import type { Singleton } from "@/lib/db/repo";
 
 /**
- * Fill the seven machine languages of a content record from its English, in
- * place, before it is saved. Only fields whose English actually changed (or
- * that are missing a translation) are sent, so an unchanged save costs nothing
- * and a body isn't re-translated on every edit of a title.
+ * Fill in whichever of English/Arabic is missing from the other, in place.
+ * Either language may be the one a person actually wrote — if only English was
+ * filled in, Arabic is machine-translated from it, and vice versa, so Arabic is
+ * never silently left as an English copy (the old behavior when it was assumed
+ * a person would always write both by hand). Runs before the machine-locale
+ * pass, which needs English filled in to work from.
+ */
+async function syncEnglishArabic(def: ContentType, data: Record<string, Dict>): Promise<void> {
+  const toAr: FieldToTranslate[] = [];
+  const toEn: FieldToTranslate[] = [];
+  for (const field of def.i18n) {
+    if (field.noTranslate) continue; // keywords, canonical URLs, flags — never translate
+    const en = data[field.key]?.en?.trim();
+    const ar = data[field.key]?.ar?.trim();
+    const format = field.type === "html" ? "html" : "text";
+    if (en && !ar) toAr.push({ key: field.key, format, text: en });
+    else if (ar && !en) toEn.push({ key: field.key, format, text: ar });
+  }
+  if (!toAr.length && !toEn.length) return;
+  try {
+    if (toAr.length) {
+      const filled = await translatePair(toAr, "en", "ar");
+      for (const [key, text] of Object.entries(filled)) data[key] = { ...data[key], ar: text };
+    }
+    if (toEn.length) {
+      const filled = await translatePair(toEn, "ar", "en");
+      for (const [key, text] of Object.entries(filled)) data[key] = { ...data[key], en: text };
+    }
+  } catch (e) {
+    // Best-effort: leave whichever language is still missing rather than fail
+    // the whole save. console.error only — the caller's own try/catch below
+    // covers the more important English→machine-locales pass.
+    console.error("English/Arabic sync failed:", e);
+  }
+}
+
+/**
+ * Fill the twelve machine languages of a content record from its English, in
+ * place. Only fields whose English actually changed (or that are missing a
+ * translation) are sent, so an unchanged save costs nothing and a body isn't
+ * re-translated on every edit of a title.
  *
  * Best-effort: returns a human warning instead of throwing, so the caller still
- * saves the English and Arabic when translation is unconfigured or fails.
+ * saves whatever the editor wrote when translation is unconfigured or fails.
  */
 export async function applyMachineTranslations(
   def: ContentType,
@@ -21,6 +58,13 @@ export async function applyMachineTranslations(
   only?: readonly string[], // limit to these locales (e.g. one language at a time)
 ): Promise<{ warning?: string }> {
   const checkLocales = only && only.length ? only : MACHINE_LOCALES;
+
+  // Single-locale calls (the per-language "translate" button) target one
+  // machine locale at a time and shouldn't re-run this on every call.
+  if ((!only || only.includes("ar") || only.includes("en")) && translationConfigured()) {
+    await syncEnglishArabic(def, data);
+  }
+
   const toTranslate: FieldToTranslate[] = [];
   for (const field of def.i18n) {
     if (field.noTranslate) continue; // keywords, canonical URLs, flags — never translate
@@ -33,7 +77,7 @@ export async function applyMachineTranslations(
   }
   if (!toTranslate.length) return {};
   if (!translationConfigured()) {
-    return { warning: "الترجمة الآلية مش متظبطة (GOOGLE_TRANSLATE_API_KEY) — اتحفظ الإنجليزي والعربي بس" };
+    return { warning: "الترجمة الآلية مش متظبطة — اتحفظ زي ما اتكتب بس" };
   }
   try {
     const results = await translateFields(toTranslate, only);
@@ -61,7 +105,7 @@ export async function translateBlockItems(
   const empty = {} as Record<MachineLocale, Record<string, string>[]>;
   if (!itemsEn.length || !fields.length) return { perLocale: empty };
   if (!translationConfigured()) {
-    return { perLocale: empty, warning: "الترجمة الآلية مش متظبطة (GOOGLE_TRANSLATE_API_KEY) — اللغات التلقائية بتاخد نسخة الإنجليزي" };
+    return { perLocale: empty, warning: "الترجمة الآلية مش متظبطة — اللغات التلقائية بتاخد نسخة الإنجليزي" };
   }
   const toTranslate: FieldToTranslate[] = [];
   itemsEn.forEach((item, i) => {
@@ -112,7 +156,7 @@ export async function applySingletonTranslations(
   }
   if (!toTranslate.length) return {};
   if (!translationConfigured()) {
-    return { warning: "الترجمة الآلية مش متظبطة (GOOGLE_TRANSLATE_API_KEY) — اتحفظ الإنجليزي والعربي بس" };
+    return { warning: "الترجمة الآلية مش متظبطة — اتحفظ الإنجليزي والعربي بس" };
   }
   try {
     const results = await translateFields(toTranslate);
