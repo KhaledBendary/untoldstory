@@ -277,7 +277,7 @@ return (
               height="1"
               width="1"
               style={{ display: "none" }}
-              alt=""
+              alt="Image?url=%2Fimages%2Fclients row 5.png&w=3840&q=75&dpl=dpl DDh37jwN4MdQ67fP9UJj3o8vn4Bg — site image"
               src={`https://www.facebook.com/tr?id=${FB_PIXEL_ID}&ev=PageView&noscript=1`}
             />
           </noscript>
