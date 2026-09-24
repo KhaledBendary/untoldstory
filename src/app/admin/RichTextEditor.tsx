@@ -16,7 +16,11 @@ export default function RichTextEditor({ value, onChange, dir = "ltr" }: {
   value: string; onChange: (html: string) => void; dir?: "ltr" | "rtl";
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const savedRange = useRef<Range | null>(null);
   const [source, setSource] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadErr, setUploadErr] = useState("");
   const last = useRef(value);
 
   // Re-seed the DOM only when the incoming value differs from what we last
@@ -53,6 +57,50 @@ export default function RichTextEditor({ value, onChange, dir = "ltr" }: {
     if (url) cmd("createLink", url);
   };
 
+  // Remember where the caret is before the file dialog steals focus.
+  const saveSelection = () => {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount && ref.current?.contains(sel.anchorNode)) {
+      savedRange.current = sel.getRangeAt(0).cloneRange();
+    } else {
+      savedRange.current = null;
+    }
+  };
+
+  // Insert an <img> at the saved caret (or append to the end), then emit.
+  const insertImage = (url: string) => {
+    const el = ref.current;
+    if (!el) return;
+    el.focus();
+    const img = `<img src="${url}" alt="" style="max-width:100%;height:auto;border-radius:8px" />`;
+    const sel = window.getSelection();
+    if (savedRange.current && sel) {
+      sel.removeAllRanges();
+      sel.addRange(savedRange.current);
+      document.execCommand("insertHTML", false, img);
+    } else {
+      el.insertAdjacentHTML("beforeend", img);
+    }
+    emit();
+  };
+
+  async function uploadImage(file: File | undefined) {
+    if (!file) return;
+    setUploading(true); setUploadErr("");
+    try {
+      const body = new FormData(); body.append("file", file);
+      const res = await fetch("/api/admin/media/upload", { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok) { setUploadErr(data.error || "فشل رفع الصورة"); return; }
+      insertImage(data.media.url);
+    } catch {
+      setUploadErr("تعذّر الاتصال بالخادم");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
+
   const Btn = ({ on, children, title }: { on: () => void; children: React.ReactNode; title: string }) => (
     <button type="button" title={title} onMouseDown={(e) => { e.preventDefault(); on(); }}
       style={{ fontSize: 13, padding: "5px 9px", minWidth: 32, background: "var(--panel)", borderColor: "var(--line)" }}>
@@ -71,6 +119,12 @@ export default function RichTextEditor({ value, onChange, dir = "ltr" }: {
         <Btn on={() => cmd("insertUnorderedList")} title="قائمة نقطية">• —</Btn>
         <Btn on={() => cmd("insertOrderedList")} title="قائمة مرقّمة">1.</Btn>
         <Btn on={link} title="إضافة رابط">🔗</Btn>
+        <button type="button" title="إدراج صورة" disabled={uploading}
+          onMouseDown={(e) => { e.preventDefault(); saveSelection(); fileRef.current?.click(); }}
+          style={{ fontSize: 13, padding: "5px 9px", minWidth: 32, background: "var(--panel)", borderColor: "var(--line)", opacity: uploading ? 0.6 : 1 }}>
+          {uploading ? "…" : "🖼️"}
+        </button>
+        <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => uploadImage(e.target.files?.[0])} />
         <Btn on={() => cmd("removeFormat")} title="إزالة التنسيق">✕</Btn>
         <button type="button" onClick={() => setSource((s) => !s)}
           style={{ marginInlineStart: "auto", fontSize: 12, padding: "5px 10px",
@@ -87,6 +141,7 @@ export default function RichTextEditor({ value, onChange, dir = "ltr" }: {
           style={{ minHeight: 260, padding: "12px 14px", outline: "none", lineHeight: 1.7, fontSize: 15,
             background: "var(--bg)" }} />
       )}
+      {uploadErr && <div style={{ color: "var(--danger)", fontSize: 12, padding: "6px 10px" }}>{uploadErr}</div>}
     </div>
   );
 }
