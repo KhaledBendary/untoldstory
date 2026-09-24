@@ -64,7 +64,15 @@ function parseArray(raw: string, n: number): string[] {
   return arr.map((x) => String(x));
 }
 
-async function openaiTranslate(q: string[], target: string, format: "text" | "html", source: string): Promise<string[]> {
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Parse OpenAI's "Please try again in 6.827s" hint out of a 429 body, or fall back to a fixed wait. */
+function retryDelayMs(body: string, attempt: number): number {
+  const m = body.match(/try again in ([\d.]+)s/i);
+  return m ? Math.ceil(parseFloat(m[1]) * 1000) + 500 : 4000 * (attempt + 1);
+}
+
+async function openaiTranslate(q: string[], target: string, format: "text" | "html", source: string, attempt = 0): Promise<string[]> {
   const key = process.env.OPENAI_API_KEY!;
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -78,6 +86,11 @@ async function openaiTranslate(q: string[], target: string, format: "text" | "ht
       ],
     }),
   });
+  if (res.status === 429 && attempt < 4) {
+    const body = await res.text();
+    await sleep(retryDelayMs(body, attempt));
+    return openaiTranslate(q, target, format, source, attempt + 1);
+  }
   if (!res.ok) throw new Error(`OpenAI ${res.status}: ${(await res.text()).slice(0, 300)}`);
   const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
   return parseArray(json.choices?.[0]?.message?.content || "", q.length);
@@ -165,7 +178,10 @@ export async function translateFields(
     }
   }
 
-  const CONCURRENCY = 12;
+  // Lower than the locale count on purpose — 12 parallel OpenAI calls landing
+  // in the same instant is what exceeded a real account's per-minute token
+  // quota (429) on the first bulk run. Retries absorb the rest.
+  const CONCURRENCY = 5;
   let next = 0;
   async function worker() {
     while (next < tasks.length) {

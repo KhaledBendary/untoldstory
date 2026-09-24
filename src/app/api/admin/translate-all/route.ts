@@ -23,8 +23,15 @@ async function translateOne(type: CType, def: ContentType, row: Row, only?: read
     data[field.key] = { ...(row.data[field.key] || {}) };
   }
   Object.assign(data, extractSeoForEditor(seo as never, def));
+  // Snapshot before translation mutates `data` — passing this (instead of
+  // undefined) lets applyMachineTranslations skip locales a field already has,
+  // instead of resending every field of every item on every bulk run. That
+  // "always retranslate everything" behavior is what blew through OpenAI's
+  // per-minute token quota (429) the first time this ran against real data.
+  const existingFlat: Record<string, Dict> = {};
+  for (const [key, dict] of Object.entries(data)) existingFlat[key] = { ...dict };
 
-  const { warning } = await applyMachineTranslations(def, data, undefined, only);
+  const { warning } = await applyMachineTranslations(def, data, existingFlat, only);
   if (warning) return { ok: false, warning };
 
   assembleSeo(data, seo as never);
