@@ -23,11 +23,79 @@ const ENDPOINT = "https://translation.googleapis.com/language/translate/v2";
 const MAX_ITEMS_PER_REQUEST = 100;
 const MAX_CHARS_PER_REQUEST = 25_000;
 
-export const translationConfigured = (): boolean => Boolean(process.env.GOOGLE_TRANSLATE_API_KEY);
+/**
+ * Provider is chosen by whichever key is set, in this order:
+ *   OPENAI_API_KEY (GPT) → ANTHROPIC_API_KEY (Claude) → GOOGLE_TRANSLATE_API_KEY.
+ * LLM translation reads more naturally for marketing copy than Google Translate.
+ */
+export const translationConfigured = (): boolean =>
+  Boolean(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY || process.env.GOOGLE_TRANSLATE_API_KEY);
+
+const LOCALE_NAMES: Record<string, string> = {
+  fr: "French", de: "German", es: "Spanish", it: "Italian", pt: "Portuguese", ru: "Russian",
+  tr: "Turkish", zh: "Simplified Chinese", ja: "Japanese", ko: "Korean", pl: "Polish", sw: "Swahili",
+};
+
+/** Translate a batch of strings to one language via an LLM, preserving HTML. */
+function llmPrompt(q: string[], target: string, format: "text" | "html"): string {
+  const lang = LOCALE_NAMES[target] || target;
+  return [
+    `Translate each string in the JSON array below from English to ${lang}.`,
+    format === "html" ? "The strings are HTML — translate only the human-readable text and keep every HTML tag, attribute and entity exactly as-is." : "The strings are plain text.",
+    "Keep brand names, URLs and email addresses unchanged. Do not add or remove items.",
+    `Return ONLY a JSON array of ${q.length} translated strings in the same order — no explanation, no code fence.`,
+    "",
+    JSON.stringify(q),
+  ].join("\n");
+}
+
+function parseArray(raw: string, n: number): string[] {
+  let s = raw.trim().replace(/^```(?:json)?/i, "").replace(/```$/,"").trim();
+  const start = s.indexOf("["); const end = s.lastIndexOf("]");
+  if (start >= 0 && end > start) s = s.slice(start, end + 1);
+  const arr = JSON.parse(s);
+  if (!Array.isArray(arr) || arr.length !== n) throw new Error("LLM translation: array length mismatch");
+  return arr.map((x) => String(x));
+}
+
+async function openaiTranslate(q: string[], target: string, format: "text" | "html"): Promise<string[]> {
+  const key = process.env.OPENAI_API_KEY!;
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model: process.env.OPENAI_TRANSLATE_MODEL || "gpt-4o-mini",
+      temperature: 0.2,
+      messages: [
+        { role: "system", content: "You are a professional website localizer. Output only what is asked." },
+        { role: "user", content: llmPrompt(q, target, format) },
+      ],
+    }),
+  });
+  if (!res.ok) throw new Error(`OpenAI ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+  return parseArray(json.choices?.[0]?.message?.content || "", q.length);
+}
+
+async function anthropicTranslate(q: string[], target: string, format: "text" | "html"): Promise<string[]> {
+  const key = process.env.ANTHROPIC_API_KEY!;
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+    body: JSON.stringify({
+      model: process.env.ANTHROPIC_TRANSLATE_MODEL || "claude-haiku-4-5-20251001",
+      max_tokens: 8000,
+      messages: [{ role: "user", content: llmPrompt(q, target, format) }],
+    }),
+  });
+  if (!res.ok) throw new Error(`Anthropic ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  const json = (await res.json()) as { content?: { type: string; text?: string }[] };
+  const text = (json.content || []).filter((b) => b.type === "text").map((b) => b.text || "").join("");
+  return parseArray(text, q.length);
+}
 
 async function googleTranslate(q: string[], target: string, format: "text" | "html"): Promise<string[]> {
-  const key = process.env.GOOGLE_TRANSLATE_API_KEY;
-  if (!key) throw new Error("GOOGLE_TRANSLATE_API_KEY not set");
+  const key = process.env.GOOGLE_TRANSLATE_API_KEY!;
   const res = await fetch(`${ENDPOINT}?key=${encodeURIComponent(key)}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -38,6 +106,14 @@ async function googleTranslate(q: string[], target: string, format: "text" | "ht
   const out = json.data?.translations?.map((t) => t.translatedText);
   if (!out || out.length !== q.length) throw new Error("Google Translate: unexpected response shape");
   return out;
+}
+
+/** Dispatch one batch to the configured provider. */
+function providerTranslate(q: string[], target: string, format: "text" | "html"): Promise<string[]> {
+  if (process.env.OPENAI_API_KEY) return openaiTranslate(q, target, format);
+  if (process.env.ANTHROPIC_API_KEY) return anthropicTranslate(q, target, format);
+  if (process.env.GOOGLE_TRANSLATE_API_KEY) return googleTranslate(q, target, format);
+  throw new Error("No translation provider configured (OPENAI_API_KEY / ANTHROPIC_API_KEY / GOOGLE_TRANSLATE_API_KEY)");
 }
 
 export type FieldToTranslate = { key: string; format: "text" | "html"; text: string };
@@ -69,7 +145,7 @@ export async function translateFields(fields: FieldToTranslate[]): Promise<Recor
     for (const format of ["text", "html"] as const) {
       const group = nonEmpty.filter((f) => f.format === format);
       for (const part of chunk(group)) {
-        const translated = await googleTranslate(part.map((f) => f.text), target, format);
+        const translated = await providerTranslate(part.map((f) => f.text), target, format);
         part.forEach((f, i) => { (out[f.key] ??= {})[target] = translated[i]; });
       }
     }
