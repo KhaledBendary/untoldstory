@@ -31,4 +31,15 @@ export const SEO_GENERATED_POSTS: SeoGeneratedPost[] = [
       "With its rich heritage, dynamic landscapes, and cost-effective resources, film production in Egypt remains the top choice for media creation in the Middle East and North Africa. By partnering with the right local line producers and agencies, you can unlock Egypt's endless creative possibilities and produce world-class visual content.",
     ],
   },
+  {
+    slug: "test-slug-article-two",
+    title: "Test Slug Article Two",
+    date: "2026-09-24",
+    category: "SEO",
+    excerpt: "Test Slug Article Two This is a test article with more than eighty characters of real content to pass the minimum length check for publishing purposes.",
+    image: "/images/film-crew-pyramids-production.jpg",
+    body: [
+      "This is a test article with more than eighty characters of real content to pass the minimum length check for publishing purposes.",
+    ],
+  },
 ];
