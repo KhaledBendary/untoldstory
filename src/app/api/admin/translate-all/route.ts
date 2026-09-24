@@ -14,8 +14,8 @@ type Dict = Record<string, string>;
 type Row = Record<string, unknown> & { slug: string; data: Record<string, Dict> };
 type CType = "services" | "projects" | "posts";
 
-/** (Re)generate every machine language for one item from its English. */
-async function translateOne(type: CType, def: ContentType, row: Row): Promise<{ ok: boolean; warning?: string }> {
+/** (Re)generate machine languages for one item from its English (optionally one locale). */
+async function translateOne(type: CType, def: ContentType, row: Row, only?: readonly string[]): Promise<{ ok: boolean; warning?: string }> {
   const seo = (row.data as { seo?: Record<string, Record<string, string>> })?.seo;
   const data: Record<string, Dict> = {};
   for (const field of def.i18n) {
@@ -24,7 +24,7 @@ async function translateOne(type: CType, def: ContentType, row: Row): Promise<{ 
   }
   Object.assign(data, extractSeoForEditor(seo as never, def));
 
-  const { warning } = await applyMachineTranslations(def, data, undefined);
+  const { warning } = await applyMachineTranslations(def, data, undefined, only);
   if (warning) return { ok: false, warning };
 
   assembleSeo(data, seo as never);
@@ -59,6 +59,9 @@ export async function POST(request: NextRequest) {
   const rawType = typeof body?.type === "string" ? body.type : undefined;
   const reqType = (rawType === "services" || rawType === "projects" || rawType === "posts") ? rawType : undefined;
   const reqSlug = typeof body?.slug === "string" ? body.slug : undefined;
+  // Optional single locale — translate one language at a time (fast, no timeout).
+  const reqLocale = typeof body?.locale === "string" ? body.locale : undefined;
+  const only = reqLocale ? [reqLocale] : undefined;
 
   // Single-item mode.
   if (reqType && reqSlug) {
@@ -67,11 +70,12 @@ export async function POST(request: NextRequest) {
     const row = (await getByType(reqType, reqSlug)) as unknown as Row | null;
     if (!row) return NextResponse.json({ error: "العنصر غير موجود" }, { status: 404 });
     let result: { ok: boolean; warning?: string } = { ok: false };
-    try { result = await translateOne(reqType, def, row); }
+    try { result = await translateOne(reqType, def, row, only); }
     catch (e) { result = { ok: false, warning: (e as Error).message }; console.error(`translate ${reqType}/${reqSlug} failed:`, e); }
     if (!result.ok) return NextResponse.json({ error: result.warning || "فشلت الترجمة — جرّب تاني (اتأكد إن المفتاح صالح)" }, { status: 502 });
-    await logActivity({ actor: auth.session.email, action: "update", entity: reqType, ref: reqSlug, detail: "ترجمة العنصر لكل اللغات" });
-    const deploy = await triggerDeploy();
+    // Deploy only when a full item (all locales) finished — not on every single-locale call.
+    const deploy = only ? { triggered: false as const } : await triggerDeploy();
+    if (!only) await logActivity({ actor: auth.session.email, action: "update", entity: reqType, ref: reqSlug, detail: "ترجمة العنصر لكل اللغات" });
     return NextResponse.json({ ok: true, done: 1, failed: [], deploy });
   }
 

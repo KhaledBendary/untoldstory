@@ -18,14 +18,16 @@ export async function applyMachineTranslations(
   def: ContentType,
   data: Record<string, Dict>, // { fieldKey: { en, ar, ... } } — mutated in place
   existing: Record<string, Dict> | undefined,
+  only?: readonly string[], // limit to these locales (e.g. one language at a time)
 ): Promise<{ warning?: string }> {
+  const checkLocales = only && only.length ? only : MACHINE_LOCALES;
   const toTranslate: FieldToTranslate[] = [];
   for (const field of def.i18n) {
     if (field.noTranslate) continue; // keywords, canonical URLs, flags — never translate
     const en = data[field.key]?.en?.trim();
     if (!en) continue;
     const prevEn = existing?.[field.key]?.en;
-    const missing = MACHINE_LOCALES.some((loc) => !existing?.[field.key]?.[loc]);
+    const missing = checkLocales.some((loc) => !existing?.[field.key]?.[loc]);
     if (en === prevEn && !missing) continue; // unchanged and already translated
     toTranslate.push({ key: field.key, format: field.type === "html" ? "html" : "text", text: data[field.key].en });
   }
@@ -34,7 +36,7 @@ export async function applyMachineTranslations(
     return { warning: "الترجمة الآلية مش متظبطة (GOOGLE_TRANSLATE_API_KEY) — اتحفظ الإنجليزي والعربي بس" };
   }
   try {
-    const results = await translateFields(toTranslate);
+    const results = await translateFields(toTranslate, only);
     for (const [key, dict] of Object.entries(results)) data[key] = { ...data[key], ...dict };
     return {};
   } catch (e) {

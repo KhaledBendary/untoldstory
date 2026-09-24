@@ -136,19 +136,23 @@ function chunk(fields: FieldToTranslate[]): FieldToTranslate[][] {
  * Translate the given English fields into all seven machine locales.
  * Returns result[fieldKey][locale] = translatedText. Empty fields are ignored.
  */
-export async function translateFields(fields: FieldToTranslate[]): Promise<Record<string, Record<MachineLocale, string>>> {
+export async function translateFields(
+  fields: FieldToTranslate[],
+  only?: readonly string[],
+): Promise<Record<string, Record<MachineLocale, string>>> {
   const out: Record<string, Record<string, string>> = {};
   const nonEmpty = fields.filter((f) => f.text && f.text.trim());
   if (!nonEmpty.length) return out as Record<string, Record<MachineLocale, string>>;
   // Pre-create each field's bucket so parallel workers never race to init it.
   for (const f of nonEmpty) out[f.key] = {};
+  const targets = only && only.length ? MACHINE_LOCALES.filter((l) => only.includes(l)) : MACHINE_LOCALES;
 
   // One task per (locale, format-chunk). Running them sequentially blows the
   // serverless timeout (12 locales × slow LLM calls), so run with bounded
   // concurrency instead — wall time drops to roughly the slowest single call.
   type Task = { target: MachineLocale; format: "text" | "html"; part: FieldToTranslate[] };
   const tasks: Task[] = [];
-  for (const target of MACHINE_LOCALES) {
+  for (const target of targets) {
     for (const format of ["text", "html"] as const) {
       const group = nonEmpty.filter((f) => f.format === format);
       for (const part of chunk(group)) tasks.push({ target, format, part });
