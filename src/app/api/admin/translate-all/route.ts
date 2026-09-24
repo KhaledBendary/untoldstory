@@ -41,8 +41,10 @@ async function translateOne(type: CType, def: ContentType, row: Row, only?: read
 
 /**
  * Translate content into every machine language. Body may target ONE item —
- * { type, slug } — or, with no body, all services/projects/posts. English/Arabic
- * are never touched. Guarded so it does nothing (and says so) with no key.
+ * { type, slug } — or, with no body, all services/projects/posts. Also fills
+ * in whichever of English/Arabic is missing from the other on every item (see
+ * applyMachineTranslations → syncEnglishArabic). Guarded so it does nothing
+ * (and says so) with no key.
  */
 export async function POST(request: NextRequest) {
   const auth = await requireAdmin();
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
 
   if (!translationConfigured()) {
     return NextResponse.json(
-      { error: "الترجمة الآلية مش متظبطة — ضيف GOOGLE_TRANSLATE_API_KEY في المتغيرات وأعِد النشر." },
+      { error: "الترجمة الآلية مش متظبطة — ضيف OPENAI_API_KEY (أو ANTHROPIC_API_KEY أو GOOGLE_TRANSLATE_API_KEY) في المتغيرات وأعِد النشر." },
       { status: 503 },
     );
   }

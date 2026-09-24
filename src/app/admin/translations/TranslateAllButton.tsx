@@ -3,14 +3,18 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-/** One-click: regenerate every machine language from English across all content. */
+/**
+ * One-click: regenerate every machine language from English across all
+ * content, and — for any item missing one of English/Arabic — fill it in
+ * from whichever one is written (see applyMachineTranslations).
+ */
 export default function TranslateAllButton() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
 
   async function run() {
-    if (!confirm("هيترجم كل الخدمات والمشاريع والمقالات لكل اللغات من الإنجليزي. العربي والإنجليزي مش هيتغيّروا. تكمّل؟")) return;
+    if (!confirm("هيترجم كل الخدمات والمشاريع والمقالات لكل اللغات من الإنجليزي، وهيكمّل أي عنصر ناقصه إنجليزي أو عربي من اللغة التانية. تكمّل؟")) return;
     setBusy(true); setMsg(null);
     try {
       const res = await fetch("/api/admin/translate-all", { method: "POST" });
