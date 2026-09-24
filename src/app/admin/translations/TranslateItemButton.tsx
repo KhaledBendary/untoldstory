@@ -4,9 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 // The 12 machine languages, translated one at a time so no single request times out.
-const LOCALES = ["fr", "de", "es", "it", "pt", "ru", "tr", "zh", "ja", "ko", "pl", "sw"];
+// "ar" is included too — not a machine locale itself, but sending it as `locale`
+// is what makes the server also run the English/Arabic sync (see
+// applyMachineTranslations), which this button used to skip entirely: it could
+// turn every machine-language dot green while leaving Arabic missing forever,
+// since only a full item save (no locale filter) ever triggered that sync.
+const LOCALES = ["ar", "fr", "de", "es", "it", "pt", "ru", "tr", "zh", "ja", "ko", "pl", "sw"];
 
-/** Translate a single item into all machine languages — one language per request. */
+/** Translate a single item into every machine language and sync Arabic — one request per language. */
 export default function TranslateItemButton({ type, slug }: { type: string; slug: string }) {
   const router = useRouter();
   const [state, setState] = useState<"idle" | "busy" | "ok" | "err">("idle");
