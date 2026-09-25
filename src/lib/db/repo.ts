@@ -116,10 +116,16 @@ export async function saveSingletonArray(
 export type MediaRow = {
   id: number; url: string; pathname: string; filename: string;
   content_type: string | null; size_bytes: number | null; uploaded_at: Date;
+  alt: Record<string, string>;
 };
 
 export const getMedia = () =>
   sql<MediaRow[]>`select * from media order by uploaded_at desc`;
+
+/** Replace an image's alt text (all locales at once — the caller fills in translations first). */
+export async function updateMediaAlt(id: number, alt: Record<string, string>) {
+  await sql`update media set alt = ${sql.json(alt as Parameters<typeof sql.json>[0])} where id = ${id}`;
+}
 
 export async function addMedia(m: {
   url: string; pathname: string; filename: string; content_type: string | null; size_bytes: number | null;
