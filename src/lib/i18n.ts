@@ -119,10 +119,14 @@ export function alternatesFor(
   const pathFor = (code: string) => {
     if (code === locale) return path; // this page's own already-correct path
     if (!slugOverride) return path;
+    // English never reads data.slugs — same rule as pickSlug in db/localize.ts.
+    // slugs.en is a change-detection marker for the translation pipeline, not
+    // a real URL value; treating it as one here served a stale/foreign slug
+    // under English's unprefixed path whenever that marker was out of date.
+    const raw = code === DEFAULT_LOCALE ? undefined : slugOverride.slugs?.[code];
     // A locale with no translated slug yet falls back to the canonical
     // (English) one — never to this page's OWN (possibly different-locale)
     // path, which would point every alternate at one locale's slug.
-    const raw = slugOverride.slugs?.[code];
     const slug = raw && isSlugSafe(raw) ? raw : slugOverride.canonicalSlug;
     return `${slugOverride.basePath}/${slug}`;
   };

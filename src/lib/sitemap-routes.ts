@@ -25,6 +25,9 @@ export type SitemapRoute = {
 
 /** This route's path for one locale — its own translated slug if it has one, else the canonical path. */
 function routePath(route: SitemapRoute, locale: string): string {
+  // English never reads data.slugs — same rule as pickSlug in db/localize.ts.
+  // slugs.en is only a change-detection marker, not a real URL value.
+  if (locale === DEFAULT_LOCALE) return route.path;
   const slug = route.basePath && route.slugs?.[locale];
   return slug && isSlugSafe(slug) ? `${route.basePath}/${slug}` : route.path;
 }

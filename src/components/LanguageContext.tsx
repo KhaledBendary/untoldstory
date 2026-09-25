@@ -94,7 +94,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
    */
   const localeHref = (code: string) => {
     if (slugOverride && bare.startsWith(`${slugOverride.basePath}/`)) {
-      const raw = slugOverride.slugs?.[code];
+      // English never reads data.slugs — same rule as pickSlug in
+      // db/localize.ts. slugs.en is only a change-detection marker for the
+      // translation pipeline, not a real URL value; treating it as one here
+      // sent English (unprefixed) to a stale/foreign slug whenever that
+      // marker was out of date, producing a bare /services/<spanish-slug> 404.
+      const raw = code === DEFAULT_LOCALE ? undefined : slugOverride.slugs?.[code];
       const slug = raw && isSlugSafe(raw) ? raw : slugOverride.canonicalSlug;
       return localizedPath(`${slugOverride.basePath}/${slug}`, code);
     }
