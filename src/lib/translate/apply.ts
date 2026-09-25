@@ -21,8 +21,12 @@ async function syncEnglishArabic(def: ContentType, data: Record<string, Dict>): 
     const en = data[field.key]?.en?.trim();
     const ar = data[field.key]?.ar?.trim();
     const format = field.type === "html" ? "html" : "text";
-    if (en && !ar) toAr.push({ key: field.key, format, text: en });
-    else if (ar && !en) toEn.push({ key: field.key, format, text: ar });
+    // Same fallback-detection gap the machine-locale pass had: a language
+    // whose saved value is just a leftover copy of the other one (from before
+    // translation was configured) looked "already filled" forever and was
+    // never revisited, since the old check only asked whether it was empty.
+    if (en && (!ar || ar === en)) toAr.push({ key: field.key, format, text: en });
+    else if (ar && (!en || en === ar)) toEn.push({ key: field.key, format, text: ar });
   }
   if (!toAr.length && !toEn.length) return {};
   try {
@@ -225,8 +229,8 @@ async function syncEnglishArabicSingleton(
     if (!field || field.ltr) continue; // technical value — keep identical across languages
     const en = e.values.en?.trim();
     const ar = e.values.ar?.trim();
-    if (en && !ar) toAr.push({ key: e.path, format: "text", text: en });
-    else if (ar && !en) toEn.push({ key: e.path, format: "text", text: ar });
+    if (en && (!ar || ar === en)) toAr.push({ key: e.path, format: "text", text: en });
+    else if (ar && (!en || en === ar)) toEn.push({ key: e.path, format: "text", text: ar });
   }
   if (!toAr.length && !toEn.length) return {};
   const byPath = new Map(edits.map((e) => [e.path, e]));
