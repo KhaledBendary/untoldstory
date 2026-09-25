@@ -80,6 +80,12 @@ async function openaiTranslate(q: string[], target: string, format: "text" | "ht
     body: JSON.stringify({
       model: process.env.OPENAI_TRANSLATE_MODEL || "gpt-4o-mini",
       temperature: 0.2,
+      // Without an explicit cap, a long article body could get cut off by the
+      // model's own default output limit, breaking the JSON array mid-string
+      // — surfacing as an opaque "array length mismatch" that discarded the
+      // whole batch (including sibling fields that translated fine) before
+      // partial-result handling existed. Generous enough for a full post body.
+      max_tokens: 16000,
       messages: [
         { role: "system", content: "You are a professional website localizer. Output only what is asked." },
         { role: "user", content: llmPrompt(q, target, format, source) },
@@ -92,8 +98,12 @@ async function openaiTranslate(q: string[], target: string, format: "text" | "ht
     return openaiTranslate(q, target, format, source, attempt + 1);
   }
   if (!res.ok) throw new Error(`OpenAI ${res.status}: ${(await res.text()).slice(0, 300)}`);
-  const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-  return parseArray(json.choices?.[0]?.message?.content || "", q.length);
+  const json = (await res.json()) as { choices?: { message?: { content?: string }; finish_reason?: string }[] };
+  const choice = json.choices?.[0];
+  if (choice?.finish_reason === "length") {
+    throw new Error(`OpenAI response was cut off (too long for max_tokens) — try a shorter field or split it`);
+  }
+  return parseArray(choice?.message?.content || "", q.length);
 }
 
 async function anthropicTranslate(q: string[], target: string, format: "text" | "html", source: string): Promise<string[]> {
@@ -136,6 +146,22 @@ function providerTranslate(q: string[], target: string, format: "text" | "html",
 }
 
 export type FieldToTranslate = { key: string; format: "text" | "html"; text: string };
+
+/**
+ * Thrown when some but not all requested translations succeeded — carries
+ * whatever DID complete so a caller (see apply.ts) can save that instead of
+ * discarding it. Before this existed, one bad chunk (e.g. an oversized HTML
+ * body the model truncated into malformed JSON) threw partway through a
+ * batch and silently dropped every OTHER field or locale already translated
+ * in the same call — the likely explanation for "the title translated but
+ * the body didn't" on the same save.
+ */
+export class PartialTranslateError extends Error {
+  constructor(message: string, public partial: Record<string, unknown>) {
+    super(message);
+    this.name = "PartialTranslateError";
+  }
+}
 
 function chunk(fields: FieldToTranslate[]): FieldToTranslate[][] {
   const out: FieldToTranslate[][] = [];
@@ -183,14 +209,23 @@ export async function translateFields(
   // quota (429) on the first bulk run. Retries absorb the rest.
   const CONCURRENCY = 5;
   let next = 0;
+  // Each task's failure is caught here, not left to reject Promise.all: one
+  // bad task (a stuck 429, a malformed response) used to throw and discard
+  // every OTHER task's already-completed translation from the same call.
+  const failures: string[] = [];
   async function worker() {
     while (next < tasks.length) {
       const t = tasks[next++];
-      const translated = await providerTranslate(t.part.map((f) => f.text), t.target, t.format);
-      t.part.forEach((f, i) => { out[f.key][t.target] = translated[i]; });
+      try {
+        const translated = await providerTranslate(t.part.map((f) => f.text), t.target, t.format);
+        t.part.forEach((f, i) => { out[f.key][t.target] = translated[i]; });
+      } catch (e) {
+        failures.push(`${t.target} (${t.part.map((f) => f.key).join(",")}): ${(e as Error).message || e}`);
+      }
     }
   }
   await Promise.all(Array.from({ length: Math.min(CONCURRENCY, tasks.length) }, worker));
+  if (failures.length) throw new PartialTranslateError(failures.join(" | "), out);
   return out as Record<string, Record<MachineLocale, string>>;
 }
 
@@ -204,12 +239,21 @@ export async function translatePair(fields: FieldToTranslate[], source: string, 
   const out: Record<string, string> = {};
   const nonEmpty = fields.filter((f) => f.text && f.text.trim());
   if (!nonEmpty.length) return out;
+  const failures: string[] = [];
   for (const format of ["text", "html"] as const) {
     const group = nonEmpty.filter((f) => f.format === format);
     for (const part of chunk(group)) {
-      const translated = await providerTranslate(part.map((f) => f.text), target, format, source);
-      part.forEach((f, i) => { out[f.key] = translated[i]; });
+      try {
+        const translated = await providerTranslate(part.map((f) => f.text), target, format, source);
+        part.forEach((f, i) => { out[f.key] = translated[i]; });
+      } catch (e) {
+        // One chunk failing (e.g. a large HTML body the model truncated into
+        // malformed JSON) no longer discards every other field's result —
+        // keep going and report only what actually failed.
+        failures.push(`${format} (${part.map((f) => f.key).join(",")}): ${(e as Error).message || e}`);
+      }
     }
   }
+  if (failures.length) throw new PartialTranslateError(failures.join(" | "), out);
   return out;
 }

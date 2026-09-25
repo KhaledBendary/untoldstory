@@ -1,5 +1,5 @@
 import "server-only";
-import { MACHINE_LOCALES, translateFields, translatePair, translationConfigured, type FieldToTranslate, type MachineLocale } from "@/lib/translate";
+import { MACHINE_LOCALES, PartialTranslateError, translateFields, translatePair, translationConfigured, type FieldToTranslate, type MachineLocale } from "@/lib/translate";
 import type { ContentType } from "@/lib/admin/content-types";
 import type { Dict } from "@/lib/content-validate";
 import { getPath, type SingletonField } from "@/lib/admin/singleton-fields";
@@ -36,24 +36,38 @@ async function syncEnglishArabic(def: ContentType, data: Record<string, Dict>): 
     else if (ar && enLooksStale) toEn.push({ key: field.key, format, text: ar });
   }
   if (!toAr.length && !toEn.length) return {};
-  try {
-    if (toAr.length) {
+  // Each direction is caught on its own, and a PartialTranslateError's
+  // partial results are still applied — one bad field (e.g. a large HTML
+  // body the model truncated into malformed JSON) used to throw away every
+  // OTHER field's already-successful translation from the same call, which
+  // is why a title/excerpt could translate fine while the body silently
+  // stayed in the source language on the exact same save.
+  const warnings: string[] = [];
+  if (toAr.length) {
+    try {
       const filled = await translatePair(toAr, "en", "ar");
       for (const [key, text] of Object.entries(filled)) data[key] = { ...data[key], ar: text };
+    } catch (e) {
+      if (e instanceof PartialTranslateError) {
+        for (const [key, text] of Object.entries(e.partial as Record<string, string>)) data[key] = { ...data[key], ar: text };
+      }
+      console.error("English/Arabic sync (en->ar) failed:", e);
+      warnings.push(`فشلت ترجمة بعض الحقول للعربي — ${((e as Error).message || "").slice(0, 250)}`);
     }
-    if (toEn.length) {
+  }
+  if (toEn.length) {
+    try {
       const filled = await translatePair(toEn, "ar", "en");
       for (const [key, text] of Object.entries(filled)) data[key] = { ...data[key], en: text };
+    } catch (e) {
+      if (e instanceof PartialTranslateError) {
+        for (const [key, text] of Object.entries(e.partial as Record<string, string>)) data[key] = { ...data[key], en: text };
+      }
+      console.error("English/Arabic sync (ar->en) failed:", e);
+      warnings.push(`فشلت ترجمة بعض الحقول للإنجليزي — ${((e as Error).message || "").slice(0, 250)}`);
     }
-    return {};
-  } catch (e) {
-    // Best-effort: leave whichever language is still missing rather than fail
-    // the whole save — but surface it, unlike before, so a broken key doesn't
-    // look like a silent no-op to the editor.
-    const detail = (e as Error).message || "";
-    console.error("English/Arabic sync failed:", e);
-    return { warning: `فشلت مزامنة الإنجليزي/العربي — ${detail.slice(0, 300)}` };
   }
+  return warnings.length ? { warning: warnings.join(" | ") } : {};
 }
 
 /**
@@ -139,20 +153,38 @@ async function updateSlugs(canonicalSlug: string, data: Record<string, Dict>, on
 
   try {
     if (targets.length) {
-      const results = await translateFields([{ key: "slug", format: "text", text: words }], targets);
-      for (const loc of targets) {
-        const t = results.slug?.[loc];
-        if (t) slugs[loc] = slugify(t);
+      try {
+        const results = await translateFields([{ key: "slug", format: "text", text: words }], targets);
+        for (const loc of targets) {
+          const t = results.slug?.[loc];
+          if (t) slugs[loc] = slugify(t);
+        }
+      } catch (e) {
+        if (e instanceof PartialTranslateError) {
+          const partial = e.partial as Record<string, Record<string, string>>;
+          for (const loc of targets) {
+            const t = partial.slug?.[loc];
+            if (t) slugs[loc] = slugify(t);
+          }
+        }
+        throw e;
       }
     }
     if (wantsAr) {
-      const ar = await translatePair([{ key: "slug", format: "text", text: words }], "en", "ar");
-      if (ar.slug) slugs.ar = slugify(transliterateArabic(ar.slug));
+      try {
+        const ar = await translatePair([{ key: "slug", format: "text", text: words }], "en", "ar");
+        if (ar.slug) slugs.ar = slugify(transliterateArabic(ar.slug));
+      } catch (e) {
+        if (e instanceof PartialTranslateError && typeof e.partial.slug === "string") {
+          slugs.ar = slugify(transliterateArabic(e.partial.slug));
+        }
+        throw e;
+      }
     }
     data.slugs = slugs;
     return {};
   } catch (e) {
-    data.slugs = slugs; // keep whatever succeeded so far rather than lose it
+    data.slugs = slugs; // keep whatever succeeded so far (partial or not) rather than lose it
     return { warning: `فشلت ترجمة السلج — ${((e as Error).message || "").slice(0, 300)}` };
   }
 }
@@ -237,9 +269,17 @@ export async function applyMachineTranslations(
     for (const [key, dict] of Object.entries(results)) data[key] = { ...data[key], ...dict };
     return { warning: combineWarnings(arWarning, slugWarning) };
   } catch (e) {
+    // A PartialTranslateError still carries whatever locales/fields DID
+    // translate — apply those instead of discarding the whole batch over one
+    // failed locale or an oversized field.
+    if (e instanceof PartialTranslateError) {
+      for (const [key, dict] of Object.entries(e.partial as Record<string, Record<string, string>>)) {
+        data[key] = { ...data[key], ...dict };
+      }
+    }
     const detail = (e as Error).message || "";
     console.error("Machine translation failed:", e);
-    return { warning: combineWarnings(arWarning, slugWarning, `فشلت الترجمة الآلية — ${detail.slice(0, 300)}`) };
+    return { warning: combineWarnings(arWarning, slugWarning, `فشلت الترجمة الآلية لبعض اللغات — ${detail.slice(0, 300)}`) };
   }
 }
 
@@ -267,21 +307,26 @@ export async function translateBlockItems(
       if (text && text.trim()) toTranslate.push({ key: `${i}::${f.key}`, format: f.format, text });
     }
   });
+  let results: Record<string, Record<MachineLocale, string>> = {};
+  let warning: string | undefined;
   try {
-    const results = await translateFields(toTranslate);
-    const perLocale = {} as Record<MachineLocale, Record<string, string>[]>;
-    for (const loc of MACHINE_LOCALES) {
-      perLocale[loc] = itemsEn.map((item, i) => {
-        const out: Record<string, string> = {};
-        for (const f of fields) out[f.key] = results[`${i}::${f.key}`]?.[loc] ?? item[f.key] ?? "";
-        return out;
-      });
-    }
-    return { perLocale };
+    results = await translateFields(toTranslate);
   } catch (e) {
+    // Keep whatever locales/items DID translate instead of falling every item
+    // back to English just because one locale or one item failed.
+    if (e instanceof PartialTranslateError) results = e.partial as typeof results;
     console.error("Machine translation (block) failed:", e);
-    return { perLocale: empty, warning: "فشلت الترجمة الآلية — اللغات التلقائية بتاخد نسخة الإنجليزي مؤقتاً" };
+    warning = "فشلت ترجمة بعض اللغات — اللي فشل هياخد نسخة الإنجليزي مؤقتاً";
   }
+  const perLocale = {} as Record<MachineLocale, Record<string, string>[]>;
+  for (const loc of MACHINE_LOCALES) {
+    perLocale[loc] = itemsEn.map((item, i) => {
+      const out: Record<string, string> = {};
+      for (const f of fields) out[f.key] = results[`${i}::${f.key}`]?.[loc] ?? item[f.key] ?? "";
+      return out;
+    });
+  }
+  return { perLocale, warning };
 }
 
 /**
@@ -305,27 +350,32 @@ async function syncEnglishArabicSingleton(
   }
   if (!toAr.length && !toEn.length) return {};
   const byPath = new Map(edits.map((e) => [e.path, e]));
-  try {
-    if (toAr.length) {
-      const filled = await translatePair(toAr, "en", "ar");
-      for (const [path, text] of Object.entries(filled)) {
-        const edit = byPath.get(path);
-        if (edit) edit.values.ar = text;
-      }
+  const applyFilled = (filled: Record<string, string>, locale: "ar" | "en") => {
+    for (const [path, text] of Object.entries(filled)) {
+      const edit = byPath.get(path);
+      if (edit) edit.values[locale] = text;
     }
-    if (toEn.length) {
-      const filled = await translatePair(toEn, "ar", "en");
-      for (const [path, text] of Object.entries(filled)) {
-        const edit = byPath.get(path);
-        if (edit) edit.values.en = text;
-      }
+  };
+  const warnings: string[] = [];
+  if (toAr.length) {
+    try {
+      applyFilled(await translatePair(toAr, "en", "ar"), "ar");
+    } catch (e) {
+      if (e instanceof PartialTranslateError) applyFilled(e.partial as Record<string, string>, "ar");
+      console.error("English/Arabic sync (singleton, en->ar) failed:", e);
+      warnings.push(`فشلت ترجمة بعض الحقول للعربي — ${((e as Error).message || "").slice(0, 250)}`);
     }
-    return {};
-  } catch (e) {
-    const detail = (e as Error).message || "";
-    console.error("English/Arabic sync (singleton) failed:", e);
-    return { warning: `فشلت مزامنة الإنجليزي/العربي — ${detail.slice(0, 300)}` };
   }
+  if (toEn.length) {
+    try {
+      applyFilled(await translatePair(toEn, "ar", "en"), "en");
+    } catch (e) {
+      if (e instanceof PartialTranslateError) applyFilled(e.partial as Record<string, string>, "en");
+      console.error("English/Arabic sync (singleton, ar->en) failed:", e);
+      warnings.push(`فشلت ترجمة بعض الحقول للإنجليزي — ${((e as Error).message || "").slice(0, 250)}`);
+    }
+  }
+  return warnings.length ? { warning: warnings.join(" | ") } : {};
 }
 
 /**
@@ -368,8 +418,14 @@ export async function applySingletonTranslations(
     }
     return { warning: arWarning };
   } catch (e) {
+    if (e instanceof PartialTranslateError) {
+      for (const [path, dict] of Object.entries(e.partial as Record<string, Record<string, string>>)) {
+        const edit = byPath.get(path);
+        if (edit) Object.assign(edit.values, dict);
+      }
+    }
     console.error("Machine translation (singleton) failed:", e);
-    const warning = "فشلت الترجمة الآلية — اتحفظ الإنجليزي والعربي، تقدر تحفظ تاني بعد شوية";
+    const warning = "فشلت ترجمة بعض اللغات — اللي فشل هياخد نسخة الإنجليزي مؤقتاً، تقدر تحفظ تاني بعد شوية";
     return { warning: arWarning ? `${arWarning} | ${warning}` : warning };
   }
 }
