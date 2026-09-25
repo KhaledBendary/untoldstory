@@ -137,6 +137,50 @@ export async function translateBlockItems(
 }
 
 /**
+ * Fill in whichever of English/Arabic is missing from the other, for edited
+ * singleton paths — same idea as syncEnglishArabic above, but over the
+ * {path, values} shape the singleton editor sends instead of a content record.
+ */
+async function syncEnglishArabicSingleton(
+  edits: { path: string; values: Record<string, string> }[],
+  fieldByPath: Map<string, SingletonField>,
+): Promise<{ warning?: string }> {
+  const toAr: FieldToTranslate[] = [];
+  const toEn: FieldToTranslate[] = [];
+  for (const e of edits) {
+    const field = fieldByPath.get(e.path);
+    if (!field || field.ltr) continue; // technical value — keep identical across languages
+    const en = e.values.en?.trim();
+    const ar = e.values.ar?.trim();
+    if (en && !ar) toAr.push({ key: e.path, format: "text", text: en });
+    else if (ar && !en) toEn.push({ key: e.path, format: "text", text: ar });
+  }
+  if (!toAr.length && !toEn.length) return {};
+  const byPath = new Map(edits.map((e) => [e.path, e]));
+  try {
+    if (toAr.length) {
+      const filled = await translatePair(toAr, "en", "ar");
+      for (const [path, text] of Object.entries(filled)) {
+        const edit = byPath.get(path);
+        if (edit) edit.values.ar = text;
+      }
+    }
+    if (toEn.length) {
+      const filled = await translatePair(toEn, "ar", "en");
+      for (const [path, text] of Object.entries(filled)) {
+        const edit = byPath.get(path);
+        if (edit) edit.values.en = text;
+      }
+    }
+    return {};
+  } catch (e) {
+    const detail = (e as Error).message || "";
+    console.error("English/Arabic sync (singleton) failed:", e);
+    return { warning: `فشلت مزامنة الإنجليزي/العربي — ${detail.slice(0, 300)}` };
+  }
+}
+
+/**
  * Generate the seven machine languages for edited singleton paths, in place.
  * Technical values (emails, phones, social URLs — the ltr fields) are never
  * translated. Each edit's `values` map gains fr…tr when its English changed or
@@ -147,6 +191,11 @@ export async function applySingletonTranslations(
   fieldByPath: Map<string, SingletonField>,
   existing: Singleton | null,
 ): Promise<{ warning?: string }> {
+  let arWarning: string | undefined;
+  if (translationConfigured()) {
+    arWarning = (await syncEnglishArabicSingleton(edits, fieldByPath)).warning;
+  }
+
   const toTranslate: FieldToTranslate[] = [];
   const byPath = new Map(edits.map((e) => [e.path, e]));
   for (const e of edits) {
@@ -159,9 +208,9 @@ export async function applySingletonTranslations(
     if (en === prevEn && !missing) continue;
     toTranslate.push({ key: e.path, format: "text", text: e.values.en });
   }
-  if (!toTranslate.length) return {};
+  if (!toTranslate.length) return { warning: arWarning };
   if (!translationConfigured()) {
-    return { warning: "الترجمة الآلية مش متظبطة — اتحفظ الإنجليزي والعربي بس" };
+    return { warning: arWarning || "الترجمة الآلية مش متظبطة — اتحفظ الإنجليزي والعربي بس" };
   }
   try {
     const results = await translateFields(toTranslate);
@@ -169,9 +218,10 @@ export async function applySingletonTranslations(
       const edit = byPath.get(path);
       if (edit) Object.assign(edit.values, dict);
     }
-    return {};
+    return { warning: arWarning };
   } catch (e) {
     console.error("Machine translation (singleton) failed:", e);
-    return { warning: "فشلت الترجمة الآلية — اتحفظ الإنجليزي والعربي، تقدر تحفظ تاني بعد شوية" };
+    const warning = "فشلت الترجمة الآلية — اتحفظ الإنجليزي والعربي، تقدر تحفظ تاني بعد شوية";
+    return { warning: arWarning ? `${arWarning} | ${warning}` : warning };
   }
 }

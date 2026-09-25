@@ -6,7 +6,7 @@ import { getSingleton, saveSingletonArray, logActivity } from "@/lib/db/repo";
 import { validateField, hasErrors, type Dict } from "@/lib/content-validate";
 import { translateBlockItems } from "@/lib/translate/apply";
 import { LOCALE_CODES } from "@/lib/i18n";
-import { MACHINE_LOCALES } from "@/lib/translate";
+import { MACHINE_LOCALES, translatePair, translationConfigured, type FieldToTranslate } from "@/lib/translate";
 import { triggerDeploy } from "@/lib/deploy";
 
 /**
@@ -65,6 +65,42 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   }
   if (hasErrors(issues)) return NextResponse.json({ error: "فيه مشاكل لازم تتصلح", issues }, { status: 422 });
 
+  // Fill in whichever of English/Arabic is missing from the other, per item —
+  // block items (e.g. footer offices) previously only ever saved Arabic exactly
+  // as typed, same gap content items had before their own EN/AR sync.
+  let arWarning: string | undefined;
+  if (translationConfigured()) {
+    const toAr: FieldToTranslate[] = [];
+    const toEn: FieldToTranslate[] = [];
+    items.forEach((it, i) => {
+      for (const f of def.fields) {
+        if (!f.i18n || f.noTranslate) continue;
+        const pair = (it[f.key] ?? {}) as { en?: string; ar?: string };
+        const en = pair.en?.trim();
+        const ar = pair.ar?.trim();
+        if (en && !ar) toAr.push({ key: `${i}::${f.key}`, format: "text", text: en });
+        else if (ar && !en) toEn.push({ key: `${i}::${f.key}`, format: "text", text: ar });
+      }
+    });
+    if (toAr.length || toEn.length) {
+      try {
+        const applyResults = (results: Record<string, string>, locale: "ar" | "en") => {
+          for (const [k, text] of Object.entries(results)) {
+            const sep = k.indexOf("::");
+            const i = Number(k.slice(0, sep));
+            const key = k.slice(sep + 2);
+            const pair = (items[i][key] ?? {}) as Record<string, string>;
+            items[i][key] = { ...pair, [locale]: text };
+          }
+        };
+        if (toAr.length) applyResults(await translatePair(toAr, "en", "ar"), "ar");
+        if (toEn.length) applyResults(await translatePair(toEn, "ar", "en"), "en");
+      } catch (e) {
+        arWarning = `فشلت مزامنة الإنجليزي/العربي — ${((e as Error).message || "").slice(0, 300)}`;
+      }
+    }
+  }
+
   // Machine-translate the translatable (and not noTranslate) fields from English.
   const txFields = def.fields.filter((f) => f.i18n && !f.noTranslate).map((f) => ({ key: f.key, format: "text" as const }));
   const itemsEn = items.map((it) => {
@@ -89,5 +125,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   await saveSingletonArray(def.singleton, def.path, arrays, setPath);
   await logActivity({ actor: auth.session.email, action: "update", entity: "blocks", ref: def.key });
   const deploy = await triggerDeploy();
-  return NextResponse.json({ ok: true, translationWarning: warning, deploy });
+  const translationWarning = arWarning && warning ? `${arWarning} | ${warning}` : arWarning || warning;
+  return NextResponse.json({ ok: true, translationWarning, deploy });
 }
