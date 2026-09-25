@@ -257,22 +257,18 @@ export default function ContentEditor({
       </div>
 
       <div style={{ display: "grid", gap: 6, marginBottom: 18 }}>
-        <span style={lbl}>المعرّف (slug) *</span>
-        <input dir="ltr" placeholder="my-new-service" value={newSlug}
-          onChange={(e) => { setDirty(true); setSlugTouched(true); setNewSlug(e.target.value.toLowerCase()); }} />
-        {!create && newSlug !== slug && (
+        <span style={lbl}>المعرّف (slug) *{lang !== "en" && " — مترجم تلقائياً، مش قابل للتعديل هنا"}</span>
+        {lang === "en" ? (
+          <input dir="ltr" placeholder="my-new-service" value={newSlug}
+            onChange={(e) => { setDirty(true); setSlugTouched(true); setNewSlug(e.target.value.toLowerCase()); }} />
+        ) : (
+          <input dir="ltr" readOnly value={slugs[lang] || "لسه متترجمش — هياخد سلج الإنجليزي مؤقتاً"}
+            style={{ opacity: slugs[lang] ? 1 : 0.55, cursor: "default" }} />
+        )}
+        {!create && lang === "en" && newSlug !== slug && (
           <span style={{ fontSize: 12, color: "var(--warn)" }}>
             هيتغيّر رابط الصفحة — هيتعمل تحويل (301) تلقائي من الرابط القديم بعد النشر الجاي.
           </span>
-        )}
-        {!create && lang !== "en" && (
-          <div style={{ fontSize: 12, color: "var(--muted)" }}>
-            رابط هذه اللغة:{" "}
-            <span dir="ltr" style={{ color: slugs[lang] ? "var(--ok)" : "var(--faint)" }}>
-              {slugs[lang] || "لسه متترجمش — هياخد سلج الإنجليزي مؤقتاً"}
-            </span>
-            <span style={{ color: "var(--faint)" }}> (بيتولّد تلقائياً من العنوان، مش قابل للتعديل هنا)</span>
-          </div>
         )}
       </div>
 
