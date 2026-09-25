@@ -16,7 +16,7 @@ import { usePageData } from '@/hooks/usePageData';
 import { getPostDetailData, type PostDetailData, type DetailResult } from '@/lib/page-data';
 
 export default function PostDetail({ slug, initialData, initialLocale }: { slug: string; initialData: DetailResult<PostDetailData> | null; initialLocale: string }) {
-  const { locale, t } = useLanguage();
+  const { locale, t, setSlugOverride } = useLanguage();
   const { data: result, loading, failed: loadFailed, retry } = usePageData(
     initialData,
     initialLocale,
@@ -27,6 +27,14 @@ export default function PostDetail({ slug, initialData, initialLocale }: { slug:
   const payload = result?.status === "ok" ? result.data : null;
   const post = payload?.post ?? null;
   const allPosts = payload?.allPosts ?? [];
+
+  // So the language switcher lands on THIS post's own slug in the target
+  // locale, instead of reusing the current URL's slug under a new prefix.
+  useEffect(() => {
+    if (!post) return;
+    setSlugOverride({ basePath: "/insights", canonicalSlug: post.canonicalSlug ?? post.slug, slugs: post.slugs });
+    return () => setSlugOverride(null);
+  }, [post, setSlugOverride]);
 
 
   if (loading) {

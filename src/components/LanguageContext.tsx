@@ -1,9 +1,18 @@
 "use client";
 
 import translations from '@/data/ui-translations.json';
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { DEFAULT_LOCALE, isLocale, localeDir, localizedPath } from '@/lib/i18n';
+import { DEFAULT_LOCALE, isLocale, isSlugSafe, localeDir, localizedPath } from '@/lib/i18n';
+
+/** A detail page's own per-locale slug map, registered so switching language
+ * there lands on THAT locale's own slug instead of reusing the current one
+ * under a new locale prefix — see setSlugOverride below. */
+export interface SlugOverride {
+  basePath: string; // e.g. "/work"
+  canonicalSlug: string;
+  slugs?: Record<string, string>;
+}
 
 export interface Language {
   code: string;
@@ -39,6 +48,8 @@ interface LanguageContextProps {
   /** Where this same page lives in another language. */
   localeHref: (code: string) => string;
   t: (key: string) => string;
+  /** A detail page calls this with its own slug map on mount (and null on unmount). */
+  setSlugOverride: (override: SlugOverride | null) => void;
 }
 
 const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
@@ -67,6 +78,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     return { locale: DEFAULT_LOCALE, bare: pathname };
   }, [pathname]);
 
+  // Set by a detail page (service/project/post) for as long as it's mounted —
+  // see setSlugOverride. Without this, switching language on a page whose URL
+  // carries a translated slug (e.g. /it/work/campagna-...) just swapped the
+  // locale prefix and kept that SAME slug (e.g. /ar/work/campagna-...), which
+  // isn't a valid combination once each locale has its own slug and 404s.
+  const [slugOverride, setSlugOverride] = useState<SlugOverride | null>(null);
+
   /*
    * The switcher needs a real URL, not just a handler. It was a row of
    * <button onClick>, so the rendered HTML contained no link to any other
@@ -74,17 +92,24 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
    * only the hreflang tags and the sitemaps to go on. Those do the job, but a
    * link is what the page should have been offering all along.
    */
-  const localeHref = (code: string) => localizedPath(bare, code);
+  const localeHref = (code: string) => {
+    if (slugOverride && bare.startsWith(`${slugOverride.basePath}/`)) {
+      const raw = slugOverride.slugs?.[code];
+      const slug = raw && isSlugSafe(raw) ? raw : slugOverride.canonicalSlug;
+      return localizedPath(`${slugOverride.basePath}/${slug}`, code);
+    }
+    return localizedPath(bare, code);
+  };
 
   const changeLocale = (code: string) => {
     if (!isLocale(code) || code === locale) return;
-    router.push(localizedPath(bare, code));
+    router.push(localeHref(code));
   };
 
   const t = (key: string) => (translations as Record<string, Record<string, string>>)[locale]?.[key] || translations.en[key as keyof typeof translations.en] || key;
 
   return (
-    <LanguageContext.Provider value={{ locale, dir: localeDir(locale), changeLocale, localeHref, t }}>
+    <LanguageContext.Provider value={{ locale, dir: localeDir(locale), changeLocale, localeHref, t, setSlugOverride }}>
       {children}
     </LanguageContext.Provider>
   );

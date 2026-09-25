@@ -15,7 +15,7 @@ import { usePageData } from '@/hooks/usePageData';
 import { getProjectDetailData, type ProjectDetailData, type DetailResult } from '@/lib/page-data';
 
 export default function ProjectDetail({ slug, initialData, initialLocale }: { slug: string; initialData: DetailResult<ProjectDetailData> | null; initialLocale: string }) {
-  const { locale, t } = useLanguage();
+  const { locale, t, setSlugOverride } = useLanguage();
   const { data: result, loading, failed: loadFailed, retry } = usePageData(
     initialData,
     initialLocale,
@@ -26,6 +26,14 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
   const payload = result?.status === "ok" ? result.data : null;
   const project = payload?.project ?? null;
   const allProjects = payload?.allProjects ?? [];
+
+  // So the language switcher lands on THIS project's own slug in the target
+  // locale, instead of reusing the current URL's slug under a new prefix.
+  useEffect(() => {
+    if (!project) return;
+    setSlugOverride({ basePath: "/work", canonicalSlug: project.canonicalSlug ?? project.slug, slugs: project.slugs });
+    return () => setSlugOverride(null);
+  }, [project, setSlugOverride]);
 
 
   if (loading) {

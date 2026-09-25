@@ -16,7 +16,7 @@ import { getServiceDetailData, type ServiceDetailData, type DetailResult } from 
 import { getServiceFaqs } from '@/data/service-faqs';
 
 export default function ServiceDetail({ slug, initialData, initialLocale }: { slug: string; initialData: DetailResult<ServiceDetailData> | null; initialLocale: string }) {
-  const { locale, t } = useLanguage();
+  const { locale, t, setSlugOverride } = useLanguage();
   const { data: result, loading, failed: loadFailed, retry } = usePageData(
     initialData,
     initialLocale,
@@ -28,6 +28,14 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
   const service = payload?.service ?? null;
   const allServices = payload?.allServices ?? [];
   const relatedProjects = payload?.relatedProjects ?? [];
+
+  // So the language switcher lands on THIS service's own slug in the target
+  // locale, instead of reusing the current URL's slug under a new prefix.
+  useEffect(() => {
+    if (!service) return;
+    setSlugOverride({ basePath: "/services", canonicalSlug: service.canonicalSlug ?? service.slug, slugs: service.slugs });
+    return () => setSlugOverride(null);
+  }, [service, setSlugOverride]);
 
 
   if (loading) {

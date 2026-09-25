@@ -109,7 +109,7 @@ export function localizedPath(path: string, locale: string): string {
 // rather than imported: this file is also pulled into client components,
 // where that module (server-only) can't be bundled.
 const MAX_SLUG_BYTES = 200;
-const isSlugSafe = (s: string) => new TextEncoder().encode(s).length <= MAX_SLUG_BYTES;
+export const isSlugSafe = (s: string) => new TextEncoder().encode(s).length <= MAX_SLUG_BYTES;
 
 export function alternatesFor(
   path: string,
