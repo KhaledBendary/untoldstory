@@ -56,7 +56,7 @@ function seoIdeal(key: string): number | null {
  * reasons, in Arabic, before anything is written.
  */
 export default function ContentEditor({
-  type, slug, fixedFields, i18nFields, labelAr, initialFixed, initialI18n, create = false, initialStatus = "published", aiEnabled = false,
+  type, slug, fixedFields, i18nFields, labelAr, initialFixed, initialI18n, create = false, initialStatus = "published", aiEnabled = false, slugs = {},
 }: {
   type: string; slug: string;
   fixedFields: FixedField[]; i18nFields: I18nField[]; labelAr: string;
@@ -65,6 +65,10 @@ export default function ContentEditor({
   create?: boolean;
   initialStatus?: string;
   aiEnabled?: boolean;
+  // Auto-generated per-locale slug (see translate/apply.ts) — read-only here,
+  // shown so the editor can see it's actually working, not editable per
+  // language: the field above always edits the real (English/canonical) slug.
+  slugs?: Record<string, string>;
 }) {
   const router = useRouter();
   const [lang, setLang] = useState("en");
@@ -260,6 +264,15 @@ export default function ContentEditor({
           <span style={{ fontSize: 12, color: "var(--warn)" }}>
             هيتغيّر رابط الصفحة — هيتعمل تحويل (301) تلقائي من الرابط القديم بعد النشر الجاي.
           </span>
+        )}
+        {!create && lang !== "en" && (
+          <div style={{ fontSize: 12, color: "var(--muted)" }}>
+            رابط هذه اللغة:{" "}
+            <span dir="ltr" style={{ color: slugs[lang] ? "var(--ok)" : "var(--faint)" }}>
+              {slugs[lang] || "لسه متترجمش — هياخد سلج الإنجليزي مؤقتاً"}
+            </span>
+            <span style={{ color: "var(--faint)" }}> (بيتولّد تلقائياً من العنوان، مش قابل للتعديل هنا)</span>
+          </div>
         )}
       </div>
 

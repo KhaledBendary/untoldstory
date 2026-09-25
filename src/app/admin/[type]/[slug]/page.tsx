@@ -41,6 +41,7 @@ export default async function EditContent({ params }: { params: Promise<{ type: 
       initialI18n={i18n}
       initialStatus={(row.status as string) ?? "published"}
       aiEnabled={aiConfigured()}
+      slugs={(data.slugs as Record<string, string> | undefined) ?? {}}
     />
   );
 }
