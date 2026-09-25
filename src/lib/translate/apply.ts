@@ -5,6 +5,8 @@ import type { Dict } from "@/lib/content-validate";
 import { getPath, type SingletonField } from "@/lib/admin/singleton-fields";
 import type { Singleton } from "@/lib/db/repo";
 
+const HTML_TAG_RE = /<[a-z][^>]*>/i;
+
 /**
  * Fill in whichever of English/Arabic is missing from the other, in place.
  * Either language may be the one a person actually wrote — if only English was
@@ -20,13 +22,18 @@ async function syncEnglishArabic(def: ContentType, data: Record<string, Dict>): 
     if (field.noTranslate) continue; // keywords, canonical URLs, flags — never translate
     const en = data[field.key]?.en?.trim();
     const ar = data[field.key]?.ar?.trim();
-    const format = field.type === "html" ? "html" : "text";
+    const isHtml = field.type === "html";
+    const format = isHtml ? "html" : "text";
     // Same fallback-detection gap the machine-locale pass had: a language
     // whose saved value is just a leftover copy of the other one (from before
     // translation was configured) looked "already filled" forever and was
-    // never revisited, since the old check only asked whether it was empty.
-    if (en && (!ar || ar === en)) toAr.push({ key: field.key, format, text: en });
-    else if (ar && (!en || en === ar)) toEn.push({ key: field.key, format, text: ar });
+    // never revisited, since the old check only asked whether it was empty —
+    // plus the same "structurally not a real translation" case (an HTML field
+    // whose stale value has no tags at all, unrelated to either language).
+    const arLooksStale = !ar || ar === en || (isHtml && HTML_TAG_RE.test(en || "") && !HTML_TAG_RE.test(ar));
+    const enLooksStale = !en || en === ar || (isHtml && HTML_TAG_RE.test(ar || "") && !HTML_TAG_RE.test(en));
+    if (en && arLooksStale) toAr.push({ key: field.key, format, text: en });
+    else if (ar && enLooksStale) toEn.push({ key: field.key, format, text: ar });
   }
   if (!toAr.length && !toEn.length) return {};
   try {
@@ -146,12 +153,21 @@ export async function applyMachineTranslations(
     // (from before translation was configured, or from this exact skip once
     // treating that copy as "already translated" and never revisiting it) —
     // both need a real translation, not just a genuinely absent key.
+    const isHtml = field.type === "html";
     const missing = checkLocales.some((loc) => {
       const val = existing?.[field.key]?.[loc];
-      return !val || val === en;
+      if (!val || val === en) return true;
+      // A leftover value from well before this translation system existed —
+      // e.g. a generic one-line summary seeded into every locale of an HTML
+      // body field, unrelated to the current English text and structurally
+      // nothing like it (no tags where the source has them). Equal-to-English
+      // doesn't catch this: the stale text differs from English too, just not
+      // by being a real translation of it.
+      if (isHtml && HTML_TAG_RE.test(en) && !HTML_TAG_RE.test(val)) return true;
+      return false;
     });
     if (en === prevEn && !missing) continue; // unchanged and already translated
-    toTranslate.push({ key: field.key, format: field.type === "html" ? "html" : "text", text: data[field.key].en });
+    toTranslate.push({ key: field.key, format: isHtml ? "html" : "text", text: data[field.key].en });
   }
   if (!toTranslate.length) { updateSlugs(def, data); return { warning: arWarning }; }
   if (!translationConfigured()) {
