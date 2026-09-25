@@ -138,7 +138,14 @@ export async function applyMachineTranslations(
     const en = data[field.key]?.en?.trim();
     if (!en) continue;
     const prevEn = existing?.[field.key]?.en;
-    const missing = checkLocales.some((loc) => !existing?.[field.key]?.[loc]);
+    // A locale with no value, OR one that's just a leftover copy of English
+    // (from before translation was configured, or from this exact skip once
+    // treating that copy as "already translated" and never revisiting it) —
+    // both need a real translation, not just a genuinely absent key.
+    const missing = checkLocales.some((loc) => {
+      const val = existing?.[field.key]?.[loc];
+      return !val || val === en;
+    });
     if (en === prevEn && !missing) continue; // unchanged and already translated
     toTranslate.push({ key: field.key, format: field.type === "html" ? "html" : "text", text: data[field.key].en });
   }
