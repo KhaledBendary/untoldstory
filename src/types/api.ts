@@ -18,6 +18,10 @@ export interface PaginatedResponse<T> {
 export interface Service {
   id: string;
   slug: string;
+  // Per-locale translated slug overrides, keyed by locale — only present when
+  // the record came from the database (translate/apply.ts generates this).
+  slugs?: Record<string, string>;
+  canonicalSlug?: string;
   icon: string;
   imageUrl: string;
   title: string;
@@ -32,6 +36,8 @@ export interface Service {
 
 export interface PortfolioItem {
   slug: string;
+  slugs?: Record<string, string>;
+  canonicalSlug?: string;
   title: string;
   client?: string;
   image?: string;
@@ -53,6 +59,8 @@ export interface PortfolioItem {
 export interface BlogPost {
   id: string;
   slug: string;
+  slugs?: Record<string, string>;
+  canonicalSlug?: string;
   title: string;
   excerpt: string;
   date: string;

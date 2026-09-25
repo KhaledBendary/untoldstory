@@ -511,6 +511,9 @@ type PageSeoInput = {
   twitterDescription?: string;
   canonical?: string;
   nofollow?: boolean;
+  // Per-locale translated slugs, for hreflang alternates that point at each
+  // OTHER locale's own slug rather than reusing this page's.
+  slugOverride?: { basePath: string; canonicalSlug: string; slugs?: Record<string, string> };
 };
 
 /**
@@ -531,6 +534,7 @@ export function pageSeo({
   twitterDescription,
   canonical,
   nofollow,
+  slugOverride,
 }: PageSeoInput): Metadata {
   const safeTitle = clampTitle(title) || BRAND;
   const desc = buildDescription(description, safeTitle);
@@ -543,7 +547,7 @@ export function pageSeo({
   const ogD = ogDescription?.trim() || desc;
   const twT = twitterTitle?.trim() || ogT;
   const twD = twitterDescription?.trim() || ogD;
-  const alt = alternatesFor(path, locale);
+  const alt = alternatesFor(path, locale, slugOverride);
   if (canonical?.trim()) alt.canonical = canonical.trim();
   return {
     title: { absolute: safeTitle },

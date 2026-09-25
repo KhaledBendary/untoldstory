@@ -13,7 +13,13 @@ const pick = (d: Dict, loc: string): string => d?.[loc] ?? d?.en ?? "";
 // data.slugs (generated alongside translation — see translate/apply.ts) holds a
 // per-locale slug; a locale without one yet falls back to the row's own
 // canonical slug rather than to English's slug, since English IS the canonical.
-const pickSlug = (slugs: Dict, loc: string, canonical: string): string => slugs?.[loc] || canonical;
+// English itself always uses the real canonical slug column, never
+// data.slugs.en: the column is the actual identity/URL an admin may have set
+// by hand (e.g. via the slug-rename feature) independent of the title, and a
+// title-derived slug could silently diverge from it after a later translation
+// run touched an unrelated field.
+const pickSlug = (slugs: Dict, loc: string, canonical: string): string =>
+  loc === "en" ? canonical : slugs?.[loc] || canonical;
 // Laravel emitted null (not "") for empty optional fields; mirror that so the
 // shape is identical and the site's `value || fallback` checks behave the same.
 const pickN = (d: Dict, loc: string): string | null => d?.[loc] ?? d?.en ?? null;
@@ -37,6 +43,13 @@ export function localizeService(r: ServiceRow, loc: string) {
   return {
     id: slug,
     slug,
+    // The full per-locale map, for building correct hreflang/sitemap links to
+    // every OTHER locale's own slug — not just this call's single locale. Plus
+    // the real canonical (English) slug regardless of which locale this call
+    // resolved, since a locale with no translated slug yet must fall back to
+    // that — not to whatever locale THIS call happened to be for.
+    slugs: d.slugs ?? {},
+    canonicalSlug: r.slug,
     icon: r.icon ?? "",
     imageUrl: r.image_url ?? "",
     price: r.price ?? "",
@@ -57,6 +70,8 @@ export function localizeProject(r: ProjectRow, loc: string) {
   const seo = seoWith(d.seo, loc, r.og_image);
   return {
     slug: pickSlug(d.slugs, loc, r.slug),
+    slugs: d.slugs ?? {},
+    canonicalSlug: r.slug,
     title: pick(d.title, loc),
     noindex: r.noindex,
     ...(seo ? { seo } : {}),
@@ -86,6 +101,8 @@ export function localizePostCard(r: PostRow, loc: string) {
   return {
     id: slug,
     slug,
+    slugs: d.slugs ?? {},
+    canonicalSlug: r.slug,
     title: pick(d.title, loc),
     excerpt: pickN(d.excerpt, loc),
     date: published,

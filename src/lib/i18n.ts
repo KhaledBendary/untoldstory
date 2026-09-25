@@ -96,12 +96,31 @@ export function localizedPath(path: string, locale: string): string {
  * `alternates` for a route: a self-canonical plus one hreflang entry per
  * locale and an x-default pointing at English.
  */
-export function alternatesFor(path: string, locale: string) {
+/**
+ * `slugOverride` lets a detail page's alternates use each OTHER locale's own
+ * translated slug (data.slugs — see translate/apply.ts) instead of reusing
+ * this page's own slug under every locale's prefix, which pointed hreflang at
+ * a slug that only exists in the current page's language.
+ */
+export function alternatesFor(
+  path: string,
+  locale: string,
+  slugOverride?: { basePath: string; canonicalSlug: string; slugs?: Record<string, string> },
+) {
+  const pathFor = (code: string) => {
+    if (code === locale) return path; // this page's own already-correct path
+    if (!slugOverride) return path;
+    // A locale with no translated slug yet falls back to the canonical
+    // (English) one — never to this page's OWN (possibly different-locale)
+    // path, which would point every alternate at one locale's slug.
+    const slug = slugOverride.slugs?.[code] || slugOverride.canonicalSlug;
+    return `${slugOverride.basePath}/${slug}`;
+  };
   const languages: Record<string, string> = {};
   for (const code of INDEXABLE_LOCALES) {
-    languages[LOCALE_TAGS[code]] = localizedPath(path, code);
+    languages[LOCALE_TAGS[code]] = localizedPath(pathFor(code), code);
   }
-  languages["x-default"] = localizedPath(path, DEFAULT_LOCALE);
+  languages["x-default"] = localizedPath(pathFor(DEFAULT_LOCALE), DEFAULT_LOCALE);
 
   return {
     canonical: localizedPath(path, locale),

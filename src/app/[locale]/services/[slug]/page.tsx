@@ -48,12 +48,13 @@ async function slugList(locale: string) {
   }
 }
 
-function serviceMeta(path: string, locale: string, title: string, description: string, image?: string | null, extra?: ReturnType<typeof cmsSeo>) {
+function serviceMeta(path: string, locale: string, title: string, description: string, image?: string | null, extra?: ReturnType<typeof cmsSeo>, canonicalSlug?: string, slugs?: Record<string, string>) {
   return applySeoOverrides(path, pageSeo({
     path, locale, title, description, image,
     ogTitle: extra?.ogTitle, ogDescription: extra?.ogDescription,
     twitterTitle: extra?.twitterTitle, twitterDescription: extra?.twitterDescription,
     canonical: extra?.canonical, nofollow: extra?.nofollow,
+    slugOverride: canonicalSlug ? { basePath: "/services", canonicalSlug, slugs } : undefined,
   }), locale);
 }
 
@@ -72,7 +73,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         path, locale,
         buildTitle(meta.metaTitle || service.title, slug),
         buildDescription(meta.metaDescription || service.shortDesc),
-        meta.ogImageUrl || service.imageUrl, meta,
+        meta.ogImageUrl || service.imageUrl, meta, service.canonicalSlug, service.slugs,
       ), (service as { noindex?: boolean }).noindex);
     }
     return serviceMeta(path, locale, fallbackTitle, fallbackTitle);
@@ -85,7 +86,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       path, locale,
       buildTitle(meta.metaTitle || service.title, slug),
       buildDescription(meta.metaDescription || service.shortDesc),
-      meta.ogImageUrl || service.imageUrl, meta,
+      meta.ogImageUrl || service.imageUrl, meta, service.canonicalSlug, service.slugs,
     );
   } catch (e) {
     console.error("Error fetching service for metadata:", e);
@@ -96,7 +97,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         path, locale,
         buildTitle(meta.metaTitle || live.title, slug),
         buildDescription(meta.metaDescription || live.shortDesc),
-        meta.ogImageUrl || live.imageUrl, meta,
+        meta.ogImageUrl || live.imageUrl, meta, live.canonicalSlug, live.slugs,
       );
     }
 

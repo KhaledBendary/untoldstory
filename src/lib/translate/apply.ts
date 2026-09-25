@@ -101,6 +101,7 @@ function updateSlugs(def: ContentType, data: Record<string, Dict>): void {
   if (!titles) return;
   const slugs: Dict = { ...(data.slugs as Dict | undefined) };
   for (const [locale, text] of Object.entries(titles)) {
+    if (locale === "en") continue; // English always uses the real slug column, never a generated one — see pickSlug in db/localize.ts
     if (!text || !text.trim()) continue;
     slugs[locale] = slugify(locale === "ar" ? transliterateArabic(text) : text);
   }
