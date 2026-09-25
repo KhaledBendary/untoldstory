@@ -40,8 +40,14 @@ export async function generateStaticParams() {
 async function slugList(locale: string) {
   try {
     const blogData = await api.getBlogPosts({ page: 1, per_page: 50, locale });
+    // Keep the canonical slug valid too, not just the translated one: the
+    // moment a locale's title first gets translated, its slug changes — with
+    // dynamicParams=false, only whatever's listed here resolves, so an old
+    // link using the canonical slug would otherwise 404 the instant a locale
+    // moves from "no translation yet" to "translated", with nothing to redirect it.
+    const slugs = blogData.items.flatMap((p) => (p.canonicalSlug && p.canonicalSlug !== p.slug ? [p.slug, p.canonicalSlug] : [p.slug]));
     return postStaticParams(
-      blogData.items.map((post) => post.slug),
+      slugs,
       FALLBACK_POSTS.map((p) => p.slug),
     );
   } catch (e) {

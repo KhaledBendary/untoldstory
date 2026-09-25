@@ -41,7 +41,13 @@ export async function generateStaticParams() {
 async function slugList(locale: string) {
   try {
     const services = await api.getServices(locale);
-    return serviceStaticParams(services.map((service) => service.slug), FALLBACK_SERVICES.map((s) => s.slug));
+    // Keep the canonical slug valid too, not just the translated one: the
+    // moment a locale's title first gets translated, its slug changes — with
+    // dynamicParams=false, only whatever's listed here resolves, so an old
+    // link using the canonical slug would otherwise 404 the instant a locale
+    // moves from "no translation yet" to "translated", with nothing to redirect it.
+    const slugs = services.flatMap((s) => (s.canonicalSlug && s.canonicalSlug !== s.slug ? [s.slug, s.canonicalSlug] : [s.slug]));
+    return serviceStaticParams(slugs, FALLBACK_SERVICES.map((s) => s.slug));
   } catch (e) {
     console.error("Error fetching services for generateStaticParams:", e instanceof Error ? e.message : e);
     return serviceStaticParams([], FALLBACK_SERVICES.map((s) => s.slug));
