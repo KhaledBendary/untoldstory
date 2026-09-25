@@ -46,6 +46,45 @@ async function syncEnglishArabic(def: ContentType, data: Record<string, Dict>): 
 }
 
 /**
+ * A URL-safe slug from a title, preserving the script it's written in (Arabic,
+ * Cyrillic, CJK, ...) instead of forcing everything to ASCII. Deliberately does
+ * NOT decompose-and-strip combining marks to drop Latin accents (é → e): that
+ * same step corrupts Japanese, which encodes voicing (ジ vs シ) as a base
+ * character plus a combining mark — NFKD-then-strip silently turned ジ into シ,
+ * a different, wrong character, not just an unaccented one. \p{M} is kept for
+ * exactly that reason, so accented Latin and every non-Latin script pass
+ * through as real, correct slug characters.
+ */
+function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/[\s_]+/g, "-")
+    .replace(/[^\p{L}\p{M}\p{N}-]+/gu, "")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
+/**
+ * Regenerate data.slugs — a per-locale slug computed from each locale's title,
+ * kept alongside the record's real (English/canonical) `slug` column. Not
+ * wired into routing yet: this only generates and stores the translated
+ * slugs so they're ready for that separately, without touching any live URL.
+ */
+function updateSlugs(def: ContentType, data: Record<string, Dict>): void {
+  const titleField = def.i18n.find((f) => f.key === "title");
+  if (!titleField) return;
+  const titles = data[titleField.key];
+  if (!titles) return;
+  const slugs: Dict = { ...(data.slugs as Dict | undefined) };
+  for (const [locale, text] of Object.entries(titles)) {
+    if (text && text.trim()) slugs[locale] = slugify(text);
+  }
+  if (Object.keys(slugs).length) data.slugs = slugs;
+}
+
+/**
  * Fill the twelve machine languages of a content record from its English, in
  * place. Only fields whose English actually changed (or that are missing a
  * translation) are sent, so an unchanged save costs nothing and a body isn't
@@ -79,17 +118,20 @@ export async function applyMachineTranslations(
     if (en === prevEn && !missing) continue; // unchanged and already translated
     toTranslate.push({ key: field.key, format: field.type === "html" ? "html" : "text", text: data[field.key].en });
   }
-  if (!toTranslate.length) return { warning: arWarning };
+  if (!toTranslate.length) { updateSlugs(def, data); return { warning: arWarning }; }
   if (!translationConfigured()) {
+    updateSlugs(def, data);
     return { warning: arWarning || "الترجمة الآلية مش متظبطة — اتحفظ زي ما اتكتب بس" };
   }
   try {
     const results = await translateFields(toTranslate, only);
     for (const [key, dict] of Object.entries(results)) data[key] = { ...data[key], ...dict };
+    updateSlugs(def, data);
     return { warning: arWarning };
   } catch (e) {
     const detail = (e as Error).message || "";
     console.error("Machine translation failed:", e);
+    updateSlugs(def, data);
     const warning = `فشلت الترجمة الآلية — ${detail.slice(0, 300)}`;
     return { warning: arWarning ? `${arWarning} | ${warning}` : warning };
   }
