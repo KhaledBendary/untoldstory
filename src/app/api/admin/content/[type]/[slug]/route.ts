@@ -76,7 +76,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   const existingFlat = { ...existingData, ...extractSeoForEditor(existingSeo, def) };
 
   // Generate the seven machine languages from the new English (best-effort).
-  const { warning } = await applyMachineTranslations(def, data, existingFlat);
+  const { warning } = await applyMachineTranslations(def, data, existingFlat, undefined, targetSlug);
 
   // Fold the flat seo.* fields back into the nested per-locale data.seo.
   assembleSeo(data, existingSeo);

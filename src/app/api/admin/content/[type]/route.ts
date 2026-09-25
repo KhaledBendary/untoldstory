@@ -48,7 +48,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   for (const field of def.fixed) fixed[field.key] = body.fixed?.[field.key] ?? null;
 
   // Generate the seven machine languages from the English (best-effort).
-  const { warning } = await applyMachineTranslations(def, data, undefined);
+  const { warning } = await applyMachineTranslations(def, data, undefined, undefined, slug);
 
   // Fold the flat seo.* fields into the nested per-locale data.seo.
   assembleSeo(data, undefined);

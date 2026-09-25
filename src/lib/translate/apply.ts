@@ -95,8 +95,11 @@ function transliterateArabic(text: string): string {
 }
 
 /**
- * Regenerate data.slugs — a per-locale slug computed from each locale's title,
- * kept alongside the record's real (English/canonical) `slug` column.
+ * Regenerate data.slugs — a per-locale slug machine-translated from the
+ * record's own canonical slug text (the "المعرّف" field the admin types),
+ * not from the title: the slug is translated the same way any other field
+ * is, so "video-production-egypt" becomes its own real phrase per language,
+ * not a slugified copy of that language's (often much longer) title.
  *
  * Arabic is transliterated to Latin rather than kept in its own script: tested
  * directly against this site's [locale]/[slug] routes (dynamicParams = false),
@@ -104,19 +107,45 @@ function transliterateArabic(text: string): string {
  * entry and 404s — apparently a Next.js bug in matching non-Latin, right-to-left
  * segments specifically, since Russian, Chinese, Japanese and Korean slugs (all
  * non-Latin, none right-to-left) were confirmed working there in the same test.
+ *
+ * Re-translates only what's missing, unless the canonical slug itself changed
+ * since the last pass — tracked via slugs.en, which exists purely as that
+ * change marker: English itself never reads from data.slugs (see pickSlug in
+ * db/localize.ts), so this key has no other use.
  */
-function updateSlugs(def: ContentType, data: Record<string, Dict>): void {
-  const titleField = def.i18n.find((f) => f.key === "title");
-  if (!titleField) return;
-  const titles = data[titleField.key];
-  if (!titles) return;
-  const slugs: Dict = { ...(data.slugs as Dict | undefined) };
-  for (const [locale, text] of Object.entries(titles)) {
-    if (locale === "en") continue; // English always uses the real slug column, never a generated one — see pickSlug in db/localize.ts
-    if (!text || !text.trim()) continue;
-    slugs[locale] = slugify(locale === "ar" ? transliterateArabic(text) : text);
+async function updateSlugs(canonicalSlug: string, data: Record<string, Dict>, only?: readonly string[]): Promise<{ warning?: string }> {
+  if (!canonicalSlug) return {};
+  const existing = (data.slugs as Dict | undefined) ?? {};
+  const changed = existing.en !== canonicalSlug;
+  const slugs: Dict = changed ? { en: canonicalSlug } : { ...existing };
+
+  const targets = (only && only.length ? MACHINE_LOCALES.filter((l) => only.includes(l)) : [...MACHINE_LOCALES])
+    .filter((loc) => changed || !slugs[loc]);
+  const wantsAr = (!only || only.includes("ar")) && (changed || !slugs.ar);
+  if (!targets.length && !wantsAr) { data.slugs = slugs; return {}; }
+  if (!translationConfigured()) { data.slugs = slugs; return {}; }
+
+  const words = canonicalSlug.replace(/-/g, " ").trim();
+  if (!words) { data.slugs = slugs; return {}; }
+
+  try {
+    if (targets.length) {
+      const results = await translateFields([{ key: "slug", format: "text", text: words }], targets);
+      for (const loc of targets) {
+        const t = results.slug?.[loc];
+        if (t) slugs[loc] = slugify(t);
+      }
+    }
+    if (wantsAr) {
+      const ar = await translatePair([{ key: "slug", format: "text", text: words }], "en", "ar");
+      if (ar.slug) slugs.ar = slugify(transliterateArabic(ar.slug));
+    }
+    data.slugs = slugs;
+    return {};
+  } catch (e) {
+    data.slugs = slugs; // keep whatever succeeded so far rather than lose it
+    return { warning: `فشلت ترجمة السلج — ${((e as Error).message || "").slice(0, 300)}` };
   }
-  if (Object.keys(slugs).length) data.slugs = slugs;
 }
 
 /**
@@ -128,11 +157,17 @@ function updateSlugs(def: ContentType, data: Record<string, Dict>): void {
  * Best-effort: returns a human warning instead of throwing, so the caller still
  * saves whatever the editor wrote when translation is unconfigured or fails.
  */
+function combineWarnings(...parts: (string | undefined)[]): string | undefined {
+  const real = parts.filter((p): p is string => Boolean(p));
+  return real.length ? real.join(" | ") : undefined;
+}
+
 export async function applyMachineTranslations(
   def: ContentType,
   data: Record<string, Dict>, // { fieldKey: { en, ar, ... } } — mutated in place
   existing: Record<string, Dict> | undefined,
   only?: readonly string[], // limit to these locales (e.g. one language at a time)
+  canonicalSlug?: string, // the record's real slug — translated into data.slugs per locale
 ): Promise<{ warning?: string }> {
   const checkLocales = only && only.length ? only : MACHINE_LOCALES;
 
@@ -169,22 +204,20 @@ export async function applyMachineTranslations(
     if (en === prevEn && !missing) continue; // unchanged and already translated
     toTranslate.push({ key: field.key, format: isHtml ? "html" : "text", text: data[field.key].en });
   }
-  if (!toTranslate.length) { updateSlugs(def, data); return { warning: arWarning }; }
+  const slugWarning = canonicalSlug ? (await updateSlugs(canonicalSlug, data, only)).warning : undefined;
+
+  if (!toTranslate.length) return { warning: combineWarnings(arWarning, slugWarning) };
   if (!translationConfigured()) {
-    updateSlugs(def, data);
-    return { warning: arWarning || "الترجمة الآلية مش متظبطة — اتحفظ زي ما اتكتب بس" };
+    return { warning: combineWarnings(arWarning, slugWarning) || "الترجمة الآلية مش متظبطة — اتحفظ زي ما اتكتب بس" };
   }
   try {
     const results = await translateFields(toTranslate, only);
     for (const [key, dict] of Object.entries(results)) data[key] = { ...data[key], ...dict };
-    updateSlugs(def, data);
-    return { warning: arWarning };
+    return { warning: combineWarnings(arWarning, slugWarning) };
   } catch (e) {
     const detail = (e as Error).message || "";
     console.error("Machine translation failed:", e);
-    updateSlugs(def, data);
-    const warning = `فشلت الترجمة الآلية — ${detail.slice(0, 300)}`;
-    return { warning: arWarning ? `${arWarning} | ${warning}` : warning };
+    return { warning: combineWarnings(arWarning, slugWarning, `فشلت الترجمة الآلية — ${detail.slice(0, 300)}`) };
   }
 }
 

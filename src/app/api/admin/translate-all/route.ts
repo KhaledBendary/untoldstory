@@ -31,7 +31,7 @@ async function translateOne(type: CType, def: ContentType, row: Row, only?: read
   const existingFlat: Record<string, Dict> = {};
   for (const [key, dict] of Object.entries(data)) existingFlat[key] = { ...dict };
 
-  const { warning } = await applyMachineTranslations(def, data, existingFlat, only);
+  const { warning } = await applyMachineTranslations(def, data, existingFlat, only, row.slug);
   if (warning) return { ok: false, warning };
 
   assembleSeo(data, seo as never);
@@ -55,8 +55,13 @@ async function translateOne(type: CType, def: ContentType, row: Row, only?: read
   if (!only || only.includes("ar") || only.includes("en")) { touched.add("ar"); touched.add("en"); }
   const sparse: Record<string, Record<string, unknown>> = {};
   for (const [key, dict] of Object.entries(data as Record<string, Record<string, unknown>>)) {
+    // slugs.en is just a change-detection marker (see updateSlugs in
+    // translate/apply.ts), not a real per-locale value competing with a
+    // concurrent sibling's write — always safe to include, and needed so the
+    // next call actually sees it and skips re-translating an unchanged slug.
+    const localesForKey = key === "slugs" ? new Set([...touched, "en"]) : touched;
     const sub: Record<string, unknown> = {};
-    for (const loc of Object.keys(dict)) if (touched.has(loc)) sub[loc] = dict[loc];
+    for (const loc of Object.keys(dict)) if (localesForKey.has(loc)) sub[loc] = dict[loc];
     if (Object.keys(sub).length) sparse[key] = sub;
   }
 
