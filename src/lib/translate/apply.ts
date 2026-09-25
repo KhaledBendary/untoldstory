@@ -71,15 +71,44 @@ async function syncEnglishArabic(def: ContentType, data: Record<string, Dict>): 
 }
 
 /**
- * A URL-safe slug from a title, preserving the script it's written in (Arabic,
- * Cyrillic, CJK, ...) instead of forcing everything to ASCII. Deliberately does
- * NOT decompose-and-strip combining marks to drop Latin accents (é → e): that
- * same step corrupts Japanese, which encodes voicing (ジ vs シ) as a base
- * character plus a combining mark — NFKD-then-strip silently turned ジ into シ,
- * a different, wrong character, not just an unaccented one. \p{M} is kept for
- * exactly that reason, so accented Latin and every non-Latin script pass
- * through as real, correct slug characters.
+ * A URL-safe slug from a title.
+ *
+ * Folds accented Latin letters to plain ASCII (é → e, ñ → n, ç → c, ü → u...)
+ * via foldLatinDiacritics below. This used to be deliberately skipped, on the
+ * theory that decompose-and-strip also corrupts Japanese voicing (ジ vs シ,
+ * encoded as a base character plus combining mark, same mechanism as a Latin
+ * accent) — true, but preserving accents turned out to be the wrong fix for
+ * the wrong problem: confirmed empirically against production tonight, ANY
+ * non-ASCII character in a [locale]/[slug] segment 404s live on this
+ * Next.js/Vercel setup regardless of script (French, Spanish, Portuguese,
+ * Turkish and Polish accented slugs all failed, alongside Russian and
+ * Japanese native-script ones) — Vercel's own x-matched-path header for a
+ * failing request comes back mojibake'd, pointing to a platform-level
+ * Latin-1/UTF-8 mismatch, not something this app's routing controls. Since
+ * every slug has to end up ASCII-safe anyway (see isSlugSafe in
+ * db/localize.ts, which now rejects non-ASCII outright and falls back to the
+ * canonical slug), folding Latin diacritics here means French/Spanish/
+ * Portuguese/Italian/German/Turkish/Polish still get real, readable slugs
+ * instead of silently degrading to the English canonical one. Cyrillic and
+ * CJK have no such fold without real script-aware romanization, so those
+ * still degrade to canonical for now — a follow-up, not fixable by stripping
+ * combining marks.
  */
+function foldLatinDiacritics(input: string): string {
+  const EXTRA: Record<string, string> = { ß: "ss", ø: "o", Ø: "O", ł: "l", Ł: "L", đ: "d", Đ: "D", ı: "i", İ: "I", œ: "oe", Œ: "OE", æ: "ae", Æ: "AE" };
+  let out = "";
+  for (const ch of input.normalize("NFD")) {
+    if (/[̀-ͯ]/.test(ch)) {
+      const prev = out[out.length - 1];
+      if (prev && /[A-Za-z]/.test(prev)) continue; // drop: a plain Latin letter's own accent
+      out += ch; // keep: base wasn't plain ASCII (e.g. Japanese kana) — leave that script alone
+    } else {
+      out += EXTRA[ch] ?? ch;
+    }
+  }
+  return out;
+}
+
 // Cap by UTF-8 BYTE length, not character count: a build writes one output
 // file per generated path on a filesystem that limits a path segment to 255
 // bytes, and CJK/Arabic-script characters are multiple bytes each in UTF-8 —
@@ -88,7 +117,7 @@ async function syncEnglishArabic(def: ContentType, data: Record<string, Dict>): 
 // also protects slugs already stored before this cap existed).
 const MAX_SLUG_BYTES = 80;
 function slugify(input: string): string {
-  const cleaned = input
+  const cleaned = foldLatinDiacritics(input)
     .toLowerCase()
     .trim()
     .replace(/[\s_]+/g, "-")

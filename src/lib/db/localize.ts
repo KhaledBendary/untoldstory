@@ -26,7 +26,21 @@ const pick = (d: Dict, loc: string): string => d?.[loc] ?? d?.en ?? "";
 // ENAMETOOLONG. Guarded here, the one place every per-locale slug is
 // resolved, rather than trusting every producer to have capped it correctly.
 const MAX_SLUG_BYTES = 200;
-export const isSlugSafe = (s: string): boolean => Buffer.byteLength(s, "utf8") <= MAX_SLUG_BYTES;
+// Separately: any non-ASCII character in a [locale]/[slug] segment 404s live
+// on this Next.js/Vercel setup with dynamicParams=false, regardless of
+// script — confirmed empirically against production for accented Latin
+// (French, Spanish, Portuguese, Turkish, Polish), Cyrillic (Russian) and CJK
+// (Japanese) slugs alike, all while generateStaticParams listed them
+// correctly. Vercel's own x-matched-path response header for a failing
+// request came back mojibake'd (e.g. "producciÃ³n" for "producción"),
+// pointing to a Latin-1/UTF-8 mismatch in how it maps a request path to a
+// prerendered file for non-ASCII segments specifically — a platform-level
+// bug, not something fixable in this app's routing. Until that's resolved
+// (or every locale's slugify gets real script-aware romanization), a
+// non-ASCII slug is never safe to link to; fall back to the always-ASCII
+// canonical slug instead of producing a live 404.
+const NON_ASCII_RE = /[^\x00-\x7F]/;
+export const isSlugSafe = (s: string): boolean => Buffer.byteLength(s, "utf8") <= MAX_SLUG_BYTES && !NON_ASCII_RE.test(s);
 
 const pickSlug = (slugs: Dict, loc: string, canonical: string): string => {
   if (loc === "en") return canonical;

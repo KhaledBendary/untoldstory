@@ -105,11 +105,17 @@ export function localizedPath(path: string, locale: string): string {
 // A locale's translated slug that's implausibly long (e.g. from an early
 // title-derived backfill, before slugs were capped by byte length) can crash
 // a build once expanded to UTF-8 bytes elsewhere, or produce a broken
-// hreflang URL here — see the matching guard in db/localize.ts. Duplicated
-// rather than imported: this file is also pulled into client components,
-// where that module (server-only) can't be bundled.
+// hreflang URL here. Separately, ANY non-ASCII character in a [locale]/[slug]
+// segment 404s live on this Next.js/Vercel setup regardless of script
+// (confirmed against production for Latin-accented, Cyrillic and CJK slugs
+// alike — Vercel's own x-matched-path header comes back mojibake'd for these,
+// pointing to a platform-level encoding bug, not something fixable here) —
+// see the matching guard in db/localize.ts. Duplicated rather than imported:
+// this file is also pulled into client components, where that module
+// (server-only) can't be bundled.
 const MAX_SLUG_BYTES = 200;
-export const isSlugSafe = (s: string) => new TextEncoder().encode(s).length <= MAX_SLUG_BYTES;
+const NON_ASCII_RE = /[^\x00-\x7F]/;
+export const isSlugSafe = (s: string) => new TextEncoder().encode(s).length <= MAX_SLUG_BYTES && !NON_ASCII_RE.test(s);
 
 export function alternatesFor(
   path: string,
