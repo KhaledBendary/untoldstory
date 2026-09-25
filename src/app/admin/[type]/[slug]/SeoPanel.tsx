@@ -83,7 +83,7 @@ export default function SeoPanel({
           <span style={lbl}>معاينة نتيجة جوجل</span>
           <div style={{ background: "#fff", borderRadius: 8, padding: "12px 14px", border: "1px solid var(--line)" }}>
             <div dir="ltr" style={{ fontSize: 12, color: "#4d5156", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{previewUrl}</div>
-            <div dir={dir} style={{ color: "#1a0dab", fontSize: 18, lineHeight: 1.3, margin: "2px 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{metaTitle || "عنوان الصفحة"}</div>
+            <div dir={dir} style={{ color: "#1a0dab", fontSize: 18, lineHeight: 1.3, margin: "2px 0", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{metaTitle || "عنوان الصفحة"}</div>
             <div dir={dir} style={{ color: "#4d5156", fontSize: 13, lineHeight: 1.5 }}>{metaDesc || "وصف الصفحة اللي هيظهر في نتائج البحث…"}</div>
           </div>
         </div>
