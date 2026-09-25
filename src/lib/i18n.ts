@@ -102,6 +102,15 @@ export function localizedPath(path: string, locale: string): string {
  * this page's own slug under every locale's prefix, which pointed hreflang at
  * a slug that only exists in the current page's language.
  */
+// A locale's translated slug that's implausibly long (e.g. from an early
+// title-derived backfill, before slugs were capped by byte length) can crash
+// a build once expanded to UTF-8 bytes elsewhere, or produce a broken
+// hreflang URL here — see the matching guard in db/localize.ts. Duplicated
+// rather than imported: this file is also pulled into client components,
+// where that module (server-only) can't be bundled.
+const MAX_SLUG_BYTES = 200;
+const isSlugSafe = (s: string) => new TextEncoder().encode(s).length <= MAX_SLUG_BYTES;
+
 export function alternatesFor(
   path: string,
   locale: string,
@@ -113,7 +122,8 @@ export function alternatesFor(
     // A locale with no translated slug yet falls back to the canonical
     // (English) one — never to this page's OWN (possibly different-locale)
     // path, which would point every alternate at one locale's slug.
-    const slug = slugOverride.slugs?.[code] || slugOverride.canonicalSlug;
+    const raw = slugOverride.slugs?.[code];
+    const slug = raw && isSlugSafe(raw) ? raw : slugOverride.canonicalSlug;
     return `${slugOverride.basePath}/${slug}`;
   };
   const languages: Record<string, string> = {};

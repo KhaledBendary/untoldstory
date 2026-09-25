@@ -66,15 +66,24 @@ async function syncEnglishArabic(def: ContentType, data: Record<string, Dict>): 
  * exactly that reason, so accented Latin and every non-Latin script pass
  * through as real, correct slug characters.
  */
+// Cap by UTF-8 BYTE length, not character count: a build writes one output
+// file per generated path on a filesystem that limits a path segment to 255
+// bytes, and CJK/Arabic-script characters are multiple bytes each in UTF-8 —
+// an 80-*character* Japanese phrase can be 240+ bytes and crash the whole
+// build with ENAMETOOLONG (see the matching guard in db/localize.ts, which
+// also protects slugs already stored before this cap existed).
+const MAX_SLUG_BYTES = 80;
 function slugify(input: string): string {
-  return input
+  const cleaned = input
     .toLowerCase()
     .trim()
     .replace(/[\s_]+/g, "-")
     .replace(/[^\p{L}\p{M}\p{N}-]+/gu, "")
     .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 80);
+    .replace(/^-+|-+$/g, "");
+  let s = cleaned;
+  while (Buffer.byteLength(s, "utf8") > MAX_SLUG_BYTES && s.length) s = s.slice(0, -1);
+  return s.replace(/-+$/g, "");
 }
 
 // Letter-by-letter Arabic → Latin, good enough for a readable slug (not

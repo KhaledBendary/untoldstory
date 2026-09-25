@@ -4,6 +4,7 @@ import { getInsightsData, getWorkData, getServicesData } from "@/lib/page-data";
 import { POST_SLUG_ALIASES, SERVICE_SLUG_ALIASES } from "@/lib/legacy-redirects";
 import { INDEXABLE_LOCALES, LOCALE_TAGS, DEFAULT_LOCALE, localizedPath } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/seo";
+import { isSlugSafe } from "@/lib/db/localize";
 
 /**
  * The set of real, indexable routes, gathered once.
@@ -25,7 +26,7 @@ export type SitemapRoute = {
 /** This route's path for one locale — its own translated slug if it has one, else the canonical path. */
 function routePath(route: SitemapRoute, locale: string): string {
   const slug = route.basePath && route.slugs?.[locale];
-  return slug ? `${route.basePath}/${slug}` : route.path;
+  return slug && isSlugSafe(slug) ? `${route.basePath}/${slug}` : route.path;
 }
 
 function parseDate(value?: string | null) {

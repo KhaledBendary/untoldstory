@@ -18,8 +18,21 @@ const pick = (d: Dict, loc: string): string => d?.[loc] ?? d?.en ?? "";
 // by hand (e.g. via the slug-rename feature) independent of the title, and a
 // title-derived slug could silently diverge from it after a later translation
 // run touched an unrelated field.
-const pickSlug = (slugs: Dict, loc: string, canonical: string): string =>
-  loc === "en" ? canonical : slugs?.[loc] || canonical;
+// Vercel's build writes one output file per generated path, on a filesystem
+// that caps a single path segment at 255 bytes. CJK scripts pack 3 bytes per
+// character in UTF-8, so a stored slug that's well within a *character* limit
+// (e.g. from an early title-derived backfill, before slugs were capped by
+// byte length) can still blow past that and crash the whole build with
+// ENAMETOOLONG. Guarded here, the one place every per-locale slug is
+// resolved, rather than trusting every producer to have capped it correctly.
+const MAX_SLUG_BYTES = 200;
+export const isSlugSafe = (s: string): boolean => Buffer.byteLength(s, "utf8") <= MAX_SLUG_BYTES;
+
+const pickSlug = (slugs: Dict, loc: string, canonical: string): string => {
+  if (loc === "en") return canonical;
+  const override = slugs?.[loc];
+  return override && isSlugSafe(override) ? override : canonical;
+};
 // Laravel emitted null (not "") for empty optional fields; mirror that so the
 // shape is identical and the site's `value || fallback` checks behave the same.
 const pickN = (d: Dict, loc: string): string | null => d?.[loc] ?? d?.en ?? null;
