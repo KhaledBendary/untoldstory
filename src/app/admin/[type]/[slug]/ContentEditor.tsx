@@ -87,6 +87,29 @@ export default function ContentEditor({
   const [dirty, setDirty] = useState(false);
   const [aiBusy, setAiBusy] = useState<string>("");   // "<action>:<key>" while running
   const [aiError, setAiError] = useState<string>("");
+  const [slugsState, setSlugsState] = useState<Record<string, string>>(slugs);
+  const [slugTransBusy, setSlugTransBusy] = useState(false);
+  const [slugTransError, setSlugTransError] = useState("");
+
+  // "ترجم السلج دلوقتي" — retranslate just data.slugs for this item, right now,
+  // without saving anything else. Only meaningful for an already-saved item.
+  async function translateSlugNow() {
+    setSlugTransBusy(true); setSlugTransError("");
+    try {
+      const res = await fetch("/api/admin/translate-all", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, slug, slugOnly: true }),
+      });
+      const out = await res.json();
+      if (!res.ok) { setSlugTransError(out.error || "فشلت ترجمة السلج"); return; }
+      setSlugsState(out.slugs || {});
+    } catch {
+      setSlugTransError("تعذّر الاتصال بالخادم");
+    } finally {
+      setSlugTransBusy(false);
+    }
+  }
 
   // The main long-form field (for SEO/summary context) and the title field.
   const bodyKey = i18nFields.find((f) => f.type === "html")?.key
@@ -257,14 +280,22 @@ export default function ContentEditor({
       </div>
 
       <div style={{ display: "grid", gap: 6, marginBottom: 18 }}>
-        <span style={lbl}>المعرّف (slug) *{lang !== "en" && " — مترجم تلقائياً، مش قابل للتعديل هنا"}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <span style={lbl}>المعرّف (slug) *{lang !== "en" && " — مترجم تلقائياً، مش قابل للتعديل هنا"}</span>
+          {!create && (
+            <button type="button" onClick={translateSlugNow} disabled={slugTransBusy} style={aiBtn}>
+              {slugTransBusy ? "بيترجم…" : "🌐 ترجم السلج دلوقتي"}
+            </button>
+          )}
+        </div>
         {lang === "en" ? (
           <input dir="ltr" placeholder="my-new-service" value={newSlug}
             onChange={(e) => { setDirty(true); setSlugTouched(true); setNewSlug(e.target.value.toLowerCase()); }} />
         ) : (
-          <input dir="ltr" readOnly value={slugs[lang] || "لسه متترجمش — هياخد سلج الإنجليزي مؤقتاً"}
-            style={{ opacity: slugs[lang] ? 1 : 0.55, cursor: "default" }} />
+          <input dir="ltr" readOnly value={slugsState[lang] || "لسه متترجمش — هياخد سلج الإنجليزي مؤقتاً"}
+            style={{ opacity: slugsState[lang] ? 1 : 0.55, cursor: "default" }} />
         )}
+        {slugTransError && <span style={{ fontSize: 12, color: "var(--danger)" }}>{slugTransError}</span>}
         {!create && lang === "en" && newSlug !== slug && (
           <span style={{ fontSize: 12, color: "var(--warn)" }}>
             هيتغيّر رابط الصفحة — هيتعمل تحويل (301) تلقائي من الرابط القديم بعد النشر الجاي.

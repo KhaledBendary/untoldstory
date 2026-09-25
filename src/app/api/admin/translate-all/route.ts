@@ -1,9 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/admin-guard";
 import { CONTENT_TYPES, type ContentType } from "@/lib/admin/content-types";
-import { listByType, getByType, saveByType, logActivity } from "@/lib/db/repo";
+import { listByType, getByType, saveByType, updateSlugsOnly, logActivity } from "@/lib/db/repo";
 import { extractSeoForEditor, assembleSeo } from "@/lib/admin/seo-fields";
-import { applyMachineTranslations } from "@/lib/translate/apply";
+import { applyMachineTranslations, retranslateSlug } from "@/lib/translate/apply";
 import { translationConfigured, MACHINE_LOCALES } from "@/lib/translate";
 import { triggerDeploy } from "@/lib/deploy";
 
@@ -94,6 +94,9 @@ export async function POST(request: NextRequest) {
   // Optional single locale — translate one language at a time (fast, no timeout).
   const reqLocale = typeof body?.locale === "string" ? body.locale : undefined;
   const only = reqLocale ? [reqLocale] : undefined;
+  // The per-field "ترجم السلج دلوقتي" button — retranslate only data.slugs for
+  // this one item, touching nothing else (no fixed columns, no other fields).
+  const slugOnly = body?.slugOnly === true;
 
   // Single-item mode.
   if (reqType && reqSlug) {
@@ -101,6 +104,20 @@ export async function POST(request: NextRequest) {
     if (!def) return NextResponse.json({ error: "نوع غير معروف" }, { status: 404 });
     const row = (await getByType(reqType, reqSlug)) as unknown as Row | null;
     if (!row) return NextResponse.json({ error: "العنصر غير موجود" }, { status: 404 });
+
+    if (slugOnly) {
+      const existingSlugs = (row.data as { slugs?: Dict })?.slugs;
+      let result: { slugs: Dict; warning?: string };
+      try { result = await retranslateSlug(row.slug, existingSlugs); }
+      catch (e) {
+        console.error(`slug-only translate ${reqType}/${reqSlug} failed:`, e);
+        return NextResponse.json({ error: (e as Error).message || "فشلت ترجمة السلج" }, { status: 502 });
+      }
+      if (result.warning) return NextResponse.json({ error: result.warning }, { status: 502 });
+      await updateSlugsOnly(reqType, row.slug, result.slugs);
+      return NextResponse.json({ ok: true, slugs: result.slugs });
+    }
+
     let result: { ok: boolean; warning?: string } = { ok: false };
     try { result = await translateOne(reqType, def, row, only); }
     catch (e) { result = { ok: false, warning: (e as Error).message }; console.error(`translate ${reqType}/${reqSlug} failed:`, e); }

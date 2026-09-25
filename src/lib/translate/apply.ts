@@ -113,10 +113,10 @@ function transliterateArabic(text: string): string {
  * change marker: English itself never reads from data.slugs (see pickSlug in
  * db/localize.ts), so this key has no other use.
  */
-async function updateSlugs(canonicalSlug: string, data: Record<string, Dict>, only?: readonly string[]): Promise<{ warning?: string }> {
+async function updateSlugs(canonicalSlug: string, data: Record<string, Dict>, only?: readonly string[], force = false): Promise<{ warning?: string }> {
   if (!canonicalSlug) return {};
   const existing = (data.slugs as Dict | undefined) ?? {};
-  const changed = existing.en !== canonicalSlug;
+  const changed = force || existing.en !== canonicalSlug;
   const slugs: Dict = changed ? { en: canonicalSlug } : { ...existing };
 
   const targets = (only && only.length ? MACHINE_LOCALES.filter((l) => only.includes(l)) : [...MACHINE_LOCALES])
@@ -146,6 +146,19 @@ async function updateSlugs(canonicalSlug: string, data: Record<string, Dict>, on
     data.slugs = slugs; // keep whatever succeeded so far rather than lose it
     return { warning: `فشلت ترجمة السلج — ${((e as Error).message || "").slice(0, 300)}` };
   }
+}
+
+/**
+ * Force a fresh translation of one item's slug right now, independent of a
+ * full save — the "ترجم السلج دلوقتي" button next to the slug field. Ignores
+ * the slugs.en change-marker (a normal save already skips retranslating an
+ * unchanged slug) so the admin can redo it on demand, e.g. to pick up a fix
+ * to the translation without re-saving the whole item.
+ */
+export async function retranslateSlug(canonicalSlug: string, existingSlugs?: Dict): Promise<{ slugs: Dict; warning?: string }> {
+  const data: Record<string, Dict> = { slugs: { ...(existingSlugs ?? {}) } };
+  const { warning } = await updateSlugs(canonicalSlug, data, undefined, true);
+  return { slugs: (data.slugs as Dict) ?? {}, warning };
 }
 
 /**
