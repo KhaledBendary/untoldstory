@@ -37,15 +37,19 @@ function projectHeadline(title: string | undefined, client?: string | null, slug
  */
 export const dynamicParams = false;
 
+// Each locale can have its own translated slug (data.slugs — see translate/apply.ts),
+// so every locale needs its own slug list, not one list reused across all of them.
 export async function generateStaticParams() {
-  const slugs = await slugList();
-  return PRERENDER_LOCALES.flatMap((locale) => slugs.map(({ slug }) => ({ locale, slug })));
+  const perLocale = await Promise.all(
+    PRERENDER_LOCALES.map(async (locale) => (await slugList(locale)).map(({ slug }) => ({ locale, slug }))),
+  );
+  return perLocale.flat();
 }
 
-async function slugList() {
+async function slugList(locale: string) {
   const extras = FALLBACK_PROJECTS.map(({ slug }) => ({ slug }));
   try {
-    const portfolioData = await api.getPortfolio({ page: 1, per_page: 100 });
+    const portfolioData = await api.getPortfolio({ page: 1, per_page: 100, locale });
     const seen = new Set(portfolioData.items.map((project) => project.slug));
     return [
       ...portfolioData.items.map((project) => ({ slug: project.slug })),

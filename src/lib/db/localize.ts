@@ -10,6 +10,10 @@ import type { ServiceRow, ProjectRow, PostRow, Singleton } from "@/lib/db/repo";
 
 type Dict = Record<string, string> | undefined;
 const pick = (d: Dict, loc: string): string => d?.[loc] ?? d?.en ?? "";
+// data.slugs (generated alongside translation — see translate/apply.ts) holds a
+// per-locale slug; a locale without one yet falls back to the row's own
+// canonical slug rather than to English's slug, since English IS the canonical.
+const pickSlug = (slugs: Dict, loc: string, canonical: string): string => slugs?.[loc] || canonical;
 // Laravel emitted null (not "") for empty optional fields; mirror that so the
 // shape is identical and the site's `value || fallback` checks behave the same.
 const pickN = (d: Dict, loc: string): string | null => d?.[loc] ?? d?.en ?? null;
@@ -29,9 +33,10 @@ function seoWith(seoDoc: unknown, loc: string, ogImage: string | null): Record<s
 export function localizeService(r: ServiceRow, loc: string) {
   const d = r.data;
   const seo = seoWith(d.seo, loc, r.og_image);
+  const slug = pickSlug(d.slugs, loc, r.slug);
   return {
-    id: r.slug,
-    slug: r.slug,
+    id: slug,
+    slug,
     icon: r.icon ?? "",
     imageUrl: r.image_url ?? "",
     price: r.price ?? "",
@@ -51,7 +56,7 @@ export function localizeProject(r: ProjectRow, loc: string) {
   const d = r.data;
   const seo = seoWith(d.seo, loc, r.og_image);
   return {
-    slug: r.slug,
+    slug: pickSlug(d.slugs, loc, r.slug),
     title: pick(d.title, loc),
     noindex: r.noindex,
     ...(seo ? { seo } : {}),
@@ -77,9 +82,10 @@ export function localizeProject(r: ProjectRow, loc: string) {
 export function localizePostCard(r: PostRow, loc: string) {
   const d = r.data;
   const published = r.published_at ? new Date(r.published_at).toISOString() : null;
+  const slug = pickSlug(d.slugs, loc, r.slug);
   return {
-    id: r.slug,
-    slug: r.slug,
+    id: slug,
+    slug,
     title: pick(d.title, loc),
     excerpt: pickN(d.excerpt, loc),
     date: published,

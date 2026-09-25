@@ -28,14 +28,18 @@ type Props = { params: Promise<{ locale: string; slug: string }> };
  */
 export const dynamicParams = false;
 
+// Each locale can have its own translated slug (data.slugs — see translate/apply.ts),
+// so every locale needs its own slug list, not one list reused across all of them.
 export async function generateStaticParams() {
-  const slugs = await slugList();
-  return PRERENDER_LOCALES.flatMap((locale) => slugs.map(({ slug }) => ({ locale, slug })));
+  const perLocale = await Promise.all(
+    PRERENDER_LOCALES.map(async (locale) => (await slugList(locale)).map(({ slug }) => ({ locale, slug }))),
+  );
+  return perLocale.flat();
 }
 
-async function slugList() {
+async function slugList(locale: string) {
   try {
-    const blogData = await api.getBlogPosts({ page: 1, per_page: 50 });
+    const blogData = await api.getBlogPosts({ page: 1, per_page: 50, locale });
     return postStaticParams(
       blogData.items.map((post) => post.slug),
       FALLBACK_POSTS.map((p) => p.slug),

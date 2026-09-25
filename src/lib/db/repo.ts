@@ -16,7 +16,7 @@ type Meta = { noindex: boolean; scheduled_at: Date | null; og_image: string | nu
 export type ServiceRow = Meta & {
   id: number; slug: string; icon: string | null; image_url: string | null;
   price: string | null; is_featured: boolean; sort_order: number; status: string;
-  data: { title?: Dict; shortDesc?: Dict; fullDesc?: Dict; features?: Record<string, unknown>; seo?: Record<string, unknown> };
+  data: { title?: Dict; shortDesc?: Dict; fullDesc?: Dict; features?: Record<string, unknown>; seo?: Record<string, unknown>; slugs?: Dict };
 };
 
 export type ProjectRow = Meta & {
@@ -24,14 +24,14 @@ export type ProjectRow = Meta & {
   video_embed: string | null; video_type: string | null; category_slug: string | null;
   grid_size: string | null; duration: string | null; budget: string | null;
   is_featured: boolean; sort_order: number; status: string;
-  data: { title?: Dict; client?: Dict; category?: Dict; shortDescription?: Dict; description?: Dict; results?: Dict; metric?: Dict; seo?: Record<string, unknown> };
+  data: { title?: Dict; client?: Dict; category?: Dict; shortDescription?: Dict; description?: Dict; results?: Dict; metric?: Dict; seo?: Record<string, unknown>; slugs?: Dict };
 };
 
 export type PostRow = Meta & {
   id: number; slug: string; featured_image: string | null; author_name: string | null;
   author_image: string | null; category_slug: string | null; read_minutes: number | null;
   tags: string[]; is_featured: boolean; sort_order: number; published_at: Date | null; status: string;
-  data: { title?: Dict; excerpt?: Dict; body?: Dict; category?: Dict; seo?: Record<string, unknown> };
+  data: { title?: Dict; excerpt?: Dict; body?: Dict; category?: Dict; seo?: Record<string, unknown>; slugs?: Dict };
 };
 
 // ---- collections (dashboard order: sort_order) ----

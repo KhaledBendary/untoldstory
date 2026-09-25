@@ -66,11 +66,33 @@ function slugify(input: string): string {
     .slice(0, 80);
 }
 
+// Letter-by-letter Arabic → Latin, good enough for a readable slug (not
+// meant to be a precise transliteration standard).
+const ARABIC_LATIN: Record<string, string> = {
+  ا: "a", أ: "a", إ: "a", آ: "a", ء: "a", ؤ: "w", ئ: "y", ى: "a", ة: "a",
+  ب: "b", ت: "t", ث: "th", ج: "j", ح: "h", خ: "kh", د: "d", ذ: "dh",
+  ر: "r", ز: "z", س: "s", ش: "sh", ص: "s", ض: "d", ط: "t", ظ: "z",
+  ع: "a", غ: "gh", ف: "f", ق: "q", ك: "k", ل: "l", م: "m", ن: "n",
+  ه: "h", و: "w", ي: "y",
+};
+// Tashkeel (diacritics) and tatweel carry no sound of their own — drop them
+// rather than let them survive transliteration as orphaned combining marks.
+const ARABIC_DIACRITIC = /[ؐ-ًؚ-ٰٟۖ-ۜ۟-۪ۨ-ۭـ]/;
+
+function transliterateArabic(text: string): string {
+  return [...text].map((ch) => (ARABIC_DIACRITIC.test(ch) ? "" : ARABIC_LATIN[ch] ?? ch)).join("");
+}
+
 /**
  * Regenerate data.slugs — a per-locale slug computed from each locale's title,
- * kept alongside the record's real (English/canonical) `slug` column. Not
- * wired into routing yet: this only generates and stores the translated
- * slugs so they're ready for that separately, without touching any live URL.
+ * kept alongside the record's real (English/canonical) `slug` column.
+ *
+ * Arabic is transliterated to Latin rather than kept in its own script: tested
+ * directly against this site's [locale]/[slug] routes (dynamicParams = false),
+ * a native-script Arabic slug fails to match its own generateStaticParams
+ * entry and 404s — apparently a Next.js bug in matching non-Latin, right-to-left
+ * segments specifically, since Russian, Chinese, Japanese and Korean slugs (all
+ * non-Latin, none right-to-left) were confirmed working there in the same test.
  */
 function updateSlugs(def: ContentType, data: Record<string, Dict>): void {
   const titleField = def.i18n.find((f) => f.key === "title");
@@ -79,7 +101,8 @@ function updateSlugs(def: ContentType, data: Record<string, Dict>): void {
   if (!titles) return;
   const slugs: Dict = { ...(data.slugs as Dict | undefined) };
   for (const [locale, text] of Object.entries(titles)) {
-    if (text && text.trim()) slugs[locale] = slugify(text);
+    if (!text || !text.trim()) continue;
+    slugs[locale] = slugify(locale === "ar" ? transliterateArabic(text) : text);
   }
   if (Object.keys(slugs).length) data.slugs = slugs;
 }
