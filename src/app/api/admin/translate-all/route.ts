@@ -4,7 +4,7 @@ import { CONTENT_TYPES, type ContentType } from "@/lib/admin/content-types";
 import { listByType, getByType, saveByType, logActivity } from "@/lib/db/repo";
 import { extractSeoForEditor, assembleSeo } from "@/lib/admin/seo-fields";
 import { applyMachineTranslations } from "@/lib/translate/apply";
-import { translationConfigured } from "@/lib/translate";
+import { translationConfigured, MACHINE_LOCALES } from "@/lib/translate";
 import { triggerDeploy } from "@/lib/deploy";
 
 export const runtime = "nodejs";
@@ -42,7 +42,25 @@ async function translateOne(type: CType, def: ContentType, row: Row, only?: read
     else if (f.type === "date") fixed[f.key] = v ? new Date(v as string).toISOString().slice(0, 10) : "";
     else fixed[f.key] = (v as string | number | null) ?? "";
   }
-  await saveByType(type, row.slug, fixed, data);
+
+  // The per-item "translate" button fires one request per locale, three at a
+  // time, all against this same row. `data` above still carries every OTHER
+  // locale's value exactly as it was when THIS request started (read from
+  // `row` at the top of this function) — writing all of it back would silently
+  // overwrite whatever a concurrent sibling request already wrote for a locale
+  // this request never touched, since saveByType's merge can't tell "unchanged
+  // snapshot" from "a real edit" once both arrive as the same shape. Only the
+  // locale(s) this call actually intended to change are saved.
+  const touched = new Set<string>(only && only.length ? only : MACHINE_LOCALES);
+  if (!only || only.includes("ar") || only.includes("en")) { touched.add("ar"); touched.add("en"); }
+  const sparse: Record<string, Record<string, unknown>> = {};
+  for (const [key, dict] of Object.entries(data as Record<string, Record<string, unknown>>)) {
+    const sub: Record<string, unknown> = {};
+    for (const loc of Object.keys(dict)) if (touched.has(loc)) sub[loc] = dict[loc];
+    if (Object.keys(sub).length) sparse[key] = sub;
+  }
+
+  await saveByType(type, row.slug, fixed, sparse as Record<string, Dict>);
   return { ok: true };
 }
 
