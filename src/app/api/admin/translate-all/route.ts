@@ -15,7 +15,7 @@ type Row = Record<string, unknown> & { slug: string; data: Record<string, Dict> 
 type CType = "services" | "projects" | "posts";
 
 /** (Re)generate machine languages for one item from its English (optionally one locale). */
-async function translateOne(type: CType, def: ContentType, row: Row, only?: readonly string[]): Promise<{ ok: boolean; warning?: string }> {
+async function translateOne(type: CType, def: ContentType, row: Row, only?: readonly string[], force = false): Promise<{ ok: boolean; warning?: string; data?: Record<string, Dict> }> {
   const seo = (row.data as { seo?: Record<string, Record<string, string>> })?.seo;
   const data: Record<string, Dict> = {};
   for (const field of def.i18n) {
@@ -31,7 +31,7 @@ async function translateOne(type: CType, def: ContentType, row: Row, only?: read
   const existingFlat: Record<string, Dict> = {};
   for (const [key, dict] of Object.entries(data)) existingFlat[key] = { ...dict };
 
-  const { warning } = await applyMachineTranslations(def, data, existingFlat, only, row.slug);
+  const { warning } = await applyMachineTranslations(def, data, existingFlat, only, row.slug, force);
   if (warning) return { ok: false, warning };
 
   assembleSeo(data, seo as never);
@@ -66,7 +66,7 @@ async function translateOne(type: CType, def: ContentType, row: Row, only?: read
   }
 
   await saveByType(type, row.slug, fixed, sparse as Record<string, Dict>);
-  return { ok: true };
+  return { ok: true, data: sparse as Record<string, Dict> };
 }
 
 /**
@@ -97,6 +97,10 @@ export async function POST(request: NextRequest) {
   // The per-field "ترجم السلج دلوقتي" button — retranslate only data.slugs for
   // this one item, touching nothing else (no fixed columns, no other fields).
   const slugOnly = body?.slugOnly === true;
+  // The "ترجم [لغة] بس" button — force a redo of this one locale even if it
+  // already has a non-empty value, since the admin is specifically saying an
+  // existing translation is wrong (see applyMachineTranslations's `force`).
+  const force = body?.force === true;
 
   // Single-item mode.
   if (reqType && reqSlug) {
@@ -118,14 +122,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true, slugs: result.slugs });
     }
 
-    let result: { ok: boolean; warning?: string } = { ok: false };
-    try { result = await translateOne(reqType, def, row, only); }
+    let result: { ok: boolean; warning?: string; data?: Record<string, Dict> } = { ok: false };
+    try { result = await translateOne(reqType, def, row, only, force); }
     catch (e) { result = { ok: false, warning: (e as Error).message }; console.error(`translate ${reqType}/${reqSlug} failed:`, e); }
     if (!result.ok) return NextResponse.json({ error: result.warning || "فشلت الترجمة — جرّب تاني (اتأكد إن المفتاح صالح)" }, { status: 502 });
     // Deploy only when a full item (all locales) finished — not on every single-locale call.
     const deploy = only ? { triggered: false as const } : await triggerDeploy();
     if (!only) await logActivity({ actor: auth.session.email, action: "update", entity: reqType, ref: reqSlug, detail: "ترجمة العنصر لكل اللغات" });
-    return NextResponse.json({ ok: true, done: 1, failed: [], deploy });
+    // Single-locale calls (the "ترجم [لغة] بس" button) return the fresh values
+    // so the editor can update its own state without a full page reload.
+    return NextResponse.json({ ok: true, done: 1, failed: [], deploy, ...(only ? { data: result.data } : {}) });
   }
 
   // All-items mode.

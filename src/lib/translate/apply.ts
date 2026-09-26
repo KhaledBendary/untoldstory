@@ -330,6 +330,12 @@ export async function applyMachineTranslations(
   existing: Record<string, Dict> | undefined,
   only?: readonly string[], // limit to these locales (e.g. one language at a time)
   canonicalSlug?: string, // the record's real slug — translated into data.slugs per locale
+  // Bypasses the "already translated?" check below for whatever locale(s)
+  // `only` names — used by the "ترجم [لغة] بس" button, where the admin is
+  // explicitly saying an existing (non-empty, non-obviously-stale) value is
+  // actually wrong and wants it redone, which the heuristics below can't
+  // detect on their own.
+  force = false,
 ): Promise<{ warning?: string }> {
   const checkLocales = only && only.length ? only : MACHINE_LOCALES;
 
@@ -351,7 +357,7 @@ export async function applyMachineTranslations(
     // treating that copy as "already translated" and never revisiting it) —
     // both need a real translation, not just a genuinely absent key.
     const isHtml = field.type === "html";
-    const missing = checkLocales.some((loc) => {
+    const missing = force || checkLocales.some((loc) => {
       const val = existing?.[field.key]?.[loc];
       if (!val || val === en) return true;
       // A leftover value from well before this translation system existed —

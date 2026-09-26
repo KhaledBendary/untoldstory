@@ -111,6 +111,41 @@ export default function ContentEditor({
     }
   }
 
+  const [localeTransBusy, setLocaleTransBusy] = useState(false);
+  const [localeTransMsg, setLocaleTransMsg] = useState("");
+
+  // Retranslate just the currently-open language tab, not the whole item —
+  // cheaper (one language instead of twelve) and lets a single bad
+  // translation be redone without risking the others, which a full re-save
+  // would otherwise touch too.
+  async function translateThisLocale() {
+    setLocaleTransBusy(true); setLocaleTransMsg("");
+    try {
+      const res = await fetch("/api/admin/translate-all", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, slug, locale: lang, force: true }),
+      });
+      const out = await res.json();
+      if (!res.ok) { setLocaleTransMsg(out.error || "فشلت الترجمة"); return; }
+      if (out.data) {
+        setI18n((prev) => {
+          const next = { ...prev };
+          for (const [key, dict] of Object.entries(out.data as Record<string, Record<string, string>>)) {
+            const value = dict[lang];
+            if (value !== undefined) next[key] = { ...next[key], [lang]: value };
+          }
+          return next;
+        });
+      }
+      setLocaleTransMsg("✓ اتترجمت");
+    } catch {
+      setLocaleTransMsg("تعذّر الاتصال بالخادم");
+    } finally {
+      setLocaleTransBusy(false);
+    }
+  }
+
   // The main long-form field (for SEO/summary context) and the title field.
   const bodyKey = i18nFields.find((f) => f.type === "html")?.key
     ?? i18nFields.find((f) => f.type === "textarea")?.key ?? "";
@@ -303,7 +338,7 @@ export default function ContentEditor({
         )}
       </div>
 
-      <div style={{ display: "flex", gap: 6, marginBottom: 18, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
         {LANGS.map((l) => (
           <button key={l.code} onClick={() => setLang(l.code)}
             style={{ padding: "7px 18px", fontSize: 14,
@@ -314,6 +349,15 @@ export default function ContentEditor({
           </button>
         ))}
       </div>
+
+      {!create && lang !== "en" && (
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
+          <button type="button" onClick={translateThisLocale} disabled={localeTransBusy} style={aiBtn}>
+            {localeTransBusy ? "بيترجم…" : `🔄 ترجم ${LANGS.find((l) => l.code === lang)?.label} بس`}
+          </button>
+          {localeTransMsg && <span style={{ fontSize: 12, color: localeTransMsg.startsWith("✓") ? "var(--ok)" : "var(--danger)" }}>{localeTransMsg}</span>}
+        </div>
+      )}
 
       {/* translatable fields */}
       {contentFields.map((f) => {
