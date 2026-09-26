@@ -25,7 +25,12 @@ export type GeoOffice = {
   closes?: string;   // "18:00"
 };
 
-export type GeoFaq = { qEn: string; aEn: string; qAr: string; aAr: string };
+// q/a hold the full per-locale machine translation (fr, de, es, ... — see
+// applySeoSettingsTranslations in api/admin/seo-settings/route.ts), generated
+// automatically from qEn/aEn. qEn/aEn/qAr/aAr stay as the two fields the admin
+// actually edits by hand; q/a are optional so old saved documents (from
+// before this existed) still parse.
+export type GeoFaq = { qEn: string; aEn: string; qAr: string; aAr: string; q?: Record<string, string>; a?: Record<string, string> };
 
 export type GeoSettings = {
   organization: {
@@ -184,15 +189,21 @@ export function officeSchemas(s: GeoSettings) {
 
 export function faqSchema(s: GeoSettings, locale: string) {
   const ar = locale === "ar";
+  // q/a (the machine-translated dicts) are preferred for any locale they
+  // cover; qEn/aEn/qAr/aAr remain the fallback for English, Arabic, or a
+  // document saved before the other 12 languages were generated.
   const items = s.faq
-    .map((f) => ({ q: ar ? (f.qAr || f.qEn) : (f.qEn || f.qAr), a: ar ? (f.aAr || f.aEn) : (f.aEn || f.aAr) }))
+    .map((f) => ({
+      q: f.q?.[locale] || (ar ? (f.qAr || f.qEn) : (f.qEn || f.qAr)),
+      a: f.a?.[locale] || (ar ? (f.aAr || f.aEn) : (f.aEn || f.aAr)),
+    }))
     .filter((x) => x.q && x.a);
   if (!items.length) return null;
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "@id": `${SITE_URL}/#faq`,
-    inLanguage: ar ? "ar" : "en",
+    inLanguage: locale,
     mainEntity: items.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })),
   };
 }
