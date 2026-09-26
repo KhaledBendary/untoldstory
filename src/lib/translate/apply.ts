@@ -430,15 +430,20 @@ export async function applySingletonTranslations(
     if (!field || field.ltr) continue; // technical value — keep identical across languages
     const en = e.values.en?.trim();
     if (!en) continue;
-    const prevEn = getPath(existing?.en, e.path);
+    const prevEnRaw = getPath(existing?.en, e.path);
+    const prevEn = typeof prevEnRaw === "string" ? prevEnRaw.trim() : prevEnRaw;
     // A locale with no value yet, OR one that's just a leftover copy of
     // English (e.g. from before this field had its own admin editor and was
     // seeded the same everywhere) both need a real translation — checking
     // only for empty missed the second case, so a newly-exposed field like
     // footer.brandDesc could look "already translated" from old seed data
-    // and never actually get sent to the translator.
+    // and never actually get sent to the translator. Trimmed on both sides:
+    // a multi-line textarea value can carry a trailing newline that a plain
+    // text input never would, which silently defeated this exact comparison
+    // for footer.brandDesc while single-line fields right next to it worked.
     const missing = MACHINE_LOCALES.some((loc) => {
-      const val = getPath(existing?.[loc], e.path);
+      const valRaw = getPath(existing?.[loc], e.path);
+      const val = typeof valRaw === "string" ? valRaw.trim() : valRaw;
       return !val || val === en;
     });
     if (en === prevEn && !missing) continue;
