@@ -119,6 +119,20 @@ export default function ContentEditor({
   // بس" or the item's own "✨ ترجم" button once the English is actually final.
   const [skipTranslate, setSkipTranslate] = useState(false);
 
+  // Merge a translate-all response's `data` (fieldKey -> {locale: value}) into
+  // i18n state, restricted to `locales` when given (the one-language button)
+  // or every locale the response touched (the force-all button).
+  function mergeTranslated(data: Record<string, Record<string, string>>, locales?: string[]) {
+    setI18n((prev) => {
+      const next = { ...prev };
+      for (const [key, dict] of Object.entries(data)) {
+        const picked = locales ? Object.fromEntries(locales.filter((l) => dict[l] !== undefined).map((l) => [l, dict[l]])) : dict;
+        if (Object.keys(picked).length) next[key] = { ...next[key], ...picked };
+      }
+      return next;
+    });
+  }
+
   // Retranslate just the currently-open language tab, not the whole item —
   // cheaper (one language instead of twelve) and lets a single bad
   // translation be redone without risking the others, which a full re-save
@@ -133,21 +147,38 @@ export default function ContentEditor({
       });
       const out = await res.json();
       if (!res.ok) { setLocaleTransMsg(out.error || "فشلت الترجمة"); return; }
-      if (out.data) {
-        setI18n((prev) => {
-          const next = { ...prev };
-          for (const [key, dict] of Object.entries(out.data as Record<string, Record<string, string>>)) {
-            const value = dict[lang];
-            if (value !== undefined) next[key] = { ...next[key], [lang]: value };
-          }
-          return next;
-        });
-      }
+      if (out.data) mergeTranslated(out.data, [lang]);
       setLocaleTransMsg("✓ اتترجمت");
     } catch {
       setLocaleTransMsg("تعذّر الاتصال بالخادم");
     } finally {
       setLocaleTransBusy(false);
+    }
+  }
+
+  const [forceAllBusy, setForceAllBusy] = useState(false);
+  const [forceAllMsg, setForceAllMsg] = useState("");
+
+  // Redo every language, even ones that already look translated — for when
+  // more than one language is wrong and clicking the per-language button
+  // repeatedly would be slower than just redoing all twelve at once.
+  async function translateAllForce() {
+    if (!confirm("هيعيد ترجمة كل اللغات من الصفر حتى لو كانت شغالة، وهياخد توكنز أكتر من زرار اللغة الواحدة. تكمّل؟")) return;
+    setForceAllBusy(true); setForceAllMsg("");
+    try {
+      const res = await fetch("/api/admin/translate-all", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, slug, force: true }),
+      });
+      const out = await res.json();
+      if (!res.ok) { setForceAllMsg(out.error || "فشلت الترجمة"); return; }
+      if (out.data) mergeTranslated(out.data);
+      setForceAllMsg("✓ اتترجم الكل من جديد");
+    } catch {
+      setForceAllMsg("تعذّر الاتصال بالخادم");
+    } finally {
+      setForceAllBusy(false);
     }
   }
 
@@ -357,12 +388,20 @@ export default function ContentEditor({
         ))}
       </div>
 
-      {!create && lang !== "en" && (
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
-          <button type="button" onClick={translateThisLocale} disabled={localeTransBusy} style={aiBtn}>
-            {localeTransBusy ? "بيترجم…" : `🔄 ترجم ${LANGS.find((l) => l.code === lang)?.label} بس`}
+      {!create && (
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18, flexWrap: "wrap" }}>
+          {lang !== "en" && (
+            <>
+              <button type="button" onClick={translateThisLocale} disabled={localeTransBusy} style={aiBtn}>
+                {localeTransBusy ? "بيترجم…" : `🔄 ترجم ${LANGS.find((l) => l.code === lang)?.label} بس`}
+              </button>
+              {localeTransMsg && <span style={{ fontSize: 12, color: localeTransMsg.startsWith("✓") ? "var(--ok)" : "var(--danger)" }}>{localeTransMsg}</span>}
+            </>
+          )}
+          <button type="button" onClick={translateAllForce} disabled={forceAllBusy} style={aiBtn}>
+            {forceAllBusy ? "بيترجم…" : "🔄 أعد ترجمة كل اللغات"}
           </button>
-          {localeTransMsg && <span style={{ fontSize: 12, color: localeTransMsg.startsWith("✓") ? "var(--ok)" : "var(--danger)" }}>{localeTransMsg}</span>}
+          {forceAllMsg && <span style={{ fontSize: 12, color: forceAllMsg.startsWith("✓") ? "var(--ok)" : "var(--danger)" }}>{forceAllMsg}</span>}
         </div>
       )}
 
