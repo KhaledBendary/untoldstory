@@ -47,8 +47,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const fixed: Record<string, string | boolean | number | null> = {};
   for (const field of def.fixed) fixed[field.key] = body.fixed?.[field.key] ?? null;
 
-  // Generate the seven machine languages from the English (best-effort).
-  const { warning } = await applyMachineTranslations(def, data, undefined, undefined, slug);
+  // Generate the seven machine languages from the English (best-effort) —
+  // unless the admin explicitly asked to save without spending tokens yet.
+  const skipTranslate = body.skipTranslate === true;
+  const { warning } = skipTranslate
+    ? {}
+    : await applyMachineTranslations(def, data, undefined, undefined, slug);
 
   // Fold the flat seo.* fields into the nested per-locale data.seo.
   assembleSeo(data, undefined);

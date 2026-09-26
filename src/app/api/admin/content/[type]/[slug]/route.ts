@@ -75,8 +75,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   const existingSeo = (existing.data as { seo?: Record<string, Record<string, string>> })?.seo;
   const existingFlat = { ...existingData, ...extractSeoForEditor(existingSeo, def) };
 
-  // Generate the seven machine languages from the new English (best-effort).
-  const { warning } = await applyMachineTranslations(def, data, existingFlat, undefined, targetSlug);
+  // Generate the seven machine languages from the new English (best-effort) —
+  // unless the admin explicitly asked to save without spending tokens yet.
+  const skipTranslate = body.skipTranslate === true;
+  const { warning } = skipTranslate
+    ? {}
+    : await applyMachineTranslations(def, data, existingFlat, undefined, targetSlug);
 
   // Fold the flat seo.* fields back into the nested per-locale data.seo.
   assembleSeo(data, existingSeo);

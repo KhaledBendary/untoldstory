@@ -113,6 +113,11 @@ export default function ContentEditor({
 
   const [localeTransBusy, setLocaleTransBusy] = useState(false);
   const [localeTransMsg, setLocaleTransMsg] = useState("");
+  // Off by default (unchanged behavior): save still auto-translates. Checking
+  // this lets an admin add/edit English content and save it as a draft-ish
+  // step without spending tokens yet — translate later with "🔄 ترجم [لغة]
+  // بس" or the item's own "✨ ترجم" button once the English is actually final.
+  const [skipTranslate, setSkipTranslate] = useState(false);
 
   // Retranslate just the currently-open language tab, not the whole item —
   // cheaper (one language instead of twelve) and lets a single bad
@@ -242,7 +247,9 @@ export default function ContentEditor({
         {
           method: create ? "POST" : "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(create ? { slug: newSlug, fixed, data: i18n, status } : { newSlug, fixed, data: i18n, status }),
+          body: JSON.stringify(create
+            ? { slug: newSlug, fixed, data: i18n, status, skipTranslate }
+            : { newSlug, fixed, data: i18n, status, skipTranslate }),
         },
       );
       const out = await res.json();
@@ -484,13 +491,20 @@ export default function ContentEditor({
         </div>
       )}
 
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 22 }}>
+      <label style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 14, fontSize: 13, color: "var(--muted)", cursor: "pointer" }}>
+        <input type="checkbox" checked={skipTranslate} onChange={(e) => setSkipTranslate(e.target.checked)} />
+        احفظ من غير ترجمة تلقائي (وفّر التوكنز — ترجم بعدين بزرار اللغة الواحدة أو "✨ ترجم")
+      </label>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 10 }}>
         <button className="primary" onClick={save} disabled={saving || deleting}>
-          {saving ? (create ? "بيتنشئ ويترجم…" : "بيتحفظ ويترجم…") : (create ? "إنشاء" : "حفظ")}
+          {saving
+            ? (skipTranslate ? (create ? "بيتنشئ…" : "بيتحفظ…") : (create ? "بيتنشئ ويترجم…" : "بيتحفظ ويترجم…"))
+            : (create ? "إنشاء" : "حفظ")}
         </button>
         {saved && errors.length === 0 && (
           <span style={{ color: "var(--ok)", fontSize: 14 }}>
-            {transWarn ? "✓ اتحفظ" : "✓ اتحفظ واتترجم للـ12 لغة"}
+            {skipTranslate ? "✓ اتحفظ من غير ترجمة" : transWarn ? "✓ اتحفظ" : "✓ اتحفظ واتترجم للـ12 لغة"}
           </span>
         )}
         {saved && deployNote && (
