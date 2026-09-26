@@ -198,6 +198,17 @@ const nextConfig: NextConfig = {
         hostname: "api.globaluntoldstory.com",
         pathname: "/api/public/storage/media/**",
       },
+      // Images uploaded through the admin media library are stored here (a
+      // per-project random subdomain — already allowed in the CSP's img-src as
+      // VERCEL_BLOB above, but missing here). Without this, next/image's own
+      // optimizer refuses the URL outright with INVALID_IMAGE_OPTIMIZE_REQUEST
+      // — every image uploaded since the media library shipped rendered as a
+      // blank box, not a 404 or a broken-image icon, since the <img> tag itself
+      // never got a working src to begin with.
+      {
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com",
+      },
     ],
     // The image optimizer will render SVG as-is, which makes it a script
     // delivery vehicle. No CMS asset needs it.
