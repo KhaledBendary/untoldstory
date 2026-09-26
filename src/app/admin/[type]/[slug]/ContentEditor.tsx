@@ -111,7 +111,7 @@ export default function ContentEditor({
     }
   }
 
-  const [localeTransBusy, setLocaleTransBusy] = useState(false);
+  const [localeTransBusy, setLocaleTransBusy] = useState<string | null>(null); // locale code currently translating, or null
   const [localeTransMsg, setLocaleTransMsg] = useState("");
   // Off by default (unchanged behavior): save still auto-translates. Checking
   // this lets an admin add/edit English content and save it as a draft-ish
@@ -133,26 +133,27 @@ export default function ContentEditor({
     });
   }
 
-  // Retranslate just the currently-open language tab, not the whole item —
-  // cheaper (one language instead of twelve) and lets a single bad
-  // translation be redone without risking the others, which a full re-save
-  // would otherwise touch too.
-  async function translateThisLocale() {
-    setLocaleTransBusy(true); setLocaleTransMsg("");
+  // Retranslate one specific language, right from its own tab button — not
+  // the whole item. Cheaper (one language instead of twelve) and lets a
+  // single bad translation be redone without risking the others, which a
+  // full re-save would otherwise touch too. `code` is whichever language's
+  // 🔄 icon was clicked, independent of which tab is currently open.
+  async function translateLocale(code: string) {
+    setLocaleTransBusy(code); setLocaleTransMsg("");
     try {
       const res = await fetch("/api/admin/translate-all", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, slug, locale: lang, force: true }),
+        body: JSON.stringify({ type, slug, locale: code, force: true }),
       });
       const out = await res.json();
-      if (!res.ok) { setLocaleTransMsg(out.error || "فشلت الترجمة"); return; }
-      if (out.data) mergeTranslated(out.data, [lang]);
-      setLocaleTransMsg("✓ اتترجمت");
+      if (!res.ok) { setLocaleTransMsg(`${LANGS.find((l) => l.code === code)?.label}: ${out.error || "فشلت الترجمة"}`); return; }
+      if (out.data) mergeTranslated(out.data, [code]);
+      setLocaleTransMsg(`✓ اتترجمت ${LANGS.find((l) => l.code === code)?.label}`);
     } catch {
       setLocaleTransMsg("تعذّر الاتصال بالخادم");
     } finally {
-      setLocaleTransBusy(false);
+      setLocaleTransBusy(null);
     }
   }
 
@@ -378,26 +379,35 @@ export default function ContentEditor({
 
       <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
         {LANGS.map((l) => (
-          <button key={l.code} onClick={() => setLang(l.code)}
-            style={{ padding: "7px 18px", fontSize: 14,
-              background: lang === l.code ? "var(--accent)" : "var(--panel)",
-              color: lang === l.code ? "var(--accent-ink)" : "var(--ink)",
-              borderColor: lang === l.code ? "var(--accent)" : "var(--line)" }}>
-            {l.label}
-          </button>
+          <span key={l.code} style={{ display: "inline-flex", alignItems: "stretch" }}>
+            <button onClick={() => setLang(l.code)}
+              style={{ padding: "7px 18px", fontSize: 14,
+                borderInlineEnd: l.code === "en" || create ? undefined : "none",
+                borderStartEndRadius: l.code === "en" || create ? undefined : 0,
+                borderEndEndRadius: l.code === "en" || create ? undefined : 0,
+                background: lang === l.code ? "var(--accent)" : "var(--panel)",
+                color: lang === l.code ? "var(--accent-ink)" : "var(--ink)",
+                borderColor: lang === l.code ? "var(--accent)" : "var(--line)" }}>
+              {l.label}
+            </button>
+            {l.code !== "en" && !create && (
+              <button type="button" onClick={() => translateLocale(l.code)} disabled={localeTransBusy === l.code}
+                title={`ترجم ${l.label} بس (يجبر إعادة الترجمة حتى لو موجودة)`}
+                style={{ padding: "7px 9px", fontSize: 13, borderStartStartRadius: 0, borderEndStartRadius: 0,
+                  background: lang === l.code ? "var(--accent)" : "var(--panel)",
+                  borderColor: lang === l.code ? "var(--accent)" : "var(--line)",
+                  color: lang === l.code ? "var(--accent-ink)" : "var(--accent)",
+                  opacity: localeTransBusy === l.code ? 0.5 : 1, cursor: "pointer" }}>
+                {localeTransBusy === l.code ? "…" : "🔄"}
+              </button>
+            )}
+          </span>
         ))}
       </div>
 
       {!create && (
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18, flexWrap: "wrap" }}>
-          {lang !== "en" && (
-            <>
-              <button type="button" onClick={translateThisLocale} disabled={localeTransBusy} style={aiBtn}>
-                {localeTransBusy ? "بيترجم…" : `🔄 ترجم ${LANGS.find((l) => l.code === lang)?.label} بس`}
-              </button>
-              {localeTransMsg && <span style={{ fontSize: 12, color: localeTransMsg.startsWith("✓") ? "var(--ok)" : "var(--danger)" }}>{localeTransMsg}</span>}
-            </>
-          )}
+          {localeTransMsg && <span style={{ fontSize: 12, color: localeTransMsg.startsWith("✓") ? "var(--ok)" : "var(--danger)" }}>{localeTransMsg}</span>}
           <button type="button" onClick={translateAllForce} disabled={forceAllBusy} style={aiBtn}>
             {forceAllBusy ? "بيترجم…" : "🔄 أعد ترجمة كل اللغات"}
           </button>
