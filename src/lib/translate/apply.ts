@@ -408,9 +408,9 @@ async function syncEnglishArabicSingleton(
 }
 
 /**
- * Generate the seven machine languages for edited singleton paths, in place.
+ * Generate the twelve machine languages for edited singleton paths, in place.
  * Technical values (emails, phones, social URLs — the ltr fields) are never
- * translated. Each edit's `values` map gains fr…tr when its English changed or
+ * translated. Each edit's `values` map gains fr…sw when its English changed or
  * a translation is missing. Best-effort, same as the collections path.
  */
 export async function applySingletonTranslations(
@@ -431,7 +431,16 @@ export async function applySingletonTranslations(
     const en = e.values.en?.trim();
     if (!en) continue;
     const prevEn = getPath(existing?.en, e.path);
-    const missing = MACHINE_LOCALES.some((loc) => !getPath(existing?.[loc], e.path));
+    // A locale with no value yet, OR one that's just a leftover copy of
+    // English (e.g. from before this field had its own admin editor and was
+    // seeded the same everywhere) both need a real translation — checking
+    // only for empty missed the second case, so a newly-exposed field like
+    // footer.brandDesc could look "already translated" from old seed data
+    // and never actually get sent to the translator.
+    const missing = MACHINE_LOCALES.some((loc) => {
+      const val = getPath(existing?.[loc], e.path);
+      return !val || val === en;
+    });
     if (en === prevEn && !missing) continue;
     toTranslate.push({ key: e.path, format: "text", text: e.values.en });
   }

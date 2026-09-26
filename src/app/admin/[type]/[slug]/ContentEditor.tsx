@@ -446,7 +446,7 @@ export default function ContentEditor({
         </button>
         {saved && errors.length === 0 && (
           <span style={{ color: "var(--ok)", fontSize: 14 }}>
-            {transWarn ? "✓ اتحفظ" : "✓ اتحفظ واتترجم للغات السبعة"}
+            {transWarn ? "✓ اتحفظ" : "✓ اتحفظ واتترجم للـ12 لغة"}
           </span>
         )}
         {saved && deployNote && (
