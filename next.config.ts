@@ -163,7 +163,20 @@ const nextConfig: NextConfig = {
   // Renamed in Next 16; the old name still works but warns on every build.
   skipProxyUrlNormalize: true,
   outputFileTracingRoot: root,
-  serverExternalPackages: ["nodemailer", "sharp"],
+  // The Japanese slug romanizer (translate/apply.ts) loads kuromoji's
+  // dictionary from node_modules at runtime — a dynamic require the file
+  // tracer can't follow statically, so its files are named here explicitly
+  // for every route that can reach updateSlugs(). Best-effort by design
+  // (see transliterateJapanese): if this is ever wrong, Japanese slugs just
+  // keep falling back to the canonical slug, not a broken build.
+  outputFileTracingIncludes: {
+    "/api/admin/translate-all": ["./node_modules/kuromoji/dict/**"],
+    "/api/admin/content/[type]": ["./node_modules/kuromoji/dict/**"],
+    "/api/admin/content/[type]/[slug]": ["./node_modules/kuromoji/dict/**"],
+  },
+  // kuromoji ships its dictionary as .dat.gz files loaded from disk at
+  // runtime, not bundled JS — same reason sharp/nodemailer are external.
+  serverExternalPackages: ["nodemailer", "sharp", "kuromoji", "kuroshiro", "kuroshiro-analyzer-kuromoji"],
   // Static generation defaults to one worker per core. Against the shared-host
   // Laravel API that burst returns 500s, and pages then prerender with fallback
   // metadata. Fewer workers make the build slower but deterministic.

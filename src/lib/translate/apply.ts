@@ -1,4 +1,6 @@
 import "server-only";
+import pinyin from "pinyin";
+import { convert as romanizeHangul } from "hangul-romanization";
 import { MACHINE_LOCALES, PartialTranslateError, translateFields, translatePair, translationConfigured, type FieldToTranslate, type MachineLocale } from "@/lib/translate";
 import type { ContentType } from "@/lib/admin/content-types";
 import type { Dict } from "@/lib/content-validate";
@@ -146,6 +148,77 @@ function transliterateArabic(text: string): string {
   return [...text].map((ch) => (ARABIC_DIACRITIC.test(ch) ? "" : ARABIC_LATIN[ch] ?? ch)).join("");
 }
 
+// Letter-by-letter Cyrillic → Latin (common practical transliteration, not a
+// precise standard) — Russian slugs need this for the same reason Arabic
+// does; see the ASCII-only requirement explained above updateSlugs.
+const RUSSIAN_LATIN: Record<string, string> = {
+  а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "yo", ж: "zh", з: "z",
+  и: "i", й: "y", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r",
+  с: "s", т: "t", у: "u", ф: "f", х: "kh", ц: "ts", ч: "ch", ш: "sh", щ: "shch",
+  ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya",
+};
+function transliterateRussian(text: string): string {
+  return [...text.toLowerCase()].map((ch) => RUSSIAN_LATIN[ch] ?? ch).join("");
+}
+
+// Han characters → pinyin, via the `pinyin` package's built-in dictionary.
+function transliterateChinese(text: string): string {
+  const syllables = pinyin(text, { style: pinyin.STYLE_NORMAL });
+  return syllables.map((group) => group[0] ?? "").join(" ");
+}
+
+// Hangul is phonetic by construction (each syllable block decomposes
+// arithmetically into consonant+vowel+consonant), so this is an exact,
+// dictionary-free romanization — unlike Chinese/Japanese, there's no reading
+// ambiguity to resolve.
+function transliterateKorean(text: string): string {
+  return romanizeHangul(text);
+}
+
+// Kanji readings are context-dependent (unlike Hangul, and unlike Latin
+// accents), so this needs an actual morphological analyzer + dictionary —
+// initialized once per server process and reused, since loading it takes
+// ~500ms. Best-effort: if the dictionary can't load in this environment (a
+// platform/packaging issue, not a translation one), fall back to the
+// original text, which the existing non-ASCII guard (isSlugSafe in
+// db/localize.ts) already degrades safely to the canonical slug instead of
+// producing a broken link.
+let kuroshiroReady: Promise<import("kuroshiro").default> | null = null;
+function getKuroshiro() {
+  if (!kuroshiroReady) {
+    kuroshiroReady = (async () => {
+      const [{ default: Kuroshiro }, { default: KuromojiAnalyzer }] = await Promise.all([
+        import("kuroshiro"),
+        import("kuroshiro-analyzer-kuromoji"),
+      ]);
+      const instance = new Kuroshiro();
+      await instance.init(new KuromojiAnalyzer());
+      return instance;
+    })();
+  }
+  return kuroshiroReady;
+}
+async function transliterateJapanese(text: string): Promise<string> {
+  try {
+    const kuroshiro = await getKuroshiro();
+    return await kuroshiro.convert(text, { to: "romaji", mode: "spaced" });
+  } catch (e) {
+    console.error("Japanese romanization unavailable, keeping native script:", e);
+    return text;
+  }
+}
+
+// Only these four machine locales need script romanization — the rest
+// (fr/de/es/it/pt/tr/pl) are Latin-script and already folded to ASCII by
+// slugify()'s foldLatinDiacritics, and sw (Swahili) is ASCII already.
+async function romanizeSlugText(locale: string, text: string): Promise<string> {
+  if (locale === "ru") return transliterateRussian(text);
+  if (locale === "zh") return transliterateChinese(text);
+  if (locale === "ko") return transliterateKorean(text);
+  if (locale === "ja") return transliterateJapanese(text);
+  return text;
+}
+
 /**
  * Regenerate data.slugs — a per-locale slug machine-translated from the
  * record's own canonical slug text (the "المعرّف" field the admin types),
@@ -153,12 +226,18 @@ function transliterateArabic(text: string): string {
  * is, so "video-production-egypt" becomes its own real phrase per language,
  * not a slugified copy of that language's (often much longer) title.
  *
- * Arabic is transliterated to Latin rather than kept in its own script: tested
+ * Every locale's slug is romanized to plain ASCII, not just Arabic's: tested
  * directly against this site's [locale]/[slug] routes (dynamicParams = false),
- * a native-script Arabic slug fails to match its own generateStaticParams
- * entry and 404s — apparently a Next.js bug in matching non-Latin, right-to-left
- * segments specifically, since Russian, Chinese, Japanese and Korean slugs (all
- * non-Latin, none right-to-left) were confirmed working there in the same test.
+ * ANY non-ASCII character in that segment 404s live regardless of script —
+ * confirmed for accented Latin (French, Spanish, Portuguese, Turkish, Polish),
+ * Cyrillic (Russian) and CJK (Japanese) alike, all while generateStaticParams
+ * listed the page correctly. Vercel's own x-matched-path header for a failing
+ * request came back mojibake'd, pointing to a platform-level encoding bug in
+ * how it maps a request to a prerendered file for non-ASCII segments. See
+ * romanizeSlugText above and foldLatinDiacritics in slugify: Arabic and
+ * Russian use a hand-built letter map, Chinese uses pinyin, Korean uses exact
+ * Hangul decomposition, Japanese uses a kuromoji-based analyzer (best-effort —
+ * falls back to the canonical slug if that dictionary can't load).
  *
  * Re-translates only what's missing, unless the canonical slug itself changed
  * since the last pass — tracked via slugs.en, which exists purely as that
@@ -186,14 +265,14 @@ async function updateSlugs(canonicalSlug: string, data: Record<string, Dict>, on
         const results = await translateFields([{ key: "slug", format: "text", text: words }], targets);
         for (const loc of targets) {
           const t = results.slug?.[loc];
-          if (t) slugs[loc] = slugify(t);
+          if (t) slugs[loc] = slugify(await romanizeSlugText(loc, t));
         }
       } catch (e) {
         if (e instanceof PartialTranslateError) {
           const partial = e.partial as Record<string, Record<string, string>>;
           for (const loc of targets) {
             const t = partial.slug?.[loc];
-            if (t) slugs[loc] = slugify(t);
+            if (t) slugs[loc] = slugify(await romanizeSlugText(loc, t));
           }
         }
         throw e;
