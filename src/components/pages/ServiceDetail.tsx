@@ -162,7 +162,7 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
           {t('Frequently asked questions')}
         </h2>
         <dl className="max-w-3xl space-y-8">
-          {getServiceFaqs(slug).map((item) => (
+          {getServiceFaqs(slug, service?.faqs).map((item) => (
             <div key={item.question}>
               <dt>
                 <h3 className="font-display font-bold text-xl md:text-2xl leading-snug">{item.question}</h3>

@@ -29,6 +29,9 @@ export interface Service {
   fullDesc: string;
   price: string;
   features: string[];
+  // Up to 5 optional Q&A pairs authored per service in the admin (falls back
+  // to src/data/service-faqs.ts's generic English defaults when empty).
+  faqs?: { question: string; answer: string }[];
   isFeatured: boolean;
   sortOrder?: number;
   seo?: Record<string, unknown>;

@@ -85,7 +85,14 @@ const BY_SLUG: Record<string, ServiceFaq[]> = {
   ],
 };
 
-export function getServiceFaqs(slug: string): ServiceFaq[] {
+/**
+ * `cms` is the service's own admin-authored, translated FAQs (Service.faqs —
+ * see db/localize.ts's pickFaqs), preferred whenever it has anything. These
+ * hardcoded English-only lists below only remain as the fallback for a
+ * service nobody has migrated into the admin yet.
+ */
+export function getServiceFaqs(slug: string, cms?: ServiceFaq[]): ServiceFaq[] {
+  if (cms && cms.length) return cms;
   for (const related of relatedServiceSlugs(slug)) {
     if (BY_SLUG[related]) return BY_SLUG[related];
   }

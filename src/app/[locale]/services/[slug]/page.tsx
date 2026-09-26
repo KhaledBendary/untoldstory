@@ -142,7 +142,7 @@ export default async function Page({ params }: Props) {
 
   if (initialData?.status === "notFound") notFound();
 
-  const faqs = getServiceFaqs(slug);
+  const faqs = getServiceFaqs(slug, initialData?.status === "ok" ? initialData.data.service.faqs : undefined);
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",

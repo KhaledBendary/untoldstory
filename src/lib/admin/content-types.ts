@@ -61,6 +61,20 @@ export const CONTENT_TYPES: Record<string, ContentType> = {
       { key: "title", label: "العنوان", type: "text", required: true },
       { key: "shortDesc", label: "الوصف المختصر", type: "textarea" },
       { key: "fullDesc", label: "الوصف الكامل", type: "html" },
+      // Optional, up to 5 pairs — empty ones are simply not shown on the
+      // page. Fills in for src/data/service-faqs.ts's hardcoded English-only
+      // FAQs, which had no way to translate since they lived in source code,
+      // not the database (see ServiceDetail.tsx / services/[slug]/page.tsx).
+      { key: "faq1_q", label: "سؤال شائع 1", type: "text" },
+      { key: "faq1_a", label: "إجابة السؤال 1", type: "textarea" },
+      { key: "faq2_q", label: "سؤال شائع 2", type: "text" },
+      { key: "faq2_a", label: "إجابة السؤال 2", type: "textarea" },
+      { key: "faq3_q", label: "سؤال شائع 3", type: "text" },
+      { key: "faq3_a", label: "إجابة السؤال 3", type: "textarea" },
+      { key: "faq4_q", label: "سؤال شائع 4", type: "text" },
+      { key: "faq4_a", label: "إجابة السؤال 4", type: "textarea" },
+      { key: "faq5_q", label: "سؤال شائع 5", type: "text" },
+      { key: "faq5_a", label: "إجابة السؤال 5", type: "textarea" },
       ...SEO_I18N,
     ],
   },

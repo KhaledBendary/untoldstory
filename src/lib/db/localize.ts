@@ -55,6 +55,21 @@ const pickArr = (d: Record<string, unknown> | undefined, loc: string): unknown[]
   return Array.isArray(v) ? v : [];
 };
 
+// Up to 5 optional Q&A pairs, stored as flat faq1_q/faq1_a..faq5_q/faq5_a
+// fields (plain i18n text fields, so they get the normal admin editor and
+// machine-translation pipeline for free) rather than a real array type,
+// which the content-type/editor system has no support for. Empty pairs are
+// dropped, so a service with fewer than 5 just shows fewer.
+function pickFaqs(d: Record<string, Dict>, loc: string): { question: string; answer: string }[] {
+  const out: { question: string; answer: string }[] = [];
+  for (let i = 1; i <= 5; i++) {
+    const question = pick(d[`faq${i}_q`], loc).trim();
+    const answer = pick(d[`faq${i}_a`], loc).trim();
+    if (question && answer) out.push({ question, answer });
+  }
+  return out;
+}
+
 // Per-locale seo object, merged with a custom OG image column when set.
 function seoWith(seoDoc: unknown, loc: string, ogImage: string | null): Record<string, unknown> | undefined {
   const doc = seoDoc as Record<string, unknown> | undefined;
@@ -86,6 +101,7 @@ export function localizeService(r: ServiceRow, loc: string) {
     shortDesc: pick(d.shortDesc, loc),
     fullDesc: pick(d.fullDesc, loc),
     features: pickArr(d.features as Record<string, unknown> | undefined, loc),
+    faqs: pickFaqs(d as unknown as Record<string, Dict>, loc),
     // Only present once SEO has been authored, so services without it stay
     // byte-identical to what the old API returned.
     ...(seo ? { seo } : {}),
