@@ -9,6 +9,15 @@ export type ContactMessage = {
   locale?: string;
 };
 
+// Header values (Reply-To, Subject) go into raw SMTP headers, where an
+// embedded CR/LF can start a new header line. nodemailer's own encoding
+// already guards against this in current versions, but that's an external
+// library's behavior, not a guarantee this code makes on its own — strip
+// them here too rather than depend solely on that.
+function stripHeaderUnsafe(value: string) {
+  return value.replace(/[\r\n]+/g, " ").trim();
+}
+
 function escapeHtml(value: string) {
   return value
     .replace(/&/g, "&amp;")
@@ -84,8 +93,8 @@ export async function sendContactEmail(data: ContactMessage) {
   await transporter.sendMail({
     from: `"Global Untold Story website" <${config.from}>`,
     to: config.to,
-    replyTo: `${data.name} <${data.email}>`,
-    subject: `New project inquiry — ${service}`,
+    replyTo: `${stripHeaderUnsafe(data.name)} <${data.email}>`,
+    subject: `New project inquiry — ${stripHeaderUnsafe(service)}`,
     text,
     html,
   });

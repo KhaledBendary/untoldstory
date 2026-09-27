@@ -12,7 +12,10 @@ export const runtime = "nodejs";
  */
 export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
-  if (secret && request.headers.get("authorization") !== `Bearer ${secret}`) {
+  // Fail closed: an unset secret used to mean "skip the check", so anyone who
+  // found this URL could force a production rebuild on demand. A missing
+  // secret is a misconfiguration, not an invitation to run unauthenticated.
+  if (!secret || request.headers.get("authorization") !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 

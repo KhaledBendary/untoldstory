@@ -3,6 +3,7 @@ import Link from "next/link";
 import { currentSession } from "@/lib/admin-session";
 import { contentType } from "@/lib/admin/content-types";
 import { getByType } from "@/lib/db/repo";
+import { renderCmsHtml } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -85,7 +86,10 @@ export default async function PreviewPage({
       <h1 style={{ fontSize: 30, fontWeight: 800, lineHeight: 1.2, margin: "0 0 14px" }}>{title}</h1>
       {blurb && <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.7, margin: "0 0 22px" }}>{blurb}</p>}
       {bodyHtml
-        ? <div style={{ fontSize: 16, lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: bodyHtml }} />
+        // Sanitized the same way the public site renders this exact field
+        // (ServiceDetail/ProjectDetail/PostDetail) — this preview had been
+        // rendering the raw database value directly.
+        ? <div style={{ fontSize: 16, lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: renderCmsHtml(bodyHtml) }} />
         : <p style={{ color: "var(--faint)" }}>لا يوجد نص طويل لهذا العنصر.</p>}
     </div>
   );
