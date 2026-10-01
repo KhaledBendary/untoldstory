@@ -27,15 +27,31 @@ const LOCALE_NAMES: Record<string, string> = {
   ko: "Korean", pl: "Polish", sw: "Swahili",
 };
 
+/** A short, standalone reminder — repeated right before the knowledge pack and
+ * again as the very last message sent to the model. The instruction used to
+ * appear once, near the top, ahead of a ~45k-token all-English knowledge pack
+ * — with that much English context after it, the model reliably followed it
+ * for English and Arabic (both very high-resource for it) but regularly drifted
+ * back to English for the other 12 locales, a well-known "lost in the middle" /
+ * context-anchoring effect in long-context LLM calls. Restating it right before
+ * generation (the end of the message list, which models weight most heavily)
+ * fixes that without having to shrink the knowledge pack. */
+function languageReminder(locale: string): string {
+  const language = LOCALE_NAMES[locale] || "English";
+  return `REMINDER — reply ONLY in ${language}, not English, even though the reference material is in English.`;
+}
+
 function systemPrompt(locale: string): string {
   const language = LOCALE_NAMES[locale] || "English";
   return [
+    `CRITICAL RULE: Write your entire reply in ${language} ONLY — never in English or any other ` +
+      "language, even though the reference material further below is written in English. This is " +
+      "the single most important rule and overrides everything else, including the visitor typing " +
+      "in a different language. Only switch language if the visitor clearly and explicitly asks you to.",
     "You are Nouran, the warm and professional virtual assistant for Global Untold Story " +
       "(globaluntoldstory.com), an international creative production studio (film, advertising, " +
       "documentary, TV, live production, post-production, motion/CGI, and more), with offices in " +
       "Cairo, Dubai and Jeddah.",
-    `Always reply in ${language} — the language the visitor is currently browsing the site in — ` +
-      "regardless of what language they type in, unless they clearly ask you to switch.",
     "Keep replies short and conversational (2-5 sentences), like a helpful chat message, not an essay. " +
       "Use the knowledge pack below to answer questions about the company, its services, past clients, " +
       "and how it works. Never invent specific prices, availability dates, booking confirmations, permit " +
@@ -51,6 +67,8 @@ function systemPrompt(locale: string): string {
     "--- COMPANY KNOWLEDGE PACK (for grounding your answers; do not dump this verbatim or mention " +
       "'source pack' or page-citation codes like P2026 to the visitor) ---",
     NOURAN_KNOWLEDGE,
+    "--- END OF KNOWLEDGE PACK ---",
+    languageReminder(locale),
   ].join("\n\n");
 }
 
@@ -120,12 +138,16 @@ export type NouranResult = { reply: string; leadCaptured: boolean };
 
 /** Run one turn of the conversation, handling a save_customer_request tool call inline if the model makes one. */
 export async function nouranChat(history: ChatMessage[], locale: string): Promise<NouranResult> {
+  const reminder: OpenAIMessage = { role: "system", content: languageReminder(locale) };
   const messages: OpenAIMessage[] = [
     { role: "system", content: systemPrompt(locale) },
     ...history.map((m) => ({ role: m.role, content: m.content })),
   ];
 
-  const first = await callOpenAI(messages);
+  // The reminder goes last, not just once near the top — models weight the
+  // end of a long message list far more heavily than a few hundred tokens in
+  // among another ~45k of English knowledge-pack context.
+  const first = await callOpenAI([...messages, reminder]);
 
   const toolCall = first.tool_calls?.find((c) => c.function.name === "save_customer_request");
   if (!toolCall) {
@@ -192,6 +214,7 @@ export async function nouranChat(history: ChatMessage[], locale: string): Promis
     ...messages,
     { role: "assistant", content: first.content ?? null, tool_calls: first.tool_calls },
     { role: "tool", content: toolResult, tool_call_id: toolCall.id },
+    reminder,
   ]);
 
   return { reply: (followUp.content || "").trim(), leadCaptured };
