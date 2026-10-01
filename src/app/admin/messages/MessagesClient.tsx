@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 export type Message = {
   id: number; name: string; email: string; phone: string | null; service: string | null;
   message: string; locale: string | null; status: string; emailed: boolean; createdAt: string;
+  source: string; conversation: { role: string; content: string }[] | null;
 };
 
 const FILTERS = [
@@ -86,7 +87,14 @@ export default function MessagesClient({ initial }: { initial: Message[] }) {
                 <span style={{ flex: 1, minWidth: 0 }}>
                   <span style={{ display: "block", fontWeight: m.status === "new" ? 700 : 600, fontSize: 14,
                     whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    {m.name} {m.service ? <span style={{ color: "var(--faint)", fontWeight: 400 }}>· {m.service}</span> : null}
+                    {m.source === "chatbot" && (
+                      <span title="جاية من الشات بوت نوران" style={{
+                        display: "inline-flex", alignItems: "center", gap: 3, fontSize: 10, fontWeight: 600,
+                        color: "#5b3a8e", background: "#5b3a8e22", border: "1px solid #5b3a8e55",
+                        borderRadius: 20, padding: "1px 8px", marginInlineEnd: 6, verticalAlign: "middle",
+                      }}>💬 نوران</span>
+                    )}
+                    {m.name} {m.service && m.source !== "chatbot" ? <span style={{ color: "var(--faint)", fontWeight: 400 }}>· {m.service}</span> : null}
                   </span>
                   <span dir="ltr" style={{ display: "block", fontSize: 12, color: "var(--faint)",
                     whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{m.email}</span>
@@ -104,6 +112,25 @@ export default function MessagesClient({ initial }: { initial: Message[] }) {
                     {m.locale && <span><strong>اللغة:</strong> {m.locale}</span>}
                   </div>
                   <p style={{ whiteSpace: "pre-wrap", fontSize: 15, lineHeight: 1.7, margin: 0 }}>{m.message}</p>
+                  {m.conversation && m.conversation.length > 0 && (
+                    <details>
+                      <summary style={{ fontSize: 12, color: "var(--faint)", cursor: "pointer" }}>
+                        عرض المحادثة الكاملة مع نوران ({m.conversation.length} رسالة)
+                      </summary>
+                      <div style={{ display: "grid", gap: 6, marginTop: 10 }}>
+                        {m.conversation.map((turn, i) => (
+                          <div key={i} style={{
+                            fontSize: 13, lineHeight: 1.6, padding: "6px 10px", borderRadius: 8,
+                            background: turn.role === "user" ? "var(--panel)" : "transparent",
+                            border: turn.role === "user" ? "1px solid var(--line)" : "none",
+                          }}>
+                            <strong style={{ color: "var(--faint)" }}>{turn.role === "user" ? "العميل" : "نوران"}: </strong>
+                            {turn.content}
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  )}
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
                     <a href={`mailto:${m.email}?subject=${encodeURIComponent("رد على رسالتك — Global Untold Story")}`}
                       onClick={() => setStatus(m.id, "replied")}

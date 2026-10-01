@@ -14,6 +14,7 @@ export default async function MessagesPage() {
     id: m.id, name: m.name, email: m.email, phone: m.phone, service: m.service,
     message: m.message, locale: m.locale, status: m.status, emailed: m.emailed,
     createdAt: new Date(m.created_at).toISOString(),
+    source: m.source, conversation: m.conversation as { role: string; content: string }[] | null,
   }));
 
   return (

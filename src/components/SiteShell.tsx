@@ -10,6 +10,7 @@ import Footer from "./Footer";
 import Cursor from "./Cursor";
 import Preloader from "./Preloader";
 import WhatsAppButton from "./WhatsAppButton";
+import NouranWidget from "./NouranWidget";
 import ConsentBanner from "./ConsentBanner";
 import DomSafetyPatch from "./DomSafetyPatch";
 import { SiteReadyProvider } from "./SiteContext";
@@ -94,6 +95,7 @@ function SiteShellInner({ children, shell, locale: initialLocale }: { children: 
         <main>{children}</main>
         <Footer initialData={shell} initialLocale={initialLocale} />
         <WhatsAppButton />
+        <NouranWidget />
         {/* Inside the provider: it reads the active locale. */}
         <ConsentBanner />
       </div>

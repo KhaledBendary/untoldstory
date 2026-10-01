@@ -149,14 +149,17 @@ export async function deleteMedia(id: number): Promise<string | null> {
 export type MessageRow = {
   id: number; name: string; email: string; phone: string | null; service: string | null;
   message: string; locale: string | null; status: string; emailed: boolean; created_at: Date;
+  source: string; conversation: unknown | null;
 };
 
 export async function addMessage(m: {
   name: string; email: string; phone?: string | null; service?: string | null; message: string; locale?: string | null;
+  source?: string; conversation?: unknown;
 }): Promise<number> {
+  const conversation = m.conversation ? sql.json(m.conversation as Parameters<typeof sql.json>[0]) : null;
   const [row] = await sql<{ id: number }[]>`
-    insert into messages (name, email, phone, service, message, locale)
-    values (${m.name}, ${m.email}, ${m.phone ?? null}, ${m.service ?? null}, ${m.message}, ${m.locale ?? null})
+    insert into messages (name, email, phone, service, message, locale, source, conversation)
+    values (${m.name}, ${m.email}, ${m.phone ?? null}, ${m.service ?? null}, ${m.message}, ${m.locale ?? null}, ${m.source ?? "contact_form"}, ${conversation})
     returning id`;
   return row.id;
 }

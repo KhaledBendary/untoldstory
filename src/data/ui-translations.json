@@ -158,7 +158,12 @@
     "Repeat business": "تعاون متكرر",
     "N/A": "غير متاح",
     "We couldn't load this right now.": "تعذّر تحميل هذا الآن.",
-    "Related articles": "مقالات مرتبطة"
+    "Related articles": "مقالات مرتبطة",
+    "Chat with Nouran": "تحدث مع نوران",
+    "Type your message…": "اكتب رسالتك…",
+    "Send": "إرسال",
+    "Nouran greeting": "أهلاً! أنا نوران، مساعدتك في Global Untold Story. قولي عايز إيه وهساعدك فيه.",
+    "Nouran is typing…": "نوران بتكتب…"
   },
   "de": {
     "Home": "Startseite",
@@ -319,7 +324,12 @@
     "This project didn't load. It's not you — try again.": "Dieses Projekt wurde nicht geladen. Es liegt nicht an Ihnen — versuchen Sie es erneut.",
     "This service didn't load. It's not you — try again.": "Diese Leistung wurde nicht geladen. Es liegt nicht an Ihnen — versuchen Sie es erneut.",
     "This article didn't load. It's not you — try again.": "Dieser Artikel wurde nicht geladen. Es liegt nicht an Ihnen — versuchen Sie es erneut.",
-    "Related articles": "Ähnliche Artikel"
+    "Related articles": "Ähnliche Artikel",
+    "Chat with Nouran": "Chat mit Nouran",
+    "Type your message…": "Schreiben Sie Ihre Nachricht…",
+    "Send": "Senden",
+    "Nouran greeting": "Hallo! Ich bin Nouran, Ihre Assistentin bei Global Untold Story. Erzählen Sie mir, wonach Sie suchen, und ich kümmere mich darum.",
+    "Nouran is typing…": "Nouran schreibt…"
   },
   "es": {
     "Home": "Inicio",
@@ -480,7 +490,12 @@
     "This project didn't load. It's not you — try again.": "Este proyecto no se ha cargado. No es culpa tuya: inténtalo de nuevo.",
     "This service didn't load. It's not you — try again.": "Este servicio no se ha cargado. No es culpa tuya: inténtalo de nuevo.",
     "This article didn't load. It's not you — try again.": "Este artículo no se ha cargado. No es culpa tuya: inténtalo de nuevo.",
-    "Related articles": "Artículos relacionados"
+    "Related articles": "Artículos relacionados",
+    "Chat with Nouran": "Chatea con Nouran",
+    "Type your message…": "Escribe tu mensaje…",
+    "Send": "Enviar",
+    "Nouran greeting": "¡Hola! Soy Nouran, tu asistente en Global Untold Story. Cuéntame qué necesitas y me encargo de ello.",
+    "Nouran is typing…": "Nouran está escribiendo…"
   },
   "fr": {
     "Home": "Accueil",
@@ -641,7 +656,12 @@
     "This project didn't load. It's not you — try again.": "Ce projet n'a pas été chargé. Vous n'y êtes pour rien — réessayez.",
     "This service didn't load. It's not you — try again.": "Ce service n'a pas été chargé. Vous n'y êtes pour rien — réessayez.",
     "This article didn't load. It's not you — try again.": "Cet article n'a pas été chargé. Vous n'y êtes pour rien — réessayez.",
-    "Related articles": "Articles liés"
+    "Related articles": "Articles liés",
+    "Chat with Nouran": "Discuter avec Nouran",
+    "Type your message…": "Écrivez votre message…",
+    "Send": "Envoyer",
+    "Nouran greeting": "Bonjour ! Je suis Nouran, votre assistante chez Global Untold Story. Dites-moi ce que vous recherchez et je m'en occupe.",
+    "Nouran is typing…": "Nouran est en train d'écrire…"
   },
   "it": {
     "Home": "Home",
@@ -802,7 +822,12 @@
     "This project didn't load. It's not you — try again.": "Questo progetto non è stato caricato. Non dipende da te: riprova.",
     "This service didn't load. It's not you — try again.": "Questo servizio non è stato caricato. Non dipende da te: riprova.",
     "This article didn't load. It's not you — try again.": "Questo articolo non è stato caricato. Non dipende da te: riprova.",
-    "Related articles": "Articoli correlati"
+    "Related articles": "Articoli correlati",
+    "Chat with Nouran": "Chatta con Nouran",
+    "Type your message…": "Scrivi il tuo messaggio…",
+    "Send": "Invia",
+    "Nouran greeting": "Ciao! Sono Nouran, la tua assistente di Global Untold Story. Dimmi cosa stai cercando e me ne occupo io.",
+    "Nouran is typing…": "Nouran sta scrivendo…"
   },
   "pt": {
     "Home": "Início",
@@ -963,7 +988,12 @@
     "This project didn't load. It's not you — try again.": "Este projeto não carregou. Não é culpa sua — tente novamente.",
     "This service didn't load. It's not you — try again.": "Este serviço não carregou. Não é culpa sua — tente novamente.",
     "This article didn't load. It's not you — try again.": "Este artigo não carregou. Não é culpa sua — tente novamente.",
-    "Related articles": "Artigos relacionados"
+    "Related articles": "Artigos relacionados",
+    "Chat with Nouran": "Converse com a Nouran",
+    "Type your message…": "Escreva sua mensagem…",
+    "Send": "Enviar",
+    "Nouran greeting": "Olá! Sou a Nouran, sua assistente na Global Untold Story. Diga-me o que você procura e eu cuido disso.",
+    "Nouran is typing…": "Nouran está digitando…"
   },
   "tr": {
     "Home": "Ana Sayfa",
@@ -1124,7 +1154,12 @@
     "This project didn't load. It's not you — try again.": "Bu proje yüklenemedi. Sorun sizden kaynaklanmıyor — tekrar deneyin.",
     "This service didn't load. It's not you — try again.": "Bu hizmet yüklenemedi. Sorun sizden kaynaklanmıyor — tekrar deneyin.",
     "This article didn't load. It's not you — try again.": "Bu yazı yüklenemedi. Sorun sizden kaynaklanmıyor — tekrar deneyin.",
-    "Related articles": "İlgili makaleler"
+    "Related articles": "İlgili makaleler",
+    "Chat with Nouran": "Nouran ile sohbet et",
+    "Type your message…": "Mesajınızı yazın…",
+    "Send": "Gönder",
+    "Nouran greeting": "Merhaba! Ben Nouran, Global Untold Story'deki asistanınızım. Ne aradığınızı söyleyin, gerisini ben hallederim.",
+    "Nouran is typing…": "Nouran yazıyor…"
   },
   "ru": {
     "Home": "Главная",
@@ -1285,7 +1320,12 @@
     "This project didn't load. It's not you — try again.": "Этот проект не загрузился. Вы ни при чём — попробуйте снова.",
     "This service didn't load. It's not you — try again.": "Эта услуга не загрузилась. Вы ни при чём — попробуйте снова.",
     "This article didn't load. It's not you — try again.": "Эта статья не загрузилась. Вы ни при чём — попробуйте снова.",
-    "Related articles": "Похожие статьи"
+    "Related articles": "Похожие статьи",
+    "Chat with Nouran": "Чат с Нуран",
+    "Type your message…": "Введите сообщение…",
+    "Send": "Отправить",
+    "Nouran greeting": "Привет! Я Нуран, ваш помощник в Global Untold Story. Расскажите, что вам нужно, и я этим займусь.",
+    "Nouran is typing…": "Нуран печатает…"
   },
   "zh": {
     "Home": "首页",
@@ -1446,7 +1486,12 @@
     "This project didn't load. It's not you — try again.": "此项目未能加载。不是你的问题，请重试。",
     "This service didn't load. It's not you — try again.": "此服务未能加载。不是你的问题，请重试。",
     "This article didn't load. It's not you — try again.": "此文章未能加载。不是你的问题，请重试。",
-    "Related articles": "Related articles"
+    "Related articles": "Related articles",
+    "Chat with Nouran": "与 Nouran 聊天",
+    "Type your message…": "输入您的消息…",
+    "Send": "发送",
+    "Nouran greeting": "您好！我是 Nouran，Global Untold Story 的助手。请告诉我您需要什么，我来为您处理。",
+    "Nouran is typing…": "Nouran 正在输入…"
   },
   "en": {
     "Home": "Home",
@@ -1475,7 +1520,12 @@
     "Failed to load data": "Failed to load data",
     "Learn more →": "Learn more →",
     "Film & Video Production": "Film & Video Production",
-    "Related articles": "Related articles"
+    "Related articles": "Related articles",
+    "Chat with Nouran": "Chat with Nouran",
+    "Type your message…": "Type your message…",
+    "Send": "Send",
+    "Nouran greeting": "Hi! I'm Nouran, your assistant at Global Untold Story. Tell me what you're looking for and I'll take it from there.",
+    "Nouran is typing…": "Nouran is typing…"
   },
   "ja": {
     "Home": "ホーム",
@@ -1636,7 +1686,12 @@
     "This project didn't load. It's not you — try again.": "このプロジェクトを読み込めませんでした。お客様側の問題ではありません。再試行してください。",
     "This service didn't load. It's not you — try again.": "このサービスを読み込めませんでした。お客様側の問題ではありません。再試行してください。",
     "This article didn't load. It's not you — try again.": "この記事を読み込めませんでした。お客様側の問題ではありません。再試行してください。",
-    "Related articles": "Related articles"
+    "Related articles": "Related articles",
+    "Chat with Nouran": "Nouranとチャットする",
+    "Type your message…": "メッセージを入力…",
+    "Send": "送信",
+    "Nouran greeting": "こんにちは！私はNouran、Global Untold Storyのアシスタントです。ご希望の内容を教えてください。",
+    "Nouran is typing…": "Nouranが入力中…"
   },
   "ko": {
     "Home": "홈",
@@ -1797,7 +1852,12 @@
     "This project didn't load. It's not you — try again.": "프로젝트를 불러오지 못했습니다. 사용자 문제는 아닙니다. 다시 시도해 주세요.",
     "This service didn't load. It's not you — try again.": "서비스를 불러오지 못했습니다. 사용자 문제는 아닙니다. 다시 시도해 주세요.",
     "This article didn't load. It's not you — try again.": "기사를 불러오지 못했습니다. 사용자 문제는 아닙니다. 다시 시도해 주세요.",
-    "Related articles": "Related articles"
+    "Related articles": "Related articles",
+    "Chat with Nouran": "Nouran과 채팅하기",
+    "Type your message…": "메시지를 입력하세요…",
+    "Send": "보내기",
+    "Nouran greeting": "안녕하세요! 저는 Global Untold Story의 어시스턴트 Nouran입니다. 원하시는 것을 말씀해 주세요.",
+    "Nouran is typing…": "Nouran이 입력 중…"
   },
   "pl": {
     "Home": "Start",
@@ -1958,7 +2018,12 @@
     "This project didn't load. It's not you — try again.": "Ten projekt się nie załadował. To nie Twoja wina — spróbuj ponownie.",
     "This service didn't load. It's not you — try again.": "Ta usługa się nie załadowała. To nie Twoja wina — spróbuj ponownie.",
     "This article didn't load. It's not you — try again.": "Ten artykuł się nie załadował. To nie Twoja wina — spróbuj ponownie.",
-    "Related articles": "Related articles"
+    "Related articles": "Related articles",
+    "Chat with Nouran": "Czat z Nouran",
+    "Type your message…": "Napisz wiadomość…",
+    "Send": "Wyślij",
+    "Nouran greeting": "Cześć! Jestem Nouran, asystentka Global Untold Story. Powiedz mi, czego szukasz, a ja się tym zajmę.",
+    "Nouran is typing…": "Nouran pisze…"
   },
   "sw": {
     "Home": "Nyumbani",
@@ -2119,6 +2184,11 @@
     "This project didn't load. It's not you — try again.": "Mradi huu haujapakiwa. Si kosa lako — jaribu tena.",
     "This service didn't load. It's not you — try again.": "Huduma hii haijapakiwa. Si kosa lako — jaribu tena.",
     "This article didn't load. It's not you — try again.": "Makala haya hayajapakiwa. Si kosa lako — jaribu tena.",
-    "Related articles": "Related articles"
+    "Related articles": "Related articles",
+    "Chat with Nouran": "Ongea na Nouran",
+    "Type your message…": "Andika ujumbe wako…",
+    "Send": "Tuma",
+    "Nouran greeting": "Habari! Mimi ni Nouran, msaidizi wako katika Global Untold Story. Niambie unachohitaji nami nitakusaidia.",
+    "Nouran is typing…": "Nouran anaandika…"
   }
 }

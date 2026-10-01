@@ -7,6 +7,7 @@ export type ContactMessage = {
   service?: string;
   message: string;
   locale?: string;
+  source?: "contact_form" | "chatbot";
 };
 
 // Header values (Reply-To, Subject) go into raw SMTP headers, where an
@@ -63,9 +64,10 @@ export async function sendContactEmail(data: ContactMessage) {
   const service = data.service || "Not specified";
   const phone = data.phone || "Not provided";
   const locale = data.locale || "en";
+  const origin = data.source === "chatbot" ? "the Nouran chatbot" : "the website contact form";
 
   const text = [
-    "New inquiry from the website contact form.",
+    `New inquiry from ${origin}.`,
     "",
     `Name: ${data.name}`,
     `Email: ${data.email}`,
@@ -78,7 +80,7 @@ export async function sendContactEmail(data: ContactMessage) {
   ].join("\n");
 
   const html = `
-    <p>New inquiry from the website contact form.</p>
+    <p>New inquiry from ${escapeHtml(origin)}.</p>
     <table cellpadding="6" cellspacing="0" style="font-family:sans-serif;font-size:14px">
       <tr><td><strong>Name</strong></td><td>${escapeHtml(data.name)}</td></tr>
       <tr><td><strong>Email</strong></td><td>${escapeHtml(data.email)}</td></tr>

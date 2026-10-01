@@ -21,7 +21,7 @@ declare global {
 }
 
 /** How someone reached out, so the reports separate a form from a phone tap. */
-export type LeadMethod = "form" | "email" | "phone" | "whatsapp";
+export type LeadMethod = "form" | "email" | "phone" | "whatsapp" | "chatbot";
 
 /*
  * Events go on the dataLayer, where Tag Manager can see them.
