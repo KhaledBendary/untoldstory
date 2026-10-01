@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useLanguage } from "./LanguageContext";
 import { trackLead } from "@/lib/analytics";
-import NouranAvatar from "./NouranAvatar";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -62,9 +62,9 @@ export default function NouranWidget() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label={t("Chat with Nouran")}
-        className="fixed bottom-24 right-5 md:bottom-28 md:right-8 z-[200] w-14 h-14 rounded-full bg-[#1a1a1a] border border-white/15 text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform duration-300 overflow-hidden"
+        className="fixed bottom-24 right-5 md:bottom-28 md:right-8 z-[200] w-14 h-14 rounded-full border border-white/15 shadow-lg hover:scale-105 transition-transform duration-300 overflow-hidden"
       >
-        <NouranAvatar size={56} />
+        <Image src="/images/nouran-avatar.jpg" alt="Nouran" width={56} height={56} className="w-full h-full object-cover" />
       </button>
 
       {open && (
@@ -74,7 +74,7 @@ export default function NouranWidget() {
         >
           <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10 bg-[#161616]">
             <div className="w-9 h-9 rounded-full overflow-hidden shrink-0">
-              <NouranAvatar size={36} />
+              <Image src="/images/nouran-avatar.jpg" alt="Nouran" width={36} height={36} className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-semibold text-white">Nouran</div>
