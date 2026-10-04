@@ -10,7 +10,7 @@
     "canonical": "/services/documentary-production-egypt"
   },
   "/work/apache-oil-gas-production-in-egypt": {
-    "canonical": "/work/apache-oil-gas-production-in-egypt"
+    "canonical": "/"
   },
   "/work/ilo-upper-egypt-documentary-film-production": {
     "canonical": "/"
@@ -46,6 +46,6 @@
     "canonical": "/work/changan-road-safety-csr-campaign-v2"
   },
   "/work/alliance-corporate-event-production": {
-    "canonical": "/work/adnoc-gas-corporate-event-workshop-production"
+    "canonical": "/work/alliance-corporate-event-production"
   }
 }
