@@ -26,5 +26,8 @@
   },
   "/services/animation-3d-production": {
     "canonical": "/services"
+  },
+  "/insights/media-production-services-egypt": {
+    "canonical": "/services"
   }
 }
