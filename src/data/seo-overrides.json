@@ -29,5 +29,8 @@
   },
   "/insights/media-production-services-egypt": {
     "canonical": "/services"
+  },
+  "/work/huawei-commercial-production-in-egypt": {
+    "canonical": "/services/commercial-video-production"
   }
 }
