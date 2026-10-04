@@ -20,5 +20,8 @@
   },
   "/insights/tv-commercial-production-in-egypt": {
     "canonical": "/"
+  },
+  "/services/post-production": {
+    "canonical": "/services"
   }
 }
