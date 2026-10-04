@@ -23,5 +23,8 @@
   },
   "/services/post-production": {
     "canonical": "/services"
+  },
+  "/services/animation-3d-production": {
+    "canonical": "/services"
   }
 }
