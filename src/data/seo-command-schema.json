@@ -1,5 +1,66 @@
 {
   "organization": null,
-  "faq": null,
+  "faq": {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How much does film production cost in Egypt?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Film production costs in Egypt vary based on scope. Commercial ads start from $5,000, documentaries from $10,000, and full TV productions from $50,000. Competitive pricing is available across all budgets."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long does video production take?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Production timelines depend on the project type. A commercial ad typically takes 2-4 weeks, a documentary 4-12 weeks, and a corporate video 1-3 weeks. We provide detailed timelines during the pre-production phase."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you offer production services outside Egypt?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes — services are available across MENA including Egypt, Dubai, and Jeddah, with on-ground production in Saudi Arabia, UAE, Kuwait, Qatar, and other MENA countries."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What types of video production do you specialize in?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We specialize in commercial advertising, documentary production, corporate content, TV shows, event coverage, podcast production, post-production, and CGI/motion graphics."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can you handle the full production cycle?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes — the complete production cycle from concept development and scripting through filming, post-production, and final delivery including localization and dubbing."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you work with international clients?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Absolutely. We work with international brands, broadcasters, and institutions worldwide. Our multilingual team handles projects in Arabic, English, French, and other languages."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can you manage permits, locations, casting, crew, and equipment for productions in Egypt?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Global Untold Story can manage the production process in Egypt, including location scouting, production planning, casting coordination, crew, equipment, logistics, permits, filming, and post-production. We can support both local and international productions from pre-production through final delivery."
+        }
+      }
+    ]
+  },
   "extra": []
 }
