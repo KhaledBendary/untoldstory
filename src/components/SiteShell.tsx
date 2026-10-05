@@ -11,6 +11,7 @@ import Cursor from "./Cursor";
 import Preloader from "./Preloader";
 import WhatsAppButton from "./WhatsAppButton";
 import NouranWidget from "./NouranWidget";
+import SeoFaq from "./SeoFaq";
 import ConsentBanner from "./ConsentBanner";
 import DomSafetyPatch from "./DomSafetyPatch";
 import { SiteReadyProvider } from "./SiteContext";
@@ -92,7 +93,10 @@ function SiteShellInner({ children, shell, locale: initialLocale }: { children: 
         {!loaded && <Preloader onDone={() => setLoaded(true)} />}
         <Cursor />
         <Navbar initialData={shell} initialLocale={initialLocale} />
-        <main>{children}</main>
+        <main>
+          {children}
+          <SeoFaq />
+        </main>
         <Footer initialData={shell} initialLocale={initialLocale} />
         <WhatsAppButton />
         <NouranWidget />
