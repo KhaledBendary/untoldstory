@@ -390,10 +390,10 @@ export async function importLocaleData(
 }
 
 /** Overwrite just data.slugs, touching no fixed column and no other i18n field. */
-export async function updateSlugsOnly(type: keyof typeof TABLES, slug: string, slugs: Dict): Promise<void> {
+export async function updateSlugsOnly(type: keyof typeof TABLES, slug: string, slugs: Dict, slugsManual?: Dict): Promise<void> {
   const current = await getByType(type, slug);
   if (!current) throw new Error(`not-found:${type}/${slug}`);
-  const data = { ...(current.data as Record<string, Dict> | undefined ?? {}), slugs };
+  const data = { ...(current.data as Record<string, Dict> | undefined ?? {}), slugs, ...(slugsManual ? { slugsManual } : {}) };
   const json = sql.json(data as Parameters<typeof sql.json>[0]);
   if (type === "services") await sql`update services set data=${json}, updated_at=now() where slug=${slug}`;
   else if (type === "projects") await sql`update projects set data=${json}, updated_at=now() where slug=${slug}`;

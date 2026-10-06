@@ -53,16 +53,16 @@ export async function POST(request: NextRequest) {
 
     if (slugOnly) {
       const existingSlugs = (row.data as { slugs?: Dict })?.slugs;
-      let result: { slugs: Dict; warning?: string };
-      try { result = await retranslateSlug(row.slug, existingSlugs, (row.data as { slugsManual?: Dict })?.slugsManual); }
+      let result: { slugs: Dict; slugsManual: Dict; warning?: string };
+      try { result = await retranslateSlug(row.slug, existingSlugs, (row.data as { slugsManual?: Dict })?.slugsManual, only); }
       catch (e) {
         console.error(`slug-only translate ${reqType}/${reqSlug} failed:`, e);
         return NextResponse.json({ error: (e as Error).message || "فشلت ترجمة السلج" }, { status: 502 });
       }
       if (result.warning) return NextResponse.json({ error: result.warning }, { status: 502 });
-      await updateSlugsOnly(reqType, row.slug, result.slugs);
+      await updateSlugsOnly(reqType, row.slug, result.slugs, result.slugsManual);
       await addLocaleSlugRedirects(reqType, row.slug, existingSlugs, result.slugs);
-      return NextResponse.json({ ok: true, slugs: result.slugs });
+      return NextResponse.json({ ok: true, slugs: result.slugs, slugsManual: result.slugsManual });
     }
 
     let result: { ok: boolean; warning?: string; data?: Record<string, Dict> } = { ok: false };

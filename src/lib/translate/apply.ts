@@ -125,7 +125,8 @@ async function updateSlugs(canonicalSlug: string, data: Record<string, Dict>, on
   const manual = (data.slugsManual as Dict | undefined) ?? {};
   const isManual = (loc: string) => Boolean(manual[loc]) && Boolean(existing[loc]);
   const changed = force || existing.en !== canonicalSlug;
-  const slugs: Dict = changed ? { en: canonicalSlug } : { ...existing };
+  // Redoing a few languages (`only`) must leave every other language's slug alone.
+  const slugs: Dict = changed && !(only && only.length) ? { en: canonicalSlug } : { ...existing, en: canonicalSlug };
   for (const loc of Object.keys(existing)) if (isManual(loc)) slugs[loc] = existing[loc];
 
   const targets = (only && only.length ? MACHINE_LOCALES.filter((l) => only.includes(l)) : [...MACHINE_LOCALES])
@@ -185,10 +186,12 @@ async function updateSlugs(canonicalSlug: string, data: Record<string, Dict>, on
  * unchanged slug) so the admin can redo it on demand, e.g. to pick up a fix
  * to the translation without re-saving the whole item.
  */
-export async function retranslateSlug(canonicalSlug: string, existingSlugs?: Dict, manualSlugs?: Dict): Promise<{ slugs: Dict; warning?: string }> {
+export async function retranslateSlug(canonicalSlug: string, existingSlugs?: Dict, manualSlugs?: Dict, only?: readonly string[]): Promise<{ slugs: Dict; slugsManual: Dict; warning?: string }> {
   const data: Record<string, Dict> = { slugs: { ...(existingSlugs ?? {}) }, slugsManual: { ...(manualSlugs ?? {}) } };
-  const { warning } = await updateSlugs(canonicalSlug, data, undefined, true);
-  return { slugs: (data.slugs as Dict) ?? {}, warning };
+  // Asking for one language by name means "redo this one" — even a hand-typed slug.
+  for (const loc of only ?? []) data.slugsManual[loc] = "";
+  const { warning } = await updateSlugs(canonicalSlug, data, only, true);
+  return { slugs: (data.slugs as Dict) ?? {}, slugsManual: (data.slugsManual as Dict) ?? {}, warning };
 }
 
 /**

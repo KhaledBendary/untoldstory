@@ -95,17 +95,26 @@ export default function ContentEditor({
 
   // "ترجم السلج دلوقتي" — retranslate just data.slugs for this item, right now,
   // without saving anything else. Only meaningful for an already-saved item.
-  async function translateSlugNow() {
+  // With `only`, redoes just that one language's slug (even a hand-typed one);
+  // without it, every language except the hand-typed ones.
+  async function translateSlugNow(only?: string) {
     setSlugTransBusy(true); setSlugTransError("");
     try {
       const res = await fetch("/api/admin/translate-all", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, slug, slugOnly: true }),
+        body: JSON.stringify({ type, slug, slugOnly: true, ...(only ? { locale: only } : {}) }),
       });
       const out = await res.json();
       if (!res.ok) { setSlugTransError(out.error || "فشلت ترجمة السلج"); return; }
-      setSlugsState(out.slugs || {});
+      // One language: touch only that field, so unsaved edits to the others survive.
+      if (only) {
+        setSlugsState((prev) => ({ ...prev, [only]: out.slugs?.[only] ?? prev[only] ?? "" }));
+        if (out.slugsManual) setManualState((prev) => ({ ...prev, [only]: out.slugsManual[only] ?? "" }));
+      } else {
+        setSlugsState(out.slugs || {});
+        if (out.slugsManual) setManualState(out.slugsManual);
+      }
     } catch {
       setSlugTransError("تعذّر الاتصال بالخادم");
     } finally {
@@ -361,8 +370,8 @@ export default function ContentEditor({
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           <span style={lbl}>المعرّف (slug) *{lang !== "en" && (manualState[lang] ? " — مكتوب يدوياً (الترجمة التلقائية مش هتغيّره)" : " — بلغة الصفحة، مترجم تلقائياً وتقدر تعدّله")}</span>
           {!create && (
-            <button type="button" onClick={translateSlugNow} disabled={slugTransBusy} style={aiBtn}>
-              {slugTransBusy ? "بيترجم…" : "🌐 ترجم السلج دلوقتي"}
+            <button type="button" onClick={() => translateSlugNow()} disabled={slugTransBusy} style={aiBtn}>
+              {slugTransBusy ? "بيترجم…" : "🌐 ترجم سلج كل اللغات"}
             </button>
           )}
         </div>
@@ -370,9 +379,16 @@ export default function ContentEditor({
           <input dir="ltr" placeholder="my-new-service" value={newSlug}
             onChange={(e) => { setDirty(true); setSlugTouched(true); setNewSlug(e.target.value.toLowerCase()); }} />
         ) : (
-          <input dir="auto" disabled={create} value={slugsState[lang] ?? ""}
-            placeholder={create ? "بعد الحفظ الأول" : "لسه متترجمش — هياخد سلج الإنجليزي مؤقتاً"}
-            onChange={(e) => { setDirty(true); setSlugsState((prev) => ({ ...prev, [lang]: e.target.value })); }} />
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <input dir="auto" disabled={create} value={slugsState[lang] ?? ""} style={{ flex: 1 }}
+              placeholder={create ? "بعد الحفظ الأول" : "لسه متترجمش — هياخد سلج الإنجليزي مؤقتاً"}
+              onChange={(e) => { setDirty(true); setSlugsState((prev) => ({ ...prev, [lang]: e.target.value })); }} />
+            {!create && (
+              <button type="button" onClick={() => translateSlugNow(lang)} disabled={slugTransBusy} style={{ ...aiBtn, whiteSpace: "nowrap" }}>
+                {slugTransBusy ? "بيترجم…" : "🌐 ترجم السلج ده بس"}
+              </button>
+            )}
+          </div>
         )}
         {lang !== "en" && !create && (
           <span style={{ fontSize: 12, color: "var(--muted, #888)" }}>
