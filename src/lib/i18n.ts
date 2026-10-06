@@ -102,20 +102,39 @@ export function localizedPath(path: string, locale: string): string {
  * this page's own slug under every locale's prefix, which pointed hreflang at
  * a slug that only exists in the current page's language.
  */
-// A locale's translated slug that's implausibly long (e.g. from an early
-// title-derived backfill, before slugs were capped by byte length) can crash
-// a build once expanded to UTF-8 bytes elsewhere, or produce a broken
-// hreflang URL here. Separately, ANY non-ASCII character in a [locale]/[slug]
-// segment 404s live on this Next.js/Vercel setup regardless of script
-// (confirmed against production for Latin-accented, Cyrillic and CJK slugs
-// alike — Vercel's own x-matched-path header comes back mojibake'd for these,
-// pointing to a platform-level encoding bug, not something fixable here) —
-// see the matching guard in db/localize.ts. Duplicated rather than imported:
-// this file is also pulled into client components, where that module
-// (server-only) can't be bundled.
-const MAX_SLUG_BYTES = 200;
+// A slug is a URL path segment in the page's own language (Arabic, Cyrillic,
+// CJK, accented Latin...), so non-ASCII is allowed. Next.js hands a dynamic
+// segment to the page percent-encoded — see decodeSlug — which is what once
+// made every native-script slug 404.
+//
+// Length is by UTF-8 bytes: a build writes one file per path and a segment is
+// capped at 255 bytes there. A non-ASCII character can expand to three escaped
+// bytes (%XX%XX%XX), so non-ASCII slugs are held to 80 bytes (<= 240 escaped).
+// Duplicated rather than imported from db/localize.ts: this file is also pulled
+// into client components, where that (server-only) module can't be bundled.
+const MAX_ASCII_SLUG_BYTES = 200;
+const MAX_NATIVE_SLUG_BYTES = 80;
 const NON_ASCII_RE = /[^\x00-\x7F]/;
-export const isSlugSafe = (s: string) => new TextEncoder().encode(s).length <= MAX_SLUG_BYTES && !NON_ASCII_RE.test(s);
+const UNSAFE_SLUG_RE = /[\s/\\?#%\x00-\x1f\x7f]/;
+export const isSlugSafe = (s: string): boolean => {
+  if (!s || UNSAFE_SLUG_RE.test(s) || /^\.+$/.test(s)) return false;
+  const bytes = new TextEncoder().encode(s).length;
+  return bytes <= (NON_ASCII_RE.test(s) ? MAX_NATIVE_SLUG_BYTES : MAX_ASCII_SLUG_BYTES);
+};
+
+/**
+ * The slug a dynamic [slug] segment actually refers to. Next.js 16 passes
+ * `params.slug` still percent-encoded ("%D8%A5..." for Arabic) while stored
+ * slugs are the real characters, so a raw comparison fails and the page 404s.
+ * Normalized to NFC so it matches how slugs are stored.
+ */
+export function decodeSlug(raw: string): string {
+  try {
+    return decodeURIComponent(raw).normalize("NFC");
+  } catch {
+    return raw;
+  }
+}
 
 export function alternatesFor(
   path: string,

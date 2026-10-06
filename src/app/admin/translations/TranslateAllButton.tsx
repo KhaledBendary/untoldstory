@@ -13,6 +13,28 @@ export default function TranslateAllButton() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
 
+  async function runSlugs() {
+    if (!confirm("هيحدّث سلج كل الخدمات والمشاريع والمقالات بلغة كل صفحة (عربي بحروف عربي… إلخ) ما عدا اللي كتبته بإيدك، وهيحوّل الروابط القديمة (301). تكمّل؟")) return;
+    setBusy(true); setMsg(null);
+    try {
+      const res = await fetch("/api/admin/translate-all", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slugOnly: true }),
+      });
+      const out = await res.json();
+      if (!res.ok) { setMsg({ kind: "err", text: out.error || "حصل خطأ" }); return; }
+      const firstError = out.failed?.[0]?.error;
+      const failed = out.failed?.length ? ` — فشل ${out.failed.length}${firstError ? ` (${firstError})` : ""}` : "";
+      setMsg({ kind: out.failed?.length ? "err" : "ok", text: `اتحدّث سلج ${out.done} عنصر${failed}. جاري نشر الموقع…` });
+      router.refresh();
+    } catch {
+      setMsg({ kind: "err", text: "تعذّر الاتصال بالخادم" });
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function run() {
     if (!confirm("هيترجم كل الخدمات والمشاريع والمقالات لكل اللغات من الإنجليزي، وهيكمّل أي عنصر ناقصه إنجليزي أو عربي من اللغة التانية. تكمّل؟")) return;
     setBusy(true); setMsg(null);
@@ -36,6 +58,9 @@ export default function TranslateAllButton() {
       <button className="primary" onClick={run} disabled={busy}
         style={{ fontSize: 13, padding: "9px 18px", background: "var(--accent)", color: "var(--accent-ink)", borderColor: "var(--accent)", opacity: busy ? 0.6 : 1 }}>
         {busy ? "بيترجم… (ممكن ياخد دقيقة)" : "✨ ترجم كل الناقص للـ12 لغة"}
+      </button>
+      <button onClick={runSlugs} disabled={busy} style={{ fontSize: 13, padding: "9px 18px", opacity: busy ? 0.6 : 1 }}>
+        🔗 حدّث السلجات بلغة كل صفحة
       </button>
       {msg && <span style={{ fontSize: 13, color: msg.kind === "ok" ? "var(--ok)" : "var(--danger)" }}>{msg.text}</span>}
     </div>

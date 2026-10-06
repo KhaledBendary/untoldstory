@@ -5,7 +5,7 @@ import ProjectDetail from "@/components/pages/ProjectDetail";
 import StructuredData from "@/components/StructuredData";
 import { applySeoOverrides } from "@/data/seo-overrides";
 import { api } from "@/lib/api";
-import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
+import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE, decodeSlug } from "@/lib/i18n";
 import { IS_PRODUCTION_BUILD, findProjectAnyLocale, projectDetailWithFallback } from "@/lib/page-data";
 import { PROJECTS as FALLBACK_PROJECTS } from "@/data/content";
 import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo, withNoindex } from "@/lib/seo";
@@ -81,7 +81,8 @@ function projectMeta(path: string, locale: string, title: string, description: s
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug, locale: raw } = await params;
+  const { slug: rawSlug, locale: raw } = await params;
+  const slug = decodeSlug(rawSlug);
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const path = `/work/${slug}`;
   const fallbackTitle = buildTitle(slug.replace(/-/g, " "), slug);
@@ -120,7 +121,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Props) {
-  const { slug, locale: raw } = await params;
+  const { slug: rawSlug, locale: raw } = await params;
+  const slug = decodeSlug(rawSlug);
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   let name = "";
   let schema: Record<string, unknown>[] | undefined;

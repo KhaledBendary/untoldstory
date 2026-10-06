@@ -1,5 +1,5 @@
 import "server-only";
-import { SITE_URL } from "./seo";
+import { SITE_URL, absoluteUrl } from "./seo";
 import { INDEXABLE_LOCALES, LOCALE_CODES, localizedPath } from "./i18n";
 
 /**
@@ -21,7 +21,7 @@ export const indexNowConfigured = (): boolean => Boolean(process.env.INDEXNOW_KE
 
 /** Absolute-ify a path or URL against the site origin. */
 function toAbsolute(u: string): string {
-  return u.startsWith("http") ? u : `${SITE_URL}${u.startsWith("/") ? u : `/${u}`}`;
+  return absoluteUrl(u);
 }
 
 /**

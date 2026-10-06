@@ -5,6 +5,7 @@ import { listByType, getByType, updateSlugsOnly, logActivity } from "@/lib/db/re
 import { retranslateSlug } from "@/lib/translate/apply";
 import { translationConfigured } from "@/lib/translate";
 import { triggerDeploy } from "@/lib/deploy";
+import { addLocaleSlugRedirects } from "@/lib/slug-redirects";
 import { translateOne, type Dict, type Row } from "@/lib/translate/translate-item";
 
 export const runtime = "nodejs";
@@ -53,13 +54,14 @@ export async function POST(request: NextRequest) {
     if (slugOnly) {
       const existingSlugs = (row.data as { slugs?: Dict })?.slugs;
       let result: { slugs: Dict; warning?: string };
-      try { result = await retranslateSlug(row.slug, existingSlugs); }
+      try { result = await retranslateSlug(row.slug, existingSlugs, (row.data as { slugsManual?: Dict })?.slugsManual); }
       catch (e) {
         console.error(`slug-only translate ${reqType}/${reqSlug} failed:`, e);
         return NextResponse.json({ error: (e as Error).message || "فشلت ترجمة السلج" }, { status: 502 });
       }
       if (result.warning) return NextResponse.json({ error: result.warning }, { status: 502 });
       await updateSlugsOnly(reqType, row.slug, result.slugs);
+      await addLocaleSlugRedirects(reqType, row.slug, existingSlugs, result.slugs);
       return NextResponse.json({ ok: true, slugs: result.slugs });
     }
 
@@ -77,6 +79,31 @@ export async function POST(request: NextRequest) {
 
   // All-items mode.
   const TYPES = ["services", "projects", "posts"] as const;
+
+  // Slugs only, for every item: regenerates each language's slug in its own
+  // script (except ones typed by hand), 301-redirecting the old URLs.
+  if (slugOnly) {
+    let slugsDone = 0;
+    const slugFailed: { ref: string; error: string }[] = [];
+    for (const type of TYPES) {
+      for (const row of (await listByType(type)) as unknown as Row[]) {
+        try {
+          const before = (row.data as { slugs?: Dict })?.slugs;
+          const result = await retranslateSlug(row.slug, before, (row.data as { slugsManual?: Dict })?.slugsManual);
+          if (result.warning) { slugFailed.push({ ref: `${type}/${row.slug}`, error: result.warning }); continue; }
+          await updateSlugsOnly(type, row.slug, result.slugs);
+          await addLocaleSlugRedirects(type, row.slug, before, result.slugs);
+          slugsDone++;
+        } catch (e) {
+          slugFailed.push({ ref: `${type}/${row.slug}`, error: (e as Error).message || "unknown" });
+        }
+      }
+    }
+    await logActivity({ actor: auth.session.email, action: "update", entity: "site", detail: `تحديث السلجات بلغة كل صفحة: ${slugsDone} عنصر` });
+    const deploy = await triggerDeploy({ force: true });
+    return NextResponse.json({ ok: true, done: slugsDone, failed: slugFailed, deploy });
+  }
+
   let done = 0;
   // Carries the real reason per item — a bare slug list gave no way to tell a
   // dead key from a transient error from a genuinely bad translation.

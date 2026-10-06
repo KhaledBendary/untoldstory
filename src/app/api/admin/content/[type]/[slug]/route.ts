@@ -1,12 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/admin-guard";
 import { contentType } from "@/lib/admin/content-types";
-import { getByType, saveByType, deleteByType, logActivity, renameSlugByType, addRedirect } from "@/lib/db/repo";
+import { getByType, listByType, saveByType, deleteByType, logActivity, renameSlugByType, addRedirect } from "@/lib/db/repo";
 import { validateField, hasErrors, type Dict } from "@/lib/content-validate";
 import { applyMachineTranslations } from "@/lib/translate/apply";
 import { assembleSeo, extractSeoForEditor } from "@/lib/admin/seo-fields";
 import { triggerDeploy } from "@/lib/deploy";
 import { pingIndexNow, contentUrls, contentPaths } from "@/lib/indexnow";
+import { isSlugSafe, DEFAULT_LOCALE, LOCALE_CODES } from "@/lib/i18n";
+import { slugify } from "@/lib/translate/apply";
+import { addLocaleSlugRedirects } from "@/lib/slug-redirects";
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -75,6 +78,41 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   const existingSeo = (existing.data as { seo?: Record<string, Record<string, string>> })?.seo;
   const existingFlat = { ...existingData, ...extractSeoForEditor(existingSeo, def) };
 
+  // Per-language slugs. The saved ones are carried in so a save only fills
+  // what's missing (and never touches a slug typed by hand); a slug the admin
+  // typed for a language is validated, kept and marked manual.
+  const savedSlugs = { ...((existingData?.slugs as Dict | undefined) ?? {}) };
+  data.slugs = { ...savedSlugs };
+  data.slugsManual = { ...((existingData?.slugsManual as Dict | undefined) ?? {}) };
+  if (body.slugs && typeof body.slugs === "object") {
+    const taken = new Map<string, string>(); // "loc/slug" → owner, among the other items of this type
+    const others = (await listByType(def.table)) as unknown as { slug: string; data?: { slugs?: Dict } }[];
+    for (const o of others) {
+      if (o.slug === slug) continue;
+      for (const [loc, v] of Object.entries(o.data?.slugs ?? {})) if (v) taken.set(`${loc}/${v}`, o.slug);
+    }
+    for (const loc of LOCALE_CODES) {
+      if (loc === DEFAULT_LOCALE) continue;
+      const given = (body.slugs as Record<string, unknown>)[loc];
+      if (typeof given !== "string") continue;
+      const wanted = slugify(given);
+      if (wanted === (savedSlugs[loc] ?? "")) continue; // unchanged — stays as it is (manual or automatic)
+      if (!wanted) {
+        // Emptied: hand the slug back to automatic translation.
+        data.slugs[loc] = "";
+        data.slugsManual[loc] = "";
+        continue;
+      }
+      if (!isSlugSafe(wanted)) {
+        return NextResponse.json({ error: `السلج (${loc}) طويل زيادة أو فيه رموز غير مسموحة` }, { status: 422 });
+      }
+      const owner = taken.get(`${loc}/${wanted}`);
+      if (owner) return NextResponse.json({ error: `السلج (${loc}) مستخدم بالفعل في "${owner}"` }, { status: 409 });
+      data.slugs[loc] = wanted;
+      data.slugsManual[loc] = "1";
+    }
+  }
+
   // Generate the seven machine languages from the new English (best-effort) —
   // unless the admin explicitly asked to save without spending tokens yet.
   const skipTranslate = body.skipTranslate === true;
@@ -87,6 +125,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   const status = body.status === "published" || body.status === "draft" ? body.status : undefined;
   await saveByType(def.table, targetSlug, fixed, data, status);
+  // Any language whose URL just changed keeps its old link alive (301, next deploy).
+  await addLocaleSlugRedirects(type, slug, savedSlugs, data.slugs);
   await logActivity({ actor: auth.session.email, action: "update", entity: type, ref: targetSlug, detail: status ? `الحالة: ${status}` : null });
   const deploy = await triggerDeploy();
 
@@ -96,7 +136,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   const isLive = effectiveStatus === "published" && !fixed.noindex && (!scheduled || scheduled <= Date.now());
   if (isLive) await pingIndexNow(contentUrls(type, targetSlug));
 
-  return NextResponse.json({ ok: true, issues, translationWarning: warning, deploy, slug: targetSlug });
+  return NextResponse.json({ ok: true, issues, translationWarning: warning, deploy, slug: targetSlug, slugs: data.slugs, slugsManual: data.slugsManual });
 }
 
 /** Delete a content item. */

@@ -254,8 +254,16 @@ export function withNoindex<T extends object>(meta: T, noindex?: boolean): T {
   return { ...meta, robots: { index: false, follow: false } };
 }
 
+/**
+ * Absolute URL for a site path. Slugs are in each page's own language, so a
+ * path can hold non-ASCII characters; canonicals, hreflang, sitemaps and
+ * structured data carry them percent-encoded (the form crawlers compare).
+ * Only the non-ASCII runs are escaped, so an already-encoded path is unchanged.
+ */
 export function absoluteUrl(path: string) {
-  return path.startsWith("http") ? path : `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  if (path.startsWith("http")) return path;
+  const encoded = path.replace(/[^ -]+/g, (run) => encodeURIComponent(run));
+  return `${SITE_URL}${encoded.startsWith("/") ? encoded : `/${encoded}`}`;
 }
 
 /** Breadcrumb trail for a detail page, e.g. Home › Services › Post Production. */

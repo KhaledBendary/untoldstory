@@ -5,7 +5,7 @@ import PostDetail from "@/components/pages/PostDetail";
 import StructuredData from "@/components/StructuredData";
 import { applySeoOverrides } from "@/data/seo-overrides";
 import { api } from "@/lib/api";
-import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
+import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE, decodeSlug } from "@/lib/i18n";
 import { IS_PRODUCTION_BUILD, findPostAnyLocale, postDetailWithFallback } from "@/lib/page-data";
 import { POSTS as FALLBACK_POSTS } from "@/data/content";
 import { postStaticParams, relatedPostSlugs } from "@/lib/legacy-redirects";
@@ -67,7 +67,8 @@ function postMeta(path: string, locale: string, title: string, description: stri
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug, locale: raw } = await params;
+  const { slug: rawSlug, locale: raw } = await params;
+  const slug = decodeSlug(rawSlug);
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const path = `/insights/${slug}`;
   const fallbackTitle = buildTitle(slug.replace(/-/g, " "), slug);
@@ -101,7 +102,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Props) {
-  const { slug, locale: raw } = await params;
+  const { slug: rawSlug, locale: raw } = await params;
+  const slug = decodeSlug(rawSlug);
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   let name = "";
   let schema;

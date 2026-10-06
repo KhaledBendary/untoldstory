@@ -1,6 +1,4 @@
 import "server-only";
-import pinyin from "pinyin";
-import { convert as romanizeHangul } from "hangul-romanization";
 import { MACHINE_LOCALES, PartialTranslateError, translateFields, translatePair, translationConfigured, type FieldToTranslate, type MachineLocale } from "@/lib/translate";
 import type { ContentType } from "@/lib/admin/content-types";
 import type { Dict } from "@/lib/content-validate";
@@ -73,150 +71,34 @@ async function syncEnglishArabic(def: ContentType, data: Record<string, Dict>): 
 }
 
 /**
- * A URL-safe slug from a title.
+ * A URL slug from translated text, kept in that language's own script: Arabic
+ * stays Arabic, Russian Cyrillic, Japanese kana/kanji, French keeps its accents.
+ * Lowercased (where a script has case), words joined with "-", everything that
+ * isn't a letter/mark/digit dropped. Arabic vowel marks and tatweel carry no
+ * meaning in a URL and are removed so the same phrase always yields one slug.
  *
- * Folds accented Latin letters to plain ASCII (é → e, ñ → n, ç → c, ü → u...)
- * via foldLatinDiacritics below. This used to be deliberately skipped, on the
- * theory that decompose-and-strip also corrupts Japanese voicing (ジ vs シ,
- * encoded as a base character plus combining mark, same mechanism as a Latin
- * accent) — true, but preserving accents turned out to be the wrong fix for
- * the wrong problem: confirmed empirically against production tonight, ANY
- * non-ASCII character in a [locale]/[slug] segment 404s live on this
- * Next.js/Vercel setup regardless of script (French, Spanish, Portuguese,
- * Turkish and Polish accented slugs all failed, alongside Russian and
- * Japanese native-script ones) — Vercel's own x-matched-path header for a
- * failing request comes back mojibake'd, pointing to a platform-level
- * Latin-1/UTF-8 mismatch, not something this app's routing controls. Since
- * every slug has to end up ASCII-safe anyway (see isSlugSafe in
- * db/localize.ts, which now rejects non-ASCII outright and falls back to the
- * canonical slug), folding Latin diacritics here means French/Spanish/
- * Portuguese/Italian/German/Turkish/Polish still get real, readable slugs
- * instead of silently degrading to the English canonical one. Cyrillic and
- * CJK have no such fold without real script-aware romanization, so those
- * still degrade to canonical for now — a follow-up, not fixable by stripping
- * combining marks.
+ * Next.js passes such a segment to the page percent-encoded; pages decode it
+ * with decodeSlug (lib/i18n) before looking the content up.
  */
-function foldLatinDiacritics(input: string): string {
-  const EXTRA: Record<string, string> = { ß: "ss", ø: "o", Ø: "O", ł: "l", Ł: "L", đ: "d", Đ: "D", ı: "i", İ: "I", œ: "oe", Œ: "OE", æ: "ae", Æ: "AE" };
-  let out = "";
-  for (const ch of input.normalize("NFD")) {
-    if (/[̀-ͯ]/.test(ch)) {
-      const prev = out[out.length - 1];
-      if (prev && /[A-Za-z]/.test(prev)) continue; // drop: a plain Latin letter's own accent
-      out += ch; // keep: base wasn't plain ASCII (e.g. Japanese kana) — leave that script alone
-    } else {
-      out += EXTRA[ch] ?? ch;
-    }
-  }
-  return out;
-}
-
-// Cap by UTF-8 BYTE length, not character count: a build writes one output
-// file per generated path on a filesystem that limits a path segment to 255
-// bytes, and CJK/Arabic-script characters are multiple bytes each in UTF-8 —
-// an 80-*character* Japanese phrase can be 240+ bytes and crash the whole
-// build with ENAMETOOLONG (see the matching guard in db/localize.ts, which
-// also protects slugs already stored before this cap existed).
+// Cap by UTF-8 BYTES, not characters — a path segment is limited to 255 bytes
+// on the build filesystem and a non-ASCII character can expand to three
+// escaped bytes. 80 bytes keeps the escaped form under 240. Matches isSlugSafe.
 const MAX_SLUG_BYTES = 80;
-function slugify(input: string): string {
-  const cleaned = foldLatinDiacritics(input)
+const ARABIC_MARKS = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g;
+export function slugify(input: string): string {
+  const cleaned = input
+    .normalize("NFC")
+    .replace(ARABIC_MARKS, "")
     .toLowerCase()
     .trim()
     .replace(/[\s_]+/g, "-")
     .replace(/[^\p{L}\p{M}\p{N}-]+/gu, "")
     .replace(/-+/g, "-")
     .replace(/^-+|-+$/g, "");
-  let s = cleaned;
-  while (Buffer.byteLength(s, "utf8") > MAX_SLUG_BYTES && s.length) s = s.slice(0, -1);
-  return s.replace(/-+$/g, "");
-}
-
-// Letter-by-letter Arabic → Latin, good enough for a readable slug (not
-// meant to be a precise transliteration standard).
-const ARABIC_LATIN: Record<string, string> = {
-  ا: "a", أ: "a", إ: "a", آ: "a", ء: "a", ؤ: "w", ئ: "y", ى: "a", ة: "a",
-  ب: "b", ت: "t", ث: "th", ج: "j", ح: "h", خ: "kh", د: "d", ذ: "dh",
-  ر: "r", ز: "z", س: "s", ش: "sh", ص: "s", ض: "d", ط: "t", ظ: "z",
-  ع: "a", غ: "gh", ف: "f", ق: "q", ك: "k", ل: "l", م: "m", ن: "n",
-  ه: "h", و: "w", ي: "y",
-};
-// Tashkeel (diacritics) and tatweel carry no sound of their own — drop them
-// rather than let them survive transliteration as orphaned combining marks.
-const ARABIC_DIACRITIC = /[ؐ-ًؚ-ٰٟۖ-ۜ۟-۪ۨ-ۭـ]/;
-
-function transliterateArabic(text: string): string {
-  return [...text].map((ch) => (ARABIC_DIACRITIC.test(ch) ? "" : ARABIC_LATIN[ch] ?? ch)).join("");
-}
-
-// Letter-by-letter Cyrillic → Latin (common practical transliteration, not a
-// precise standard) — Russian slugs need this for the same reason Arabic
-// does; see the ASCII-only requirement explained above updateSlugs.
-const RUSSIAN_LATIN: Record<string, string> = {
-  а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "yo", ж: "zh", з: "z",
-  и: "i", й: "y", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r",
-  с: "s", т: "t", у: "u", ф: "f", х: "kh", ц: "ts", ч: "ch", ш: "sh", щ: "shch",
-  ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya",
-};
-function transliterateRussian(text: string): string {
-  return [...text.toLowerCase()].map((ch) => RUSSIAN_LATIN[ch] ?? ch).join("");
-}
-
-// Han characters → pinyin, via the `pinyin` package's built-in dictionary.
-function transliterateChinese(text: string): string {
-  const syllables = pinyin(text, { style: pinyin.STYLE_NORMAL });
-  return syllables.map((group) => group[0] ?? "").join(" ");
-}
-
-// Hangul is phonetic by construction (each syllable block decomposes
-// arithmetically into consonant+vowel+consonant), so this is an exact,
-// dictionary-free romanization — unlike Chinese/Japanese, there's no reading
-// ambiguity to resolve.
-function transliterateKorean(text: string): string {
-  return romanizeHangul(text);
-}
-
-// Kanji readings are context-dependent (unlike Hangul, and unlike Latin
-// accents), so this needs an actual morphological analyzer + dictionary —
-// initialized once per server process and reused, since loading it takes
-// ~500ms. Best-effort: if the dictionary can't load in this environment (a
-// platform/packaging issue, not a translation one), fall back to the
-// original text, which the existing non-ASCII guard (isSlugSafe in
-// db/localize.ts) already degrades safely to the canonical slug instead of
-// producing a broken link.
-let kuroshiroReady: Promise<import("kuroshiro").default> | null = null;
-function getKuroshiro() {
-  if (!kuroshiroReady) {
-    kuroshiroReady = (async () => {
-      const [{ default: Kuroshiro }, { default: KuromojiAnalyzer }] = await Promise.all([
-        import("kuroshiro"),
-        import("kuroshiro-analyzer-kuromoji"),
-      ]);
-      const instance = new Kuroshiro();
-      await instance.init(new KuromojiAnalyzer());
-      return instance;
-    })();
-  }
-  return kuroshiroReady;
-}
-async function transliterateJapanese(text: string): Promise<string> {
-  try {
-    const kuroshiro = await getKuroshiro();
-    return await kuroshiro.convert(text, { to: "romaji", mode: "spaced" });
-  } catch (e) {
-    console.error("Japanese romanization unavailable, keeping native script:", e);
-    return text;
-  }
-}
-
-// Only these four machine locales need script romanization — the rest
-// (fr/de/es/it/pt/tr/pl) are Latin-script and already folded to ASCII by
-// slugify()'s foldLatinDiacritics, and sw (Swahili) is ASCII already.
-async function romanizeSlugText(locale: string, text: string): Promise<string> {
-  if (locale === "ru") return transliterateRussian(text);
-  if (locale === "zh") return transliterateChinese(text);
-  if (locale === "ko") return transliterateKorean(text);
-  if (locale === "ja") return transliterateJapanese(text);
-  return text;
+  // Trim by whole code points so a multi-byte character is never cut in half.
+  const chars = [...cleaned];
+  while (chars.length && Buffer.byteLength(chars.join(""), "utf8") > MAX_SLUG_BYTES) chars.pop();
+  return chars.join("").replace(/-+$/g, "");
 }
 
 /**
@@ -226,18 +108,11 @@ async function romanizeSlugText(locale: string, text: string): Promise<string> {
  * is, so "video-production-egypt" becomes its own real phrase per language,
  * not a slugified copy of that language's (often much longer) title.
  *
- * Every locale's slug is romanized to plain ASCII, not just Arabic's: tested
- * directly against this site's [locale]/[slug] routes (dynamicParams = false),
- * ANY non-ASCII character in that segment 404s live regardless of script —
- * confirmed for accented Latin (French, Spanish, Portuguese, Turkish, Polish),
- * Cyrillic (Russian) and CJK (Japanese) alike, all while generateStaticParams
- * listed the page correctly. Vercel's own x-matched-path header for a failing
- * request came back mojibake'd, pointing to a platform-level encoding bug in
- * how it maps a request to a prerendered file for non-ASCII segments. See
- * romanizeSlugText above and foldLatinDiacritics in slugify: Arabic and
- * Russian use a hand-built letter map, Chinese uses pinyin, Korean uses exact
- * Hangul decomposition, Japanese uses a kuromoji-based analyzer (best-effort —
- * falls back to the canonical slug if that dictionary can't load).
+ * Each slug is written in its own language and script (see slugify) — an
+ * Arabic page gets an Arabic slug, a Russian page a Russian one.
+ *
+ * A slug the admin typed by hand is listed in data.slugsManual and is never
+ * overwritten here, whatever else changes.
  *
  * Re-translates only what's missing, unless the canonical slug itself changed
  * since the last pass — tracked via slugs.en, which exists purely as that
@@ -247,12 +122,15 @@ async function romanizeSlugText(locale: string, text: string): Promise<string> {
 async function updateSlugs(canonicalSlug: string, data: Record<string, Dict>, only?: readonly string[], force = false): Promise<{ warning?: string }> {
   if (!canonicalSlug) return {};
   const existing = (data.slugs as Dict | undefined) ?? {};
+  const manual = (data.slugsManual as Dict | undefined) ?? {};
+  const isManual = (loc: string) => Boolean(manual[loc]) && Boolean(existing[loc]);
   const changed = force || existing.en !== canonicalSlug;
   const slugs: Dict = changed ? { en: canonicalSlug } : { ...existing };
+  for (const loc of Object.keys(existing)) if (isManual(loc)) slugs[loc] = existing[loc];
 
   const targets = (only && only.length ? MACHINE_LOCALES.filter((l) => only.includes(l)) : [...MACHINE_LOCALES])
-    .filter((loc) => changed || !slugs[loc]);
-  const wantsAr = (!only || only.includes("ar")) && (changed || !slugs.ar);
+    .filter((loc) => !isManual(loc) && (changed || !slugs[loc]));
+  const wantsAr = (!only || only.includes("ar")) && !isManual("ar") && (changed || !slugs.ar);
   if (!targets.length && !wantsAr) { data.slugs = slugs; return {}; }
   if (!translationConfigured()) { data.slugs = slugs; return {}; }
 
@@ -265,14 +143,15 @@ async function updateSlugs(canonicalSlug: string, data: Record<string, Dict>, on
         const results = await translateFields([{ key: "slug", format: "text", text: words }], targets);
         for (const loc of targets) {
           const t = results.slug?.[loc];
-          if (t) slugs[loc] = slugify(await romanizeSlugText(loc, t));
+          const slug = t ? slugify(t) : "";
+          if (slug) slugs[loc] = slug;
         }
       } catch (e) {
         if (e instanceof PartialTranslateError) {
           const partial = e.partial as Record<string, Record<string, string>>;
           for (const loc of targets) {
-            const t = partial.slug?.[loc];
-            if (t) slugs[loc] = slugify(await romanizeSlugText(loc, t));
+            const slug = partial.slug?.[loc] ? slugify(partial.slug[loc]) : "";
+            if (slug) slugs[loc] = slug;
           }
         }
         throw e;
@@ -281,10 +160,12 @@ async function updateSlugs(canonicalSlug: string, data: Record<string, Dict>, on
     if (wantsAr) {
       try {
         const ar = await translatePair([{ key: "slug", format: "text", text: words }], "en", "ar");
-        if (ar.slug) slugs.ar = slugify(transliterateArabic(ar.slug));
+        const slug = ar.slug ? slugify(ar.slug) : "";
+        if (slug) slugs.ar = slug;
       } catch (e) {
         if (e instanceof PartialTranslateError && typeof e.partial.slug === "string") {
-          slugs.ar = slugify(transliterateArabic(e.partial.slug));
+          const slug = slugify(e.partial.slug);
+          if (slug) slugs.ar = slug;
         }
         throw e;
       }
@@ -304,8 +185,8 @@ async function updateSlugs(canonicalSlug: string, data: Record<string, Dict>, on
  * unchanged slug) so the admin can redo it on demand, e.g. to pick up a fix
  * to the translation without re-saving the whole item.
  */
-export async function retranslateSlug(canonicalSlug: string, existingSlugs?: Dict): Promise<{ slugs: Dict; warning?: string }> {
-  const data: Record<string, Dict> = { slugs: { ...(existingSlugs ?? {}) } };
+export async function retranslateSlug(canonicalSlug: string, existingSlugs?: Dict, manualSlugs?: Dict): Promise<{ slugs: Dict; warning?: string }> {
+  const data: Record<string, Dict> = { slugs: { ...(existingSlugs ?? {}) }, slugsManual: { ...(manualSlugs ?? {}) } };
   const { warning } = await updateSlugs(canonicalSlug, data, undefined, true);
   return { slugs: (data.slugs as Dict) ?? {}, warning };
 }

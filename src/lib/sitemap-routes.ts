@@ -3,7 +3,7 @@ import type { BlogPost, PortfolioItem, Service } from "@/types/api";
 import { getInsightsData, getWorkData, getServicesData } from "@/lib/page-data";
 import { POST_SLUG_ALIASES, SERVICE_SLUG_ALIASES } from "@/lib/legacy-redirects";
 import { INDEXABLE_LOCALES, LOCALE_TAGS, DEFAULT_LOCALE, localizedPath } from "@/lib/i18n";
-import { SITE_URL } from "@/lib/seo";
+import { absoluteUrl } from "@/lib/seo";
 import { isSlugSafe } from "@/lib/db/localize";
 
 /**
@@ -124,7 +124,7 @@ export function localeSitemapPath(locale: string) {
 // to name the identical string, or it advertises a URL the page itself does not
 // claim as canonical.
 function absolute(path: string, locale: string) {
-  return `${SITE_URL}${localizedPath(path, locale)}`.replace(/\/$/, "");
+  return absoluteUrl(localizedPath(path, locale)).replace(/\/$/, "");
 }
 
 function xmlEscape(value: string) {
