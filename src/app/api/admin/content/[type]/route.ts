@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { cleanDictResidue } from "@/lib/clean-html";
 import { requireAdmin } from "@/lib/admin-guard";
 import { contentType } from "@/lib/admin/content-types";
 import { getByType, createByType, logActivity } from "@/lib/db/repo";
@@ -36,7 +37,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const data: Record<string, Dict> = {};
   const issues = [];
   for (const field of def.i18n) {
-    const dict = (body.data?.[field.key] ?? {}) as Dict;
+    // Text pasted from an AI chat or Word carries wrapper markup that would block the save — strip it.
+    const dict = cleanDictResidue((body.data?.[field.key] ?? {}) as Dict);
     data[field.key] = dict;
     issues.push(...validateField(field.key, field.label, dict, { required: field.required }));
   }

@@ -1,4 +1,5 @@
 import "server-only";
+import { cleanPastedHtml, splitHtml } from "@/lib/clean-html";
 
 /**
  * Machine translation of the site's languages.
@@ -147,6 +148,48 @@ function providerTranslate(q: string[], target: string, format: "text" | "html",
 
 export type FieldToTranslate = { key: string; format: "text" | "html"; text: string };
 
+// A long article body can't be translated in one reply: the translation of a
+// 30k-character Russian page runs past the model's output limit and the whole
+// field fails ("cut off"). HTML is therefore translated in pieces of whole
+// blocks and joined back. Word/AI-chat residue is stripped from the source
+// first — it can be most of a field's size and is never translated anyway.
+const PART_MAX_CHARS = 8000;
+const PART_MARK = "\u0001part";
+
+function expandLong(fields: FieldToTranslate[]): FieldToTranslate[] {
+  return fields.flatMap((f) => {
+    if (f.format !== "html") return [f];
+    const text = cleanPastedHtml(f.text);
+    if (text.length <= PART_MAX_CHARS) return [{ ...f, text }];
+    return splitHtml(text, PART_MAX_CHARS).map((part, i) => ({ key: `${f.key}${PART_MARK}${i}`, format: f.format, text: part }));
+  });
+}
+
+function partCounts(fields: FieldToTranslate[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const f of fields) {
+    const at = f.key.indexOf(PART_MARK);
+    if (at > 0) counts.set(f.key.slice(0, at), (counts.get(f.key.slice(0, at)) ?? 0) + 1);
+  }
+  return counts;
+}
+
+/** Put each field's pieces back together; a language missing any piece is left out, never half-filled. */
+function joinParts(out: Record<string, Record<string, string>>, parts: Map<string, number>) {
+  for (const [base, count] of parts) {
+    const keyOf = (i: number) => `${base}${PART_MARK}${i}`;
+    const locales = new Set<string>();
+    for (let i = 0; i < count; i++) for (const loc of Object.keys(out[keyOf(i)] ?? {})) locales.add(loc);
+    const joined: Record<string, string> = {};
+    for (const loc of locales) {
+      const pieces = Array.from({ length: count }, (_, i) => out[keyOf(i)]?.[loc]);
+      if (pieces.every((p) => typeof p === "string")) joined[loc] = (pieces as string[]).join("");
+    }
+    for (let i = 0; i < count; i++) delete out[keyOf(i)];
+    out[base] = joined;
+  }
+}
+
 /**
  * Thrown when some but not all requested translations succeeded — carries
  * whatever DID complete so a caller (see apply.ts) can save that instead of
@@ -186,8 +229,9 @@ export async function translateFields(
   only?: readonly string[],
 ): Promise<Record<string, Record<MachineLocale, string>>> {
   const out: Record<string, Record<string, string>> = {};
-  const nonEmpty = fields.filter((f) => f.text && f.text.trim());
+  const nonEmpty = expandLong(fields.filter((f) => f.text && f.text.trim()));
   if (!nonEmpty.length) return out as Record<string, Record<MachineLocale, string>>;
+  const parts = partCounts(nonEmpty);
   // Pre-create each field's bucket so parallel workers never race to init it.
   for (const f of nonEmpty) out[f.key] = {};
   const targets = only && only.length ? MACHINE_LOCALES.filter((l) => only.includes(l)) : MACHINE_LOCALES;
@@ -225,6 +269,7 @@ export async function translateFields(
     }
   }
   await Promise.all(Array.from({ length: Math.min(CONCURRENCY, tasks.length) }, worker));
+  joinParts(out, parts);
   if (failures.length) throw new PartialTranslateError(failures.join(" | "), out);
   return out as Record<string, Record<MachineLocale, string>>;
 }
@@ -237,8 +282,9 @@ export async function translateFields(
  */
 export async function translatePair(fields: FieldToTranslate[], source: string, target: string): Promise<Record<string, string>> {
   const out: Record<string, string> = {};
-  const nonEmpty = fields.filter((f) => f.text && f.text.trim());
+  const nonEmpty = expandLong(fields.filter((f) => f.text && f.text.trim()));
   if (!nonEmpty.length) return out;
+  const parts = partCounts(nonEmpty);
   const failures: string[] = [];
   for (const format of ["text", "html"] as const) {
     const group = nonEmpty.filter((f) => f.format === format);
@@ -253,6 +299,12 @@ export async function translatePair(fields: FieldToTranslate[], source: string, 
         failures.push(`${format} (${part.map((f) => f.key).join(",")}): ${(e as Error).message || e}`);
       }
     }
+  }
+  // Pieces of one field come back keyed by piece; join each field's pieces.
+  for (const [base, count] of parts) {
+    const pieces = Array.from({ length: count }, (_, i) => out[`${base}${PART_MARK}${i}`]);
+    for (let i = 0; i < count; i++) delete out[`${base}${PART_MARK}${i}`];
+    if (pieces.every((p) => typeof p === "string")) out[base] = pieces.join("");
   }
   if (failures.length) throw new PartialTranslateError(failures.join(" | "), out);
   return out;
