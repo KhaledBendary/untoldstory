@@ -3,7 +3,6 @@ import { MACHINE_LOCALES } from "@/lib/translate";
 import { applyMachineTranslations } from "@/lib/translate/apply";
 import { extractSeoForEditor, assembleSeo } from "@/lib/admin/seo-fields";
 import { saveByType } from "@/lib/db/repo";
-import { addLocaleSlugRedirects } from "@/lib/slug-redirects";
 import type { ContentType } from "@/lib/admin/content-types";
 
 export type Dict = Record<string, string>;
@@ -19,11 +18,6 @@ export async function translateOne(type: CType, def: ContentType, row: Row, only
     data[field.key] = { ...(row.data[field.key] || {}) };
   }
   Object.assign(data, extractSeoForEditor(seo as never, def));
-  // The slugs already saved (and which of them were typed by hand) — without
-  // these every run would regenerate every language's slug from scratch.
-  const savedSlugs = { ...((row.data.slugs as Dict | undefined) ?? {}) };
-  data.slugs = { ...savedSlugs };
-  data.slugsManual = { ...((row.data.slugsManual as Dict | undefined) ?? {}) };
   // Snapshot before translation mutates `data` — passing this (instead of
   // undefined) lets applyMachineTranslations skip locales a field already has,
   // instead of resending every field of every item on every bulk run. That
@@ -32,7 +26,7 @@ export async function translateOne(type: CType, def: ContentType, row: Row, only
   const existingFlat: Record<string, Dict> = {};
   for (const [key, dict] of Object.entries(data)) existingFlat[key] = { ...dict };
 
-  const { warning } = await applyMachineTranslations(def, data, existingFlat, only, row.slug, force);
+  const { warning } = await applyMachineTranslations(def, data, existingFlat, only, force);
   if (warning) return { ok: false, warning };
 
   assembleSeo(data, seo as never);
@@ -67,6 +61,5 @@ export async function translateOne(type: CType, def: ContentType, row: Row, only
   }
 
   await saveByType(type, row.slug, fixed, sparse as Record<string, Dict>);
-  await addLocaleSlugRedirects(type, row.slug, savedSlugs, sparse.slugs as Dict | undefined);
   return { ok: true, data: sparse as Record<string, Dict> };
 }

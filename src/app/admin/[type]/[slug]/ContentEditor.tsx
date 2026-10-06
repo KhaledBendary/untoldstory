@@ -368,7 +368,7 @@ export default function ContentEditor({
 
       <div style={{ display: "grid", gap: 6, marginBottom: 18 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <span style={lbl}>المعرّف (slug) *{lang !== "en" && (manualState[lang] ? " — مكتوب يدوياً (الترجمة التلقائية مش هتغيّره)" : " — بلغة الصفحة، مترجم تلقائياً وتقدر تعدّله")}</span>
+          <span style={lbl}>المعرّف (slug) *{lang !== "en" && (manualState[lang] ? " — مكتوب يدوياً" : " — يدوي: اكتبه بإيدك أو اضغط زرار الترجمة")}</span>
           {!create && (
             <button type="button" onClick={() => translateSlugNow()} disabled={slugTransBusy} style={aiBtn}>
               {slugTransBusy ? "بيترجم…" : "🌐 ترجم سلج كل اللغات"}
@@ -392,7 +392,7 @@ export default function ContentEditor({
         )}
         {lang !== "en" && !create && (
           <span style={{ fontSize: 12, color: "var(--muted, #888)" }}>
-            اكتب السلج بلغة الصفحة (حروف وأرقام وشرطة بين الكلمات). لو مسحته هيرجع تلقائي. الرابط القديم بيتحوّل (301) تلقائي بعد النشر الجاي.
+            السلج مبيتترجمش لوحده عند الحفظ — اكتبه بلغة الصفحة (حروف وأرقام وشرطة بين الكلمات) أو اضغط زرار الترجمة. لو فاضي الصفحة بتاخد سلج الإنجليزي. الرابط القديم بيتحوّل (301) تلقائي بعد النشر الجاي.
           </span>
         )}
         {slugTransError && <span style={{ fontSize: 12, color: "var(--danger)" }}>{slugTransError}</span>}

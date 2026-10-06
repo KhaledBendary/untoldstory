@@ -54,7 +54,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const skipTranslate = body.skipTranslate === true;
   const { warning } = skipTranslate
     ? {}
-    : await applyMachineTranslations(def, data, undefined, undefined, slug);
+    : await applyMachineTranslations(def, data, undefined, undefined);
 
   // Fold the flat seo.* fields into the nested per-locale data.seo.
   assembleSeo(data, undefined);

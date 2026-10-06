@@ -213,7 +213,6 @@ export async function applyMachineTranslations(
   data: Record<string, Dict>, // { fieldKey: { en, ar, ... } } — mutated in place
   existing: Record<string, Dict> | undefined,
   only?: readonly string[], // limit to these locales (e.g. one language at a time)
-  canonicalSlug?: string, // the record's real slug — translated into data.slugs per locale
   // Bypasses the "already translated?" check below for whatever locale(s)
   // `only` names — used by the "ترجم [لغة] بس" button, where the admin is
   // explicitly saying an existing (non-empty, non-obviously-stale) value is
@@ -256,16 +255,17 @@ export async function applyMachineTranslations(
     if (en === prevEn && !missing) continue; // unchanged and already translated
     toTranslate.push({ key: field.key, format: isHtml ? "html" : "text", text: data[field.key].en });
   }
-  const slugWarning = canonicalSlug ? (await updateSlugs(canonicalSlug, data, only)).warning : undefined;
+  // Slugs are not translated here: they change only when the admin types one or
+  // presses a slug button (retranslateSlug), never as a side effect of saving.
 
-  if (!toTranslate.length) return { warning: combineWarnings(arWarning, slugWarning) };
+  if (!toTranslate.length) return { warning: combineWarnings(arWarning) };
   if (!translationConfigured()) {
-    return { warning: combineWarnings(arWarning, slugWarning) || "الترجمة الآلية مش متظبطة — اتحفظ زي ما اتكتب بس" };
+    return { warning: combineWarnings(arWarning) || "الترجمة الآلية مش متظبطة — اتحفظ زي ما اتكتب بس" };
   }
   try {
     const results = await translateFields(toTranslate, only);
     for (const [key, dict] of Object.entries(results)) data[key] = { ...data[key], ...dict };
-    return { warning: combineWarnings(arWarning, slugWarning) };
+    return { warning: combineWarnings(arWarning) };
   } catch (e) {
     // A PartialTranslateError still carries whatever locales/fields DID
     // translate — apply those instead of discarding the whole batch over one
@@ -277,7 +277,7 @@ export async function applyMachineTranslations(
     }
     const detail = (e as Error).message || "";
     console.error("Machine translation failed:", e);
-    return { warning: combineWarnings(arWarning, slugWarning, `فشلت الترجمة الآلية لبعض اللغات — ${detail.slice(0, 300)}`) };
+    return { warning: combineWarnings(arWarning, `فشلت الترجمة الآلية لبعض اللغات — ${detail.slice(0, 300)}`) };
   }
 }
 
