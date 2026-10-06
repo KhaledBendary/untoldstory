@@ -352,6 +352,19 @@ export async function listByType(type: keyof typeof TABLES) {
   return TABLES[type]();
 }
 
+/**
+ * Every item's per-language slugs (data.slugs) except one item's — just that
+ * one JSON key, not the rows: a service's full text is hundreds of KB, and
+ * the duplicate-slug check runs on every save.
+ */
+export async function otherSlugsByType(type: keyof typeof TABLES, exceptSlug: string): Promise<{ slug: string; slugs: Record<string, string> }[]> {
+  const rows =
+    type === "services" ? await sql`select slug, data->'slugs' as slugs from services where slug <> ${exceptSlug}`
+    : type === "projects" ? await sql`select slug, data->'slugs' as slugs from projects where slug <> ${exceptSlug}`
+    : await sql`select slug, data->'slugs' as slugs from posts where slug <> ${exceptSlug}`;
+  return rows.map((r) => ({ slug: r.slug as string, slugs: (r.slugs as Record<string, string> | null) ?? {} }));
+}
+
 export async function getByType(type: keyof typeof TABLES, slug: string) {
   if (type === "services") return getService(slug);
   if (type === "projects") return getProject(slug);

@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { cleanDictResidue } from "@/lib/clean-html";
 import { requireAdmin } from "@/lib/admin-guard";
 import { contentType } from "@/lib/admin/content-types";
-import { getByType, listByType, saveByType, deleteByType, logActivity, renameSlugByType, addRedirect } from "@/lib/db/repo";
+import { getByType, otherSlugsByType, saveByType, deleteByType, logActivity, renameSlugByType, addRedirect } from "@/lib/db/repo";
 import { validateField, hasErrors, type Dict } from "@/lib/content-validate";
 import { applyMachineTranslations } from "@/lib/translate/apply";
 import { assembleSeo, extractSeoForEditor } from "@/lib/admin/seo-fields";
@@ -88,10 +88,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   data.slugsManual = { ...((existingData?.slugsManual as Dict | undefined) ?? {}) };
   if (body.slugs && typeof body.slugs === "object") {
     const taken = new Map<string, string>(); // "loc/slug" → owner, among the other items of this type
-    const others = (await listByType(def.table)) as unknown as { slug: string; data?: { slugs?: Dict } }[];
-    for (const o of others) {
-      if (o.slug === slug) continue;
-      for (const [loc, v] of Object.entries(o.data?.slugs ?? {})) if (v) taken.set(`${loc}/${v}`, o.slug);
+    for (const o of await otherSlugsByType(def.table, slug)) {
+      for (const [loc, v] of Object.entries(o.slugs)) if (v) taken.set(`${loc}/${v}`, o.slug);
     }
     for (const loc of LOCALE_CODES) {
       if (loc === DEFAULT_LOCALE) continue;
