@@ -140,7 +140,29 @@ async function dbRedirects() {
     const sql = postgres(url, { ssl: "require", max: 1, connect_timeout: 15, prepare: false, onnotice: () => {} });
     try {
       const rows = await sql<{ from_path: string; to_path: string }[]>`select from_path, to_path from redirects`;
-      return rows.map((r) => ({ source: r.from_path, destination: r.to_path, permanent: true }));
+      const explicit = rows.map((r) => ({ source: r.from_path, destination: r.to_path, permanent: true }));
+
+      // Every item with its own slug in a language: the English slug under that
+      // language's prefix (/ar/insights/how-to-...) is the same page and must go
+      // to the localized one. Derived from the data on each build, so it can't
+      // go stale the way a hand-kept redirect row does.
+      const items = await sql<{ base: string; slug: string; slugs: Record<string, string> | null }[]>`
+        select '/services' as base, slug, data->'slugs' as slugs from services
+        union all select '/work', slug, data->'slugs' from projects
+        union all select '/insights', slug, data->'slugs' from posts`;
+      const taken = new Set(explicit.map((r) => r.source));
+      const derived: { source: string; destination: string; permanent: true }[] = [];
+      for (const item of items) {
+        for (const [loc, native] of Object.entries(item.slugs ?? {})) {
+          if (loc === "en" || typeof native !== "string" || !native || native === item.slug) continue;
+          if (/[\s/\\?#%]/.test(native)) continue; // unusable as a path segment
+          const source = `/${loc}${item.base}/${item.slug}`;
+          if (taken.has(source)) continue;
+          taken.add(source);
+          derived.push({ source, destination: `/${loc}${item.base}/${native}`, permanent: true });
+        }
+      }
+      return [...explicit, ...derived];
     } finally {
       await sql.end({ timeout: 5 });
     }
