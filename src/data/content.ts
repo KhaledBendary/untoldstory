@@ -501,35 +501,6 @@ const POSTS_STATIC: Post[] = [
       'Finally, verify local reach. Filming in Egypt demands real on-ground capability: permits, locations, crews and logistics across Cairo, Giza, the desert and beyond. That is the ground we stand on.',
     ],
   },
-  {
-    slug: 'tv-commercial-production-in-egypt',
-    title: 'TV Commercial Production in Egypt: Complete Guide 2026',
-    date: '2026-06-15',
-    category: 'Blogs',
-    excerpt: 'Types, workflow, industries, trends and pricing of commercial production in Egypt — the complete 2026 guide.',
-    image: '/images/cinema-camera-red-dragon.jpg',
-    body: [
-      'Egypt remains the production powerhouse of the Arab world — deep crew benches, world-class locations and a mature advertising industry make it a natural home for TV commercial production.',
-      'Commercials come in many forms: classic 30-second TV spots, digital-first films, performance cutdowns, product demos and brand anthems. Each format has its own grammar, and the best campaigns are designed as families of assets from day one.',
-      'The workflow is disciplined: concept and script development, storyboards and pre-visualization, casting, art direction, shoot, then post — edit, grade, sound, motion graphics, versioning and localization for every market the campaign touches.',
-      'Budgets vary with ambition: talent, locations, art builds and post complexity are the main drivers. What matters is predictability — a detailed, honest budget approved before the shoot, with no surprises after it.',
-      'The 2026 trend lines are clear: AI-assisted pre-visualization and post, motion-led brand systems, and campaigns built as multi-format ecosystems rather than single spots. We build for exactly that.',
-    ],
-  },
-  {
-    slug: 'corporate-video-production-in-cairo',
-    title: 'Corporate Video Production in Cairo: What Every Brand Needs to Know',
-    date: '2026-06-18',
-    category: 'Company Insights',
-    excerpt: 'Why corporate video matters, and how full-cycle production from Media Production City changes the equation.',
-    image: '/images/apache-corporate-energy-egypt.jpg',
-    body: [
-      'Corporate video is no longer a nice-to-have. Leadership communication, employer branding, safety training, investor relations and sales enablement all move faster on film.',
-      'Cairo offers a unique advantage: Egyptian Media Production City concentrates studios, crews, equipment and post facilities in one ecosystem — and that is where we are based.',
-      'The difference between a forgettable corporate film and a powerful one is story. Operations, factories and facilities are cinematic when they are filmed with intent — real people, real scale, real light.',
-      'A full-cycle partner takes you from messaging strategy through production to multi-version delivery and localization — one team, one standard, one point of accountability.',
-    ],
-  },
 ];
 
 export const POSTS: Post[] = [...SEO_GENERATED_POSTS, ...POSTS_STATIC];
