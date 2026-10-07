@@ -197,7 +197,11 @@ export async function getInsightsData(locale?: string): Promise<BlogPost[]> {
   try {
     const data = await api.getBlogPosts({ page: 1, per_page: 50, locale });
     const items = (data?.items || []).map((post) => normalizeBlogPost(post, locale));
-    const seen = new Set(items.map((p) => p.slug));
+    // A CMS article is the same article as a built-in one when either its own or
+    // its canonical (English) slug matches. Comparing only the localized slug
+    // listed every article twice in a language that has its own slug — once
+    // translated, once as the untranslated built-in copy.
+    const seen = new Set(items.flatMap((p) => (p.canonicalSlug && p.canonicalSlug !== p.slug ? [p.slug, p.canonicalSlug] : [p.slug])));
     return [...items, ...extras.filter((p) => !seen.has(p.slug))];
   } catch (e) {
     console.warn("Using fallback insights:", e instanceof Error ? e.message : e);
