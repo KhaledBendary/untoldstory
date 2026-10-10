@@ -457,50 +457,6 @@ export interface Post {
 }
 
 const POSTS_STATIC: Post[] = [
-  {
-    slug: 'the-video-production-journey-from-idea-to-impact',
-    title: 'The Video Production Journey: From Idea to Impact',
-    date: '2025-06-24',
-    category: 'Production',
-    excerpt: 'How a film moves from a spark of an idea to measurable business impact — pre-production, filming, post and distribution, explained.',
-    image: '/images/film-crew-pyramids-production.jpg',
-    body: [
-      'Every impactful film starts long before the camera rolls. The production journey is a chain of decisions — and each link either protects or erodes the final result.',
-      'Pre-production is where the film is truly made: objectives, script, storyboards, casting, locations, permits and schedule. A disciplined pre-production phase is what makes budgets predictable and results premium.',
-      'Production is execution under pressure. The right crew, equipment and on-ground logistics turn the plan into footage — whether that is a commercial set in Cairo or a documentary unit in the desert.',
-      'Post-production shapes the story: offline edit, color grade, sound design, motion graphics, versioning and localization. Then distribution puts the work to work — broadcast, digital, social cutdowns and performance assets.',
-      'When one team owns the complete cycle, nothing gets lost between stages. That is how an idea becomes impact.',
-    ],
-  },
-  {
-    slug: 'why-every-brand-needs-a-story-that-moves-people',
-    title: 'Why Every Brand Needs a Story That Moves People',
-    date: '2025-07-15',
-    category: 'Video',
-    excerpt: 'Storytelling is not decoration — it is a strategic brand asset that creates connection, memorability, trust and action.',
-    image: '/images/commercial-food-advertising.jpg',
-    body: [
-      'People forget specifications. They remember stories. A brand story that moves people does three things: it creates emotional connection, it makes the brand memorable, and it builds the trust that precedes action.',
-      'In a feed of infinite content, attention is earned by meaning, not volume. Story-first films give audiences a reason to care — a character, a tension, a resolution — before they are asked to buy.',
-      'The strongest brand stories are true: real people, real operations, real impact. Documentary craft applied to brand communication is the most credible form of advertising there is.',
-      'Story is a system, not a single film. One narrative spine can power a brand film, social cutdowns, photography and internal communications — consistent everywhere, efficient everywhere.',
-    ],
-  },
-  {
-    slug: 'how-to-choose-a-media-production-agency-in-egypt',
-    title: 'How to Choose a Media Production Agency in Egypt?',
-    date: '2026-01-30',
-    category: 'Production',
-    excerpt: 'A practical guide to evaluating production partners — from strategic thinking and process to local reach and professionalism.',
-    image: '/images/on-ground-production-giza.jpg',
-    body: [
-      'Choosing a production agency in Egypt is a strategic decision. The right partner protects your budget, your timeline and your brand; the wrong one costs all three.',
-      'Start with objectives: a serious agency asks what the film must achieve before it talks about cameras. Look for strategic thinking and storytelling capability, not just equipment lists.',
-      'Examine process. Transparent budgeting, clear scheduling, permit handling and a defined post-production workflow are the difference between a smooth production and a rescue mission.',
-      'Check service integration. An agency that covers the full cycle — development, production, post, localization and marketing — removes the friction and finger-pointing of multi-vendor setups.',
-      'Finally, verify local reach. Filming in Egypt demands real on-ground capability: permits, locations, crews and logistics across Cairo, Giza, the desert and beyond. That is the ground we stand on.',
-    ],
-  },
 ];
 
 export const POSTS: Post[] = [...SEO_GENERATED_POSTS, ...POSTS_STATIC];

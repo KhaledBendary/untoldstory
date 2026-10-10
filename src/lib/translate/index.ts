@@ -26,7 +26,7 @@ const ENDPOINT = "https://translation.googleapis.com/language/translate/v2";
 // Keep each request under Google's payload limits: cap the batch by count and by
 // total characters, so a few long article bodies don't overflow one call.
 const MAX_ITEMS_PER_REQUEST = 100;
-const MAX_CHARS_PER_REQUEST = 25_000;
+const MAX_CHARS_PER_REQUEST = 6_000;
 
 /**
  * Provider is chosen by whichever key is set, in this order:
@@ -43,14 +43,16 @@ const LOCALE_NAMES: Record<string, string> = {
 };
 
 /** Translate a batch of strings from one language to another via an LLM, preserving HTML. */
-function llmPrompt(q: string[], target: string, format: "text" | "html", source: string): string {
+function llmPrompt(q: string[], target: string, format: "text" | "html", source: string, asObject = false): string {
   const from = LOCALE_NAMES[source] || source;
   const to = LOCALE_NAMES[target] || target;
   return [
     `Translate each string in the JSON array below from ${from} to ${to}.`,
     format === "html" ? "The strings are HTML — translate only the human-readable text and keep every HTML tag, attribute and entity exactly as-is." : "The strings are plain text.",
     "Keep brand names, URLs and email addresses unchanged. Do not add or remove items.",
-    `Return ONLY a JSON array of ${q.length} translated strings in the same order — no explanation, no code fence.`,
+    asObject
+      ? `Return ONLY a JSON object {"translations": [...]} whose array holds the ${q.length} translated strings in the same order — no explanation, no code fence.`
+      : `Return ONLY a JSON array of ${q.length} translated strings in the same order — no explanation, no code fence.`,
     "",
     JSON.stringify(q),
   ].join("\n");
@@ -58,9 +60,12 @@ function llmPrompt(q: string[], target: string, format: "text" | "html", source:
 
 function parseArray(raw: string, n: number): string[] {
   let s = raw.trim().replace(/^```(?:json)?/i, "").replace(/```$/,"").trim();
-  const start = s.indexOf("["); const end = s.lastIndexOf("]");
-  if (start >= 0 && end > start) s = s.slice(start, end + 1);
-  const arr = JSON.parse(s);
+  if (!s.startsWith("{")) {
+    const start = s.indexOf("["); const end = s.lastIndexOf("]");
+    if (start >= 0 && end > start) s = s.slice(start, end + 1);
+  }
+  const parsed = JSON.parse(s);
+  const arr = Array.isArray(parsed) ? parsed : (parsed as { translations?: unknown })?.translations;
   if (!Array.isArray(arr) || arr.length !== n) throw new Error("LLM translation: array length mismatch");
   return arr.map((x) => String(x));
 }
@@ -87,9 +92,12 @@ async function openaiTranslate(q: string[], target: string, format: "text" | "ht
       // whole batch (including sibling fields that translated fine) before
       // partial-result handling existed. Generous enough for a full post body.
       max_tokens: 16000,
+      // JSON mode: the model otherwise sometimes returns HTML with unescaped
+      // double quotes inside the JSON strings, which fails to parse.
+      response_format: { type: "json_object" },
       messages: [
         { role: "system", content: "You are a professional website localizer. Output only what is asked." },
-        { role: "user", content: llmPrompt(q, target, format, source) },
+        { role: "user", content: llmPrompt(q, target, format, source, true) },
       ],
     }),
   });
@@ -153,7 +161,7 @@ export type FieldToTranslate = { key: string; format: "text" | "html"; text: str
 // field fails ("cut off"). HTML is therefore translated in pieces of whole
 // blocks and joined back. Word/AI-chat residue is stripped from the source
 // first — it can be most of a field's size and is never translated anyway.
-const PART_MAX_CHARS = 8000;
+const PART_MAX_CHARS = 3500;
 const PART_MARK = "\u0001part";
 
 function expandLong(fields: FieldToTranslate[]): FieldToTranslate[] {
