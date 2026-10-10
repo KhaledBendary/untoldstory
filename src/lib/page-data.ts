@@ -4,7 +4,6 @@ import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { POSTS as FALLBACK_POSTS, PROJECTS as FALLBACK_PROJECTS, SERVICES as FALLBACK_SERVICES } from "@/data/content";
 import { POST_SLUG_ALIASES, POST_SLUGS_THAT_REDIRECT, legacyDestination, relatedPostSlugs, relatedServiceSlugs } from "@/lib/legacy-redirects";
 import { isoPostDate } from "@/lib/dates";
-import { postTranslation } from "@/data/post-translations";
 import { isUnreadable, nameFromSlug } from "@/lib/seo";
 import type { About, BlogPost, LayoutData, PortfolioItem, Service } from "@/types/api";
 
@@ -67,23 +66,12 @@ function withDisplayTitle<T extends { slug?: string; title?: string }>(record: T
   return record.title ? record : { ...record, title: nameFromSlug(record.slug) };
 }
 
-function translatedBody(body: string[]): string {
-  return body.map((block) => block.startsWith("<") ? block : `<p>${block}</p>`).join("");
-}
-
 function normalizeBlogPost(post: BlogPost, locale?: string): BlogPost {
   const iso = isoPostDate(post);
-  const normalized = withDisplayTitle({ ...post, date: iso || post.date, publishedAt: iso || post.publishedAt });
-  const translated = locale ? postTranslation(normalized.slug, locale) : undefined;
-  if (!translated) return normalized;
-
-  return {
-    ...normalized,
-    title: translated.title,
-    excerpt: translated.excerpt,
-    body: translatedBody(translated.body),
-    category: locale === "ar" ? "محتوى" : normalized.category,
-  };
+  // The article exactly as the CMS holds it in this language. Translations used to be
+  // overlaid here from a file in the code, which silently overrode whatever was
+  // edited in the dashboard.
+  return withDisplayTitle({ ...post, date: iso || post.date, publishedAt: iso || post.publishedAt });
 }
 
 /*
@@ -95,10 +83,7 @@ function normalizeBlogPost(post: BlogPost, locale?: string): BlogPost {
  */
 function allMappedFallbackPosts(locale?: string): BlogPost[] {
   return FALLBACK_POSTS.map((p) => {
-    const translated = locale ? postTranslation(p.slug, locale) : undefined;
-    const title = translated?.title ?? p.title;
-    const excerpt = translated?.excerpt ?? p.excerpt;
-    const body = translated?.body ?? p.body;
+    const { title, excerpt, body } = p;
 
     return {
       id: p.slug,
