@@ -21,8 +21,13 @@ export const maxDuration = 300;
  * the same pipeline as everything else.
  *
  * Machine-to-machine, so no admin session: a shared secret (SEO_TOOL_SECRET)
- * set on both projects. Without it configured here, the endpoint refuses and the
- * SEO tool falls back to the legacy file path.
+ * set on both projects. Without it configured here, the endpoint refuses.
+ *
+ * An article arrives as a DRAFT: it shows up in the dashboard, is invisible to
+ * visitors, triggers no deploy and spends no translation tokens. It goes live only
+ * when someone publishes it from the dashboard (after translating it and choosing
+ * its image) — or when the caller passes `publish: true`. A re-publish of an
+ * article that already exists replaces its English text and keeps its status.
  */
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -63,6 +68,7 @@ export async function POST(request: NextRequest) {
   if (title.length < 3) return NextResponse.json({ error: "title-required" }, { status: 422 });
   if (bodyHtml.length < 80 || bodyHtml.length > 400_000) return NextResponse.json({ error: "invalid-body-length" }, { status: 422 });
 
+  const publish = body.publish === true;
   const def = CONTENT_TYPES.posts;
   const existing = (await getByType("posts", slug)) as unknown as Row | null;
   if (existing && body.overwrite !== true) return NextResponse.json({ error: "exists", slug }, { status: 409 });
@@ -87,7 +93,7 @@ export async function POST(request: NextRequest) {
     // (image, category, flags) and every other locale as the admin left them.
     const seoDoc = (existing.data as { seo?: Record<string, Record<string, string>> })?.seo;
     assembleSeo(data, seoDoc as never);
-    await saveByType("posts", slug, fixedFromRow(existing), data);
+    await saveByType("posts", slug, fixedFromRow(existing), data, publish ? "published" : undefined);
   } else {
     const fixed: Record<string, string | boolean | number | null> = {
       featured_image: str(body.featuredImage, 300) || "/images/film-crew-pyramids-production.jpg",
@@ -100,7 +106,7 @@ export async function POST(request: NextRequest) {
       scheduled_at: null,
     };
     assembleSeo(data, undefined);
-    await createByType("posts", slug, fixed, data, "published");
+    await createByType("posts", slug, fixed, data, publish ? "published" : "draft");
   }
 
   await logActivity({
@@ -108,12 +114,13 @@ export async function POST(request: NextRequest) {
     action: existing ? "update" : "create",
     entity: "posts",
     ref: slug,
-    detail: "نُشرت من نظام السيو",
+    detail: existing ? "اتحدّثت من نظام السيو" : publish ? "اتنشرت من نظام السيو" : "نزلت مسودة من نظام السيو",
   });
 
-  // Translate after the response goes out — twelve languages of a full article
-  // takes longer than the SEO tool's own request is allowed to wait.
-  const translating = translationConfigured();
+  // Translation is opt-in (`translate: true`): a draft is translated from the
+  // dashboard when it is ready. Done after the response goes out — thirteen
+  // languages of a full article take longer than the SEO tool will wait.
+  const translating = body.translate === true && translationConfigured();
   if (translating) {
     after(async () => {
       try {
@@ -129,6 +136,7 @@ export async function POST(request: NextRequest) {
     ok: true,
     slug,
     created: !existing,
+    status: existing ? ((existing as unknown as { status?: string }).status ?? "published") : publish ? "published" : "draft",
     translating,
     url: `/insights/${slug}`,
     adminUrl: `/admin/posts/${slug}`,
