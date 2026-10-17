@@ -136,9 +136,14 @@ export default async function Page({ params }: Props) {
       description: buildDescription(service.shortDesc),
       url: absoluteUrl(localizedPath(`/services/${slug}`, locale)),
       image: service.imageUrl ? absoluteUrl(service.imageUrl) : undefined,
-      provider: { "@type": "Organization", name: "Global Untold Story", url: "https://globaluntoldstory.com/" },
+      provider: {
+        "@type": "Organization",
+        name: "Global Untold Story",
+        url: "https://globaluntoldstory.com/",
+        logo: { "@type": "ImageObject", url: absoluteUrl("/images/logo-white.png") },
+      },
       brand: { "@type": "Organization", name: "Global Untold Story" },
-      areaServed: ["Egypt", "UAE", "Saudi Arabia", "MENA"],
+      areaServed: ["Egypt", "United Arab Emirates", "Saudi Arabia", "MENA"],
     };
   }
 

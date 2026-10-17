@@ -128,19 +128,35 @@ function normOffice(o: GeoOffice, i: number): GeoOffice {
 // ---- schema builders (identical output shape to the previous hard-coded ones) ----
 
 export function organizationSchema(s: GeoSettings) {
+  const primaryOffice = s.offices[0];
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": `${SITE_URL}/#organization`,
     name: s.organization.name,
     url: `${SITE_URL}/`,
-    logo: `${SITE_URL}/images/logo-white.png`,
+    logo: {
+      "@type": "ImageObject",
+      url: `${SITE_URL}/images/logo-white.png`,
+      caption: s.organization.name,
+    },
+    image: `${SITE_URL}/images/logo-white.png`,
     description: s.organization.description,
     email: s.organization.email,
     founder: { "@type": "Person", name: "Khaled Bendary", jobTitle: "CEO" },
-    address: s.offices.map((o) => ({ "@type": "PostalAddress", addressLocality: o.locality, addressCountry: o.country })),
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: primaryOffice?.locality || "Egyptian Media Production City, 6th of October City",
+      addressLocality: "6th of October City",
+      addressRegion: primaryOffice?.region || "Giza",
+      addressCountry: primaryOffice?.country || "EG",
+    },
     contactPoint: s.offices.filter((o) => o.phone).map((o) => ({
-      "@type": "ContactPoint", telephone: o.phone, contactType: "sales", areaServed: o.country, availableLanguage: ["en", "ar"],
+      "@type": "ContactPoint",
+      telephone: o.phone,
+      contactType: "customer service",
+      areaServed: o.country,
+      availableLanguage: ["en", "ar"],
     })),
     sameAs: s.organization.sameAs,
     slogan: s.organization.slogan,
@@ -165,9 +181,19 @@ export function officeSchemas(s: GeoSettings) {
     image: `${SITE_URL}/images/on-ground-production-giza.jpg`,
     logo: `${SITE_URL}/images/logo-white.png`,
     email: s.organization.email,
-    ...(office.phone ? { telephone: office.phone } : {}),
-    parentOrganization: { "@id": `${SITE_URL}/#organization` },
-    address: { "@type": "PostalAddress", addressLocality: office.locality, addressRegion: office.region, addressCountry: office.country },
+    telephone: office.phone || "+201001299639",
+    parentOrganization: {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: s.organization.name,
+    },
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: office.locality,
+      addressLocality: office.locality,
+      addressRegion: office.region,
+      addressCountry: office.country,
+    },
     ...(office.lat != null && office.lng != null
       ? { geo: { "@type": "GeoCoordinates", latitude: office.lat, longitude: office.lng } }
       : {}),

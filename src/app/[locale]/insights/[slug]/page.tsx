@@ -118,17 +118,32 @@ export default async function Page({ params }: Props) {
     const post = initialData.data.post;
     name = cleanHeadline(post.title, slug);
     const articleImage = post.featuredImage ? absoluteUrl(post.featuredImage) : absoluteUrl("/images/cinema-camera-red-dragon.jpg");
+    const pubDate = post.publishedAt && !Number.isNaN(new Date(post.publishedAt).getTime())
+      ? new Date(post.publishedAt).toISOString()
+      : "2026-08-25T12:00:00.000Z";
     schema = {
       "@context": "https://schema.org",
       "@type": "Article",
       headline: post.title,
       description: buildDescription(post.excerpt, post.title),
-      datePublished: post.publishedAt,
-      dateModified: post.publishedAt,
-      image: articleImage,
-      mainEntityOfPage: absoluteUrl(localizedPath(`/insights/${slug}`, locale)),
-      author: { "@type": "Organization", name: "Global Untold Story" },
-      publisher,
+      datePublished: pubDate,
+      dateModified: pubDate,
+      image: [articleImage],
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": absoluteUrl(localizedPath(`/insights/${slug}`, locale)),
+      },
+      author: [{
+        "@type": "Organization",
+        name: "Global Untold Story",
+        url: "https://globaluntoldstory.com/",
+      }],
+      publisher: {
+        "@type": "Organization",
+        name: "Global Untold Story",
+        url: "https://globaluntoldstory.com/",
+        logo: { "@type": "ImageObject", url: absoluteUrl("/images/logo-white.png") },
+      },
     };
   }
 

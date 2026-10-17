@@ -145,7 +145,8 @@ export default async function Page({ params }: Props) {
         "@type": "VideoObject",
         name,
         description: buildDescription(project.results, name),
-        thumbnailUrl: project.image ? absoluteUrl(project.image) : absoluteUrl("/images/on-ground-production-giza.jpg"),
+        thumbnailUrl: [project.image ? absoluteUrl(project.image) : absoluteUrl("/images/on-ground-production-giza.jpg")],
+        uploadDate: "2026-01-01T00:00:00.000Z",
         contentUrl: absoluteUrl(project.video),
       });
     }

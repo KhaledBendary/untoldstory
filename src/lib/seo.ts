@@ -178,7 +178,10 @@ export function buildTitle(raw?: string | null, slug?: string, fallback = BRAND)
   const suffix = ` | ${BRAND}`;
   if (name === BRAND) return name;
   if (name.length + suffix.length <= TITLE_MAX) return name + suffix;
-  return clampWords(name, TITLE_MAX);
+
+  const shortSuffix = " | GUS";
+  if (name.length + shortSuffix.length <= TITLE_MAX) return name + shortSuffix;
+  return `${clampWords(name, TITLE_MAX - shortSuffix.length)}${shortSuffix}`;
 }
 
 /**
