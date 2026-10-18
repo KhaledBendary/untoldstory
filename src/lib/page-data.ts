@@ -15,7 +15,10 @@ import type { About, BlogPost, LayoutData, PortfolioItem, Service } from "@/type
  * their version-controlled fallback. Browser visits and on-demand server
  * renders still request fresh detail data.
  */
-export const IS_PRODUCTION_BUILD = process.env.NEXT_PHASE === "phase-production-build";
+export const IS_PRODUCTION_BUILD =
+  process.env.NEXT_PHASE === "phase-production-build" ||
+  Boolean(process.env.VERCEL && process.env.CI) ||
+  (process.env.NODE_ENV === "production" && !process.env.PORT);
 
 /**
  * Per-page data fetchers, written so the same function runs on the server

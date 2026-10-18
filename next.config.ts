@@ -262,4 +262,13 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default function (phase: string): NextConfig {
+  process.env.NEXT_PHASE = phase;
+  return {
+    ...nextConfig,
+    env: {
+      ...nextConfig.env,
+      NEXT_PHASE: phase,
+    },
+  };
+}
