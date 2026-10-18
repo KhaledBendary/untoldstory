@@ -206,11 +206,6 @@ export function officeSchemas(s: GeoSettings) {
     }],
     priceRange: "$$",
     areaServed: ["Egypt", "United Arab Emirates", "Saudi Arabia", "MENA"],
-    knowsLanguage: ["en", "ar"],
-    serviceType: [
-      "Film production", "Commercial advertising production", "Documentary production",
-      "Corporate video production", "Live broadcast production", "Post production",
-    ],
   }));
 }
 

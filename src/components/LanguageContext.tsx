@@ -4,6 +4,7 @@ import translations from '@/data/ui-translations.json';
 import { createContext, useContext, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { DEFAULT_LOCALE, isLocale, isSlugSafe, localeDir, localizedPath } from '@/lib/i18n';
+import { resolveDetailPath } from '@/lib/legacy-redirects';
 
 /** A detail page's own per-locale slug map, registered so switching language
  * there lands on THAT locale's own slug instead of reusing the current one
@@ -103,6 +104,17 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       const slug = raw && isSlugSafe(raw) ? raw : slugOverride.canonicalSlug;
       return localizedPath(`${slugOverride.basePath}/${slug}`, code);
     }
+
+    // SSR fallback: resolve slug for `code` from static slug dictionary
+    const resolved = resolveDetailPath(bare, code);
+    if (resolved) return resolved;
+
+    // Safety guard: never emit an unmatched detail slug into another language's URL
+    const detailMatch = bare.match(/^\/(services|work|insights)\/.+$/);
+    if (detailMatch && code !== locale) {
+      return localizedPath(`/${detailMatch[1]}`, code);
+    }
+
     return localizedPath(bare, code);
   };
 
