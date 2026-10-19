@@ -31,9 +31,7 @@ export const DEFAULT_LOCALE: Locale = "en";
  *
  * Re-measure before adding one: `node scripts/translation-coverage.mjs`.
  */
-export const INDEXABLE_LOCALES: readonly Locale[] = [
-  "en", "ar", "fr", "de", "es", "it", "pt", "ru", "tr",
-];
+export const INDEXABLE_LOCALES: readonly Locale[] = LOCALE_CODES;
 
 export function isIndexableLocale(locale: string): locale is Locale {
   return (INDEXABLE_LOCALES as readonly string[]).includes(locale);

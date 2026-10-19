@@ -173,14 +173,22 @@ export default async function SeoPage() {
 
       <div className="card" style={{ padding: "14px 16px", marginBottom: 22 }}>
         <h2 style={{ fontSize: 15, fontWeight: 700, margin: "0 0 8px" }}>الفهرسة حسب اللغة</h2>
-        <p style={{ fontSize: 12.5, color: "var(--muted)", margin: "0 0 8px", lineHeight: 1.7 }}>
-          كل عنصر منشور موجود بكل الـ{LOCALE_CODES.length} لغة، بس <strong>{INDEXABLE_LOCALES.length} لغات بس هي المسموح لجوجل يفهرسها</strong>
-          {" "}({INDEXABLE_LOCALES.join("، ")}). الباقي ({shellLocales.join("، ")}) نسخ إنجليزية متعلّمة <code>noindex</code> عمداً لحد ما تتترجم فعلاً.
-        </p>
-        <p style={{ fontSize: 12.5, color: "var(--faint)", margin: 0 }}>
-          يعني المفروض جوجل يفهرس ≈ <strong>{indexablePages}</strong> رابط، و≈ <strong>{shellPages}</strong> رابط بيظهروا في GSC كـ
-          «Excluded by noindex» — وده <strong>طبيعي ومقصود</strong>، مش خطأ. لما نترجم الـ{shellLocales.length} لغات دي هنفتح فهرستها.
-        </p>
+        {shellLocales.length > 0 ? (
+          <>
+            <p style={{ fontSize: 12.5, color: "var(--muted)", margin: "0 0 8px", lineHeight: 1.7 }}>
+              كل عنصر منشور موجود بكل الـ{LOCALE_CODES.length} لغة، بس <strong>{INDEXABLE_LOCALES.length} لغات بس هي المسموح لجوجل يفهرسها</strong>
+              {" "}({INDEXABLE_LOCALES.join("، ")}). الباقي ({shellLocales.join("، ")}) نسخ إنجليزية متعلّمة <code>noindex</code> عمداً لحد ما تتترجم فعلاً.
+            </p>
+            <p style={{ fontSize: 12.5, color: "var(--faint)", margin: 0 }}>
+              يعني المفروض جوجل يفهرس ≈ <strong>{indexablePages}</strong> رابط، و≈ <strong>{shellPages}</strong> رابط بيظهروا في GSC كـ
+              «Excluded by noindex» — وده <strong>طبيعي ومقصود</strong>، مش خطأ. لما نترجم الـ{shellLocales.length} لغات دي هنفتح فهرستها.
+            </p>
+          </>
+        ) : (
+          <p style={{ fontSize: 12.5, color: "var(--ok)", margin: 0, fontWeight: 600 }}>
+            كل عناصر الموقع مفهرسة بالكامل في كل اللغات الـ{LOCALE_CODES.length} ومتاحة لمحركات البحث في خرائط الموقع (Sitemaps).
+          </p>
+        )}
       </div>
 
       <Section label="الخدمات" base="services" rows={services as unknown as Row[]} />

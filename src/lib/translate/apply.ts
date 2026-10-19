@@ -264,7 +264,16 @@ export async function applyMachineTranslations(
   }
   try {
     const results = await translateFields(toTranslate, only);
-    for (const [key, dict] of Object.entries(results)) data[key] = { ...data[key], ...dict };
+    for (const [key, dict] of Object.entries(results)) {
+      for (const [loc, text] of Object.entries(dict)) {
+        const userValue = data[key]?.[loc]?.trim();
+        const prevValue = existing?.[key]?.[loc]?.trim();
+        const userEdited = Boolean(userValue && userValue !== prevValue);
+        if (!userEdited) {
+          data[key] = { ...data[key], [loc]: text };
+        }
+      }
+    }
     return { warning: combineWarnings(arWarning) };
   } catch (e) {
     // A PartialTranslateError still carries whatever locales/fields DID
@@ -272,7 +281,14 @@ export async function applyMachineTranslations(
     // failed locale or an oversized field.
     if (e instanceof PartialTranslateError) {
       for (const [key, dict] of Object.entries(e.partial as Record<string, Record<string, string>>)) {
-        data[key] = { ...data[key], ...dict };
+        for (const [loc, text] of Object.entries(dict)) {
+          const userValue = data[key]?.[loc]?.trim();
+          const prevValue = existing?.[key]?.[loc]?.trim();
+          const userEdited = Boolean(userValue && userValue !== prevValue);
+          if (!userEdited) {
+            data[key] = { ...data[key], [loc]: text };
+          }
+        }
       }
     }
     const detail = (e as Error).message || "";
