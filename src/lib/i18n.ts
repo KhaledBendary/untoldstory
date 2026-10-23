@@ -31,9 +31,7 @@ export const DEFAULT_LOCALE: Locale = "en";
  *
  * Re-measure before adding one: `node scripts/translation-coverage.mjs`.
  */
-export const INDEXABLE_LOCALES: readonly Locale[] = [
-  "en", "ar", "fr", "de", "es", "it", "pt", "ru", "tr",
-];
+export const INDEXABLE_LOCALES: readonly Locale[] = LOCALE_CODES;
 
 export function isIndexableLocale(locale: string): locale is Locale {
   return (INDEXABLE_LOCALES as readonly string[]).includes(locale);
@@ -96,12 +94,70 @@ export function localizedPath(path: string, locale: string): string {
  * `alternates` for a route: a self-canonical plus one hreflang entry per
  * locale and an x-default pointing at English.
  */
-export function alternatesFor(path: string, locale: string) {
+/**
+ * `slugOverride` lets a detail page's alternates use each OTHER locale's own
+ * translated slug (data.slugs — see translate/apply.ts) instead of reusing
+ * this page's own slug under every locale's prefix, which pointed hreflang at
+ * a slug that only exists in the current page's language.
+ */
+// A slug is a URL path segment in the page's own language (Arabic, Cyrillic,
+// CJK, accented Latin...), so non-ASCII is allowed. Next.js hands a dynamic
+// segment to the page percent-encoded — see decodeSlug — which is what once
+// made every native-script slug 404.
+//
+// Length is by UTF-8 bytes: a build writes one file per path and a segment is
+// capped at 255 bytes there. A non-ASCII character can expand to three escaped
+// bytes (%XX%XX%XX), so non-ASCII slugs are held to 80 bytes (<= 240 escaped).
+// Duplicated rather than imported from db/localize.ts: this file is also pulled
+// into client components, where that (server-only) module can't be bundled.
+const MAX_ASCII_SLUG_BYTES = 200;
+const MAX_NATIVE_SLUG_BYTES = 80;
+const NON_ASCII_RE = /[^\x00-\x7F]/;
+const UNSAFE_SLUG_RE = /[\s/\\?#%\x00-\x1f\x7f]/;
+export const isSlugSafe = (s: string): boolean => {
+  if (!s || UNSAFE_SLUG_RE.test(s) || /^\.+$/.test(s)) return false;
+  const bytes = new TextEncoder().encode(s).length;
+  return bytes <= (NON_ASCII_RE.test(s) ? MAX_NATIVE_SLUG_BYTES : MAX_ASCII_SLUG_BYTES);
+};
+
+/**
+ * The slug a dynamic [slug] segment actually refers to. Next.js 16 passes
+ * `params.slug` still percent-encoded ("%D8%A5..." for Arabic) while stored
+ * slugs are the real characters, so a raw comparison fails and the page 404s.
+ * Normalized to NFC so it matches how slugs are stored.
+ */
+export function decodeSlug(raw: string): string {
+  try {
+    return decodeURIComponent(raw).normalize("NFC");
+  } catch {
+    return raw;
+  }
+}
+
+export function alternatesFor(
+  path: string,
+  locale: string,
+  slugOverride?: { basePath: string; canonicalSlug: string; slugs?: Record<string, string> },
+) {
+  const pathFor = (code: string) => {
+    if (code === locale) return path; // this page's own already-correct path
+    if (!slugOverride) return path;
+    // English never reads data.slugs — same rule as pickSlug in db/localize.ts.
+    // slugs.en is a change-detection marker for the translation pipeline, not
+    // a real URL value; treating it as one here served a stale/foreign slug
+    // under English's unprefixed path whenever that marker was out of date.
+    const raw = code === DEFAULT_LOCALE ? undefined : slugOverride.slugs?.[code];
+    // A locale with no translated slug yet falls back to the canonical
+    // (English) one — never to this page's OWN (possibly different-locale)
+    // path, which would point every alternate at one locale's slug.
+    const slug = raw && isSlugSafe(raw) ? raw : slugOverride.canonicalSlug;
+    return `${slugOverride.basePath}/${slug}`;
+  };
   const languages: Record<string, string> = {};
   for (const code of INDEXABLE_LOCALES) {
-    languages[LOCALE_TAGS[code]] = localizedPath(path, code);
+    languages[LOCALE_TAGS[code]] = localizedPath(pathFor(code), code);
   }
-  languages["x-default"] = localizedPath(path, DEFAULT_LOCALE);
+  languages["x-default"] = localizedPath(pathFor(DEFAULT_LOCALE), DEFAULT_LOCALE);
 
   return {
     canonical: localizedPath(path, locale),

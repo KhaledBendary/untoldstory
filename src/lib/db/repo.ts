@@ -16,7 +16,7 @@ type Meta = { noindex: boolean; scheduled_at: Date | null; og_image: string | nu
 export type ServiceRow = Meta & {
   id: number; slug: string; icon: string | null; image_url: string | null;
   price: string | null; is_featured: boolean; sort_order: number; status: string;
-  data: { title?: Dict; shortDesc?: Dict; fullDesc?: Dict; features?: Record<string, unknown>; seo?: Record<string, unknown> };
+  data: { title?: Dict; shortDesc?: Dict; fullDesc?: Dict; features?: Record<string, unknown>; seo?: Record<string, unknown>; slugs?: Dict };
 };
 
 export type ProjectRow = Meta & {
@@ -24,14 +24,14 @@ export type ProjectRow = Meta & {
   video_embed: string | null; video_type: string | null; category_slug: string | null;
   grid_size: string | null; duration: string | null; budget: string | null;
   is_featured: boolean; sort_order: number; status: string;
-  data: { title?: Dict; client?: Dict; category?: Dict; shortDescription?: Dict; description?: Dict; results?: Dict; metric?: Dict; seo?: Record<string, unknown> };
+  data: { title?: Dict; client?: Dict; category?: Dict; shortDescription?: Dict; description?: Dict; results?: Dict; metric?: Dict; seo?: Record<string, unknown>; slugs?: Dict };
 };
 
 export type PostRow = Meta & {
   id: number; slug: string; featured_image: string | null; author_name: string | null;
   author_image: string | null; category_slug: string | null; read_minutes: number | null;
   tags: string[]; is_featured: boolean; sort_order: number; published_at: Date | null; status: string;
-  data: { title?: Dict; excerpt?: Dict; body?: Dict; category?: Dict; seo?: Record<string, unknown> };
+  data: { title?: Dict; excerpt?: Dict; body?: Dict; category?: Dict; seo?: Record<string, unknown>; slugs?: Dict };
 };
 
 // ---- collections (dashboard order: sort_order) ----
@@ -116,10 +116,16 @@ export async function saveSingletonArray(
 export type MediaRow = {
   id: number; url: string; pathname: string; filename: string;
   content_type: string | null; size_bytes: number | null; uploaded_at: Date;
+  alt: Record<string, string>;
 };
 
 export const getMedia = () =>
   sql<MediaRow[]>`select * from media order by uploaded_at desc`;
+
+/** Replace an image's alt text (all locales at once — the caller fills in translations first). */
+export async function updateMediaAlt(id: number, alt: Record<string, string>) {
+  await sql`update media set alt = ${sql.json(alt as Parameters<typeof sql.json>[0])} where id = ${id}`;
+}
 
 export async function addMedia(m: {
   url: string; pathname: string; filename: string; content_type: string | null; size_bytes: number | null;
@@ -143,14 +149,17 @@ export async function deleteMedia(id: number): Promise<string | null> {
 export type MessageRow = {
   id: number; name: string; email: string; phone: string | null; service: string | null;
   message: string; locale: string | null; status: string; emailed: boolean; created_at: Date;
+  source: string; conversation: unknown | null;
 };
 
 export async function addMessage(m: {
   name: string; email: string; phone?: string | null; service?: string | null; message: string; locale?: string | null;
+  source?: string; conversation?: unknown;
 }): Promise<number> {
+  const conversation = m.conversation ? sql.json(m.conversation as Parameters<typeof sql.json>[0]) : null;
   const [row] = await sql<{ id: number }[]>`
-    insert into messages (name, email, phone, service, message, locale)
-    values (${m.name}, ${m.email}, ${m.phone ?? null}, ${m.service ?? null}, ${m.message}, ${m.locale ?? null})
+    insert into messages (name, email, phone, service, message, locale, source, conversation)
+    values (${m.name}, ${m.email}, ${m.phone ?? null}, ${m.service ?? null}, ${m.message}, ${m.locale ?? null}, ${m.source ?? "contact_form"}, ${conversation})
     returning id`;
   return row.id;
 }
@@ -313,6 +322,8 @@ export const getRedirects = () =>
   sql<RedirectRow[]>`select * from redirects order by created_at desc`;
 
 export async function addRedirect(fromPath: string, toPath: string) {
+  // A redirect that points back at this one's target would loop (A→B, then B→A).
+  await sql`delete from redirects where from_path = ${toPath}`;
   await sql`insert into redirects (from_path, to_path) values (${fromPath}, ${toPath})
     on conflict (from_path) do update set to_path = excluded.to_path`;
   await clearNotFound(fromPath); // it's handled now
@@ -341,10 +352,65 @@ export async function listByType(type: keyof typeof TABLES) {
   return TABLES[type]();
 }
 
+/**
+ * Every item's per-language slugs (data.slugs) except one item's — just that
+ * one JSON key, not the rows: a service's full text is hundreds of KB, and
+ * the duplicate-slug check runs on every save.
+ */
+export async function otherSlugsByType(type: keyof typeof TABLES, exceptSlug: string): Promise<{ slug: string; slugs: Record<string, string> }[]> {
+  const rows =
+    type === "services" ? await sql`select slug, data->'slugs' as slugs from services where slug <> ${exceptSlug}`
+    : type === "projects" ? await sql`select slug, data->'slugs' as slugs from projects where slug <> ${exceptSlug}`
+    : await sql`select slug, data->'slugs' as slugs from posts where slug <> ${exceptSlug}`;
+  return rows.map((r) => ({ slug: r.slug as string, slugs: (r.slugs as Record<string, string> | null) ?? {} }));
+}
+
 export async function getByType(type: keyof typeof TABLES, slug: string) {
   if (type === "services") return getService(slug);
   if (type === "projects") return getProject(slug);
   return getPost(slug);
+}
+
+/**
+ * Merge per-locale translations into an item's `data`, writing only the JSONB
+ * (fixed columns and untouched languages/fields are preserved). `patch` is
+ * { fieldKey: { locale: value } } — used by the translation-file importer.
+ */
+export async function importLocaleData(
+  type: keyof typeof TABLES,
+  slug: string,
+  patch: Record<string, Record<string, string>>,
+): Promise<{ applied: number; locales: string[] }> {
+  const current = await getByType(type, slug);
+  if (!current) throw new Error(`not-found:${type}/${slug}`);
+  const data = ((current.data as Record<string, Dict>) ?? {}) as Record<string, Dict>;
+  let applied = 0;
+  const locales = new Set<string>();
+  for (const [field, byLoc] of Object.entries(patch)) {
+    for (const [loc, val] of Object.entries(byLoc)) {
+      if (typeof val === "string" && val.trim()) {
+        data[field] = { ...(data[field] ?? {}), [loc]: val };
+        applied++;
+        locales.add(loc);
+      }
+    }
+  }
+  const json = sql.json(data as Parameters<typeof sql.json>[0]);
+  if (type === "services") await sql`update services set data=${json}, updated_at=now() where slug=${slug}`;
+  else if (type === "projects") await sql`update projects set data=${json}, updated_at=now() where slug=${slug}`;
+  else await sql`update posts set data=${json}, updated_at=now() where slug=${slug}`;
+  return { applied, locales: [...locales] };
+}
+
+/** Overwrite just data.slugs, touching no fixed column and no other i18n field. */
+export async function updateSlugsOnly(type: keyof typeof TABLES, slug: string, slugs: Dict, slugsManual?: Dict): Promise<void> {
+  const current = await getByType(type, slug);
+  if (!current) throw new Error(`not-found:${type}/${slug}`);
+  const data = { ...(current.data as Record<string, Dict> | undefined ?? {}), slugs, ...(slugsManual ? { slugsManual } : {}) };
+  const json = sql.json(data as Parameters<typeof sql.json>[0]);
+  if (type === "services") await sql`update services set data=${json}, updated_at=now() where slug=${slug}`;
+  else if (type === "projects") await sql`update projects set data=${json}, updated_at=now() where slug=${slug}`;
+  else await sql`update posts set data=${json}, updated_at=now() where slug=${slug}`;
 }
 
 // ---- writes ----
@@ -418,6 +484,17 @@ export async function createByType(
       values (${slug}, ${str(f.featured_image)}, ${str(f.author_name)}, ${str(f.category_slug)},
         ${num(f.read_minutes)}, ${bool(f.is_featured)}, ${status}, ${bool(f.noindex)}, ${dt(f.scheduled_at)}, ${str(f.og_image)}, now(), ${d})`;
   }
+}
+
+/**
+ * Rename a row's slug — its identity and its public URL. Throws on conflict
+ * (unique constraint) so the caller can show "that slug is taken" instead of
+ * silently overwriting another item.
+ */
+export async function renameSlugByType(type: keyof typeof TABLES, oldSlug: string, newSlug: string) {
+  if (type === "services") await sql`update services set slug=${newSlug}, updated_at=now() where slug=${oldSlug}`;
+  else if (type === "projects") await sql`update projects set slug=${newSlug}, updated_at=now() where slug=${oldSlug}`;
+  else await sql`update posts set slug=${newSlug}, updated_at=now() where slug=${oldSlug}`;
 }
 
 /** Delete a content row by slug. */

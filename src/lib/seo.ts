@@ -178,7 +178,10 @@ export function buildTitle(raw?: string | null, slug?: string, fallback = BRAND)
   const suffix = ` | ${BRAND}`;
   if (name === BRAND) return name;
   if (name.length + suffix.length <= TITLE_MAX) return name + suffix;
-  return clampWords(name, TITLE_MAX);
+
+  const shortSuffix = " | GUS";
+  if (name.length + shortSuffix.length <= TITLE_MAX) return name + shortSuffix;
+  return `${clampWords(name, TITLE_MAX - shortSuffix.length)}${shortSuffix}`;
 }
 
 /**
@@ -230,11 +233,21 @@ export function buildDescription(raw?: string | null, fallback = "") {
 
 /** The CMS ships an untyped `seo` bag on most records. Read it safely. */
 export function cmsSeo(seo?: Record<string, unknown> | null) {
-  const read = (key: string) => (typeof seo?.[key] === "string" ? (seo[key] as string) : undefined);
+  const read = (key: string) => {
+    const v = seo?.[key];
+    return typeof v === "string" && v.trim() ? (v as string) : undefined;
+  };
+  const nf = read("nofollow");
   return {
     metaTitle: read("metaTitle"),
     metaDescription: read("metaDescription"),
     ogImageUrl: read("ogImageUrl"),
+    ogTitle: read("ogTitle"),
+    ogDescription: read("ogDescription"),
+    twitterTitle: read("twitterTitle"),
+    twitterDescription: read("twitterDescription"),
+    canonical: read("canonical"),
+    nofollow: nf === "true" || nf === "1",
   };
 }
 
@@ -244,8 +257,16 @@ export function withNoindex<T extends object>(meta: T, noindex?: boolean): T {
   return { ...meta, robots: { index: false, follow: false } };
 }
 
+/**
+ * Absolute URL for a site path. Slugs are in each page's own language, so a
+ * path can hold non-ASCII characters; canonicals, hreflang, sitemaps and
+ * structured data carry them percent-encoded (the form crawlers compare).
+ * Only the non-ASCII runs are escaped, so an already-encoded path is unchanged.
+ */
 export function absoluteUrl(path: string) {
-  return path.startsWith("http") ? path : `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  if (path.startsWith("http")) return path;
+  const encoded = path.replace(/[^ -]+/g, (run) => encodeURIComponent(run));
+  return `${SITE_URL}${encoded.startsWith("/") ? encoded : `/${encoded}`}`;
 }
 
 /** Breadcrumb trail for a detail page, e.g. Home › Services › Post Production. */
@@ -494,6 +515,16 @@ type PageSeoInput = {
   image?: string | null;
   type?: "website" | "article";
   publishedTime?: string;
+  // Per-item overrides from the dashboard SEO panel (all optional).
+  ogTitle?: string;
+  ogDescription?: string;
+  twitterTitle?: string;
+  twitterDescription?: string;
+  canonical?: string;
+  nofollow?: boolean;
+  // Per-locale translated slugs, for hreflang alternates that point at each
+  // OTHER locale's own slug rather than reusing this page's.
+  slugOverride?: { basePath: string; canonicalSlug: string; slugs?: Record<string, string> };
 };
 
 /**
@@ -508,33 +539,48 @@ export function pageSeo({
   image,
   type = "website",
   publishedTime,
+  ogTitle,
+  ogDescription,
+  twitterTitle,
+  twitterDescription,
+  canonical,
+  nofollow,
+  slugOverride,
 }: PageSeoInput): Metadata {
   const safeTitle = clampTitle(title) || BRAND;
   const desc = buildDescription(description, safeTitle);
   const url = absoluteUrl(localizedPath(path, locale));
   const img = absoluteUrl(image || DEFAULT_OG_IMAGE);
   const indexable = isIndexableLocale(locale);
+  const follow = !nofollow;
+  // Per-item overrides fall back to the meta title/description.
+  const ogT = ogTitle?.trim() || safeTitle;
+  const ogD = ogDescription?.trim() || desc;
+  const twT = twitterTitle?.trim() || ogT;
+  const twD = twitterDescription?.trim() || ogD;
+  const alt = alternatesFor(path, locale, slugOverride);
+  if (canonical?.trim()) alt.canonical = canonical.trim();
   return {
     title: { absolute: safeTitle },
     description: desc,
-    alternates: alternatesFor(path, locale),
+    alternates: alt,
     robots: indexable
-      ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } }
-      : { index: false, follow: true, googleBot: { index: false, follow: true } },
+      ? { index: true, follow, googleBot: { index: true, follow, "max-image-preview": "large", "max-snippet": -1 } }
+      : { index: false, follow, googleBot: { index: false, follow } },
     openGraph: {
-      title: safeTitle,
-      description: desc,
+      title: ogT,
+      description: ogD,
       url,
       siteName: BRAND,
       locale: OG_LOCALES[(isLocale(locale) ? locale : DEFAULT_LOCALE) as Locale],
       type,
-      images: [{ url: img, width: 1200, height: 630, alt: safeTitle }],
+      images: [{ url: img, width: 1200, height: 630, alt: ogT }],
       ...(publishedTime ? { publishedTime } : {}),
     },
     twitter: {
       card: "summary_large_image",
-      title: safeTitle,
-      description: desc,
+      title: twT,
+      description: twD,
       images: [img],
     },
   };

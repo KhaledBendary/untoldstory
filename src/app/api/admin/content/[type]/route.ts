@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { cleanDictResidue } from "@/lib/clean-html";
 import { requireAdmin } from "@/lib/admin-guard";
 import { contentType } from "@/lib/admin/content-types";
 import { getByType, createByType, logActivity } from "@/lib/db/repo";
@@ -36,7 +37,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const data: Record<string, Dict> = {};
   const issues = [];
   for (const field of def.i18n) {
-    const dict = (body.data?.[field.key] ?? {}) as Dict;
+    // Text pasted from an AI chat or Word carries wrapper markup that would block the save — strip it.
+    const dict = cleanDictResidue((body.data?.[field.key] ?? {}) as Dict);
     data[field.key] = dict;
     issues.push(...validateField(field.key, field.label, dict, { required: field.required }));
   }
@@ -47,8 +49,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const fixed: Record<string, string | boolean | number | null> = {};
   for (const field of def.fixed) fixed[field.key] = body.fixed?.[field.key] ?? null;
 
-  // Generate the seven machine languages from the English (best-effort).
-  const { warning } = await applyMachineTranslations(def, data, undefined);
+  // Generate the seven machine languages from the English (best-effort) —
+  // unless the admin explicitly asked to save without spending tokens yet.
+  const skipTranslate = body.skipTranslate === true;
+  const { warning } = skipTranslate
+    ? {}
+    : await applyMachineTranslations(def, data, undefined, undefined);
 
   // Fold the flat seo.* fields into the nested per-locale data.seo.
   assembleSeo(data, undefined);

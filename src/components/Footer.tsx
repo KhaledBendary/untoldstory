@@ -76,8 +76,11 @@ export default function Footer({ initialData, initialLocale }: { initialData: Sh
         <div className="md:col-span-2">
           <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#0a0a0a]/65 mb-5">{footer?.aboutTitle || t('Menu')}</p>
           <ul className="space-y-2.5 text-sm">
-            {(footer?.aboutLinks || [['/', 'Home'], ['/work', 'Work'], ['/services', 'Services'], ['/about', 'About'], ['/insights', 'Insights'], ['/contact', 'Contact']].map(([to, label]) => ({ href: to, label }))).map((l: { href: string; label: string }) => (
-              <li key={l.href}><Link href={l.href} className="link-line">{t(l.label)}</Link></li>
+            {(footer?.aboutLinks?.length
+              ? footer.aboutLinks
+              : [['/', 'Home'], ['/work', 'Work'], ['/services', 'Services'], ['/about', 'About'], ['/insights', 'Insights'], ['/contact', 'Contact']].map(([href, label]) => ({ href, label: t(label) }))
+            ).map((l: { href: string; label: string }) => (
+              <li key={l.href}><Link href={l.href} className="link-line">{l.label}</Link></li>
             ))}
           </ul>
         </div>

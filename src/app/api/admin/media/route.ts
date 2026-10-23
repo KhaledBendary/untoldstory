@@ -8,5 +8,5 @@ export async function GET() {
   if (!auth.session) return auth.response;
 
   const media = await getMedia();
-  return NextResponse.json({ items: media.map((m) => ({ id: m.id, url: m.url, filename: m.filename })) });
+  return NextResponse.json({ items: media.map((m) => ({ id: m.id, url: m.url, filename: m.filename, alt: m.alt || {} })) });
 }

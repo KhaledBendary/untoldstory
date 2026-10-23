@@ -31,7 +31,10 @@ function isRetryable(status?: number): boolean {
  * faster there, and trip a short circuit so the rest of the build uses
  * editorial fallbacks instead of waiting on a dead connection.
  */
-const IS_BUILD = process.env.NEXT_PHASE === "phase-production-build";
+const IS_BUILD =
+  process.env.NEXT_PHASE === "phase-production-build" ||
+  Boolean(process.env.VERCEL && process.env.CI) ||
+  (process.env.NODE_ENV === "production" && !process.env.PORT);
 const RETRY_ATTEMPTS = IS_BUILD ? 2 : 6;
 const RETRY_DELAYS_MS = IS_BUILD ? [400, 1000] : [500, 1500, 3000, 6000, 10000];
 

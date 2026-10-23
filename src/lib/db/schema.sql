@@ -218,3 +218,13 @@ CREATE INDEX IF NOT EXISTS services_order  ON services  (sort_order, id);
 CREATE INDEX IF NOT EXISTS projects_order  ON projects  (sort_order, id);
 CREATE INDEX IF NOT EXISTS posts_published ON posts     (published_at DESC NULLS LAST);
 CREATE INDEX IF NOT EXISTS media_uploaded  ON media     (uploaded_at DESC);
+
+-- ---------------------------------------------------------------------------
+-- Nouran (the website chatbot) files its captured leads into the same
+-- `messages` inbox as the contact form, distinguished by `source` so the
+-- dashboard can flag them. `conversation` keeps the full transcript behind
+-- the one-line summary stored in `message`, for the admin to review context.
+-- ---------------------------------------------------------------------------
+
+ALTER TABLE messages ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT 'contact_form';
+ALTER TABLE messages ADD COLUMN IF NOT EXISTS conversation JSONB;

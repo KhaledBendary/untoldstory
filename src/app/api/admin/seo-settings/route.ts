@@ -1,8 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/admin-guard";
 import { getSingleton, putSingleton, logActivity } from "@/lib/db/repo";
-import { mergeGeo, type GeoSettings } from "@/lib/seo/geo";
+import { mergeGeo, type GeoSettings, type GeoFaq } from "@/lib/seo/geo";
 import { triggerDeploy } from "@/lib/deploy";
+import { translateBlockItems } from "@/lib/translate/apply";
+import { MACHINE_LOCALES, translationConfigured } from "@/lib/translate";
 
 /** Read the current GEO/SEO settings (merged over defaults). */
 export async function GET() {
@@ -63,6 +65,27 @@ export async function PUT(request: NextRequest) {
     llmsIntro: str(body.llmsIntro),
     aiCrawlers: typeof body.aiCrawlers === "boolean" ? body.aiCrawlers : true,
   };
+
+  // The FAQ schema (invisible structured data for search engines, not shown
+  // on any page) only ever had English and Arabic — every other locale's page
+  // silently reused the English text. Machine-translate qEn/aEn into the same
+  // twelve languages as everything else, by array position (matching how the
+  // repeating-block editors already do this): correlating "this FAQ item" by
+  // its position in the previous save is good enough for a handful of rarely
+  // reordered entries, and any mismatch after a reorder just costs one extra
+  // (harmless) re-translation of that item, not incorrect content.
+  if (clean.faq.length && translationConfigured()) {
+    const itemsEn = clean.faq.map((f) => ({ q: f.qEn, a: f.aEn }));
+    const { perLocale } = await translateBlockItems(itemsEn, [
+      { key: "q", format: "text" },
+      { key: "a", format: "text" },
+    ]);
+    clean.faq = clean.faq.map((f, i): GeoFaq => ({
+      ...f,
+      q: { en: f.qEn, ar: f.qAr || f.qEn, ...Object.fromEntries(MACHINE_LOCALES.map((loc) => [loc, perLocale[loc]?.[i]?.q || f.qEn])) },
+      a: { en: f.aEn, ar: f.aAr || f.aEn, ...Object.fromEntries(MACHINE_LOCALES.map((loc) => [loc, perLocale[loc]?.[i]?.a || f.aEn])) },
+    }));
+  }
 
   await putSingleton("seo_settings", clean);
   await logActivity({ actor: auth.session.email, action: "update", entity: "site", ref: "seo_settings", detail: "إعدادات SEO/GEO" });

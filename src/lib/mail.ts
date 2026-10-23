@@ -7,7 +7,17 @@ export type ContactMessage = {
   service?: string;
   message: string;
   locale?: string;
+  source?: "contact_form" | "chatbot";
 };
+
+// Header values (Reply-To, Subject) go into raw SMTP headers, where an
+// embedded CR/LF can start a new header line. nodemailer's own encoding
+// already guards against this in current versions, but that's an external
+// library's behavior, not a guarantee this code makes on its own — strip
+// them here too rather than depend solely on that.
+function stripHeaderUnsafe(value: string) {
+  return value.replace(/[\r\n]+/g, " ").trim();
+}
 
 function escapeHtml(value: string) {
   return value
@@ -54,9 +64,10 @@ export async function sendContactEmail(data: ContactMessage) {
   const service = data.service || "Not specified";
   const phone = data.phone || "Not provided";
   const locale = data.locale || "en";
+  const origin = data.source === "chatbot" ? "the Nouran chatbot" : "the website contact form";
 
   const text = [
-    "New inquiry from the website contact form.",
+    `New inquiry from ${origin}.`,
     "",
     `Name: ${data.name}`,
     `Email: ${data.email}`,
@@ -69,7 +80,7 @@ export async function sendContactEmail(data: ContactMessage) {
   ].join("\n");
 
   const html = `
-    <p>New inquiry from the website contact form.</p>
+    <p>New inquiry from ${escapeHtml(origin)}.</p>
     <table cellpadding="6" cellspacing="0" style="font-family:sans-serif;font-size:14px">
       <tr><td><strong>Name</strong></td><td>${escapeHtml(data.name)}</td></tr>
       <tr><td><strong>Email</strong></td><td>${escapeHtml(data.email)}</td></tr>
@@ -84,8 +95,8 @@ export async function sendContactEmail(data: ContactMessage) {
   await transporter.sendMail({
     from: `"Global Untold Story website" <${config.from}>`,
     to: config.to,
-    replyTo: `${data.name} <${data.email}>`,
-    subject: `New project inquiry — ${service}`,
+    replyTo: `${stripHeaderUnsafe(data.name)} <${data.email}>`,
+    subject: `New project inquiry — ${stripHeaderUnsafe(service)}`,
     text,
     html,
   });

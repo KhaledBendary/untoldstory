@@ -3,7 +3,8 @@ import type { BlogPost, PortfolioItem, Service } from "@/types/api";
 import { getInsightsData, getWorkData, getServicesData } from "@/lib/page-data";
 import { POST_SLUG_ALIASES, SERVICE_SLUG_ALIASES } from "@/lib/legacy-redirects";
 import { INDEXABLE_LOCALES, LOCALE_TAGS, DEFAULT_LOCALE, localizedPath } from "@/lib/i18n";
-import { SITE_URL } from "@/lib/seo";
+import { absoluteUrl } from "@/lib/seo";
+import { isSlugSafe } from "@/lib/db/localize";
 
 /**
  * The set of real, indexable routes, gathered once.
@@ -14,17 +15,31 @@ import { SITE_URL } from "@/lib/seo";
  */
 
 export type SitemapRoute = {
-  path: string;
+  path: string; // canonical (English) path — always valid, used when a locale has no override
+  basePath?: string; // e.g. "/services" — combined with slugs[locale] for a detail page
+  slugs?: Record<string, string>; // per-locale slug overrides (data.slugs — see translate/apply.ts)
   lastModified?: Date;
   changeFrequency: "weekly" | "monthly" | "yearly";
   priority: number;
 };
+
+/** This route's path for one locale — its own translated slug if it has one, else the canonical path. */
+function routePath(route: SitemapRoute, locale: string): string {
+  // English never reads data.slugs — same rule as pickSlug in db/localize.ts.
+  // slugs.en is only a change-detection marker, not a real URL value.
+  if (locale === DEFAULT_LOCALE) return route.path;
+  const slug = route.basePath && route.slugs?.[locale];
+  return slug && isSlugSafe(slug) ? `${route.basePath}/${slug}` : route.path;
+}
 
 function parseDate(value?: string | null) {
   if (!value) return undefined;
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? undefined : date;
 }
+
+const slugsOf = (item: unknown): Record<string, string> | undefined =>
+  item && typeof item === "object" && "slugs" in item ? (item as { slugs?: Record<string, string> }).slugs : undefined;
 
 export async function collectRoutes(): Promise<SitemapRoute[]> {
   const services: (Service | { slug: string })[] = await getServicesData();
@@ -33,7 +48,12 @@ export async function collectRoutes(): Promise<SitemapRoute[]> {
 
   // Slugs the CMS renamed still arrive from the API under the old name; list
   // the destination, never the alias, or the sitemap advertises a redirect.
-  const serviceSlugs = [...new Set(services.map((s) => SERVICE_SLUG_ALIASES[s.slug] || s.slug))];
+  const serviceEntries = [...new Map(
+    services.map((s) => {
+      const slug = SERVICE_SLUG_ALIASES[s.slug] || s.slug;
+      return [slug, { slug, slugs: slugsOf(s) }];
+    }),
+  ).values()];
   const postEntries = [...new Map(
     posts.map((post) => {
       const slug = POST_SLUG_ALIASES[post.slug] && POST_SLUG_ALIASES[post.slug] !== post.slug
@@ -62,10 +82,16 @@ export async function collectRoutes(): Promise<SitemapRoute[]> {
     { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
     { path: "/cookies", changeFrequency: "yearly", priority: 0.3 },
 
-    ...serviceSlugs.map((slug): SitemapRoute => ({ path: `/services/${slug}`, changeFrequency: "monthly", priority: 0.8 })),
-    ...projects.map((p): SitemapRoute => ({ path: `/work/${p.slug}`, changeFrequency: "monthly", priority: 0.7 })),
+    ...serviceEntries.map((s): SitemapRoute => ({
+      path: `/services/${s.slug}`, basePath: "/services", slugs: s.slugs, changeFrequency: "monthly", priority: 0.8,
+    })),
+    ...projects.map((p): SitemapRoute => ({
+      path: `/work/${p.slug}`, basePath: "/work", slugs: slugsOf(p), changeFrequency: "monthly", priority: 0.7,
+    })),
     ...postEntries.map((post): SitemapRoute => ({
       path: `/insights/${post.slug}`,
+      basePath: "/insights",
+      slugs: slugsOf(post),
       lastModified:
         parseDate("publishedAt" in post ? post.publishedAt : undefined) ??
         parseDate("date" in post ? post.date : undefined),
@@ -98,7 +124,7 @@ export function localeSitemapPath(locale: string) {
 // to name the identical string, or it advertises a URL the page itself does not
 // claim as canonical.
 function absolute(path: string, locale: string) {
-  return `${SITE_URL}${localizedPath(path, locale)}`.replace(/\/$/, "");
+  return absoluteUrl(localizedPath(path, locale)).replace(/\/$/, "");
 }
 
 function xmlEscape(value: string) {
@@ -109,10 +135,10 @@ export async function buildLocaleSitemap(locale: string) {
   const routes = await collectRoutes();
 
   const urls = routes.map((route) => {
-    const loc = absolute(route.path, locale);
+    const loc = absolute(routePath(route, locale), locale);
     const alternates = INDEXABLE_LOCALES.map(
       (code) =>
-        `    <xhtml:link rel="alternate" hreflang="${LOCALE_TAGS[code]}" href="${xmlEscape(absolute(route.path, code))}"/>`,
+        `    <xhtml:link rel="alternate" hreflang="${LOCALE_TAGS[code]}" href="${xmlEscape(absolute(routePath(route, code), code))}"/>`,
     ).join("\n");
 
     return [

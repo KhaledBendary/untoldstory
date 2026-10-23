@@ -1,44 +1,299 @@
 import "server-only";
-import { MACHINE_LOCALES, translateFields, translationConfigured, type FieldToTranslate, type MachineLocale } from "@/lib/translate";
+import { MACHINE_LOCALES, PartialTranslateError, translateFields, translatePair, translationConfigured, type FieldToTranslate, type MachineLocale } from "@/lib/translate";
 import type { ContentType } from "@/lib/admin/content-types";
 import type { Dict } from "@/lib/content-validate";
 import { getPath, type SingletonField } from "@/lib/admin/singleton-fields";
 import type { Singleton } from "@/lib/db/repo";
 
+const HTML_TAG_RE = /<[a-z][^>]*>/i;
+
 /**
- * Fill the seven machine languages of a content record from its English, in
- * place, before it is saved. Only fields whose English actually changed (or
- * that are missing a translation) are sent, so an unchanged save costs nothing
- * and a body isn't re-translated on every edit of a title.
+ * Fill in whichever of English/Arabic is missing from the other, in place.
+ * Either language may be the one a person actually wrote — if only English was
+ * filled in, Arabic is machine-translated from it, and vice versa, so Arabic is
+ * never silently left as an English copy (the old behavior when it was assumed
+ * a person would always write both by hand). Runs before the machine-locale
+ * pass, which needs English filled in to work from.
+ */
+async function syncEnglishArabic(def: ContentType, data: Record<string, Dict>): Promise<{ warning?: string }> {
+  const toAr: FieldToTranslate[] = [];
+  const toEn: FieldToTranslate[] = [];
+  for (const field of def.i18n) {
+    if (field.noTranslate) continue; // keywords, canonical URLs, flags — never translate
+    const en = data[field.key]?.en?.trim();
+    const ar = data[field.key]?.ar?.trim();
+    const isHtml = field.type === "html";
+    const format = isHtml ? "html" : "text";
+    // Same fallback-detection gap the machine-locale pass had: a language
+    // whose saved value is just a leftover copy of the other one (from before
+    // translation was configured) looked "already filled" forever and was
+    // never revisited, since the old check only asked whether it was empty —
+    // plus the same "structurally not a real translation" case (an HTML field
+    // whose stale value has no tags at all, unrelated to either language).
+    const arLooksStale = !ar || ar === en || (isHtml && HTML_TAG_RE.test(en || "") && !HTML_TAG_RE.test(ar));
+    const enLooksStale = !en || en === ar || (isHtml && HTML_TAG_RE.test(ar || "") && !HTML_TAG_RE.test(en));
+    if (en && arLooksStale) toAr.push({ key: field.key, format, text: en });
+    else if (ar && enLooksStale) toEn.push({ key: field.key, format, text: ar });
+  }
+  if (!toAr.length && !toEn.length) return {};
+  // Each direction is caught on its own, and a PartialTranslateError's
+  // partial results are still applied — one bad field (e.g. a large HTML
+  // body the model truncated into malformed JSON) used to throw away every
+  // OTHER field's already-successful translation from the same call, which
+  // is why a title/excerpt could translate fine while the body silently
+  // stayed in the source language on the exact same save.
+  const warnings: string[] = [];
+  if (toAr.length) {
+    try {
+      const filled = await translatePair(toAr, "en", "ar");
+      for (const [key, text] of Object.entries(filled)) data[key] = { ...data[key], ar: text };
+    } catch (e) {
+      if (e instanceof PartialTranslateError) {
+        for (const [key, text] of Object.entries(e.partial as Record<string, string>)) data[key] = { ...data[key], ar: text };
+      }
+      console.error("English/Arabic sync (en->ar) failed:", e);
+      warnings.push(`فشلت ترجمة بعض الحقول للعربي — ${((e as Error).message || "").slice(0, 250)}`);
+    }
+  }
+  if (toEn.length) {
+    try {
+      const filled = await translatePair(toEn, "ar", "en");
+      for (const [key, text] of Object.entries(filled)) data[key] = { ...data[key], en: text };
+    } catch (e) {
+      if (e instanceof PartialTranslateError) {
+        for (const [key, text] of Object.entries(e.partial as Record<string, string>)) data[key] = { ...data[key], en: text };
+      }
+      console.error("English/Arabic sync (ar->en) failed:", e);
+      warnings.push(`فشلت ترجمة بعض الحقول للإنجليزي — ${((e as Error).message || "").slice(0, 250)}`);
+    }
+  }
+  return warnings.length ? { warning: warnings.join(" | ") } : {};
+}
+
+/**
+ * A URL slug from translated text, kept in that language's own script: Arabic
+ * stays Arabic, Russian Cyrillic, Japanese kana/kanji, French keeps its accents.
+ * Lowercased (where a script has case), words joined with "-", everything that
+ * isn't a letter/mark/digit dropped. Arabic vowel marks and tatweel carry no
+ * meaning in a URL and are removed so the same phrase always yields one slug.
+ *
+ * Next.js passes such a segment to the page percent-encoded; pages decode it
+ * with decodeSlug (lib/i18n) before looking the content up.
+ */
+// Cap by UTF-8 BYTES, not characters — a path segment is limited to 255 bytes
+// on the build filesystem and a non-ASCII character can expand to three
+// escaped bytes. 80 bytes keeps the escaped form under 240. Matches isSlugSafe.
+const MAX_SLUG_BYTES = 80;
+const ARABIC_MARKS = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g;
+export function slugify(input: string): string {
+  const cleaned = input
+    .normalize("NFC")
+    .replace(ARABIC_MARKS, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[\s_]+/g, "-")
+    .replace(/[^\p{L}\p{M}\p{N}-]+/gu, "")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  // Trim by whole code points so a multi-byte character is never cut in half.
+  const chars = [...cleaned];
+  while (chars.length && Buffer.byteLength(chars.join(""), "utf8") > MAX_SLUG_BYTES) chars.pop();
+  return chars.join("").replace(/-+$/g, "");
+}
+
+/**
+ * Regenerate data.slugs — a per-locale slug machine-translated from the
+ * record's own canonical slug text (the "المعرّف" field the admin types),
+ * not from the title: the slug is translated the same way any other field
+ * is, so "video-production-egypt" becomes its own real phrase per language,
+ * not a slugified copy of that language's (often much longer) title.
+ *
+ * Each slug is written in its own language and script (see slugify) — an
+ * Arabic page gets an Arabic slug, a Russian page a Russian one.
+ *
+ * A slug the admin typed by hand is listed in data.slugsManual and is never
+ * overwritten here, whatever else changes.
+ *
+ * Re-translates only what's missing, unless the canonical slug itself changed
+ * since the last pass — tracked via slugs.en, which exists purely as that
+ * change marker: English itself never reads from data.slugs (see pickSlug in
+ * db/localize.ts), so this key has no other use.
+ */
+async function updateSlugs(canonicalSlug: string, data: Record<string, Dict>, only?: readonly string[], force = false): Promise<{ warning?: string }> {
+  if (!canonicalSlug) return {};
+  const existing = (data.slugs as Dict | undefined) ?? {};
+  const manual = (data.slugsManual as Dict | undefined) ?? {};
+  const isManual = (loc: string) => Boolean(manual[loc]) && Boolean(existing[loc]);
+  const changed = force || existing.en !== canonicalSlug;
+  // Redoing a few languages (`only`) must leave every other language's slug alone.
+  const slugs: Dict = changed && !(only && only.length) ? { en: canonicalSlug } : { ...existing, en: canonicalSlug };
+  for (const loc of Object.keys(existing)) if (isManual(loc)) slugs[loc] = existing[loc];
+
+  const targets = (only && only.length ? MACHINE_LOCALES.filter((l) => only.includes(l)) : [...MACHINE_LOCALES])
+    .filter((loc) => !isManual(loc) && (changed || !slugs[loc]));
+  const wantsAr = (!only || only.includes("ar")) && !isManual("ar") && (changed || !slugs.ar);
+  if (!targets.length && !wantsAr) { data.slugs = slugs; return {}; }
+  if (!translationConfigured()) { data.slugs = slugs; return {}; }
+
+  const words = canonicalSlug.replace(/-/g, " ").trim();
+  if (!words) { data.slugs = slugs; return {}; }
+
+  try {
+    if (targets.length) {
+      try {
+        const results = await translateFields([{ key: "slug", format: "text", text: words }], targets);
+        for (const loc of targets) {
+          const t = results.slug?.[loc];
+          const slug = t ? slugify(t) : "";
+          if (slug) slugs[loc] = slug;
+        }
+      } catch (e) {
+        if (e instanceof PartialTranslateError) {
+          const partial = e.partial as Record<string, Record<string, string>>;
+          for (const loc of targets) {
+            const slug = partial.slug?.[loc] ? slugify(partial.slug[loc]) : "";
+            if (slug) slugs[loc] = slug;
+          }
+        }
+        throw e;
+      }
+    }
+    if (wantsAr) {
+      try {
+        const ar = await translatePair([{ key: "slug", format: "text", text: words }], "en", "ar");
+        const slug = ar.slug ? slugify(ar.slug) : "";
+        if (slug) slugs.ar = slug;
+      } catch (e) {
+        if (e instanceof PartialTranslateError && typeof e.partial.slug === "string") {
+          const slug = slugify(e.partial.slug);
+          if (slug) slugs.ar = slug;
+        }
+        throw e;
+      }
+    }
+    data.slugs = slugs;
+    return {};
+  } catch (e) {
+    data.slugs = slugs; // keep whatever succeeded so far (partial or not) rather than lose it
+    return { warning: `فشلت ترجمة السلج — ${((e as Error).message || "").slice(0, 300)}` };
+  }
+}
+
+/**
+ * Force a fresh translation of one item's slug right now, independent of a
+ * full save — the "ترجم السلج دلوقتي" button next to the slug field. Ignores
+ * the slugs.en change-marker (a normal save already skips retranslating an
+ * unchanged slug) so the admin can redo it on demand, e.g. to pick up a fix
+ * to the translation without re-saving the whole item.
+ */
+export async function retranslateSlug(canonicalSlug: string, existingSlugs?: Dict, manualSlugs?: Dict, only?: readonly string[]): Promise<{ slugs: Dict; slugsManual: Dict; warning?: string }> {
+  const data: Record<string, Dict> = { slugs: { ...(existingSlugs ?? {}) }, slugsManual: { ...(manualSlugs ?? {}) } };
+  // Asking for one language by name means "redo this one" — even a hand-typed slug.
+  for (const loc of only ?? []) data.slugsManual[loc] = "";
+  const { warning } = await updateSlugs(canonicalSlug, data, only, true);
+  return { slugs: (data.slugs as Dict) ?? {}, slugsManual: (data.slugsManual as Dict) ?? {}, warning };
+}
+
+/**
+ * Fill the twelve machine languages of a content record from its English, in
+ * place. Only fields whose English actually changed (or that are missing a
+ * translation) are sent, so an unchanged save costs nothing and a body isn't
+ * re-translated on every edit of a title.
  *
  * Best-effort: returns a human warning instead of throwing, so the caller still
- * saves the English and Arabic when translation is unconfigured or fails.
+ * saves whatever the editor wrote when translation is unconfigured or fails.
  */
+function combineWarnings(...parts: (string | undefined)[]): string | undefined {
+  const real = parts.filter((p): p is string => Boolean(p));
+  return real.length ? real.join(" | ") : undefined;
+}
+
 export async function applyMachineTranslations(
   def: ContentType,
   data: Record<string, Dict>, // { fieldKey: { en, ar, ... } } — mutated in place
   existing: Record<string, Dict> | undefined,
+  only?: readonly string[], // limit to these locales (e.g. one language at a time)
+  // Bypasses the "already translated?" check below for whatever locale(s)
+  // `only` names — used by the "ترجم [لغة] بس" button, where the admin is
+  // explicitly saying an existing (non-empty, non-obviously-stale) value is
+  // actually wrong and wants it redone, which the heuristics below can't
+  // detect on their own.
+  force = false,
 ): Promise<{ warning?: string }> {
+  const checkLocales = only && only.length ? only : MACHINE_LOCALES;
+
+  // Single-locale calls (the per-language "translate" button) target one
+  // machine locale at a time and shouldn't re-run this on every call.
+  let arWarning: string | undefined;
+  if ((!only || only.includes("ar") || only.includes("en")) && translationConfigured()) {
+    arWarning = (await syncEnglishArabic(def, data)).warning;
+  }
+
   const toTranslate: FieldToTranslate[] = [];
   for (const field of def.i18n) {
+    if (field.noTranslate) continue; // keywords, canonical URLs, flags — never translate
     const en = data[field.key]?.en?.trim();
     if (!en) continue;
     const prevEn = existing?.[field.key]?.en;
-    const missing = MACHINE_LOCALES.some((loc) => !existing?.[field.key]?.[loc]);
+    // A locale with no value, OR one that's just a leftover copy of English
+    // (from before translation was configured, or from this exact skip once
+    // treating that copy as "already translated" and never revisiting it) —
+    // both need a real translation, not just a genuinely absent key.
+    const isHtml = field.type === "html";
+    const missing = force || checkLocales.some((loc) => {
+      const val = existing?.[field.key]?.[loc];
+      if (!val || val === en) return true;
+      // A leftover value from well before this translation system existed —
+      // e.g. a generic one-line summary seeded into every locale of an HTML
+      // body field, unrelated to the current English text and structurally
+      // nothing like it (no tags where the source has them). Equal-to-English
+      // doesn't catch this: the stale text differs from English too, just not
+      // by being a real translation of it.
+      if (isHtml && HTML_TAG_RE.test(en) && !HTML_TAG_RE.test(val)) return true;
+      return false;
+    });
     if (en === prevEn && !missing) continue; // unchanged and already translated
-    toTranslate.push({ key: field.key, format: field.type === "html" ? "html" : "text", text: data[field.key].en });
+    toTranslate.push({ key: field.key, format: isHtml ? "html" : "text", text: data[field.key].en });
   }
-  if (!toTranslate.length) return {};
+  // Slugs are not translated here: they change only when the admin types one or
+  // presses a slug button (retranslateSlug), never as a side effect of saving.
+
+  if (!toTranslate.length) return { warning: combineWarnings(arWarning) };
   if (!translationConfigured()) {
-    return { warning: "الترجمة الآلية مش متظبطة (GOOGLE_TRANSLATE_API_KEY) — اتحفظ الإنجليزي والعربي بس" };
+    return { warning: combineWarnings(arWarning) || "الترجمة الآلية مش متظبطة — اتحفظ زي ما اتكتب بس" };
   }
   try {
-    const results = await translateFields(toTranslate);
-    for (const [key, dict] of Object.entries(results)) data[key] = { ...data[key], ...dict };
-    return {};
+    const results = await translateFields(toTranslate, only);
+    for (const [key, dict] of Object.entries(results)) {
+      for (const [loc, text] of Object.entries(dict)) {
+        const userValue = data[key]?.[loc]?.trim();
+        const prevValue = existing?.[key]?.[loc]?.trim();
+        const userEdited = Boolean(userValue && userValue !== prevValue);
+        if (!userEdited) {
+          data[key] = { ...data[key], [loc]: text };
+        }
+      }
+    }
+    return { warning: combineWarnings(arWarning) };
   } catch (e) {
+    // A PartialTranslateError still carries whatever locales/fields DID
+    // translate — apply those instead of discarding the whole batch over one
+    // failed locale or an oversized field.
+    if (e instanceof PartialTranslateError) {
+      for (const [key, dict] of Object.entries(e.partial as Record<string, Record<string, string>>)) {
+        for (const [loc, text] of Object.entries(dict)) {
+          const userValue = data[key]?.[loc]?.trim();
+          const prevValue = existing?.[key]?.[loc]?.trim();
+          const userEdited = Boolean(userValue && userValue !== prevValue);
+          if (!userEdited) {
+            data[key] = { ...data[key], [loc]: text };
+          }
+        }
+      }
+    }
+    const detail = (e as Error).message || "";
     console.error("Machine translation failed:", e);
-    return { warning: "فشلت الترجمة الآلية — اتحفظ الإنجليزي والعربي، تقدر تحفظ تاني بعد شوية عشان تتولّد" };
+    return { warning: combineWarnings(arWarning, `فشلت الترجمة الآلية لبعض اللغات — ${detail.slice(0, 300)}`) };
   }
 }
 
@@ -57,7 +312,7 @@ export async function translateBlockItems(
   const empty = {} as Record<MachineLocale, Record<string, string>[]>;
   if (!itemsEn.length || !fields.length) return { perLocale: empty };
   if (!translationConfigured()) {
-    return { perLocale: empty, warning: "الترجمة الآلية مش متظبطة (GOOGLE_TRANSLATE_API_KEY) — اللغات التلقائية بتاخد نسخة الإنجليزي" };
+    return { perLocale: empty, warning: "الترجمة الآلية مش متظبطة — اللغات التلقائية بتاخد نسخة الإنجليزي" };
   }
   const toTranslate: FieldToTranslate[] = [];
   itemsEn.forEach((item, i) => {
@@ -66,27 +321,81 @@ export async function translateBlockItems(
       if (text && text.trim()) toTranslate.push({ key: `${i}::${f.key}`, format: f.format, text });
     }
   });
+  let results: Record<string, Record<MachineLocale, string>> = {};
+  let warning: string | undefined;
   try {
-    const results = await translateFields(toTranslate);
-    const perLocale = {} as Record<MachineLocale, Record<string, string>[]>;
-    for (const loc of MACHINE_LOCALES) {
-      perLocale[loc] = itemsEn.map((item, i) => {
-        const out: Record<string, string> = {};
-        for (const f of fields) out[f.key] = results[`${i}::${f.key}`]?.[loc] ?? item[f.key] ?? "";
-        return out;
-      });
-    }
-    return { perLocale };
+    results = await translateFields(toTranslate);
   } catch (e) {
+    // Keep whatever locales/items DID translate instead of falling every item
+    // back to English just because one locale or one item failed.
+    if (e instanceof PartialTranslateError) results = e.partial as typeof results;
     console.error("Machine translation (block) failed:", e);
-    return { perLocale: empty, warning: "فشلت الترجمة الآلية — اللغات التلقائية بتاخد نسخة الإنجليزي مؤقتاً" };
+    warning = "فشلت ترجمة بعض اللغات — اللي فشل هياخد نسخة الإنجليزي مؤقتاً";
   }
+  const perLocale = {} as Record<MachineLocale, Record<string, string>[]>;
+  for (const loc of MACHINE_LOCALES) {
+    perLocale[loc] = itemsEn.map((item, i) => {
+      const out: Record<string, string> = {};
+      for (const f of fields) out[f.key] = results[`${i}::${f.key}`]?.[loc] ?? item[f.key] ?? "";
+      return out;
+    });
+  }
+  return { perLocale, warning };
 }
 
 /**
- * Generate the seven machine languages for edited singleton paths, in place.
+ * Fill in whichever of English/Arabic is missing from the other, for edited
+ * singleton paths — same idea as syncEnglishArabic above, but over the
+ * {path, values} shape the singleton editor sends instead of a content record.
+ */
+async function syncEnglishArabicSingleton(
+  edits: { path: string; values: Record<string, string> }[],
+  fieldByPath: Map<string, SingletonField>,
+): Promise<{ warning?: string }> {
+  const toAr: FieldToTranslate[] = [];
+  const toEn: FieldToTranslate[] = [];
+  for (const e of edits) {
+    const field = fieldByPath.get(e.path);
+    if (!field || field.ltr) continue; // technical value — keep identical across languages
+    const en = e.values.en?.trim();
+    const ar = e.values.ar?.trim();
+    if (en && (!ar || ar === en)) toAr.push({ key: e.path, format: "text", text: en });
+    else if (ar && (!en || en === ar)) toEn.push({ key: e.path, format: "text", text: ar });
+  }
+  if (!toAr.length && !toEn.length) return {};
+  const byPath = new Map(edits.map((e) => [e.path, e]));
+  const applyFilled = (filled: Record<string, string>, locale: "ar" | "en") => {
+    for (const [path, text] of Object.entries(filled)) {
+      const edit = byPath.get(path);
+      if (edit) edit.values[locale] = text;
+    }
+  };
+  const warnings: string[] = [];
+  if (toAr.length) {
+    try {
+      applyFilled(await translatePair(toAr, "en", "ar"), "ar");
+    } catch (e) {
+      if (e instanceof PartialTranslateError) applyFilled(e.partial as Record<string, string>, "ar");
+      console.error("English/Arabic sync (singleton, en->ar) failed:", e);
+      warnings.push(`فشلت ترجمة بعض الحقول للعربي — ${((e as Error).message || "").slice(0, 250)}`);
+    }
+  }
+  if (toEn.length) {
+    try {
+      applyFilled(await translatePair(toEn, "ar", "en"), "en");
+    } catch (e) {
+      if (e instanceof PartialTranslateError) applyFilled(e.partial as Record<string, string>, "en");
+      console.error("English/Arabic sync (singleton, ar->en) failed:", e);
+      warnings.push(`فشلت ترجمة بعض الحقول للإنجليزي — ${((e as Error).message || "").slice(0, 250)}`);
+    }
+  }
+  return warnings.length ? { warning: warnings.join(" | ") } : {};
+}
+
+/**
+ * Generate the twelve machine languages for edited singleton paths, in place.
  * Technical values (emails, phones, social URLs — the ltr fields) are never
- * translated. Each edit's `values` map gains fr…tr when its English changed or
+ * translated. Each edit's `values` map gains fr…sw when its English changed or
  * a translation is missing. Best-effort, same as the collections path.
  */
 export async function applySingletonTranslations(
@@ -94,6 +403,11 @@ export async function applySingletonTranslations(
   fieldByPath: Map<string, SingletonField>,
   existing: Singleton | null,
 ): Promise<{ warning?: string }> {
+  let arWarning: string | undefined;
+  if (translationConfigured()) {
+    arWarning = (await syncEnglishArabicSingleton(edits, fieldByPath)).warning;
+  }
+
   const toTranslate: FieldToTranslate[] = [];
   const byPath = new Map(edits.map((e) => [e.path, e]));
   for (const e of edits) {
@@ -101,14 +415,28 @@ export async function applySingletonTranslations(
     if (!field || field.ltr) continue; // technical value — keep identical across languages
     const en = e.values.en?.trim();
     if (!en) continue;
-    const prevEn = getPath(existing?.en, e.path);
-    const missing = MACHINE_LOCALES.some((loc) => !getPath(existing?.[loc], e.path));
+    const prevEnRaw = getPath(existing?.en, e.path);
+    const prevEn = typeof prevEnRaw === "string" ? prevEnRaw.trim() : prevEnRaw;
+    // A locale with no value yet, OR one that's just a leftover copy of
+    // English (e.g. from before this field had its own admin editor and was
+    // seeded the same everywhere) both need a real translation — checking
+    // only for empty missed the second case, so a newly-exposed field like
+    // footer.brandDesc could look "already translated" from old seed data
+    // and never actually get sent to the translator. Trimmed on both sides:
+    // a multi-line textarea value can carry a trailing newline that a plain
+    // text input never would, which silently defeated this exact comparison
+    // for footer.brandDesc while single-line fields right next to it worked.
+    const missing = MACHINE_LOCALES.some((loc) => {
+      const valRaw = getPath(existing?.[loc], e.path);
+      const val = typeof valRaw === "string" ? valRaw.trim() : valRaw;
+      return !val || val === en;
+    });
     if (en === prevEn && !missing) continue;
     toTranslate.push({ key: e.path, format: "text", text: e.values.en });
   }
-  if (!toTranslate.length) return {};
+  if (!toTranslate.length) return { warning: arWarning };
   if (!translationConfigured()) {
-    return { warning: "الترجمة الآلية مش متظبطة (GOOGLE_TRANSLATE_API_KEY) — اتحفظ الإنجليزي والعربي بس" };
+    return { warning: arWarning || "الترجمة الآلية مش متظبطة — اتحفظ الإنجليزي والعربي بس" };
   }
   try {
     const results = await translateFields(toTranslate);
@@ -116,9 +444,16 @@ export async function applySingletonTranslations(
       const edit = byPath.get(path);
       if (edit) Object.assign(edit.values, dict);
     }
-    return {};
+    return { warning: arWarning };
   } catch (e) {
+    if (e instanceof PartialTranslateError) {
+      for (const [path, dict] of Object.entries(e.partial as Record<string, Record<string, string>>)) {
+        const edit = byPath.get(path);
+        if (edit) Object.assign(edit.values, dict);
+      }
+    }
     console.error("Machine translation (singleton) failed:", e);
-    return { warning: "فشلت الترجمة الآلية — اتحفظ الإنجليزي والعربي، تقدر تحفظ تاني بعد شوية" };
+    const warning = "فشلت ترجمة بعض اللغات — اللي فشل هياخد نسخة الإنجليزي مؤقتاً، تقدر تحفظ تاني بعد شوية";
+    return { warning: arWarning ? `${arWarning} | ${warning}` : warning };
   }
 }

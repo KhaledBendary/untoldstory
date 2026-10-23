@@ -115,7 +115,7 @@ export default function PageEditor({
         <button className="primary" onClick={save} disabled={saving}>{saving ? "بيتحفظ ويترجم…" : "حفظ"}</button>
         {saved && errors.length === 0 && (
           <span style={{ color: "var(--ok)", fontSize: 14 }}>
-            {transWarn ? "✓ اتحفظ" : "✓ اتحفظ واتترجم للغات السبعة"}
+            {transWarn ? "✓ اتحفظ" : "✓ اتحفظ واتترجم للـ12 لغة"}
           </span>
         )}
       </div>

@@ -25,7 +25,12 @@ export type GeoOffice = {
   closes?: string;   // "18:00"
 };
 
-export type GeoFaq = { qEn: string; aEn: string; qAr: string; aAr: string };
+// q/a hold the full per-locale machine translation (fr, de, es, ... — see
+// applySeoSettingsTranslations in api/admin/seo-settings/route.ts), generated
+// automatically from qEn/aEn. qEn/aEn/qAr/aAr stay as the two fields the admin
+// actually edits by hand; q/a are optional so old saved documents (from
+// before this existed) still parse.
+export type GeoFaq = { qEn: string; aEn: string; qAr: string; aAr: string; q?: Record<string, string>; a?: Record<string, string> };
 
 export type GeoSettings = {
   organization: {
@@ -123,22 +128,38 @@ function normOffice(o: GeoOffice, i: number): GeoOffice {
 // ---- schema builders (identical output shape to the previous hard-coded ones) ----
 
 export function organizationSchema(s: GeoSettings) {
+  const primaryOffice = s?.offices?.[0];
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": `${SITE_URL}/#organization`,
-    name: s.organization.name,
+    name: s?.organization?.name || "Global Untold Story",
     url: `${SITE_URL}/`,
-    logo: `${SITE_URL}/images/logo-white.png`,
-    description: s.organization.description,
-    email: s.organization.email,
+    logo: {
+      "@type": "ImageObject",
+      url: `${SITE_URL}/images/logo-white.png`,
+      caption: s?.organization?.name || "Global Untold Story",
+    },
+    image: `${SITE_URL}/images/logo-white.png`,
+    description: s?.organization?.description || "",
+    email: s?.organization?.email || "",
     founder: { "@type": "Person", name: "Khaled Bendary", jobTitle: "CEO" },
-    address: s.offices.map((o) => ({ "@type": "PostalAddress", addressLocality: o.locality, addressCountry: o.country })),
-    contactPoint: s.offices.filter((o) => o.phone).map((o) => ({
-      "@type": "ContactPoint", telephone: o.phone, contactType: "sales", areaServed: o.country, availableLanguage: ["en", "ar"],
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: primaryOffice?.locality || "Egyptian Media Production City, 6th of October City",
+      addressLocality: "6th of October City",
+      addressRegion: primaryOffice?.region || "Giza",
+      addressCountry: primaryOffice?.country || "EG",
+    },
+    contactPoint: (s?.offices || []).filter((o) => o?.phone).map((o) => ({
+      "@type": "ContactPoint",
+      telephone: o.phone,
+      contactType: "customer service",
+      areaServed: o.country,
+      availableLanguage: ["en", "ar"],
     })),
-    sameAs: s.organization.sameAs,
-    slogan: s.organization.slogan,
+    sameAs: s?.organization?.sameAs || [],
+    slogan: s?.organization?.slogan || "",
     areaServed: [
       { "@type": "Country", name: "Egypt" },
       { "@type": "Country", name: "United Arab Emirates" },
@@ -146,11 +167,12 @@ export function organizationSchema(s: GeoSettings) {
       { "@type": "Place", name: "Middle East and North Africa" },
     ],
     foundingLocation: { "@type": "Place", name: "Cairo, Egypt" },
-    knowsAbout: s.organization.knowsAbout,
+    knowsAbout: s?.organization?.knowsAbout || [],
   };
 }
 
 export function officeSchemas(s: GeoSettings) {
+  if (!s?.offices || !Array.isArray(s.offices)) return [];
   return s.offices.map((office) => ({
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
@@ -159,10 +181,20 @@ export function officeSchemas(s: GeoSettings) {
     url: `${SITE_URL}/contact`,
     image: `${SITE_URL}/images/on-ground-production-giza.jpg`,
     logo: `${SITE_URL}/images/logo-white.png`,
-    email: s.organization.email,
-    ...(office.phone ? { telephone: office.phone } : {}),
-    parentOrganization: { "@id": `${SITE_URL}/#organization` },
-    address: { "@type": "PostalAddress", addressLocality: office.locality, addressRegion: office.region, addressCountry: office.country },
+    email: s?.organization?.email || "bendary@globaluntoldstory.com",
+    telephone: office.phone || "+201001299639",
+    parentOrganization: {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: s.organization.name,
+    },
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: office.locality,
+      addressLocality: office.locality,
+      addressRegion: office.region,
+      addressCountry: office.country,
+    },
     ...(office.lat != null && office.lng != null
       ? { geo: { "@type": "GeoCoordinates", latitude: office.lat, longitude: office.lng } }
       : {}),
@@ -174,25 +206,26 @@ export function officeSchemas(s: GeoSettings) {
     }],
     priceRange: "$$",
     areaServed: ["Egypt", "United Arab Emirates", "Saudi Arabia", "MENA"],
-    knowsLanguage: ["en", "ar"],
-    serviceType: [
-      "Film production", "Commercial advertising production", "Documentary production",
-      "Corporate video production", "Live broadcast production", "Post production",
-    ],
   }));
 }
 
 export function faqSchema(s: GeoSettings, locale: string) {
   const ar = locale === "ar";
+  // q/a (the machine-translated dicts) are preferred for any locale they
+  // cover; qEn/aEn/qAr/aAr remain the fallback for English, Arabic, or a
+  // document saved before the other 12 languages were generated.
   const items = s.faq
-    .map((f) => ({ q: ar ? (f.qAr || f.qEn) : (f.qEn || f.qAr), a: ar ? (f.aAr || f.aEn) : (f.aEn || f.aAr) }))
+    .map((f) => ({
+      q: f.q?.[locale] || (ar ? (f.qAr || f.qEn) : (f.qEn || f.qAr)),
+      a: f.a?.[locale] || (ar ? (f.aAr || f.aEn) : (f.aEn || f.aAr)),
+    }))
     .filter((x) => x.q && x.a);
   if (!items.length) return null;
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "@id": `${SITE_URL}/#faq`,
-    inLanguage: ar ? "ar" : "en",
+    inLanguage: locale,
     mainEntity: items.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })),
   };
 }

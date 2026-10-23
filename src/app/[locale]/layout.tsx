@@ -12,7 +12,7 @@ import { getCommandCenterSchemas } from "@/data/seo-command-schema";
 import { getShellData } from "@/lib/page-data";
 import { BRAND, DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/seo";
 import { getGeoSettings } from "@/lib/seo/geo-store";
-import { organizationSchema, officeSchemas, faqSchema, geoMeta } from "@/lib/seo/geo";
+import { organizationSchema, officeSchemas, geoMeta } from "@/lib/seo/geo";
 import { pageMeta } from "@/data/page-meta";
 
 /**
@@ -289,7 +289,6 @@ return (
           organizationSchema(geo),
           website,
           ...officeSchemas(geo),
-          faqSchema(geo, locale),
           ...getCommandCenterSchemas(),
         ].filter((x): x is Record<string, unknown> => Boolean(x))}
       />

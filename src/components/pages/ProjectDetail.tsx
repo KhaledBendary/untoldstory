@@ -10,11 +10,12 @@ import RetryState from '../RetryState';
 import { getProjectImage } from '@/lib/utils';
 import type { PortfolioItem } from '@/types/api';
 import { useLanguage } from '../LanguageContext';
+import { renderCmsHtml } from '@/lib/seo';
 import { usePageData } from '@/hooks/usePageData';
 import { getProjectDetailData, type ProjectDetailData, type DetailResult } from '@/lib/page-data';
 
 export default function ProjectDetail({ slug, initialData, initialLocale }: { slug: string; initialData: DetailResult<ProjectDetailData> | null; initialLocale: string }) {
-  const { locale, t } = useLanguage();
+  const { locale, t, setSlugOverride } = useLanguage();
   const { data: result, loading, failed: loadFailed, retry } = usePageData(
     initialData,
     initialLocale,
@@ -25,6 +26,14 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
   const payload = result?.status === "ok" ? result.data : null;
   const project = payload?.project ?? null;
   const allProjects = payload?.allProjects ?? [];
+
+  // So the language switcher lands on THIS project's own slug in the target
+  // locale, instead of reusing the current URL's slug under a new prefix.
+  useEffect(() => {
+    if (!project) return;
+    setSlugOverride({ basePath: "/work", canonicalSlug: project.canonicalSlug ?? project.slug, slugs: project.slugs });
+    return () => setSlugOverride(null);
+  }, [project, setSlugOverride]);
 
 
   if (loading) {
@@ -106,6 +115,20 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
               text={project.results || project.title}
               className="font-display font-bold leading-[1.25] text-2xl md:text-4xl normal-case tracking-tight"
             />
+            {project.description && (
+              <Reveal>
+                <div
+                  className="mt-8 prose prose-invert prose-lg max-w-none
+                    prose-headings:font-display prose-headings:uppercase prose-headings:tracking-tight
+                    prose-h2:text-xl prose-h2:md:text-2xl prose-h2:mt-8 prose-h2:mb-3
+                    prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-2
+                    prose-p:text-white/65 prose-p:leading-relaxed
+                    prose-a:text-white prose-a:underline prose-a:decoration-white/30 hover:prose-a:decoration-white
+                    prose-strong:text-white prose-strong:font-bold prose-li:text-white/65"
+                  dangerouslySetInnerHTML={{ __html: renderCmsHtml(project.description) }}
+                />
+              </Reveal>
+            )}
             <Reveal className="mt-10 flex flex-wrap gap-3">
               {project.category && (
                 <span className="font-mono2 text-[10px] tracking-[0.2em] uppercase border border-white/20 px-4 py-2 text-white/70">{project.category}</span>

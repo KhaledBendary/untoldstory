@@ -4,6 +4,8 @@ import { currentSession } from "@/lib/admin-session";
 import { getServices, getProjects, getPosts } from "@/lib/db/repo";
 import { LOCALE_CODES } from "@/lib/i18n";
 import TranslateAllButton from "./TranslateAllButton";
+import ImportTranslationsButton from "./ImportTranslationsButton";
+import TranslateItemButton from "./TranslateItemButton";
 
 export const dynamic = "force-dynamic";
 
@@ -74,6 +76,7 @@ function Section({ label, type, items }: { label: string; type: string; items: I
               {LOCALES.map((l) => (
                 <th key={l} style={{ padding: "10px 4px", fontWeight: 600, color: "var(--faint)", fontSize: 11, borderBottom: "1px solid var(--line)" }}>{LOCALE_LABEL[l] ?? l.toUpperCase()}</th>
               ))}
+              <th style={{ padding: "10px 8px", borderBottom: "1px solid var(--line)" }} />
             </tr>
           </thead>
           <tbody>
@@ -89,6 +92,9 @@ function Section({ label, type, items }: { label: string; type: string; items: I
                       background: DOT[it.state[l]].color }} />
                   </td>
                 ))}
+                <td style={{ padding: "6px 8px", textAlign: "end" }}>
+                  <TranslateItemButton type={type} slug={it.slug} />
+                </td>
               </tr>
             ))}
           </tbody>
@@ -113,8 +119,9 @@ export default async function TranslationsPage() {
       <p style={{ fontSize: 12, color: "var(--faint)", margin: "0 0 4px" }}>
         النسبة بتحسب الترجمة الحقيقية بس (اللي مختلفة عن الإنجليزي). اللغات اللي لسه نسخة إنجليزي محتاجة ترجمة فعلية.
       </p>
-      <div style={{ margin: "14px 0 22px" }}>
+      <div style={{ margin: "14px 0 22px", display: "grid", gap: 10 }}>
         <TranslateAllButton />
+        <ImportTranslationsButton />
       </div>
       <Section label="الخدمات" type="services" items={analyze(services)} />
       <Section label="الأعمال" type="projects" items={analyze(projects)} />

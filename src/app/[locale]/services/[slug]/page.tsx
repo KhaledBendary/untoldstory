@@ -5,7 +5,7 @@ import ServiceDetail from "@/components/pages/ServiceDetail";
 import StructuredData from "@/components/StructuredData";
 import { applySeoOverrides } from "@/data/seo-overrides";
 import { api } from "@/lib/api";
-import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
+import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE, decodeSlug } from "@/lib/i18n";
 import { IS_PRODUCTION_BUILD, findServiceAnyLocale, serviceDetailWithFallback } from "@/lib/page-data";
 import { SERVICES as FALLBACK_SERVICES } from "@/data/content";
 import { relatedServiceSlugs, serviceStaticParams } from "@/lib/legacy-redirects";
@@ -29,27 +29,44 @@ type Props = { params: Promise<{ locale: string; slug: string }> };
  */
 export const dynamicParams = false;
 
+// Each locale can have its own translated slug (data.slugs — see translate/apply.ts),
+// so every locale needs its own slug list, not one list reused across all of them.
 export async function generateStaticParams() {
-  const slugs = await slugList();
-  return PRERENDER_LOCALES.flatMap((locale) => slugs.map(({ slug }) => ({ locale, slug })));
+  const perLocale = await Promise.all(
+    PRERENDER_LOCALES.map(async (locale) => (await slugList(locale)).map(({ slug }) => ({ locale, slug }))),
+  );
+  return perLocale.flat();
 }
 
-async function slugList() {
+async function slugList(locale: string) {
   try {
-    const services = await api.getServices();
-    return serviceStaticParams(services.map((service) => service.slug), FALLBACK_SERVICES.map((s) => s.slug));
+    const services = await api.getServices(locale);
+    // Keep the canonical slug valid too, not just the translated one: the
+    // moment a locale's title first gets translated, its slug changes — with
+    // dynamicParams=false, only whatever's listed here resolves, so an old
+    // link using the canonical slug would otherwise 404 the instant a locale
+    // moves from "no translation yet" to "translated", with nothing to redirect it.
+    const slugs = services.flatMap((s) => (s.canonicalSlug && s.canonicalSlug !== s.slug ? [s.slug, s.canonicalSlug] : [s.slug]));
+    return serviceStaticParams(slugs, FALLBACK_SERVICES.map((s) => s.slug));
   } catch (e) {
     console.error("Error fetching services for generateStaticParams:", e instanceof Error ? e.message : e);
     return serviceStaticParams([], FALLBACK_SERVICES.map((s) => s.slug));
   }
 }
 
-function serviceMeta(path: string, locale: string, title: string, description: string, image?: string | null) {
-  return applySeoOverrides(path, pageSeo({ path, locale, title, description, image }), locale);
+function serviceMeta(path: string, locale: string, title: string, description: string, image?: string | null, extra?: ReturnType<typeof cmsSeo>, canonicalSlug?: string, slugs?: Record<string, string>) {
+  return applySeoOverrides(path, pageSeo({
+    path, locale, title, description, image,
+    ogTitle: extra?.ogTitle, ogDescription: extra?.ogDescription,
+    twitterTitle: extra?.twitterTitle, twitterDescription: extra?.twitterDescription,
+    canonical: extra?.canonical, nofollow: extra?.nofollow,
+    slugOverride: canonicalSlug ? { basePath: "/services", canonicalSlug, slugs } : undefined,
+  }), locale);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug, locale: raw } = await params;
+  const { slug: rawSlug, locale: raw } = await params;
+  const slug = decodeSlug(rawSlug);
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const path = `/services/${slug}`;
   const fallbackTitle = buildTitle(slug.replace(/-/g, " "), slug);
@@ -63,7 +80,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         path, locale,
         buildTitle(meta.metaTitle || service.title, slug),
         buildDescription(meta.metaDescription || service.shortDesc),
-        meta.ogImageUrl || service.imageUrl,
+        meta.ogImageUrl || service.imageUrl, meta, service.canonicalSlug, service.slugs,
       ), (service as { noindex?: boolean }).noindex);
     }
     return serviceMeta(path, locale, fallbackTitle, fallbackTitle);
@@ -76,7 +93,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       path, locale,
       buildTitle(meta.metaTitle || service.title, slug),
       buildDescription(meta.metaDescription || service.shortDesc),
-      meta.ogImageUrl || service.imageUrl,
+      meta.ogImageUrl || service.imageUrl, meta, service.canonicalSlug, service.slugs,
     );
   } catch (e) {
     console.error("Error fetching service for metadata:", e);
@@ -87,7 +104,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         path, locale,
         buildTitle(meta.metaTitle || live.title, slug),
         buildDescription(meta.metaDescription || live.shortDesc),
-        meta.ogImageUrl || live.imageUrl,
+        meta.ogImageUrl || live.imageUrl, meta, live.canonicalSlug, live.slugs,
       );
     }
 
@@ -102,7 +119,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Props) {
-  const { slug, locale: raw } = await params;
+  const { slug: rawSlug, locale: raw } = await params;
+  const slug = decodeSlug(rawSlug);
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   let name = "";
   let schema;
@@ -118,15 +136,20 @@ export default async function Page({ params }: Props) {
       description: buildDescription(service.shortDesc),
       url: absoluteUrl(localizedPath(`/services/${slug}`, locale)),
       image: service.imageUrl ? absoluteUrl(service.imageUrl) : undefined,
-      provider: { "@type": "Organization", name: "Global Untold Story", url: "https://globaluntoldstory.com/" },
+      provider: {
+        "@type": "Organization",
+        name: "Global Untold Story",
+        url: "https://globaluntoldstory.com/",
+        logo: { "@type": "ImageObject", url: absoluteUrl("/images/logo-white.png") },
+      },
       brand: { "@type": "Organization", name: "Global Untold Story" },
-      areaServed: ["Egypt", "UAE", "Saudi Arabia", "MENA"],
+      areaServed: ["Egypt", "United Arab Emirates", "Saudi Arabia", "MENA"],
     };
   }
 
   if (initialData?.status === "notFound") notFound();
 
-  const faqs = getServiceFaqs(slug);
+  const faqs = getServiceFaqs(slug, initialData?.status === "ok" ? initialData.data.service.faqs : undefined);
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",

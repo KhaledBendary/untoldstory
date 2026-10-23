@@ -1,5 +1,51 @@
 {
   "/insights/the-video-production-journey-from-idea-to-impact": {
-    "description": "Discover Why This Process Matters — premium production across Egypt and MENA by Global Untold Story."
+    "description": "Discover Why This Process Matters — premium production across Egypt and MENA by Global Untold Story.",
+    "canonical": "/insights/the-video-production-journey-from-idea-to-impact"
+  },
+  "/services/on-ground-egypt": {
+    "canonical": "/services/on-ground-egypt"
+  },
+  "/services/documentary-production-egypt": {
+    "canonical": "/services/documentary-production-egypt"
+  },
+  "/work/apache-oil-gas-production-in-egypt": {
+    "canonical": "/work/apache-oil-gas-production-in-egypt"
+  },
+  "/work/ilo-upper-egypt-documentary-film-production": {
+    "canonical": "/work/ilo-upper-egypt-documentary-film-production"
+  },
+  "/insights/professional-film-production-equipment": {
+    "canonical": "/insights/professional-film-production-equipment"
+  },
+  "/insights/tv-commercial-production-in-egypt": {
+    "canonical": "/insights/tv-commercial-production-in-egypt"
+  },
+  "/services/post-production": {
+    "canonical": "/services/post-production"
+  },
+  "/services/animation-3d-production": {
+    "canonical": "/services/animation-3d-production"
+  },
+  "/insights/media-production-services-egypt": {
+    "canonical": "/insights/media-production-services-egypt"
+  },
+  "/work/huawei-commercial-production-in-egypt": {
+    "canonical": "/work/huawei-commercial-production-in-egypt"
+  },
+  "/work/hamaki-concert-coverage-live-event-production": {
+    "canonical": "/work/hamaki-concert-coverage-live-event-production"
+  },
+  "/work/apache-egypt-operations-documentary": {
+    "canonical": "/work/apache-egypt-operations-documentary"
+  },
+  "/work/apache-egypt-operations-and-community-impact-film": {
+    "canonical": "/work/apache-egypt-operations-and-community-impact-film"
+  },
+  "/work/changan-road-safety-csr-campaign": {
+    "canonical": "/work/changan-road-safety-csr-campaign"
+  },
+  "/work/alliance-corporate-event-production": {
+    "canonical": "/work/alliance-corporate-event-production"
   }
 }

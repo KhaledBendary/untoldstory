@@ -72,8 +72,14 @@ const guard = async <T>(fn: () => Promise<T>): Promise<T | null> => {
 export const services = (locale = "en") =>
   guard(async () => (await allServices()).map((r) => localizeService(r, locale)));
 
+// A translated slug is only stored in data.slugs for the locale it belongs to
+// (see translate/apply.ts) — the canonical column always still matches too, so
+// the old (English/canonical) URL for an item never breaks after translation.
+const matchesSlug = (r: { slug: string; data: { slugs?: Record<string, string> } }, slug: string, locale: string) =>
+  r.slug === slug || r.data.slugs?.[locale] === slug;
+
 export const service = async (slug: string, locale = "en") => {
-  const r = (await allServices()).find((x) => x.slug === slug);
+  const r = (await allServices()).find((x) => matchesSlug(x, slug, locale));
   return r ? localizeService(r, locale) : null;
 };
 
@@ -86,7 +92,7 @@ export const portfolio = (params: { locale?: string; category?: string; page?: n
   });
 
 export const portfolioItem = async (slug: string, locale = "en") => {
-  const r = (await allProjects()).find((x) => x.slug === slug);
+  const r = (await allProjects()).find((x) => matchesSlug(x, slug, locale));
   return r ? localizeProject(r, locale) : null;
 };
 
@@ -101,7 +107,7 @@ export const blog = (params: { locale?: string; category?: string; tag?: string;
   });
 
 export const blogPost = async (slug: string, locale = "en") => {
-  const r = (await allPosts()).find((x) => x.slug === slug);
+  const r = (await allPosts()).find((x) => matchesSlug(x, slug, locale));
   return r ? localizePost(r, locale) : null;
 };
 

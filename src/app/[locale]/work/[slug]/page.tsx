@@ -5,7 +5,7 @@ import ProjectDetail from "@/components/pages/ProjectDetail";
 import StructuredData from "@/components/StructuredData";
 import { applySeoOverrides } from "@/data/seo-overrides";
 import { api } from "@/lib/api";
-import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
+import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE, decodeSlug } from "@/lib/i18n";
 import { IS_PRODUCTION_BUILD, findProjectAnyLocale, projectDetailWithFallback } from "@/lib/page-data";
 import { PROJECTS as FALLBACK_PROJECTS } from "@/data/content";
 import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo, withNoindex } from "@/lib/seo";
@@ -37,18 +37,31 @@ function projectHeadline(title: string | undefined, client?: string | null, slug
  */
 export const dynamicParams = false;
 
+// Each locale can have its own translated slug (data.slugs — see translate/apply.ts),
+// so every locale needs its own slug list, not one list reused across all of them.
 export async function generateStaticParams() {
-  const slugs = await slugList();
-  return PRERENDER_LOCALES.flatMap((locale) => slugs.map(({ slug }) => ({ locale, slug })));
+  const perLocale = await Promise.all(
+    PRERENDER_LOCALES.map(async (locale) => (await slugList(locale)).map(({ slug }) => ({ locale, slug }))),
+  );
+  return perLocale.flat();
 }
 
-async function slugList() {
+async function slugList(locale: string) {
   const extras = FALLBACK_PROJECTS.map(({ slug }) => ({ slug }));
   try {
-    const portfolioData = await api.getPortfolio({ page: 1, per_page: 100 });
-    const seen = new Set(portfolioData.items.map((project) => project.slug));
+    const portfolioData = await api.getPortfolio({ page: 1, per_page: 100, locale });
+    // Keep the canonical slug valid too, not just the translated one: the
+    // moment a locale's title first gets translated, its slug changes — with
+    // dynamicParams=false, only whatever's listed here resolves, so an old
+    // link using the canonical slug would otherwise 404 the instant a locale
+    // moves from "no translation yet" to "translated", with nothing to redirect it.
+    const slugsForItem = (project: { slug: string; canonicalSlug?: string }) =>
+      project.canonicalSlug && project.canonicalSlug !== project.slug
+        ? [project.slug, project.canonicalSlug]
+        : [project.slug];
+    const seen = new Set(portfolioData.items.flatMap(slugsForItem));
     return [
-      ...portfolioData.items.map((project) => ({ slug: project.slug })),
+      ...portfolioData.items.flatMap((project) => slugsForItem(project).map((slug) => ({ slug }))),
       ...extras.filter((item) => !seen.has(item.slug)),
     ];
   } catch (e) {
@@ -57,12 +70,19 @@ async function slugList() {
   }
 }
 
-function projectMeta(path: string, locale: string, title: string, description: string, image?: string | null) {
-  return applySeoOverrides(path, pageSeo({ path, locale, title, description, image, type: "article" }), locale);
+function projectMeta(path: string, locale: string, title: string, description: string, image?: string | null, extra?: ReturnType<typeof cmsSeo>, canonicalSlug?: string, slugs?: Record<string, string>) {
+  return applySeoOverrides(path, pageSeo({
+    path, locale, title, description, image, type: "article",
+    ogTitle: extra?.ogTitle, ogDescription: extra?.ogDescription,
+    twitterTitle: extra?.twitterTitle, twitterDescription: extra?.twitterDescription,
+    canonical: extra?.canonical, nofollow: extra?.nofollow,
+    slugOverride: canonicalSlug ? { basePath: "/work", canonicalSlug, slugs } : undefined,
+  }), locale);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug, locale: raw } = await params;
+  const { slug: rawSlug, locale: raw } = await params;
+  const slug = decodeSlug(rawSlug);
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const path = `/work/${slug}`;
   const fallbackTitle = buildTitle(slug.replace(/-/g, " "), slug);
@@ -73,7 +93,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     if (project) {
       const headline = projectHeadline(project.title, project.client, slug);
       const m = cmsSeo((project as { seo?: Record<string, unknown> }).seo);
-      return withNoindex(projectMeta(path, locale, buildTitle(m.metaTitle || headline, slug), buildDescription(m.metaDescription || project.results, headline), m.ogImageUrl || project.image), (project as { noindex?: boolean }).noindex);
+      return withNoindex(projectMeta(path, locale, buildTitle(m.metaTitle || headline, slug), buildDescription(m.metaDescription || project.results, headline), m.ogImageUrl || project.image, m, project.canonicalSlug, project.slugs), (project as { noindex?: boolean }).noindex);
     }
     return projectMeta(path, locale, fallbackTitle, fallbackTitle);
   }
@@ -82,14 +102,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const project = await api.getPortfolioBySlug(slug, locale);
     const headline = projectHeadline(project.title, project.client, slug);
     const m = cmsSeo((project as { seo?: Record<string, unknown> }).seo);
-    return projectMeta(path, locale, buildTitle(m.metaTitle || headline, slug), buildDescription(m.metaDescription || project.results, headline), m.ogImageUrl || project.image);
+    return projectMeta(path, locale, buildTitle(m.metaTitle || headline, slug), buildDescription(m.metaDescription || project.results, headline), m.ogImageUrl || project.image, m, project.canonicalSlug, project.slugs);
   } catch (e) {
     console.error("Error fetching project for metadata:", e);
     const live = await findProjectAnyLocale(slug, locale);
     if (live) {
       const headline = projectHeadline(live.title, live.client, slug);
       const m = cmsSeo((live as { seo?: Record<string, unknown> }).seo);
-      return projectMeta(path, locale, buildTitle(m.metaTitle || headline, slug), buildDescription(m.metaDescription || live.results, headline), m.ogImageUrl || live.image);
+      return projectMeta(path, locale, buildTitle(m.metaTitle || headline, slug), buildDescription(m.metaDescription || live.results, headline), m.ogImageUrl || live.image, m, live.canonicalSlug, live.slugs);
     }
 
     const project = FALLBACK_PROJECTS.find((item) => item.slug === slug);
@@ -101,7 +121,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Props) {
-  const { slug, locale: raw } = await params;
+  const { slug: rawSlug, locale: raw } = await params;
+  const slug = decodeSlug(rawSlug);
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   let name = "";
   let schema: Record<string, unknown>[] | undefined;
@@ -124,7 +145,8 @@ export default async function Page({ params }: Props) {
         "@type": "VideoObject",
         name,
         description: buildDescription(project.results, name),
-        thumbnailUrl: project.image ? absoluteUrl(project.image) : absoluteUrl("/images/on-ground-production-giza.jpg"),
+        thumbnailUrl: [project.image ? absoluteUrl(project.image) : absoluteUrl("/images/on-ground-production-giza.jpg")],
+        uploadDate: "2026-01-01T00:00:00.000Z",
         contentUrl: absoluteUrl(project.video),
       });
     }

@@ -83,6 +83,14 @@ export const SINGLETON_BLOCKS: Record<string, SingletonBlock> = {
       { key: "value", label: "الاسم", type: "text", i18n: true },
     ],
   },
+  "layout-about-links": {
+    key: "layout-about-links", singleton: "layout", path: "footer.aboutLinks",
+    labelAr: "روابط قائمة الفوتر", itemLabelAr: "رابط", titleField: "label",
+    fields: [
+      { key: "href", label: "الرابط (مثلاً /work)", type: "text" },
+      { key: "label", label: "النص الظاهر", type: "text", i18n: true },
+    ],
+  },
   "layout-offices": {
     key: "layout-offices", singleton: "layout", path: "footer.offices",
     labelAr: "المكاتب", itemLabelAr: "مكتب", titleField: "region",

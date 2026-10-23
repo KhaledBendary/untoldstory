@@ -5,7 +5,7 @@ import PostDetail from "@/components/pages/PostDetail";
 import StructuredData from "@/components/StructuredData";
 import { applySeoOverrides } from "@/data/seo-overrides";
 import { api } from "@/lib/api";
-import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
+import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE, decodeSlug } from "@/lib/i18n";
 import { IS_PRODUCTION_BUILD, findPostAnyLocale, postDetailWithFallback } from "@/lib/page-data";
 import { POSTS as FALLBACK_POSTS } from "@/data/content";
 import { postStaticParams, relatedPostSlugs } from "@/lib/legacy-redirects";
@@ -28,16 +28,26 @@ type Props = { params: Promise<{ locale: string; slug: string }> };
  */
 export const dynamicParams = false;
 
+// Each locale can have its own translated slug (data.slugs — see translate/apply.ts),
+// so every locale needs its own slug list, not one list reused across all of them.
 export async function generateStaticParams() {
-  const slugs = await slugList();
-  return PRERENDER_LOCALES.flatMap((locale) => slugs.map(({ slug }) => ({ locale, slug })));
+  const perLocale = await Promise.all(
+    PRERENDER_LOCALES.map(async (locale) => (await slugList(locale)).map(({ slug }) => ({ locale, slug }))),
+  );
+  return perLocale.flat();
 }
 
-async function slugList() {
+async function slugList(locale: string) {
   try {
-    const blogData = await api.getBlogPosts({ page: 1, per_page: 50 });
+    const blogData = await api.getBlogPosts({ page: 1, per_page: 50, locale });
+    // Keep the canonical slug valid too, not just the translated one: the
+    // moment a locale's title first gets translated, its slug changes — with
+    // dynamicParams=false, only whatever's listed here resolves, so an old
+    // link using the canonical slug would otherwise 404 the instant a locale
+    // moves from "no translation yet" to "translated", with nothing to redirect it.
+    const slugs = blogData.items.flatMap((p) => (p.canonicalSlug && p.canonicalSlug !== p.slug ? [p.slug, p.canonicalSlug] : [p.slug]));
     return postStaticParams(
-      blogData.items.map((post) => post.slug),
+      slugs,
       FALLBACK_POSTS.map((p) => p.slug),
     );
   } catch (e) {
@@ -46,12 +56,19 @@ async function slugList() {
   }
 }
 
-function postMeta(path: string, locale: string, title: string, description: string, image?: string | null, publishedTime?: string) {
-  return applySeoOverrides(path, pageSeo({ path, locale, title, description, image, type: "article", publishedTime }), locale);
+function postMeta(path: string, locale: string, title: string, description: string, image?: string | null, publishedTime?: string, extra?: ReturnType<typeof cmsSeo>, canonicalSlug?: string, slugs?: Record<string, string>) {
+  return applySeoOverrides(path, pageSeo({
+    path, locale, title, description, image, type: "article", publishedTime,
+    ogTitle: extra?.ogTitle, ogDescription: extra?.ogDescription,
+    twitterTitle: extra?.twitterTitle, twitterDescription: extra?.twitterDescription,
+    canonical: extra?.canonical, nofollow: extra?.nofollow,
+    slugOverride: canonicalSlug ? { basePath: "/insights", canonicalSlug, slugs } : undefined,
+  }), locale);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug, locale: raw } = await params;
+  const { slug: rawSlug, locale: raw } = await params;
+  const slug = decodeSlug(rawSlug);
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const path = `/insights/${slug}`;
   const fallbackTitle = buildTitle(slug.replace(/-/g, " "), slug);
@@ -61,7 +78,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const post = detail?.status === "ok" ? detail.data.post : null;
     if (post) {
       const meta = cmsSeo(post.seo as Record<string, unknown> | undefined);
-      return withNoindex(postMeta(path, locale, buildTitle(meta.metaTitle || post.title, slug), buildDescription(meta.metaDescription || post.excerpt, post.title), meta.ogImageUrl || post.featuredImage, post.publishedAt), (post as { noindex?: boolean }).noindex);
+      return withNoindex(postMeta(path, locale, buildTitle(meta.metaTitle || post.title, slug), buildDescription(meta.metaDescription || post.excerpt, post.title), meta.ogImageUrl || post.featuredImage, post.publishedAt, meta, post.canonicalSlug, post.slugs), (post as { noindex?: boolean }).noindex);
     }
     return postMeta(path, locale, fallbackTitle, fallbackTitle);
   }
@@ -69,12 +86,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const post = await api.getBlogPostBySlug(slug, locale);
     const meta = cmsSeo(post.seo as Record<string, unknown> | undefined);
-    return postMeta(path, locale, buildTitle(meta.metaTitle || post.title, slug), buildDescription(meta.metaDescription || post.excerpt, post.title), meta.ogImageUrl || post.featuredImage, post.publishedAt);
+    return postMeta(path, locale, buildTitle(meta.metaTitle || post.title, slug), buildDescription(meta.metaDescription || post.excerpt, post.title), meta.ogImageUrl || post.featuredImage, post.publishedAt, meta, post.canonicalSlug, post.slugs);
   } catch (e) {
     console.error("Error fetching post for metadata:", e);
     const live = await findPostAnyLocale(slug, locale);
     if (live) {
-      return postMeta(path, locale, buildTitle(live.title, slug), buildDescription(live.excerpt, live.title), live.featuredImage, live.publishedAt);
+      return postMeta(path, locale, buildTitle(live.title, slug), buildDescription(live.excerpt, live.title), live.featuredImage, live.publishedAt, undefined, live.canonicalSlug, live.slugs);
     }
 
     const post = FALLBACK_POSTS.find((item) => relatedPostSlugs(slug).includes(item.slug));
@@ -85,7 +102,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Props) {
-  const { slug, locale: raw } = await params;
+  const { slug: rawSlug, locale: raw } = await params;
+  const slug = decodeSlug(rawSlug);
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   let name = "";
   let schema;
@@ -100,17 +118,32 @@ export default async function Page({ params }: Props) {
     const post = initialData.data.post;
     name = cleanHeadline(post.title, slug);
     const articleImage = post.featuredImage ? absoluteUrl(post.featuredImage) : absoluteUrl("/images/cinema-camera-red-dragon.jpg");
+    const pubDate = post.publishedAt && !Number.isNaN(new Date(post.publishedAt).getTime())
+      ? new Date(post.publishedAt).toISOString()
+      : "2026-08-25T12:00:00.000Z";
     schema = {
       "@context": "https://schema.org",
       "@type": "Article",
       headline: post.title,
       description: buildDescription(post.excerpt, post.title),
-      datePublished: post.publishedAt,
-      dateModified: post.publishedAt,
-      image: articleImage,
-      mainEntityOfPage: absoluteUrl(localizedPath(`/insights/${slug}`, locale)),
-      author: { "@type": "Organization", name: "Global Untold Story" },
-      publisher,
+      datePublished: pubDate,
+      dateModified: pubDate,
+      image: [articleImage],
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": absoluteUrl(localizedPath(`/insights/${slug}`, locale)),
+      },
+      author: [{
+        "@type": "Organization",
+        name: "Global Untold Story",
+        url: "https://globaluntoldstory.com/",
+      }],
+      publisher: {
+        "@type": "Organization",
+        name: "Global Untold Story",
+        url: "https://globaluntoldstory.com/",
+        logo: { "@type": "ImageObject", url: absoluteUrl("/images/logo-white.png") },
+      },
     };
   }
 

@@ -18,6 +18,10 @@ export interface PaginatedResponse<T> {
 export interface Service {
   id: string;
   slug: string;
+  // Per-locale translated slug overrides, keyed by locale — only present when
+  // the record came from the database (translate/apply.ts generates this).
+  slugs?: Record<string, string>;
+  canonicalSlug?: string;
   icon: string;
   imageUrl: string;
   title: string;
@@ -25,6 +29,9 @@ export interface Service {
   fullDesc: string;
   price: string;
   features: string[];
+  // Up to 5 optional Q&A pairs authored per service in the admin (falls back
+  // to src/data/service-faqs.ts's generic English defaults when empty).
+  faqs?: { question: string; answer: string }[];
   isFeatured: boolean;
   sortOrder?: number;
   seo?: Record<string, unknown>;
@@ -32,6 +39,8 @@ export interface Service {
 
 export interface PortfolioItem {
   slug: string;
+  slugs?: Record<string, string>;
+  canonicalSlug?: string;
   title: string;
   client?: string;
   image?: string;
@@ -41,6 +50,8 @@ export interface PortfolioItem {
   categorySlug?: string;
   duration?: string | null;
   budget?: string | null;
+  shortDescription?: string;
+  description?: string;
   results?: string;
   metric?: string;
   gridSize?: string;
@@ -51,6 +62,8 @@ export interface PortfolioItem {
 export interface BlogPost {
   id: string;
   slug: string;
+  slugs?: Record<string, string>;
+  canonicalSlug?: string;
   title: string;
   excerpt: string;
   date: string;

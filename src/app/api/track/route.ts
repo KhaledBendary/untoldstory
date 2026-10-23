@@ -23,6 +23,11 @@ export async function POST(request: NextRequest) {
   const ua = h.get("user-agent") || "";
   // Exclude bots and our own dashboard visits so analytics reflects real visitors.
   if (!ua || BOT_RE.test(ua)) return NextResponse.json({ ok: true, skipped: "bot" });
+  // A browser always labels a request made by our own page "same-origin" and the
+  // label can't be set from page script. Anything else (a script, curl with a
+  // browser user agent, another site) is not a visit to this site.
+  const fetchSite = h.get("sec-fetch-site");
+  if (fetchSite && fetchSite !== "same-origin" && fetchSite !== "same-site") return NextResponse.json({ ok: true, skipped: "cross-site" });
   if (/^\/(?:[a-z]{2}\/)?admin(?:\/|$)/i.test(body.path)) return NextResponse.json({ ok: true, skipped: "admin" });
 
   const device = /Mobi|Android|iPhone|iPad|Windows Phone/i.test(ua) ? "mobile" : "desktop";

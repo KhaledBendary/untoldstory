@@ -1,4 +1,60 @@
-import { DEFAULT_LOCALE, isLocale, localizedPath } from "@/lib/i18n";
+import { DEFAULT_LOCALE, decodeSlug, isLocale, localizedPath } from "@/lib/i18n";
+import slugDictionary from "@/data/slug-dictionary.json";
+
+type CatalogItem = { canonicalSlug: string; slugs: Record<string, string> };
+
+const { pathRedirects, slugAliases, catalog } = slugDictionary as {
+  pathRedirects: Record<string, string>;
+  slugAliases: Record<string, string>;
+  catalog: Record<string, CatalogItem[]>;
+};
+
+const slugMap = new Map<string, { section: string; canonicalSlug: string; slugs: Record<string, string> }>();
+
+for (const section of ["services", "work", "insights"]) {
+  const items = catalog[section] || [];
+  for (const item of items) {
+    slugMap.set(item.canonicalSlug.toLowerCase(), { section, canonicalSlug: item.canonicalSlug, slugs: item.slugs });
+    for (const s of Object.values(item.slugs)) {
+      if (s) {
+        slugMap.set(String(s).toLowerCase(), { section, canonicalSlug: item.canonicalSlug, slugs: item.slugs });
+      }
+    }
+  }
+}
+
+for (const [alias, canonical] of Object.entries(slugAliases)) {
+  const target = slugMap.get(canonical.toLowerCase());
+  if (target) {
+    slugMap.set(alias.toLowerCase(), target);
+  }
+}
+
+export function resolveDetailPath(bare: string, targetLocale: string): string | null {
+  const clean = bare.replace(/\/$/, "");
+  const decoded = decodeSlug(clean);
+  const match = decoded.match(/^\/(services|service|work|insights|blog|article)\/([^/?#]+)$/i);
+  if (!match) return null;
+
+  const sectionRaw = match[1].toLowerCase();
+  const slug = match[2].toLowerCase();
+
+  const sectionMap: Record<string, string> = {
+    service: "services",
+    services: "services",
+    work: "work",
+    insights: "insights",
+    blog: "insights",
+    article: "insights",
+  };
+  const section = sectionMap[sectionRaw] || sectionRaw;
+
+  const item = slugMap.get(slug);
+  if (!item) return null;
+
+  const destSlug = targetLocale === DEFAULT_LOCALE ? item.canonicalSlug : (item.slugs[targetLocale] || item.canonicalSlug);
+  return localizedPath(`/${section}/${destSlug}`, targetLocale);
+}
 
 /**
  * WordPress and pre-CMS Next slugs that still collect Google hits.
@@ -10,6 +66,8 @@ const PAGE_ALIASES: Record<string, string> = {
   "/who-we-are": "/about",
   "/our-story": "/about",
   "/about-me": "/about",
+  "/team": "/about",
+  "/our-team": "/about",
   "/contact-us": "/contact",
   "/contactus": "/contact",
   "/get-a-quote": "/contact",
@@ -19,22 +77,42 @@ const PAGE_ALIASES: Record<string, string> = {
   "/portfolio": "/work",
   "/portfolios": "/work",
   "/projects": "/work",
+  "/portfolio-category": "/work",
   "/blog": "/insights",
+  "/blogs": "/insights",
   "/news": "/insights",
   "/articles": "/insights",
   "/our-services": "/services",
   "/service": "/services",
+  "/service-category": "/services",
   "/index.php": "/",
   "/index.html": "/",
   "/home": "/",
+  "/landing-page": "/",
   "/sitemap_index.xml": "/sitemap.xml",
   "/wp-sitemap.xml": "/sitemap.xml",
+  "/page-sitemap.xml": "/sitemap.xml",
+  "/pxl-template-sitemap.xml": "/sitemap.xml",
+  "/service-sitemap.xml": "/sitemap.xml",
   "/production-journey": "/insights/the-video-production-journey-from-idea-to-impact",
   "/brand-storytelling": "/insights/why-every-brand-needs-a-story-that-moves-people",
   "/how-to-choose-a-media-production-agency-in-egypt": "/insights/how-to-choose-a-media-production-agency-in-egypt",
-  "/professional-film-production-equipment": "/insights/professional-film-production-equipment",
+  "/professional-film-production-equipment": "/insights/film-production-in-egypt",
   "/corporate-video-production-in-cairo-what-every-brand-needs-to-know": "/insights/corporate-video-production-in-cairo",
   "/tv-commercial-production-in-egypt-complete-guide-2026": "/insights/tv-commercial-production-in-egypt",
+  "/afkar-studio-tasweer": "/insights",
+  "/افكار-استديو-تصوير": "/insights",
+  "/شركة-إنتاج-إعلانات-في-مصر": "/services/commercial-video-production",
+  "/أفضل-شركة-تصوير-ومونتاج-في-الرياض": "/services/commercial-video-production",
+  "/أفضل-شركة-إنتاج-إعلامي-في-مصر": "/about",
+  "/افضل-شركة-انتاج-اعلامي-في-مصر": "/about",
+  "/أفضل-شركة-إنتاج-تلفزيوني-في-مصر": "/services/tv-show-production-live-broadcast",
+  "/إنتاج-فيديو-شركات-في-مصر": "/services/corporate-video-production-egypt",
+  "/إنتاج-فيديو-صناعي-في-مصر": "/services/corporate-video-production-egypt",
+  "/تواصل-معنا": "/contact",
+  "/real-estate-films": "/services/commercial-video-production",
+  "/pre-productions": "/services/on-ground-egypt",
+  "/locations": "/services/on-ground-egypt",
 };
 
 export const SERVICE_SLUG_ALIASES: Record<string, string> = {
@@ -72,8 +150,8 @@ export const POST_SLUG_ALIASES: Record<string, string> = {
   "why-every-brand-needs-a-story-that-moves-people": "why-every-brand-needs-a-story-that-moves-people",
   "media-production-agency-in-egypt": "how-to-choose-a-media-production-agency-in-egypt",
   "how-to-choose-a-media-production-agency-in-egypt": "how-to-choose-a-media-production-agency-in-egypt",
-  "film-production-in-egypt": "professional-film-production-equipment",
-  "professional-film-production-equipment": "professional-film-production-equipment",
+  "film-production-in-egypt": "film-production-in-egypt",
+  "professional-film-production-equipment": "film-production-in-egypt",
   "corporate-video-production-in-cairo-what-every-brand-needs-to-know": "corporate-video-production-in-cairo",
   "tv-commercial-production-in-egypt-complete-guide-2026": "tv-commercial-production-in-egypt",
 };
@@ -192,11 +270,34 @@ const SERVICE_ALIASES: Record<string, string> = {
 };
 
 export function legacyDestination(pathname: string): string | null {
+  const cleanPath = stripSlash(pathname);
+  const decodedPath = decodeSlug(cleanPath).toLowerCase();
+
+  // 1. Direct path redirects (from DB redirects table)
+  if (pathRedirects[cleanPath.toLowerCase()]) {
+    return pathRedirects[cleanPath.toLowerCase()];
+  }
+  if (pathRedirects[decodedPath]) {
+    return pathRedirects[decodedPath];
+  }
+
   const { locale, bare } = splitLocale(pathname);
-  const mapped = mapBare(bare);
-  if (!mapped) return null;
-  const dest = locale === DEFAULT_LOCALE ? mapped : localizedPath(mapped, locale);
-  return dest === stripSlash(pathname) ? null : dest;
+  const decodedBare = decodeSlug(bare);
+
+  // 2. Direct page aliases
+  const mapped = mapBare(bare) || mapBare(decodedBare);
+  if (mapped) {
+    const dest = locale === DEFAULT_LOCALE ? mapped : localizedPath(mapped, locale);
+    return dest === cleanPath || dest === decodedPath ? null : dest;
+  }
+
+  // 3. Cross-locale detail path resolution
+  const resolved = resolveDetailPath(decodedBare, locale);
+  if (resolved) {
+    return resolved === cleanPath || resolved === decodedPath ? null : resolved;
+  }
+
+  return null;
 }
 
 export const POST_SLUGS_THAT_REDIRECT = new Set(

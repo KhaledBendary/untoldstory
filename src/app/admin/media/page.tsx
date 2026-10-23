@@ -17,7 +17,7 @@ export default async function MediaPage() {
         <h1 style={{ fontSize: 22, fontWeight: 600, margin: 0 }}>الصور</h1>
         <span style={{ fontSize: 13, color: "var(--faint)" }}>{media.length}</span>
       </div>
-      <MediaManager initial={media.map((m) => ({ id: m.id, url: m.url, filename: m.filename }))} />
+      <MediaManager initial={media.map((m) => ({ id: m.id, url: m.url, filename: m.filename, alt: m.alt || {} }))} />
     </div>
   );
 }

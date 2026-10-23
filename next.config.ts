@@ -78,6 +78,14 @@ const GOOGLE_COUNTRY_DOMAINS = [
 
 const META = "https://www.facebook.com https://connect.facebook.net";
 
+// Images uploaded through the admin (media library, rich-text editor) are
+// stored in Vercel Blob, at a per-project random subdomain — not the same
+// "blob:" URL scheme already allowed below. Without this, every such image
+// loads fine directly (curl, the API) but is silently blocked in the browser
+// by this very policy, showing as a broken image with no console-visible error
+// on the page itself (only in devtools' CSP violation log).
+const VERCEL_BLOB = "https://*.public.blob.vercel-storage.com";
+
 // React's dev server needs eval() for fast-refresh/debugging; production never
 // does. Allow it only in development so the live CSP stays strict.
 const DEV_SCRIPT = process.env.NODE_ENV !== "production" ? " 'unsafe-eval'" : "";
@@ -89,8 +97,8 @@ const CSP = [
   "style-src 'self' 'unsafe-inline'",
   // Fonts are self-hosted through next/font, so no third-party origin here.
   "font-src 'self' data:",
-  `img-src 'self' data: blob: ${UPSTREAM_ORIGIN} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} ${GOOGLE_COUNTRY_DOMAINS} https://www.facebook.com`,
-  `media-src 'self' ${UPSTREAM_ORIGIN}`,
+  `img-src 'self' data: blob: ${UPSTREAM_ORIGIN} ${VERCEL_BLOB} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} ${GOOGLE_COUNTRY_DOMAINS} https://www.facebook.com`,
+  `media-src 'self' ${UPSTREAM_ORIGIN} ${VERCEL_BLOB}`,
   `connect-src 'self' ${UPSTREAM_ORIGIN} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} ${GOOGLE_COUNTRY_DOMAINS} ${META}`,
   "object-src 'none'",
   "base-uri 'self'",
@@ -132,7 +140,29 @@ async function dbRedirects() {
     const sql = postgres(url, { ssl: "require", max: 1, connect_timeout: 15, prepare: false, onnotice: () => {} });
     try {
       const rows = await sql<{ from_path: string; to_path: string }[]>`select from_path, to_path from redirects`;
-      return rows.map((r) => ({ source: r.from_path, destination: r.to_path, permanent: true }));
+      const explicit = rows.map((r) => ({ source: r.from_path, destination: r.to_path, permanent: true }));
+
+      // Every item with its own slug in a language: the English slug under that
+      // language's prefix (/ar/insights/how-to-...) is the same page and must go
+      // to the localized one. Derived from the data on each build, so it can't
+      // go stale the way a hand-kept redirect row does.
+      const items = await sql<{ base: string; slug: string; slugs: Record<string, string> | null }[]>`
+        select '/services' as base, slug, data->'slugs' as slugs from services
+        union all select '/work', slug, data->'slugs' from projects
+        union all select '/insights', slug, data->'slugs' from posts`;
+      const taken = new Set(explicit.map((r) => r.source));
+      const derived: { source: string; destination: string; permanent: true }[] = [];
+      for (const item of items) {
+        for (const [loc, native] of Object.entries(item.slugs ?? {})) {
+          if (loc === "en" || typeof native !== "string" || !native || native === item.slug) continue;
+          if (/[\s/\\?#%]/.test(native)) continue; // unusable as a path segment
+          const source = `/${loc}${item.base}/${item.slug}`;
+          if (taken.has(source)) continue;
+          taken.add(source);
+          derived.push({ source, destination: `/${loc}${item.base}/${native}`, permanent: true });
+        }
+      }
+      return [...explicit, ...derived];
     } finally {
       await sql.end({ timeout: 5 });
     }
@@ -176,6 +206,17 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "api.globaluntoldstory.com",
         pathname: "/api/public/storage/media/**",
+      },
+      // Images uploaded through the admin media library are stored here (a
+      // per-project random subdomain — already allowed in the CSP's img-src as
+      // VERCEL_BLOB above, but missing here). Without this, next/image's own
+      // optimizer refuses the URL outright with INVALID_IMAGE_OPTIMIZE_REQUEST
+      // — every image uploaded since the media library shipped rendered as a
+      // blank box, not a 404 or a broken-image icon, since the <img> tag itself
+      // never got a working src to begin with.
+      {
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com",
       },
     ],
     // The image optimizer will render SVG as-is, which makes it a script
@@ -221,4 +262,13 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default function (phase: string): NextConfig {
+  process.env.NEXT_PHASE = phase;
+  return {
+    ...nextConfig,
+    env: {
+      ...nextConfig.env,
+      NEXT_PHASE: phase,
+    },
+  };
+}

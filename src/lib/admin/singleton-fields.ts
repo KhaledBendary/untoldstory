@@ -24,6 +24,10 @@ export const SINGLETONS: Record<string, SingletonDef> = {
         { path: "site_config.tagline", label: "الشعار النصّي", type: "text" },
         { path: "site_config.description", label: "الوصف", type: "textarea" },
         { path: "footer.brandDesc", label: "وصف الفوتر", type: "textarea" },
+        { path: "footer.contactUs", label: "عنوان دعوة التواصل في الفوتر", type: "text" },
+        { path: "footer.aboutTitle", label: "عنوان قائمة الفوتر (About)", type: "text" },
+        { path: "footer.servicesTitle", label: "عنوان قائمة الخدمات في الفوتر", type: "text" },
+        { path: "footer.allRights", label: "نص حقوق النشر", type: "text" },
       ]},
       { title: "بيانات الاتصال", fields: [
         { path: "site_config.email", label: "البريد الإلكتروني", type: "text", ltr: true },
