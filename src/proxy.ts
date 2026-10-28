@@ -24,6 +24,19 @@ function isProductionHost(host: string | null) {
   return name === PRODUCTION_HOST || name === WWW_HOST || name === "localhost";
 }
 
+function repairMojibake(pathname: string): string | null {
+  try {
+    const decoded = decodeURIComponent(pathname);
+    if (/[\u00C0-\u00DF][\u0080-\u00BF]|[\u00E0-\u00EF][\u0080-\u00BF]{2}/.test(decoded)) {
+      const fixed = Buffer.from(decoded, "binary").toString("utf8");
+      if (fixed && fixed !== decoded && !fixed.includes("\uFFFD")) {
+        return fixed;
+      }
+    }
+  } catch {}
+  return null;
+}
+
 function markNonProduction(response: NextResponse, request: NextRequest) {
   if (!isProductionHost(request.headers.get("host"))) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
@@ -35,6 +48,16 @@ export function proxy(request: NextRequest) {
   const host = hostname(request.headers.get("host"));
   const { pathname } = request.nextUrl;
   const params = request.nextUrl.searchParams;
+
+  const repaired = repairMojibake(pathname);
+  if (repaired && repaired !== pathname) {
+    const destinationHost = host === WWW_HOST ? PRODUCTION_HOST : request.headers.get("host") || PRODUCTION_HOST;
+    const scheme = destinationHost.startsWith("localhost") ? "http" : "https";
+    return markNonProduction(
+      NextResponse.redirect(`${scheme}://${destinationHost}${encodeURI(repaired)}${request.nextUrl.search}`, 301),
+      request,
+    );
+  }
 
   const dropWww = host === WWW_HOST;
   const trailingSlash = pathname.length > 1 && pathname.endsWith("/");
