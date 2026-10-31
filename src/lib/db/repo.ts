@@ -11,7 +11,7 @@ import { sql } from "@/lib/db/client";
 
 export type Dict = Record<string, string>;
 
-type Meta = { noindex: boolean; scheduled_at: Date | null; og_image: string | null };
+type Meta = { noindex: boolean; scheduled_at: Date | null; og_image: string | null; updated_at?: Date | null; created_at?: Date | null };
 
 export type ServiceRow = Meta & {
   id: number; slug: string; icon: string | null; image_url: string | null;
@@ -57,6 +57,14 @@ export const getPost = async (slug: string) =>
 // ---- singletons ----
 
 export type Singleton = Record<string, Record<string, unknown>>; // { en: {...}, ar: {...} }
+
+
+export const getSingletonsUpdatedAt = async (): Promise<Record<string, Date>> => {
+  const rows = await sql<{ key: string; updated_at: Date }[]>`select key, updated_at from singletons`;
+  const out: Record<string, Date> = {};
+  for (const r of rows) out[r.key] = new Date(r.updated_at);
+  return out;
+};
 
 export const getSingleton = async (key: string): Promise<Singleton | null> =>
   (await sql<{ data: Singleton }[]>`select data from singletons where key = ${key}`)[0]?.data ?? null;

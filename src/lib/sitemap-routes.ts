@@ -5,6 +5,7 @@ import { POST_SLUG_ALIASES, SERVICE_SLUG_ALIASES } from "@/lib/legacy-redirects"
 import { INDEXABLE_LOCALES, LOCALE_TAGS, DEFAULT_LOCALE, localizedPath } from "@/lib/i18n";
 import { absoluteUrl } from "@/lib/seo";
 import { isSlugSafe } from "@/lib/db/localize";
+import { LEGAL_UPDATED } from "@/data/legal";
 
 /**
  * The set of real, indexable routes, gathered once.
@@ -42,18 +43,25 @@ const slugsOf = (item: unknown): Record<string, string> | undefined =>
   item && typeof item === "object" && "slugs" in item ? (item as { slugs?: Record<string, string> }).slugs : undefined;
 
 export async function collectRoutes(): Promise<SitemapRoute[]> {
-  const services: (Service | { slug: string })[] = await getServicesData();
-  const projects: (PortfolioItem | { slug: string })[] = await getWorkData();
-  const posts: (BlogPost | { slug: string; date?: string; publishedAt?: string })[] = await getInsightsData();
+  const services: (Service | { slug: string; updatedAt?: string | null })[] = await getServicesData();
+  const projects: (PortfolioItem | { slug: string; updatedAt?: string | null })[] = await getWorkData();
+  const posts: (BlogPost | { slug: string; date?: string; publishedAt?: string; updatedAt?: string | null })[] = await getInsightsData();
+
+  let singletonDates: Record<string, Date> = {};
+  try {
+    const { getSingletonsUpdatedAt } = await import("@/lib/db/repo");
+    singletonDates = await getSingletonsUpdatedAt();
+  } catch {}
 
   // Slugs the CMS renamed still arrive from the API under the old name; list
   // the destination, never the alias, or the sitemap advertises a redirect.
   const serviceEntries = [...new Map(
     services.map((s) => {
       const slug = SERVICE_SLUG_ALIASES[s.slug] || s.slug;
-      return [slug, { slug, slugs: slugsOf(s) }];
+      return [slug, { slug, slugs: slugsOf(s), updatedAt: "updatedAt" in s ? s.updatedAt : undefined }];
     }),
   ).values()];
+
   const postEntries = [...new Map(
     posts.map((post) => {
       const slug = POST_SLUG_ALIASES[post.slug] && POST_SLUG_ALIASES[post.slug] !== post.slug
@@ -63,36 +71,108 @@ export async function collectRoutes(): Promise<SitemapRoute[]> {
     }),
   ).values()];
 
-  const newestPost = posts
-    .map((p) => parseDate("publishedAt" in p ? p.publishedAt : undefined) ?? parseDate("date" in p ? p.date : undefined))
+  const newestService = serviceEntries
+    .map((s) => parseDate(s.updatedAt))
     .filter((d): d is Date => Boolean(d))
     .sort((a, b) => b.getTime() - a.getTime())[0];
 
+  const newestProject = projects
+    .map((p) => parseDate("updatedAt" in p ? p.updatedAt : undefined))
+    .filter((d): d is Date => Boolean(d))
+    .sort((a, b) => b.getTime() - a.getTime())[0];
+
+  const newestPost = posts
+    .map((p) =>
+      parseDate("updatedAt" in p ? p.updatedAt : undefined) ??
+      parseDate("publishedAt" in p ? p.publishedAt : undefined) ??
+      parseDate("date" in p ? p.date : undefined)
+    )
+    .filter((d): d is Date => Boolean(d))
+    .sort((a, b) => b.getTime() - a.getTime())[0];
+
+  const legalDate = parseDate(LEGAL_UPDATED);
+
   return [
-    { path: "", changeFrequency: "weekly", priority: 1 },
-    { path: "/services", changeFrequency: "monthly", priority: 0.8 },
-    { path: "/work", changeFrequency: "monthly", priority: 0.8 },
+    {
+      path: "",
+      lastModified: singletonDates.home ?? newestProject ?? newestService,
+      changeFrequency: "weekly",
+      priority: 1,
+    },
+    {
+      path: "/services",
+      lastModified: newestService,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      path: "/work",
+      lastModified: newestProject ?? parseDate("2026-10-18T18:00:00.000Z"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // The index genuinely changes when its newest article does.
-    { path: "/insights", lastModified: newestPost, changeFrequency: "monthly", priority: 0.8 },
-    { path: "/about", changeFrequency: "monthly", priority: 0.8 },
-    { path: "/contact", changeFrequency: "monthly", priority: 0.8 },
+    {
+      path: "/insights",
+      lastModified: newestPost,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      path: "/about",
+      lastModified: singletonDates.about ?? newestProject,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      path: "/contact",
+      lastModified: singletonDates.layout ?? singletonDates.home,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // Low priority, but they must be listed: search engines and the ad
     // platforms both look for a reachable, indexed privacy policy.
-    { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
-    { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
-    { path: "/cookies", changeFrequency: "yearly", priority: 0.3 },
+    {
+      path: "/privacy",
+      lastModified: legalDate,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      path: "/terms",
+      lastModified: legalDate,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      path: "/cookies",
+      lastModified: legalDate,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
 
     ...serviceEntries.map((s): SitemapRoute => ({
-      path: `/services/${s.slug}`, basePath: "/services", slugs: s.slugs, changeFrequency: "monthly", priority: 0.8,
+      path: `/services/${s.slug}`,
+      basePath: "/services",
+      slugs: s.slugs,
+      lastModified: parseDate(s.updatedAt),
+      changeFrequency: "monthly",
+      priority: 0.8,
     })),
     ...projects.map((p): SitemapRoute => ({
-      path: `/work/${p.slug}`, basePath: "/work", slugs: slugsOf(p), changeFrequency: "monthly", priority: 0.7,
+      path: `/work/${p.slug}`,
+      basePath: "/work",
+      slugs: slugsOf(p),
+      lastModified: parseDate("updatedAt" in p ? p.updatedAt : undefined) ?? parseDate("2026-10-18T18:00:00.000Z"),
+      changeFrequency: "monthly",
+      priority: 0.7,
     })),
     ...postEntries.map((post): SitemapRoute => ({
       path: `/insights/${post.slug}`,
       basePath: "/insights",
       slugs: slugsOf(post),
       lastModified:
+        parseDate("updatedAt" in post ? post.updatedAt : undefined) ??
         parseDate("publishedAt" in post ? post.publishedAt : undefined) ??
         parseDate("date" in post ? post.date : undefined),
       changeFrequency: "yearly",

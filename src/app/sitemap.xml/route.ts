@@ -1,6 +1,6 @@
 import { SITE_URL } from "@/lib/seo";
 import { INDEXABLE_LOCALES } from "@/lib/i18n";
-import { localeSitemapPath } from "@/lib/sitemap-routes";
+import { collectRoutes, localeSitemapPath } from "@/lib/sitemap-routes";
 
 /**
  * Sitemap index, pointing at one sitemap per indexable language.
@@ -12,14 +12,20 @@ import { localeSitemapPath } from "@/lib/sitemap-routes";
  */
 export const dynamic = "force-static";
 
-export function GET() {
-  const now = new Date().toISOString();
+export async function GET() {
+  const routes = await collectRoutes();
+  const newestDate = routes
+    .map((r) => r.lastModified)
+    .filter((d): d is Date => Boolean(d))
+    .sort((a, b) => b.getTime() - a.getTime())[0];
+
+  const lastmod = (newestDate || new Date("2026-10-30T18:10:03.815Z")).toISOString();
 
   const entries = INDEXABLE_LOCALES.map((locale) =>
     [
       "  <sitemap>",
       `    <loc>${SITE_URL}${localeSitemapPath(locale)}</loc>`,
-      `    <lastmod>${now}</lastmod>`,
+      `    <lastmod>${lastmod}</lastmod>`,
       "  </sitemap>",
     ].join("\n"),
   );

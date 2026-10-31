@@ -83,6 +83,7 @@ export function localizeService(r: ServiceRow, loc: string) {
     fullDesc: pick(d.fullDesc, loc),
     features: pickArr(d.features as Record<string, unknown> | undefined, loc),
     faqs: pickFaqs(d as unknown as Record<string, Dict>, loc),
+    updatedAt: r.updated_at ? new Date(r.updated_at).toISOString() : null,
     // Only present once SEO has been authored, so services without it stay
     // byte-identical to what the old API returned.
     ...(seo ? { seo } : {}),
@@ -98,6 +99,7 @@ export function localizeProject(r: ProjectRow, loc: string) {
     canonicalSlug: r.slug,
     title: pick(d.title, loc),
     noindex: r.noindex,
+    updatedAt: r.updated_at ? new Date(r.updated_at).toISOString() : null,
     ...(seo ? { seo } : {}),
     shortDescription: pickN(d.shortDescription, loc),
     description: pickN(d.description, loc),
@@ -131,6 +133,7 @@ export function localizePostCard(r: PostRow, loc: string) {
     excerpt: pickN(d.excerpt, loc),
     date: published,
     publishedAt: published,
+    updatedAt: r.updated_at ? new Date(r.updated_at).toISOString() : published,
     category: pickN(d.category, loc),
     categorySlug: r.category_slug ?? null,
     authorName: r.author_name ?? null,

@@ -41,6 +41,7 @@ export function mappedFallbackServices(): Service[] {
     capabilities: s.capabilities,
     isFeatured: i < 4,
     sortOrder: i,
+    updatedAt: "2026-10-16T18:00:00.000Z",
   } as unknown as Service));
 }
 
@@ -53,6 +54,7 @@ export function mappedFallbackProjects(): PortfolioItem[] {
     category: p.categories[0],
     results: p.description,
     isFeatured: false,
+    updatedAt: "2026-10-18T18:00:00.000Z",
   }));
 }
 

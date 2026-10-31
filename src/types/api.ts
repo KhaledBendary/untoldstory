@@ -34,6 +34,7 @@ export interface Service {
   faqs?: { question: string; answer: string }[];
   isFeatured: boolean;
   sortOrder?: number;
+  updatedAt?: string | null;
   seo?: Record<string, unknown>;
 }
 
@@ -57,6 +58,7 @@ export interface PortfolioItem {
   gridSize?: string;
   isFeatured?: boolean;
   categoryIcon?: string;
+  updatedAt?: string | null;
 }
 
 export interface BlogPost {
@@ -68,6 +70,7 @@ export interface BlogPost {
   excerpt: string;
   date: string;
   publishedAt: string;
+  updatedAt?: string | null;
   category: string;
   categorySlug: string;
   authorName: string;
