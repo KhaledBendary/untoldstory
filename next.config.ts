@@ -151,15 +151,20 @@ async function dbRedirects() {
           normTo = decodeURIComponent(normTo).normalize("NFC");
         } catch {}
 
+        if (!normFrom || !normTo || normFrom === normTo) continue;
+
+        // Ensure destination is URL-encoded so Node HTTP Location header never produces Mojibake
+        const dest = encodeURI(normTo);
+
         if (!takenExplicit.has(normFrom)) {
           takenExplicit.add(normFrom);
-          explicit.push({ source: normFrom, destination: normTo, permanent: true });
+          explicit.push({ source: normFrom, destination: dest, permanent: true });
         }
 
         const encodedFrom = encodeURI(normFrom);
         if (encodedFrom !== normFrom && !takenExplicit.has(encodedFrom)) {
           takenExplicit.add(encodedFrom);
-          explicit.push({ source: encodedFrom, destination: normTo, permanent: true });
+          explicit.push({ source: encodedFrom, destination: dest, permanent: true });
         }
       }
 
@@ -180,7 +185,7 @@ async function dbRedirects() {
           const source = `/${loc}${item.base}/${item.slug}`;
           if (taken.has(source)) continue;
           taken.add(source);
-          derived.push({ source, destination: `/${loc}${item.base}/${native}`, permanent: true });
+          derived.push({ source, destination: encodeURI(`/${loc}${item.base}/${native}`), permanent: true });
         }
       }
       return [...explicit, ...derived];

@@ -282,8 +282,10 @@ const normalizedPathRedirects = new Map<string, string>();
 for (const [from, to] of Object.entries(pathRedirects)) {
   const normFrom = normalizeRedirectPath(from);
   const normTo = normalizeRedirectPath(to);
-  normalizedPathRedirects.set(normFrom, normTo);
-  normalizedPathRedirects.set(normFrom.toLowerCase(), normTo);
+  if (normFrom && normTo && normFrom !== normTo) {
+    normalizedPathRedirects.set(normFrom, normTo);
+    normalizedPathRedirects.set(normFrom.toLowerCase(), normTo);
+  }
 }
 
 export function legacyDestination(pathname: string): string | null {

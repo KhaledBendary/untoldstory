@@ -90,7 +90,13 @@ export function proxy(request: NextRequest) {
      * every other path a person might type with a slash on the end.
      */
     const target = `${url.pathname}${url.search}`;
-    if (target === `${pathname}${request.nextUrl.search}`) {
+    let isSamePath = target === `${pathname}${request.nextUrl.search}`;
+    if (!isSamePath) {
+      try {
+        isSamePath = decodeURIComponent(url.pathname).normalize("NFC") === decodeURIComponent(pathname).normalize("NFC");
+      } catch {}
+    }
+    if (isSamePath) {
       // Nothing actually changes — serve the page instead of looping.
       return markNonProduction(NextResponse.next(), request);
     }

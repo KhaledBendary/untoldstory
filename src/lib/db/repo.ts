@@ -341,6 +341,10 @@ export function normalizeRedirectPath(p: string): string {
 export async function addRedirect(fromPath: string, toPath: string) {
   const normFrom = normalizeRedirectPath(fromPath);
   const normTo = normalizeRedirectPath(toPath);
+  if (!normFrom || !normTo || normFrom === normTo) {
+    if (normFrom) await sql`delete from redirects where from_path = ${normFrom}`;
+    return;
+  }
   // A redirect that points back at this one's target would loop (A→B, then B→A).
   await sql`delete from redirects where from_path = ${normTo}`;
   await sql`insert into redirects (from_path, to_path) values (${normFrom}, ${normTo})
