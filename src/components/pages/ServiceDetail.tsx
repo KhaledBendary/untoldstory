@@ -10,7 +10,7 @@ import RetryState from '../RetryState';
 import { getServiceImagePosition, getServiceImage, getProjectImage } from '@/lib/utils';
 import type { Service, PortfolioItem } from '@/types/api';
 import { useLanguage } from '../LanguageContext';
-import { cleanHeadline, renderCmsHtml } from '@/lib/seo';
+import { renderCmsHtml } from '@/lib/seo';
 import { usePageData } from '@/hooks/usePageData';
 import { getServiceDetailData, type ServiceDetailData, type DetailResult } from '@/lib/page-data';
 import { getServiceFaqs } from '@/data/service-faqs';
@@ -68,6 +68,7 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
 
   const idx = allServices.findIndex(s => s.slug === slug);
   const next = allServices[(idx + 1) % allServices.length];
+  const isPodcastService = (service.canonicalSlug ?? service.slug) === 'podcast-production';
 
   return (
     <>
@@ -86,8 +87,8 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
             </p>
             <SplitWords
               as="h1"
-              text={cleanHeadline(service.title, slug) || service.title}
-              className="font-display font-black uppercase tracking-tight leading-[0.9] text-[10.5vw] md:text-[6.5vw]"
+              text={service.title}
+              className={`font-display font-black uppercase tracking-tight leading-[0.9] ${isPodcastService ? 'text-[10.5vw] md:text-[1.875vw]' : 'text-[10.5vw] md:text-[6.5vw]'}`}
             />
           </div>
           <Reveal className="shrink-0">

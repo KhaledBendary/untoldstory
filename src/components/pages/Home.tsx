@@ -154,7 +154,7 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
         </h1>
         {hydrated ? (
           <motion.p
-            className="hidden md:block font-mono2 font-normal text-[11px] tracking-[0.25em] normal-case text-white/60 max-w-[240px] leading-relaxed mt-5"
+            className="hidden md:block font-mono2 font-bold text-[14.5px] tracking-[0.25em] normal-case text-white/60 max-w-[760px] leading-relaxed mt-5"
             initial={{ opacity: 0 }}
             animate={ready ? { opacity: 1 } : {}}
             transition={{ duration: 1, delay: 1.2 }}
@@ -162,7 +162,7 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
             {t('Film, advertising, documentary services, content, post-production and marketing across Egypt, UAE and Saudi Arabia. From the region to the world')}
           </motion.p>
         ) : (
-          <p className="hidden md:block font-mono2 font-normal text-[11px] tracking-[0.25em] normal-case text-white/60 max-w-[240px] leading-relaxed mt-5">
+          <p className="hidden md:block font-mono2 font-bold text-[14.5px] tracking-[0.25em] normal-case text-white/60 max-w-[760px] leading-relaxed mt-5">
             {t('Film, advertising, documentary services, content, post-production and marketing across Egypt, UAE and Saudi Arabia. From the region to the world')}
           </p>
         )}
@@ -219,7 +219,7 @@ function ServicesList({ services }: { services: HomeService[] }) {
           <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-4">( {t('Services')} )</p>
           <SplitWords
             text={t("The idea comes first. Everything else follows.")}
-            className="font-display font-extrabold uppercase tracking-tight leading-[0.95] text-[7.5vw] md:text-[4.2vw]"
+            className="font-display font-extrabold uppercase tracking-tight leading-[0.95] text-[7.5vw] md:text-[3vw]"
           />
         </div>
         <Link href="/services" className="hidden md:flex items-center gap-2 font-mono2 text-[11px] tracking-[0.25em] uppercase link-line shrink-0 mb-3">
@@ -260,7 +260,7 @@ function ServicesList({ services }: { services: HomeService[] }) {
                 onMouseLeave={() => setActive(null)}
               >
                 <span className="font-mono2 text-[11px] text-white/55 w-8 shrink-0">{String(i + 1).padStart(2, '0')}</span>
-                <span className={`font-display font-bold uppercase tracking-tight leading-none text-[6.4vw] md:text-[3.4vw] transition-all duration-500 ${active === i ? 'text-white rtl:-translate-x-3 md:rtl:-translate-x-6 translate-x-3 md:translate-x-6' : 'text-white/55'}`}>
+                <span className={`font-display font-bold uppercase tracking-tight leading-none text-[2.88vw] md:text-[1.53vw] transition-all duration-500 ${active === i ? 'text-white rtl:-translate-x-3 md:rtl:-translate-x-6 translate-x-3 md:translate-x-6' : 'text-white/55'}`}>
                   {s.title}
                 </span>
                 <ArrowUpRight className={`ms-auto w-6 h-6 md:w-8 md:h-8 shrink-0 transition-all duration-500 rtl:-scale-x-100 ${active === i ? 'opacity-100 rotate-45' : 'opacity-20'}`} />
@@ -415,7 +415,7 @@ function ClientLogos({ stats }: { stats: Array<{ value: number; suffix: string; 
           <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-4">( {t('Trusted by')} )</p>
           <SplitWords
             text={t('Our journey with the Titans')}
-            className="font-display font-extrabold uppercase tracking-tight leading-[0.95] text-[10vw] md:text-[5.5vw]"
+            className="font-display font-extrabold uppercase tracking-tight leading-[0.95] text-[10vw] md:text-[4.5vw]"
           />
         </div>
         <Reveal className="font-mono2 text-[11px] tracking-[0.2em] uppercase text-white/50 md:text-right leading-loose">
@@ -489,7 +489,7 @@ function Manifesto({
       <SplitWords
         as="h2"
         text={titleText}
-        className="font-display font-bold uppercase tracking-tight leading-[1.02] text-[7.5vw] md:text-[4.2vw] max-w-[1200px]"
+        className="font-display font-bold uppercase tracking-tight leading-[1.02] text-[3.75vw] md:text-[2.1vw] max-w-[1200px]"
       />
       <div className="mt-10 md:mt-14 grid md:grid-cols-2 gap-8 max-w-4xl">
         <Reveal>
