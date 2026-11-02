@@ -329,12 +329,26 @@ export const clearNotFound = (path: string) =>
 export const getRedirects = () =>
   sql<RedirectRow[]>`select * from redirects order by created_at desc`;
 
+export function normalizeRedirectPath(p: string): string {
+  if (!p) return "";
+  try {
+    return decodeURIComponent(p.trim()).normalize("NFC");
+  } catch {
+    return p.trim().normalize("NFC");
+  }
+}
+
 export async function addRedirect(fromPath: string, toPath: string) {
+  const normFrom = normalizeRedirectPath(fromPath);
+  const normTo = normalizeRedirectPath(toPath);
   // A redirect that points back at this one's target would loop (A→B, then B→A).
-  await sql`delete from redirects where from_path = ${toPath}`;
-  await sql`insert into redirects (from_path, to_path) values (${fromPath}, ${toPath})
+  await sql`delete from redirects where from_path = ${normTo}`;
+  await sql`insert into redirects (from_path, to_path) values (${normFrom}, ${normTo})
     on conflict (from_path) do update set to_path = excluded.to_path`;
-  await clearNotFound(fromPath); // it's handled now
+  await clearNotFound(normFrom);
+  if (normFrom !== fromPath) {
+    await clearNotFound(fromPath);
+  }
 }
 
 export const deleteRedirect = (id: number) =>

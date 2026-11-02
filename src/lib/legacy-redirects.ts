@@ -269,16 +269,39 @@ const SERVICE_ALIASES: Record<string, string> = {
   "/ip-development": "/services/original-ip-development",
 };
 
+function normalizeRedirectPath(p: string): string {
+  if (!p) return "";
+  try {
+    return decodeURIComponent(p).normalize("NFC");
+  } catch {
+    return p.normalize("NFC");
+  }
+}
+
+const normalizedPathRedirects = new Map<string, string>();
+for (const [from, to] of Object.entries(pathRedirects)) {
+  const normFrom = normalizeRedirectPath(from);
+  const normTo = normalizeRedirectPath(to);
+  normalizedPathRedirects.set(normFrom, normTo);
+  normalizedPathRedirects.set(normFrom.toLowerCase(), normTo);
+}
+
 export function legacyDestination(pathname: string): string | null {
   const cleanPath = stripSlash(pathname);
   const decodedPath = decodeSlug(cleanPath).toLowerCase();
 
   // 1. Direct path redirects (from DB redirects table)
-  if (pathRedirects[cleanPath.toLowerCase()]) {
-    return pathRedirects[cleanPath.toLowerCase()];
-  }
-  if (pathRedirects[decodedPath]) {
-    return pathRedirects[decodedPath];
+  const normVisitorPath = normalizeRedirectPath(cleanPath);
+  const normVisitorLower = normVisitorPath.toLowerCase();
+
+  const directMatch =
+    normalizedPathRedirects.get(normVisitorPath) ||
+    normalizedPathRedirects.get(normVisitorLower) ||
+    normalizedPathRedirects.get(cleanPath) ||
+    normalizedPathRedirects.get(cleanPath.toLowerCase());
+
+  if (directMatch && directMatch !== normVisitorPath && directMatch !== cleanPath) {
+    return directMatch;
   }
 
   const { locale, bare } = splitLocale(pathname);

@@ -140,7 +140,28 @@ async function dbRedirects() {
     const sql = postgres(url, { ssl: "require", max: 1, connect_timeout: 15, prepare: false, onnotice: () => {} });
     try {
       const rows = await sql<{ from_path: string; to_path: string }[]>`select from_path, to_path from redirects`;
-      const explicit = rows.map((r) => ({ source: r.from_path, destination: r.to_path, permanent: true }));
+      const explicit: { source: string; destination: string; permanent: true }[] = [];
+      const takenExplicit = new Set<string>();
+
+      for (const r of rows) {
+        let normFrom = r.from_path;
+        let normTo = r.to_path;
+        try {
+          normFrom = decodeURIComponent(normFrom).normalize("NFC");
+          normTo = decodeURIComponent(normTo).normalize("NFC");
+        } catch {}
+
+        if (!takenExplicit.has(normFrom)) {
+          takenExplicit.add(normFrom);
+          explicit.push({ source: normFrom, destination: normTo, permanent: true });
+        }
+
+        const encodedFrom = encodeURI(normFrom);
+        if (encodedFrom !== normFrom && !takenExplicit.has(encodedFrom)) {
+          takenExplicit.add(encodedFrom);
+          explicit.push({ source: encodedFrom, destination: normTo, permanent: true });
+        }
+      }
 
       // Every item with its own slug in a language: the English slug under that
       // language's prefix (/ar/insights/how-to-...) is the same page and must go
