@@ -8,10 +8,17 @@ import { mergeGeo, type GeoSettings } from "./geo";
  * single render (generateMetadata + the layout body) reads the row once. Any
  * failure falls back to the built-in defaults so the site never loses its schema.
  */
+let cachedGeoPromise: Promise<GeoSettings> | null = null;
+
 export const getGeoSettings = cache(async (): Promise<GeoSettings> => {
-  try {
-    return mergeGeo(await getSingleton("seo_settings"));
-  } catch {
-    return mergeGeo(null);
+  if (!cachedGeoPromise) {
+    cachedGeoPromise = (async () => {
+      try {
+        return mergeGeo(await getSingleton("seo_settings"));
+      } catch {
+        return mergeGeo(null);
+      }
+    })();
   }
+  return cachedGeoPromise;
 });

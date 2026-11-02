@@ -20,7 +20,7 @@ function create() {
   if (!url) throw new Error("DATABASE_URL is not set");
   return postgres(url, {
     ssl: "require",
-    max: 5,
+    max: 10,
     idle_timeout: 20,
     connect_timeout: 15,
     // Supabase's transaction pooler (and pgbouncer in general) doesn't support

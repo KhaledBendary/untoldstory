@@ -42,7 +42,16 @@ function parseDate(value?: string | null) {
 const slugsOf = (item: unknown): Record<string, string> | undefined =>
   item && typeof item === "object" && "slugs" in item ? (item as { slugs?: Record<string, string> }).slugs : undefined;
 
-export async function collectRoutes(): Promise<SitemapRoute[]> {
+let cachedRoutesPromise: Promise<SitemapRoute[]> | null = null;
+
+export function collectRoutes(): Promise<SitemapRoute[]> {
+  if (!cachedRoutesPromise) {
+    cachedRoutesPromise = collectRoutesUncached();
+  }
+  return cachedRoutesPromise;
+}
+
+async function collectRoutesUncached(): Promise<SitemapRoute[]> {
   const services: (Service | { slug: string; updatedAt?: string | null })[] = await getServicesData();
   const projects: (PortfolioItem | { slug: string; updatedAt?: string | null })[] = await getWorkData();
   const posts: (BlogPost | { slug: string; date?: string; publishedAt?: string; updatedAt?: string | null })[] = await getInsightsData();
