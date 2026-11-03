@@ -14,7 +14,6 @@
     "/pl/work/dokumentacja-operacji-apache-egypt-przed-wiertnictwem-każdy-szczegół-ma-znaczeni": "/pl/work/produkcja-korporacyjna-i-przemysłowa-apache-w-egipcie",
     "/pt/work/documentário-das-operações-do-apache-no-egito-antes-do-poço-cada-detalhe-importa": "/pt/work/produção-corporativa-e-industrial-da-apache-no-egito",
     "/ru/work/документальный-фильм-операций-apache-egypt-перед-скважиной-каждое-деталь-имеет-з": "/ru/work/корпоративное-и-промышленное-производство",
-    "/ar/services/رابط-مكتوب-يدوي": "/ar/services/ز-ز-سلاگتست-مسودة",
     "/de/work/apache-ägypten-betriebsdokumentation-vor-dem-brunnen-jedes-detail-zählt": "/de/work/apache-unternehmens-und-industrieproduktion-in-ägypten",
     "/es/work/documental-de-operaciones-de-apache-en-egipto-antes-del-pozo-cada-detalle-cuenta": "/es/work/producción-corporativa-e-industrial-de-apache-en-egipto",
     "/fr/work/documentaire-sur-les-opérations-dapache-en-égypte-avant-le-puits-chaque-détai": "/fr/work/production-d-entreprise-et-industrielle-apache-en-égypte",
@@ -50,7 +49,7 @@
     "/sw/services/katika-ardhi-misri": "/sw/services/uzalishaji-nchini-misri",
     "/tr/services/misirda": "/tr/services/mısır-da-sahada-üretim",
     "/zh/services/zai-ai-ji-de-di-mian-shang": "/zh/services/埃及在地实地制作",
-    "/ar/work/hmla-almswwlya-alajtmaaya-llslama-ala-altrq-mn-tshanghan-v2": "/ar/work/حملة-شانجان-للسلامة-على-الطرق",
+    "/ar/work/hmla-almswwlya-alajtmaaya-llslama-ala-altrq-mn-tshanghan-v2": "/ar/work/حملة-شانجان-ضد-السرعة-واستخدام-الهاتف",
     "/de/work/changan-strassenverkehrssicherheits-csr-kampagne-v2": "/de/work/changan-csr-kampagne-geschwindigkeit-handy-am-steuer",
     "/es/work/campana-de-responsabilidad-social-corporativa-de-seguridad-vial-de-changan-v2": "/es/work/campaña-rse-changan-exceso-de-velocidad-y-móvil",
     "/fr/work/campagne-csr-de-securite-routiere-changan-v2": "/fr/work/campagne-rse-changan-vitesse-et-téléphone-au-volant",
@@ -665,7 +664,7 @@
     "/sw/work/kampeni-ya-csr-ya-usalama-barabarani-ya-changan-v2": "/sw/work/kampeni-ya-csr-ya-changan-mwendo-kasi-na-simu",
     "/tr/work/changan-yol-guvenligi-csr-kampanyasi-v2": "/tr/work/changan-csr-kampanyası-hız-ve-telefon-kullanımı",
     "/zh/work/长安汽车道路安全企业社会责任营销活动-v2": "/zh/work/长安汽车超速与驾车使用手机企业社会责任活动",
-    "/ar/work/حملة-شانجان-للمسؤولية-المجتمعية-للسلامة-v2": "/ar/work/حملة-شانجان-للمسؤولية-المجتمعية-للسلامة-على-الطريق",
+    "/ar/work/حملة-شانجان-للمسؤولية-المجتمعية-للسلامة-v2": "/ar/work/حملة-شانجان-للسلامة-على-الطرق",
     "/ar/work/حملة-شانجان-للمسؤولية-المجتمعية-للسلامة": "/ar/work/حملة-شانجان-ضد-السرعة-واستخدام-الهاتف",
     "/it/work/documentario-sulle-operazioni-in-egitto-di-apache": "/it/work/documentario-sulle-operazioni-apache-in-egitto",
     "/zh/services/in-egitto": "/zh/services/埃及在地实地制作",
@@ -678,11 +677,14 @@
     "/services/katika-ardhi-misri": "/services/on-ground-egypt",
     "/portfolio-category/industry": "/work",
     "/ar/كيف-تختار-أكبر-شركات-الإنتاج-السينمائ": "/ar/insights/كيفية-اختيار-وكالة-إنتاج-إعلامي-في-مصر",
-    "/tr/insights/мультипликационное-производство": "/tr/insights/3d-ve-animasyon",
+    "/tr/insights/мультипликационное-производство": "/tr/insights/çizgi-film-üretimi",
     "/ar/work/على-الأرض-مصر": "/ar/services/إنتاج-ميداني-في-مصر",
     "/قبل-ما-تصور-احكي-قصتك-الأول": "/ar/insights/قبل-أن-تصور-احك-قصتك-أولا",
     "/ar/قبل-ما-تصور-احكي-قصتك-الأول": "/ar/insights/قبل-أن-تصور-احك-قصتك-أولا",
-    "/insights/misirda-bir-medya-produksiyon-ajansi-nasil-secilir": "/tr/insights/mısır-da-bir-medya-yapım-ajansı-nasıl-seçilir"
+    "/insights/misirda-bir-medya-produksiyon-ajansi-nasil-secilir": "/tr/insights/mısır-da-bir-medya-yapım-ajansı-nasıl-seçilir",
+    "/ar/work/campagna-csr-sulla-sicurezza-stradale-changan": "/ar/work/حملة-شانجان-للسلامة-على-الطرق",
+    "/ko/work/changan-speeding-phone-use-csr-campaign": "/ko/work/창안-과속-휴대폰-사용-csr-캠페인",
+    "/de/work/changan-道路交通安全-csr-キャンペーン-v2": "/de/work/changan-csr-kampagne-geschwindigkeit-handy-am-steuer"
   },
   "slugAliases": {
     "produccion-de-publicidad-comercial": "commercial-video-production",
@@ -1370,7 +1372,7 @@
       {
         "canonicalSlug": "changan-road-safety-csr-campaign",
         "slugs": {
-          "ar": "حملة-شانجان-للمسؤولية-المجتمعية-للسلامة-v2",
+          "ar": "حملة-شانجان-للسلامة-على-الطرق",
           "de": "changan-straßenverkehrssicherheits-csr-kampagne",
           "es": "campaña-de-rse-de-seguridad-vial-de-changan",
           "fr": "campagne-de-rse-sur-la-sécurité-routière-de-changan",
