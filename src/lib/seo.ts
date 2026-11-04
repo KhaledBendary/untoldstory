@@ -99,6 +99,92 @@ function trimTagline(value: string, slug?: string) {
   return words.slice(0, end + 1).join(" ");
 }
 
+const BRAND_VARIANTS = [
+  // English
+  "global untold story",
+  "global untold",
+  "gus",
+
+  // Arabic
+  "القصة العالمية غير المروية",
+  "قصة عالمية غير مروية",
+
+  // Chinese
+  "全球未讲述的故事",
+  "全球未被讲述的故事",
+  "全球未解之谜",
+
+  // Japanese
+  "グローバル・アンタルド・ストーリー",
+  "グローバル・アンタールド・ストーリー",
+  "グローバルアンタールドストーリー",
+  "グローバル・アントールド・ストーリー",
+
+  // Korean
+  "글로벌 언톨드 스토리",
+  "글로벌 알려지지 않은 이야기",
+
+  // German
+  "globale unentdeckte geschichte",
+  "globale ungesagte geschichte",
+
+  // Spanish
+  "historia global no contada",
+
+  // French
+  "histoire mondiale non racontée",
+
+  // Italian
+  "storia globale non raccontata",
+
+  // Portuguese
+  "história global não contada",
+
+  // Turkish
+  "küresel anlatılmamış hikaye",
+
+  // Russian
+  "глобальная нерассказанная история",
+
+  // Polish
+  "globalna niewypowiedziana historia",
+
+  // Swahili
+  "hadithi isiyojulikana ya ulimwengu",
+  "hadithi isiyoeleweka ya kimataifa",
+  "hadithi isiyoeleweka duniani",
+];
+
+export function stripBrandSuffix(raw: string): string {
+  let text = (raw || "").trim();
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+    const cleaned = text.replace(/[\s|/–—\-·•]+$/, "").trim();
+    if (cleaned !== text) {
+      text = cleaned;
+      changed = true;
+    }
+
+    const lower = text.toLowerCase();
+    for (const b of BRAND_VARIANTS) {
+      const idx = lower.lastIndexOf(b);
+      if (idx >= 0 && idx + b.length === lower.length) {
+        const before = text.slice(0, idx).trim();
+        const separatorMatch = before.match(/[\s|/–—\-·•]+$/);
+        if (separatorMatch || before.length === 0) {
+          text = before.replace(/[\s|/–—\-·•]+$/, "").trim();
+          changed = true;
+          break;
+        }
+      }
+    }
+  }
+
+  return text;
+}
+
 /** Cut at the last whole word that fits, so nothing ends mid-word. */
 function clampWords(value: string, max: number) {
   if (value.length <= max) return value;
@@ -107,9 +193,9 @@ function clampWords(value: string, max: number) {
   return (lastSpace > max * 0.5 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:—–-]+$/, "");
 }
 
-/** Clamp a finished title that already includes the brand suffix. */
+/** Clamp a finished title without truncation. Full title is preserved. */
 export function clampTitle(value: string) {
-  return clampWords(plainText(value), TITLE_MAX);
+  return plainText(value);
 }
 
 /** Strip HTML, markdown leftovers and collapse whitespace. */
@@ -172,16 +258,19 @@ export function cleanHeadline(raw?: string | null, slug?: string) {
  * ~60 characters Google renders.
  */
 export function buildTitle(raw?: string | null, slug?: string, fallback = BRAND) {
-  // Same guard as buildDescription: a title of question marks is worse than
-  // the slug-derived fallback.
-  const name = cleanHeadline(isUnreadable(raw) ? undefined : raw, slug) || fallback;
-  const suffix = ` | ${BRAND}`;
-  if (name === BRAND) return name;
-  if (name.length + suffix.length <= TITLE_MAX) return name + suffix;
+  let text = plainText(raw);
 
-  const shortSuffix = " | GUS";
-  if (name.length + shortSuffix.length <= TITLE_MAX) return name + shortSuffix;
-  return `${clampWords(name, TITLE_MAX - shortSuffix.length)}${shortSuffix}`;
+  if (!text || isUnreadable(text)) {
+    text = nameFromSlug(slug) || fallback;
+  }
+
+  const pageName = stripBrandSuffix(text);
+
+  if (!pageName || pageName.toLowerCase() === BRAND.toLowerCase()) {
+    return BRAND;
+  }
+
+  return `${pageName} | ${BRAND}`;
 }
 
 /**
