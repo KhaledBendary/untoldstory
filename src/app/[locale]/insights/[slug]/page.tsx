@@ -59,8 +59,10 @@ async function slugList(locale: string) {
 function postMeta(path: string, locale: string, title: string, description: string, image?: string | null, publishedTime?: string, extra?: ReturnType<typeof cmsSeo>, canonicalSlug?: string, slugs?: Record<string, string>) {
   return applySeoOverrides(path, pageSeo({
     path, locale, title, description, image, type: "article", publishedTime,
-    ogTitle: extra?.ogTitle, ogDescription: extra?.ogDescription,
-    twitterTitle: extra?.twitterTitle, twitterDescription: extra?.twitterDescription,
+    ogTitle: extra?.ogTitle ? buildTitle(extra.ogTitle, title) : title,
+    ogDescription: extra?.ogDescription,
+    twitterTitle: extra?.twitterTitle ? buildTitle(extra.twitterTitle, title) : title,
+    twitterDescription: extra?.twitterDescription,
     canonical: extra?.canonical, nofollow: extra?.nofollow,
     slugOverride: canonicalSlug ? { basePath: "/insights", canonicalSlug, slugs } : undefined,
   }), locale);
@@ -78,7 +80,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const post = detail?.status === "ok" ? detail.data.post : null;
     if (post) {
       const meta = cmsSeo(post.seo as Record<string, unknown> | undefined);
-      return withNoindex(postMeta(path, locale, buildTitle(meta.metaTitle || post.title, slug), buildDescription(meta.metaDescription || post.excerpt, post.title), meta.ogImageUrl || post.featuredImage, post.publishedAt, meta, post.canonicalSlug, post.slugs), (post as { noindex?: boolean }).noindex);
+      return withNoindex(postMeta(path, locale, buildTitle(meta.metaTitle, post.title, slug), buildDescription(meta.metaDescription || post.excerpt, post.title), meta.ogImageUrl || post.featuredImage, post.publishedAt, meta, post.canonicalSlug, post.slugs), (post as { noindex?: boolean }).noindex);
     }
     return postMeta(path, locale, fallbackTitle, fallbackTitle);
   }
@@ -86,7 +88,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const post = await api.getBlogPostBySlug(slug, locale);
     const meta = cmsSeo(post.seo as Record<string, unknown> | undefined);
-    return postMeta(path, locale, buildTitle(meta.metaTitle || post.title, slug), buildDescription(meta.metaDescription || post.excerpt, post.title), meta.ogImageUrl || post.featuredImage, post.publishedAt, meta, post.canonicalSlug, post.slugs);
+    return postMeta(path, locale, buildTitle(meta.metaTitle, post.title, slug), buildDescription(meta.metaDescription || post.excerpt, post.title), meta.ogImageUrl || post.featuredImage, post.publishedAt, meta, post.canonicalSlug, post.slugs);
   } catch (e) {
     console.error("Error fetching post for metadata:", e);
     const live = await findPostAnyLocale(slug, locale);

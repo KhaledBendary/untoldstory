@@ -57,8 +57,10 @@ async function slugList(locale: string) {
 function serviceMeta(path: string, locale: string, title: string, description: string, image?: string | null, extra?: ReturnType<typeof cmsSeo>, canonicalSlug?: string, slugs?: Record<string, string>) {
   return applySeoOverrides(path, pageSeo({
     path, locale, title, description, image,
-    ogTitle: extra?.ogTitle, ogDescription: extra?.ogDescription,
-    twitterTitle: extra?.twitterTitle, twitterDescription: extra?.twitterDescription,
+    ogTitle: extra?.ogTitle ? buildTitle(extra.ogTitle, title) : title,
+    ogDescription: extra?.ogDescription,
+    twitterTitle: extra?.twitterTitle ? buildTitle(extra.twitterTitle, title) : title,
+    twitterDescription: extra?.twitterDescription,
     canonical: extra?.canonical, nofollow: extra?.nofollow,
     slugOverride: canonicalSlug ? { basePath: "/services", canonicalSlug, slugs } : undefined,
   }), locale);
@@ -78,7 +80,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       const meta = cmsSeo(service.seo);
       return withNoindex(serviceMeta(
         path, locale,
-        buildTitle(meta.metaTitle || service.title, slug),
+        buildTitle(meta.metaTitle, service.title, slug),
         buildDescription(meta.metaDescription || service.shortDesc),
         meta.ogImageUrl || service.imageUrl, meta, service.canonicalSlug, service.slugs,
       ), (service as { noindex?: boolean }).noindex);
@@ -91,7 +93,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const meta = cmsSeo(service.seo);
     return serviceMeta(
       path, locale,
-      buildTitle(meta.metaTitle || service.title, slug),
+      buildTitle(meta.metaTitle, service.title, slug),
       buildDescription(meta.metaDescription || service.shortDesc),
       meta.ogImageUrl || service.imageUrl, meta, service.canonicalSlug, service.slugs,
     );
@@ -102,7 +104,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       const meta = cmsSeo(live.seo);
       return serviceMeta(
         path, locale,
-        buildTitle(meta.metaTitle || live.title, slug),
+        buildTitle(meta.metaTitle, live.title, slug),
         buildDescription(meta.metaDescription || live.shortDesc),
         meta.ogImageUrl || live.imageUrl, meta, live.canonicalSlug, live.slugs,
       );

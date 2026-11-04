@@ -254,22 +254,58 @@ export function cleanHeadline(raw?: string | null, slug?: string) {
 }
 
 /**
- * Page title, brand suffix included only when it still fits inside the
- * ~60 characters Google renders.
+ * Extract the page name from metaTitle or headline:
+ * 1. Take the part before the first " | "
+ * 2. If the page name ends with "Global Untold Story" without " | ", remove it.
+ * 3. Strip any trailing brand variants.
  */
-export function buildTitle(raw?: string | null, slug?: string, fallback = BRAND) {
+export function extractPageName(raw?: string | null): string {
+  if (!raw) return "";
   let text = plainText(raw);
+  if (!text || /\?{3,}/.test(text)) return "";
 
-  if (!text || isUnreadable(text)) {
-    text = nameFromSlug(slug) || fallback;
+  // 1. Take the part before the first " | " (or "|")
+  if (text.includes("|")) {
+    text = text.split("|")[0].trim();
   }
 
-  const pageName = stripBrandSuffix(text);
+  // 2. If the page name ends with "Global Untold Story" without " | ", remove it.
+  text = text.replace(/[\s\-_—–·•]*Global\s+Untold\s+Story$/i, "").trim();
 
+  // Also strip any other trailing brand variants (e.g. translated brand or "GUS" or "Global Untold")
+  text = stripBrandSuffix(text);
+
+  return text.trim();
+}
+
+/**
+ * Build page title for Work, Services, and Insights pages:
+ * Format: [Page Name] | Global Untold Story
+ *
+ * - No clamping or word cutting.
+ * - Extracts page name before the first " | " from metaTitle.
+ * - If metaTitle is empty, falls back to the page's H1.
+ * - Suffix is always " | Global Untold Story" in English across all languages.
+ */
+export function buildTitle(
+  raw?: string | null,
+  h1FallbackOrSlug?: string,
+  maybeSlug?: string,
+  fallback = BRAND
+): string {
+  const h1 = maybeSlug !== undefined ? h1FallbackOrSlug : undefined;
+  const slug = maybeSlug !== undefined ? maybeSlug : h1FallbackOrSlug;
+
+  let pageName = extractPageName(raw);
+  if (!pageName && h1) {
+    pageName = extractPageName(h1);
+  }
+  if (!pageName && slug) {
+    pageName = extractPageName(nameFromSlug(slug));
+  }
   if (!pageName || pageName.toLowerCase() === BRAND.toLowerCase()) {
-    return BRAND;
+    return fallback;
   }
-
   return `${pageName} | ${BRAND}`;
 }
 
@@ -354,7 +390,7 @@ export function withNoindex<T extends object>(meta: T, noindex?: boolean): T {
  */
 export function absoluteUrl(path: string) {
   if (path.startsWith("http")) return path;
-  const encoded = path.replace(/[^ -]+/g, (run) => encodeURIComponent(run));
+  const encoded = path.replace(/[^\x00-]+/g, (run) => encodeURIComponent(run));
   return `${SITE_URL}${encoded.startsWith("/") ? encoded : `/${encoded}`}`;
 }
 
@@ -642,10 +678,10 @@ export function pageSeo({
   const img = absoluteUrl(image || DEFAULT_OG_IMAGE);
   const indexable = isIndexableLocale(locale);
   const follow = !nofollow;
-  // Per-item overrides fall back to the meta title/description.
-  const ogT = ogTitle?.trim() || safeTitle;
+  // Per-item overrides follow the exact same rule: [Page Name] | Global Untold Story
+  const ogT = (ogTitle?.trim() ? buildTitle(ogTitle, safeTitle) : safeTitle) || BRAND;
   const ogD = ogDescription?.trim() || desc;
-  const twT = twitterTitle?.trim() || ogT;
+  const twT = (twitterTitle?.trim() ? buildTitle(twitterTitle, ogT) : ogT) || BRAND;
   const twD = twitterDescription?.trim() || ogD;
   const alt = alternatesFor(path, locale, slugOverride);
   if (canonical?.trim()) alt.canonical = canonical.trim();
