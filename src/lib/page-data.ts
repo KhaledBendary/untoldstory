@@ -1,7 +1,7 @@
 import { api } from "@/lib/api";
 import { ApiError } from "@/lib/api-client";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
-import { POSTS as FALLBACK_POSTS, PROJECTS as FALLBACK_PROJECTS, SERVICES as FALLBACK_SERVICES } from "@/data/content";
+import { POSTS as FALLBACK_POSTS, SERVICES as FALLBACK_SERVICES } from "@/data/content";
 import { POST_SLUG_ALIASES, POST_SLUGS_THAT_REDIRECT, legacyDestination, relatedPostSlugs, relatedServiceSlugs } from "@/lib/legacy-redirects";
 import { isoPostDate } from "@/lib/dates";
 import { isUnreadable, nameFromSlug } from "@/lib/seo";
@@ -45,17 +45,14 @@ export function mappedFallbackServices(): Service[] {
   } as unknown as Service));
 }
 
+/**
+ * Projects have no copy in the code any more: the CMS is the only source. The
+ * old built-in list (13 projects from the previous site, 182 pages across the
+ * languages) was removed and its addresses now answer 410 Gone (see
+ * lib/gone-pages.ts). Kept as a function so callers stay unchanged.
+ */
 export function mappedFallbackProjects(): PortfolioItem[] {
-  return FALLBACK_PROJECTS.map((p) => ({
-    slug: p.slug,
-    title: p.title,
-    client: p.client,
-    image: p.image,
-    category: p.categories[0],
-    results: p.description,
-    isFeatured: false,
-    updatedAt: "2026-10-18T18:00:00.000Z",
-  }));
+  return [];
 }
 
 /*

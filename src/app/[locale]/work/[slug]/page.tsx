@@ -7,7 +7,6 @@ import { applySeoOverrides } from "@/data/seo-overrides";
 import { api } from "@/lib/api";
 import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE, decodeSlug } from "@/lib/i18n";
 import { IS_PRODUCTION_BUILD, findProjectAnyLocale, projectDetailWithFallback } from "@/lib/page-data";
-import { PROJECTS as FALLBACK_PROJECTS } from "@/data/content";
 import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo, withNoindex } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
@@ -47,7 +46,6 @@ export async function generateStaticParams() {
 }
 
 async function slugList(locale: string) {
-  const extras = FALLBACK_PROJECTS.map(({ slug }) => ({ slug }));
   try {
     const portfolioData = await api.getPortfolio({ page: 1, per_page: 100, locale });
     // Keep the canonical slug valid too, not just the translated one: the
@@ -60,13 +58,11 @@ async function slugList(locale: string) {
         ? [project.slug, project.canonicalSlug]
         : [project.slug];
     const seen = new Set(portfolioData.items.flatMap(slugsForItem));
-    return [
-      ...portfolioData.items.flatMap((project) => slugsForItem(project).map((slug) => ({ slug }))),
-      ...extras.filter((item) => !seen.has(item.slug)),
-    ];
+    return [...seen].map((slug) => ({ slug }));
   } catch (e) {
+    // No CMS, no project pages: fail the build so the last good deployment stays live.
     console.error("Error fetching portfolio for generateStaticParams:", e instanceof Error ? e.message : e);
-    return extras;
+    throw e;
   }
 }
 
@@ -114,11 +110,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       return projectMeta(path, locale, buildTitle(m.metaTitle, h1, slug), buildDescription(m.metaDescription || live.results, h1), m.ogImageUrl || live.image, m, live.canonicalSlug, live.slugs);
     }
 
-    const project = FALLBACK_PROJECTS.find((item) => item.slug === slug);
-    if (!project) return projectMeta(path, locale, fallbackTitle, fallbackTitle);
-
-    const h1 = project.title;
-    return projectMeta(path, locale, buildTitle(h1, slug), buildDescription(project.description, h1), project.image);
+    return projectMeta(path, locale, fallbackTitle, fallbackTitle);
   }
 }
 

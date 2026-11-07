@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n";
 import { legacyDestination } from "@/lib/legacy-redirects";
+import { GONE_HTML, isGonePath } from "@/lib/gone-pages";
 
 /**
  * Renamed from middleware.ts for Next 16, which deprecated that file
@@ -107,6 +108,17 @@ export function proxy(request: NextRequest) {
     const scheme = destinationHost.startsWith("localhost") ? "http" : "https";
     return markNonProduction(
       NextResponse.redirect(`${scheme}://${destinationHost}${target}`, 301),
+      request,
+    );
+  }
+
+  // Removed for good (the old built-in projects): 410 so search engines drop them.
+  if (isGonePath(pathname)) {
+    return markNonProduction(
+      new NextResponse(GONE_HTML, {
+        status: 410,
+        headers: { "content-type": "text/html; charset=utf-8", "x-robots-tag": "noindex" },
+      }),
       request,
     );
   }
