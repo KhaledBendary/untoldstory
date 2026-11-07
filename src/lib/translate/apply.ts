@@ -97,8 +97,21 @@ export function slugify(input: string): string {
     .replace(/^-+|-+$/g, "");
   // Trim by whole code points so a multi-byte character is never cut in half.
   const chars = [...cleaned];
-  while (chars.length && Buffer.byteLength(chars.join(""), "utf8") > MAX_SLUG_BYTES) chars.pop();
-  return chars.join("").replace(/-+$/g, "");
+  let trimmed = false;
+  while (chars.length && Buffer.byteLength(chars.join(""), "utf8") > MAX_SLUG_BYTES) {
+    chars.pop();
+    trimmed = true;
+  }
+  let slug = chars.join("");
+  // A slug that had to be shortened ends at the last whole word, never half-way
+  // through one ("...-в-египт"), and doesn't end on a one- or two-letter
+  // connector such as "в", "и", "في" or "of".
+  if (trimmed && cleaned.charAt(slug.length) !== "-") {
+    const cut = slug.lastIndexOf("-");
+    if (cut > 0) slug = slug.slice(0, cut);
+  }
+  if (trimmed) slug = slug.replace(/-+$/g, "").replace(/-[^-]{1,2}$/u, "");
+  return slug.replace(/-+$/g, "");
 }
 
 /**
