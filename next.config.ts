@@ -159,6 +159,14 @@ async function dbRedirects() {
           takenExplicit.add(normFrom);
           explicit.push({ source: normFrom, destination: dest, permanent: true });
         }
+        // Requests arrive percent-encoded, so a source written in Arabic,
+        // Cyrillic or CJK letters never matched: only ASCII redirects worked.
+        // Add the encoded form of every non-ASCII source as well.
+        const encodedFrom = encodeURI(normFrom);
+        if (encodedFrom !== normFrom && !takenExplicit.has(encodedFrom)) {
+          takenExplicit.add(encodedFrom);
+          explicit.push({ source: encodedFrom, destination: dest, permanent: true });
+        }
       }
 
       return explicit;
