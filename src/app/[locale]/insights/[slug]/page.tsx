@@ -8,7 +8,7 @@ import { api } from "@/lib/api";
 import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE, decodeSlug } from "@/lib/i18n";
 import { IS_PRODUCTION_BUILD, findPostAnyLocale, postDetailWithFallback } from "@/lib/page-data";
 import { POSTS as FALLBACK_POSTS } from "@/data/content";
-import { postStaticParams, relatedPostSlugs } from "@/lib/legacy-redirects";
+import { postStaticParams, relatedPostSlugs, withoutForwardedSlugs } from "@/lib/legacy-redirects";
 import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo, withNoindex } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
@@ -40,15 +40,15 @@ export async function generateStaticParams() {
 async function slugList(locale: string) {
   try {
     const blogData = await api.getBlogPosts({ page: 1, per_page: 50, locale });
-    // Keep the canonical slug valid too, not just the translated one: the
-    // moment a locale's title first gets translated, its slug changes — with
-    // dynamicParams=false, only whatever's listed here resolves, so an old
-    // link using the canonical slug would otherwise 404 the instant a locale
-    // moves from "no translation yet" to "translated", with nothing to redirect it.
-    const slugs = blogData.items.flatMap((p) => (p.canonicalSlug && p.canonicalSlug !== p.slug ? [p.slug, p.canonicalSlug] : [p.slug]));
-    return postStaticParams(
-      slugs,
-      FALLBACK_POSTS.map((p) => p.slug),
+    // Only the slug each language actually serves; the English-slug address in
+    // another language is forwarded before routing (see withoutForwardedSlugs).
+    const slugs = blogData.items.map((p) => p.slug);
+    return withoutForwardedSlugs(
+      postStaticParams(
+        slugs,
+        FALLBACK_POSTS.map((p) => p.slug),
+      ),
+      blogData.items,
     );
   } catch (e) {
     console.error("Error fetching blog posts for generateStaticParams:", e instanceof Error ? e.message : e);

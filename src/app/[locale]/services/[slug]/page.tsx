@@ -8,7 +8,7 @@ import { api } from "@/lib/api";
 import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE, decodeSlug } from "@/lib/i18n";
 import { IS_PRODUCTION_BUILD, findServiceAnyLocale, serviceDetailWithFallback } from "@/lib/page-data";
 import { SERVICES as FALLBACK_SERVICES } from "@/data/content";
-import { relatedServiceSlugs, serviceStaticParams } from "@/lib/legacy-redirects";
+import { relatedServiceSlugs, serviceStaticParams, withoutForwardedSlugs } from "@/lib/legacy-redirects";
 import { getServiceFaqs } from "@/data/service-faqs";
 import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo, withNoindex } from "@/lib/seo";
 
@@ -41,13 +41,10 @@ export async function generateStaticParams() {
 async function slugList(locale: string) {
   try {
     const services = await api.getServices(locale);
-    // Keep the canonical slug valid too, not just the translated one: the
-    // moment a locale's title first gets translated, its slug changes — with
-    // dynamicParams=false, only whatever's listed here resolves, so an old
-    // link using the canonical slug would otherwise 404 the instant a locale
-    // moves from "no translation yet" to "translated", with nothing to redirect it.
-    const slugs = services.flatMap((s) => (s.canonicalSlug && s.canonicalSlug !== s.slug ? [s.slug, s.canonicalSlug] : [s.slug]));
-    return serviceStaticParams(slugs, FALLBACK_SERVICES.map((s) => s.slug));
+    // Only the slug each language actually serves; the English-slug address in
+    // another language is forwarded before routing (see withoutForwardedSlugs).
+    const slugs = services.map((s) => s.slug);
+    return withoutForwardedSlugs(serviceStaticParams(slugs, FALLBACK_SERVICES.map((s) => s.slug)), services);
   } catch (e) {
     console.error("Error fetching services for generateStaticParams:", e instanceof Error ? e.message : e);
     return serviceStaticParams([], FALLBACK_SERVICES.map((s) => s.slug));

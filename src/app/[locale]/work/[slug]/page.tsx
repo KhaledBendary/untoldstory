@@ -48,16 +48,10 @@ export async function generateStaticParams() {
 async function slugList(locale: string) {
   try {
     const portfolioData = await api.getPortfolio({ page: 1, per_page: 100, locale });
-    // Keep the canonical slug valid too, not just the translated one: the
-    // moment a locale's title first gets translated, its slug changes — with
-    // dynamicParams=false, only whatever's listed here resolves, so an old
-    // link using the canonical slug would otherwise 404 the instant a locale
-    // moves from "no translation yet" to "translated", with nothing to redirect it.
-    const slugsForItem = (project: { slug: string; canonicalSlug?: string }) =>
-      project.canonicalSlug && project.canonicalSlug !== project.slug
-        ? [project.slug, project.canonicalSlug]
-        : [project.slug];
-    const seen = new Set(portfolioData.items.flatMap(slugsForItem));
+    // Only the slug each language actually serves. The English-slug address in
+    // another language is forwarded by a redirect rule before routing, so it
+    // needs no page of its own (see withoutForwardedSlugs).
+    const seen = new Set(portfolioData.items.map((project) => project.slug));
     return [...seen].map((slug) => ({ slug }));
   } catch (e) {
     // No CMS, no project pages: fail the build so the last good deployment stays live.

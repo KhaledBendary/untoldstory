@@ -378,3 +378,24 @@ export function postStaticParams(apiSlugs: string[] = [], fallbackSlugs: string[
     ...Object.values(POST_SLUG_ALIASES),
   ]);
 }
+
+/**
+ * Drop the English-slug copy of a page that has its own slug in this language.
+ *
+ * /de/services/commercial-video-production is never shown: a redirect rule
+ * (added whenever a language's slug changes, see slug-redirects.ts) or the
+ * proxy's slug dictionary sends it to /de/services/werbefilmproduktion before
+ * routing. Building it anyway added 571 unseen pages to every deployment
+ * (checked on 8 Nov 2026: all 571 addresses answered 301 to the right page).
+ * Fallback and alias slugs with no CMS record of their own are kept.
+ */
+export function withoutForwardedSlugs<T extends { slug: string }>(
+  params: T[],
+  items: { slug: string; canonicalSlug?: string }[],
+): T[] {
+  const live = new Set(items.map((i) => i.slug));
+  const forwarded = new Set(
+    items.filter((i) => i.canonicalSlug && i.canonicalSlug !== i.slug).map((i) => i.canonicalSlug as string),
+  );
+  return params.filter((p) => live.has(p.slug) || !forwarded.has(p.slug));
+}
