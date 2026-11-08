@@ -5,6 +5,7 @@ import Link from '@/components/LocaleLink';
 import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
 import { SplitWords, Reveal } from '../Reveal';
+import { fitTitleStyle } from '@/lib/title-fit';
 import { getServiceImagePosition, getServiceImage } from '@/lib/utils';
 import type { Service } from '@/types/api';
 import { SERVICES as FALLBACK_SERVICES } from '@/data/content';
@@ -13,7 +14,7 @@ import { usePageData } from '@/hooks/usePageData';
 import { getServiceCards, type ServiceCard } from '@/lib/page-data';
 
 export default function Services({ initialData, initialLocale }: { initialData: ServiceCard[] | null; initialLocale: string }) {
-  const { t } = useLanguage();
+  const { locale, t } = useLanguage();
   const { data, loading, failed } = usePageData(initialData, initialLocale, getServiceCards);
   const services = data ?? [];
 
@@ -41,7 +42,8 @@ export default function Services({ initialData, initialLocale }: { initialData: 
         <SplitWords
           as="h1"
           text={t('Production Services in Egypt & MENA')}
-          className="font-display font-black uppercase tracking-tight leading-[0.9] text-[6vw] w-full"
+          style={fitTitleStyle(t('Production Services in Egypt & MENA'), { locale })}
+          className="fit-title [--t-max:8vw] md:[--t-max:3vw] font-display heading-ar-spacious font-black uppercase tracking-tight leading-[0.95]"
         />
         <Reveal className="mt-8 max-w-xl">
           <p className="text-white/60 leading-relaxed">

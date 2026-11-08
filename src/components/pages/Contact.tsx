@@ -3,6 +3,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { ArrowUpRight, Mail, Phone, MapPin, Check } from 'lucide-react';
 import { SplitWords, Reveal } from '../Reveal';
+import { fitTitleStyle } from '@/lib/title-fit';
 import Magnetic from '../Magnetic';
 import type { ContactForm } from '@/types/api';
 import { useLanguage } from '../LanguageContext';
@@ -119,7 +120,8 @@ export default function ContactPage({ initialData, initialLocale, formToken }: {
         <SplitWords
           as="h1"
           text={t('Contact a Production Studio in Egypt')}
-          className="font-display font-black uppercase tracking-tight leading-[0.9] text-[12vw] md:text-[7.5vw] max-w-6xl"
+          style={fitTitleStyle(t('Contact a Production Studio in Egypt'), { locale })}
+          className="fit-title [--t-max:8vw] md:[--t-max:3vw] font-display heading-ar-spacious font-black uppercase tracking-tight leading-[0.95]"
         />
         <Reveal className="mt-8">
           <p className="text-white/60 max-w-xl leading-relaxed">

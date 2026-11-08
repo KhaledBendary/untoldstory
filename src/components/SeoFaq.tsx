@@ -45,20 +45,22 @@ export default function SeoFaq() {
   return (
     <section className="px-5 md:px-10 py-14 md:py-20 border-t border-white/10">
       <StructuredData data={schema} />
+      <div className="read-col">
       <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-6">( {t("Questions")} )</p>
-      <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl md:text-5xl mb-10">
+      <h2 className="font-display heading-ar-spacious font-extrabold uppercase tracking-tight text-2xl md:text-3xl mb-10">
         {t("Frequently asked questions")}
       </h2>
-      <dl className="max-w-3xl space-y-8">
+      <dl className="space-y-8">
         {items.map((item) => (
           <div key={item.q}>
             <dt>
-              <h3 className="font-display font-bold text-xl md:text-2xl leading-snug">{item.q}</h3>
+              <h3 className="font-display font-bold text-lg md:text-xl leading-snug">{item.q}</h3>
             </dt>
-            <dd className="mt-3 text-white/65 leading-relaxed">{item.a}</dd>
+            <dd className="mt-3 text-white/70 leading-[1.8] text-base md:text-[1.0625rem]">{item.a}</dd>
           </div>
         ))}
       </dl>
+      </div>
     </section>
   );
 }

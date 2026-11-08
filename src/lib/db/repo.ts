@@ -16,7 +16,7 @@ type Meta = { noindex: boolean; scheduled_at: Date | null; og_image: string | nu
 export type ServiceRow = Meta & {
   id: number; slug: string; icon: string | null; image_url: string | null;
   price: string | null; is_featured: boolean; sort_order: number; status: string;
-  data: { title?: Dict; shortDesc?: Dict; fullDesc?: Dict; features?: Record<string, unknown>; seo?: Record<string, unknown>; slugs?: Dict };
+  data: { title?: Dict; tagline?: Dict; shortDesc?: Dict; fullDesc?: Dict; features?: Record<string, unknown>; seo?: Record<string, unknown>; slugs?: Dict };
 };
 
 export type ProjectRow = Meta & {

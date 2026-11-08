@@ -59,6 +59,9 @@ export const CONTENT_TYPES: Record<string, ContentType> = {
     ],
     i18n: [
       { key: "title", label: "العنوان", type: "text", required: true },
+      // One short line shown under the title on the service page. Optional;
+      // when empty the page uses the site's own line (src/data/service-taglines.ts).
+      { key: "tagline", label: "السطر تحت العنوان", type: "text" },
       { key: "shortDesc", label: "الوصف المختصر", type: "textarea" },
       { key: "fullDesc", label: "الوصف الكامل", type: "html" },
       // Optional, up to 5 pairs — empty ones are simply not shown on the

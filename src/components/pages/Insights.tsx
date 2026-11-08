@@ -5,6 +5,7 @@ import Link from '@/components/LocaleLink';
 import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
 import { SplitWords, Reveal } from '../Reveal';
+import { fitTitleStyle } from '@/lib/title-fit';
 import { getPostImage } from '@/lib/utils';
 import { formatPostDate } from '@/lib/dates';
 import type { BlogPost } from '@/types/api';
@@ -36,7 +37,8 @@ export default function Insights({ initialData, initialLocale }: { initialData: 
         <SplitWords
           as="h1"
           text={t("Film Production Insights")}
-          className="font-display font-black uppercase tracking-tight leading-[0.9] text-[12vw] md:text-[7.5vw]"
+          style={fitTitleStyle(t("Film Production Insights"), { locale })}
+          className="fit-title [--t-max:8vw] md:[--t-max:3vw] font-display heading-ar-spacious font-black uppercase tracking-tight leading-[0.95]"
         />
         <p className="mt-6 max-w-2xl text-white/60 leading-relaxed">
           {t('Production insights, practical guides and field notes from film, commercials, documentaries and on-ground work in Egypt and MENA.')}

@@ -11,6 +11,7 @@ import { getProjectImage } from '@/lib/utils';
 import type { PortfolioItem } from '@/types/api';
 import { useLanguage } from '../LanguageContext';
 import { renderCmsHtml } from '@/lib/seo';
+import { fitTitleStyle } from '@/lib/title-fit';
 import { usePageData } from '@/hooks/usePageData';
 import { getProjectDetailData, type ProjectDetailData, type DetailResult } from '@/lib/page-data';
 
@@ -84,7 +85,8 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
           <SplitWords
             as="h1"
             text={project.title}
-            className="font-display heading-ar-spacious font-black uppercase tracking-tight leading-[0.92] text-[9vw] md:text-[5.5vw] max-w-6xl"
+            style={fitTitleStyle(project.title, { locale })}
+            className="fit-title [--t-max:7.5vw] md:[--t-max:2.75vw] font-display heading-ar-spacious font-black uppercase tracking-tight leading-[0.95]"
           />
         </div>
       </section>
@@ -105,43 +107,33 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
           ))}
         </div>
 
-        <div className="grid md:grid-cols-12 gap-10">
-          <div className="md:col-span-4">
-            <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">( {t('The brief & the build')} )</p>
-          </div>
-          <div className="md:col-span-8">
-            <SplitWords
-              as="h2"
-              text={project.results || project.title}
-              className="font-display font-bold leading-[1.25] text-2xl md:text-4xl normal-case tracking-tight"
-            />
-            {project.description && (
-              <Reveal>
-                <div
-                  className="mt-8 prose prose-invert prose-lg max-w-none
-                    prose-headings:font-display prose-headings:uppercase prose-headings:tracking-tight
-                    prose-h2:text-xl prose-h2:md:text-2xl prose-h2:mt-8 prose-h2:mb-3
-                    prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-2
-                    prose-p:text-white/65 prose-p:leading-relaxed
-                    prose-a:text-white prose-a:underline prose-a:decoration-white/30 hover:prose-a:decoration-white
-                    prose-strong:text-white prose-strong:font-bold prose-li:text-white/65"
-                  dangerouslySetInnerHTML={{ __html: renderCmsHtml(project.description) }}
-                />
-              </Reveal>
-            )}
-            <Reveal className="mt-10 flex flex-wrap gap-3">
-              {project.category && (
-                <span className="font-mono2 text-[10px] tracking-[0.2em] uppercase border border-white/20 px-4 py-2 text-white/70">{project.category}</span>
-              )}
+        <div className="read-col">
+          <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">( {t('The brief & the build')} )</p>
+          <SplitWords
+            as="p"
+            text={project.results || project.title}
+            className="mt-6 font-display font-semibold leading-[1.4] text-xl md:text-2xl normal-case tracking-tight text-white/90"
+          />
+          {project.description && (
+            <Reveal>
+              <div
+                className="cms-prose mt-10"
+                dangerouslySetInnerHTML={{ __html: renderCmsHtml(project.description) }}
+              />
             </Reveal>
-          </div>
+          )}
+          <Reveal className="mt-10 flex flex-wrap gap-3">
+            {project.category && (
+              <span className="font-mono2 text-[10px] tracking-[0.2em] uppercase border border-white/20 px-4 py-2 text-white/70">{project.category}</span>
+            )}
+          </Reveal>
         </div>
       </section>
 
       {/* Related */}
       {related.length > 0 && (
         <section className="px-5 md:px-10 py-16 md:py-24 border-t border-white/10">
-          <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl md:text-5xl mb-10">{t('Related productions')}</h2>
+          <h2 className="font-display heading-ar-spacious font-extrabold uppercase tracking-tight text-2xl md:text-3xl mb-10">{t('Related productions')}</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {related.map(p => (
               <Link key={p.slug} href={`/work/${p.slug}`} className="group block">
@@ -161,7 +153,10 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
         <div className="px-5 md:px-10 py-16 md:py-24 flex items-center justify-between gap-6">
           <div>
             <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-4">( {t('Next project')} )</p>
-            <h2 className="font-display font-black uppercase tracking-tight leading-[0.95] text-[8vw] md:text-[5vw] group-hover:translate-x-3 rtl:group-hover:-translate-x-3 transition-transform duration-500">
+            <h2
+              style={fitTitleStyle(next.title, { locale })}
+              className="fit-title [--t-max:6.5vw] md:[--t-max:2.5vw] md:[--t-avail:calc(100vw_-_13rem)] font-display font-black uppercase tracking-tight leading-[0.95] group-hover:translate-x-3 rtl:group-hover:-translate-x-3 transition-transform duration-500"
+            >
               {next.title}
             </h2>
           </div>

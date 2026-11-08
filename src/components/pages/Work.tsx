@@ -6,6 +6,7 @@ import Link from '@/components/LocaleLink';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, Play } from 'lucide-react';
 import { SplitWords, Reveal, EASE } from '../Reveal';
+import { fitTitleStyle } from '@/lib/title-fit';
 import RetryState from '../RetryState';
 import { getProjectImage } from '@/lib/utils';
 import type { PortfolioItem } from '@/types/api';
@@ -81,7 +82,7 @@ function WorkCard({ project }: { project: PortfolioItem }) {
 
 export default function Work({ initialData, initialLocale }: { initialData: PortfolioItem[] | null; initialLocale: string }) {
   const [filter, setFilter] = useState('All');
-  const { t } = useLanguage();
+  const { locale, t } = useLanguage();
   const { data, loading, failed: loadFailed, retry } = usePageData(initialData, initialLocale, getWorkData);
   const projects = data ?? [];
 
@@ -113,7 +114,8 @@ export default function Work({ initialData, initialLocale }: { initialData: Port
         <SplitWords
           as="h1"
           text={t('Film & Advertising Portfolio')}
-          className="font-display font-black uppercase tracking-tight leading-[0.9] text-[13vw] md:text-[8vw]"
+          style={fitTitleStyle(t('Film & Advertising Portfolio'), { locale })}
+          className="fit-title [--t-max:8vw] md:[--t-max:3vw] font-display heading-ar-spacious font-black uppercase tracking-tight leading-[0.95]"
         />
         <Reveal className="mt-6 max-w-xl">
           <p className="text-white/60 leading-relaxed">
@@ -163,7 +165,8 @@ export default function Work({ initialData, initialLocale }: { initialData: Port
           <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-4">( {t('The story is yours')} )</p>
           <SplitWords
             text={t("Let's bring it to life")}
-            className="font-display font-extrabold uppercase tracking-tight leading-[0.95] text-[10vw] md:text-[5.5vw] mb-8"
+            style={fitTitleStyle(t("Let's bring it to life"), { locale })}
+            className="fit-title [--t-max:8vw] md:[--t-max:3vw] font-display heading-ar-spacious font-extrabold uppercase tracking-tight leading-[0.95] mb-8"
           />
           <Link
             href="/contact"

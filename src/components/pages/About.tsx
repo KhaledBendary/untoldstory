@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from '@/components/LocaleLink';
 import { ArrowRight } from 'lucide-react';
 import { SplitWords, Reveal } from '../Reveal';
+import { fitTitleStyle } from '@/lib/title-fit';
 import Marquee from '../Marquee';
 import Magnetic from '../Magnetic';
 import type { About as AboutType } from '@/types/api';
@@ -101,33 +102,32 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
         <SplitWords
           as="h1"
           text={t("About Global Untold Story")}
-          className="font-display font-black uppercase tracking-tight leading-[0.9] text-[5vw] w-full whitespace-nowrap"
+          style={fitTitleStyle(t("About Global Untold Story"), { locale })}
+          className="fit-title [--t-max:8vw] md:[--t-max:3vw] font-display heading-ar-spacious font-black uppercase tracking-tight leading-[0.95]"
         />
       </section>
 
       <section className="px-5 md:px-10 pb-20 md:pb-28">
-        <div className="grid md:grid-cols-12 gap-10 border-t border-white/10 pt-14">
-          <div className="md:col-span-4">
+        <div className="border-t border-white/10 pt-14">
+          <div className="read-col space-y-8">
             <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">( {t('About')} )</p>
-          </div>
-          <div className="md:col-span-8 space-y-8">
             <SplitWords
               as="h2"
               text={t("Where story meets execution. Predictable budgets. Premium results.")}
-              className="font-display font-bold text-2xl md:text-4xl leading-[1.25] tracking-tight normal-case"
+              className="font-display heading-ar-spacious font-bold text-2xl md:text-3xl leading-[1.3] tracking-tight normal-case"
             />
             <Reveal>
-              <p className="text-white/60 leading-relaxed max-w-2xl">
+              <p className="text-white/70 leading-[1.8] text-base md:text-[1.0625rem]">
                 {t(aboutData?.page?.subtitle || 'Under the leadership of CEO Khaled Bendary, our team owns the complete production cycle: strategy and planning, filming, live execution, post-production, delivery and localization. Brands, platforms, broadcasters, institutions and international crews trust us with the stories that matter most to them — and 90% come back for the next one.')}
               </p>
             </Reveal>
             <Reveal>
-              <p className="text-white/60 leading-relaxed max-w-2xl">
+              <p className="text-white/70 leading-[1.8] text-base md:text-[1.0625rem]">
                 {t('Based in Egyptian Media Production City, with offices in Dubai and Jeddah, we run film, advertising, documentary, corporate, live, post and original-IP work to the same standard. Permits, crews, locations and finishing sit in one team, so international productions in Egypt do not have to assemble a vendor chain from scratch.')}
               </p>
             </Reveal>
             <Reveal>
-              <p className="text-white/60 leading-relaxed max-w-2xl">
+              <p className="text-white/70 leading-[1.8] text-base md:text-[1.0625rem]">
                 {t('That is why clients return: one point of contact, a budget that holds, and a picture that still looks like the brief when it lands in every language and every cutdown.')}
               </p>
             </Reveal>
@@ -152,7 +152,8 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
             <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-4">( {t('About')} )</p>
             <SplitWords
               text={t("Our Work")}
-              className="font-display font-extrabold uppercase tracking-tight leading-[0.95] text-[10vw] md:text-[5.5vw]"
+              style={fitTitleStyle(t("Our Work"), { locale })}
+              className="fit-title [--t-max:8vw] md:[--t-max:3vw] font-display heading-ar-spacious font-extrabold uppercase tracking-tight leading-[0.95]"
             />
           </div>
         </div>
@@ -200,7 +201,8 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
         <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-4">( {t('Offices')} )</p>
         <SplitWords
           text={t('Three grounds. One standard.')}
-          className="font-display font-extrabold uppercase tracking-tight leading-[0.95] text-[10vw] md:text-[5vw] mb-14"
+          style={fitTitleStyle(t('Three grounds. One standard.'), { locale })}
+          className="fit-title [--t-max:8vw] md:[--t-max:3vw] font-display heading-ar-spacious font-extrabold uppercase tracking-tight leading-[0.95] mb-14"
         />
         <div className="grid md:grid-cols-3 gap-px bg-white/10 border border-white/10">
           {[

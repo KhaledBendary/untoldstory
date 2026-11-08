@@ -25,6 +25,8 @@ export interface Service {
   icon: string;
   imageUrl: string;
   title: string;
+  // One line under the title on the service page (optional).
+  tagline?: string;
   shortDesc: string;
   fullDesc: string;
   price: string;

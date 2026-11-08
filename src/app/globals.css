@@ -311,3 +311,166 @@ img {
     animation-direction: reverse !important;
   }
 }
+
+/*
+ * Page titles sized to their own text (see src/lib/title-fit.ts).
+ *
+ * --t-em is the title's width at 1em, set inline per title. The size is
+ * whatever makes the text fill --t-lines lines of the available width, held
+ * between --t-min and the template's cap --t-max. text-wrap: balance keeps a
+ * lone word from ending up on a line of its own.
+ */
+/* Defaults sit in :where() (no specificity) so a template's own
+   [--t-max:…] / md:[--t-avail:…] classes always override them. */
+:where(.fit-title) {
+  --t-lines: 3;
+  --t-fill: 0.93;
+  --t-avail: calc(100vw - 2.5rem);
+  --t-min: 1.625rem;
+  --t-max: 8vw;
+}
+@media (min-width: 768px) {
+  :where(.fit-title) {
+    --t-lines: 2;
+    --t-avail: calc(100vw - 5rem);
+    --t-min: 2rem;
+    --t-max: 3vw;
+  }
+}
+.fit-title {
+  font-size: clamp(var(--t-min), calc(var(--t-avail) * var(--t-lines) * var(--t-fill) / var(--t-em, 24)), var(--t-max));
+  text-wrap: balance;
+  max-width: none;
+}
+html[dir="rtl"] .fit-title {
+  line-height: 1.45;
+}
+
+/* One reading column for long text, centred, so no side of the page is left empty. */
+.read-col {
+  width: 100%;
+  max-width: 54rem;
+  margin-inline: auto;
+}
+
+/*
+ * Rich text from the CMS (project, service and article bodies).
+ *
+ * The pages used Tailwind's prose classes, but the typography plugin was never
+ * installed, so none of them applied: headings showed as plain lines, lists
+ * lost their bullets and paragraphs had no space between them.
+ */
+.cms-prose {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  overflow-wrap: break-word;
+}
+@media (min-width: 768px) {
+  .cms-prose {
+    font-size: 1.125rem;
+  }
+}
+.cms-prose :where(p, ul, ol, blockquote, figure, table, pre, div, h1, h2, h3, h4, h5, h6) + :where(p, ul, ol, blockquote, figure, table, pre, div) {
+  margin-top: 1.05em;
+}
+.cms-prose h1,
+.cms-prose h2,
+.cms-prose h3,
+.cms-prose h4,
+.cms-prose h5 {
+  font-family: var(--font-archivo), sans-serif;
+  color: #fafafa;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.cms-prose h1,
+.cms-prose h2 {
+  font-size: 1.375rem;
+  font-weight: 800;
+  margin-top: 2.4em;
+  margin-bottom: -0.2em;
+}
+.cms-prose h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-top: 1.9em;
+  margin-bottom: -0.3em;
+}
+.cms-prose h4,
+.cms-prose h5 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 1.6em;
+}
+/* Nothing above the first line of the body. */
+.cms-prose > :is(h1, h2, h3, h4, h5):first-child {
+  margin-top: 0;
+}
+@media (min-width: 768px) {
+  .cms-prose h1,
+  .cms-prose h2 {
+    font-size: 1.625rem;
+  }
+  .cms-prose h3 {
+    font-size: 1.25rem;
+  }
+}
+html[dir="rtl"] .cms-prose h1,
+html[dir="rtl"] .cms-prose h2,
+html[dir="rtl"] .cms-prose h3,
+html[dir="rtl"] .cms-prose h4,
+html[dir="rtl"] .cms-prose h5 {
+  font-family: var(--font-alexandria), var(--font-archivo), sans-serif;
+  text-transform: none;
+  line-height: 1.5;
+}
+.cms-prose ul,
+.cms-prose ol {
+  padding-inline-start: 1.35em;
+}
+.cms-prose ul {
+  list-style: disc;
+}
+.cms-prose ol {
+  list-style: decimal;
+}
+.cms-prose li + li {
+  margin-top: 0.4em;
+}
+.cms-prose li::marker {
+  color: rgba(255, 255, 255, 0.4);
+}
+.cms-prose a {
+  color: #fafafa;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.3);
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 0.3s;
+}
+.cms-prose a:hover {
+  text-decoration-color: #fafafa;
+}
+.cms-prose strong,
+.cms-prose b {
+  color: #fafafa;
+  font-weight: 700;
+}
+.cms-prose blockquote {
+  border-inline-start: 2px solid rgba(255, 255, 255, 0.25);
+  padding-inline-start: 1.25em;
+  color: rgba(255, 255, 255, 0.85);
+  font-style: italic;
+}
+.cms-prose img,
+.cms-prose video,
+.cms-prose iframe {
+  max-width: 100%;
+  height: auto;
+}
+.cms-prose hr {
+  border-color: rgba(255, 255, 255, 0.12);
+  margin-block: 2.5em;
+}

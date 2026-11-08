@@ -79,6 +79,9 @@ export function localizeService(r: ServiceRow, loc: string) {
     isFeatured: r.is_featured,
     noindex: r.noindex,
     title: pick(d.title, loc),
+    // This language only: a missing one falls back to the site's own copy
+    // (src/data/service-taglines.ts), not to the English line.
+    tagline: d.tagline?.[loc] ?? "",
     shortDesc: pick(d.shortDesc, loc),
     fullDesc: pick(d.fullDesc, loc),
     features: pickArr(d.features as Record<string, unknown> | undefined, loc),

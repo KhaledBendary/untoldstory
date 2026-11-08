@@ -2,6 +2,7 @@
 
 import Link from "@/components/LocaleLink";
 import { SplitWords, Reveal } from "../Reveal";
+import { fitTitleStyle } from "@/lib/title-fit";
 import { useLanguage } from "../LanguageContext";
 import { legalDoc, hasTranslation, LEGAL_UPDATED, type LegalKey } from "@/data/legal";
 
@@ -37,7 +38,8 @@ export default function Legal({ docKey, locale }: { docKey: LegalKey; locale: st
         <SplitWords
           as="h1"
           text={doc.title}
-          className="font-display font-black uppercase tracking-tight leading-[0.9] text-[11vw] md:text-[6.5vw] max-w-5xl"
+          style={fitTitleStyle(doc.title, { locale: translated ? locale : "en" })}
+          className="fit-title [--t-max:8vw] md:[--t-max:3vw] font-display heading-ar-spacious font-black uppercase tracking-tight leading-[0.95]"
         />
 
         <Reveal className="mt-8 max-w-2xl">
@@ -59,7 +61,7 @@ export default function Legal({ docKey, locale }: { docKey: LegalKey; locale: st
       </section>
 
       <section className="px-5 md:px-10 pb-24 md:pb-32">
-        <div className="max-w-3xl space-y-14 border-t border-white/10 pt-14">
+        <div className="read-col space-y-14 border-t border-white/10 pt-14">
           {doc.sections.map((section, i) => (
             <Reveal key={section.heading} delay={i * 0.04}>
               <div className="grid md:grid-cols-12 gap-6 md:gap-10">
@@ -74,7 +76,7 @@ export default function Legal({ docKey, locale }: { docKey: LegalKey; locale: st
                   </h2>
                   <div className="space-y-4">
                     {section.body.map((paragraph, j) => (
-                      <p key={j} className="text-white/65 leading-relaxed">
+                      <p key={j} className="text-white/70 leading-[1.8] text-base md:text-[1.0625rem]">
                         {paragraph}
                       </p>
                     ))}
@@ -85,7 +87,7 @@ export default function Legal({ docKey, locale }: { docKey: LegalKey; locale: st
           ))}
         </div>
 
-        <Reveal className="max-w-3xl mt-16 pt-10 border-t border-white/10">
+        <Reveal className="read-col mt-16 pt-10 border-t border-white/10">
           <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-5">
             ( {t("Read next")} )
           </p>

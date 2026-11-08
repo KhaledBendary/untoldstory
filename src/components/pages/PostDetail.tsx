@@ -12,6 +12,7 @@ import { formatPostDate } from '@/lib/dates';
 import type { BlogPost } from '@/types/api';
 import { useLanguage } from '../LanguageContext';
 import { renderCmsHtml } from '@/lib/seo';
+import { fitTitleStyle } from '@/lib/title-fit';
 import { usePageData } from '@/hooks/usePageData';
 import { getPostDetailData, type PostDetailData, type DetailResult } from '@/lib/page-data';
 
@@ -78,7 +79,7 @@ export default function PostDetail({ slug, initialData, initialLocale }: { slug:
   return (
     <>
       <article>
-        <header className="px-5 md:px-10 pt-32 md:pt-44 pb-12 max-w-5xl mx-auto">
+        <header className="px-5 md:px-10 pt-32 md:pt-44 pb-12">
           <Reveal>
             <Link href="/insights" className="inline-flex items-center gap-2 font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/60 hover:text-white transition-colors mb-8">
               <ArrowLeft className="w-4 h-4 rtl:hidden" /> <ArrowRight className="w-4 h-4 hidden rtl:block" /> {t('All insights')}
@@ -92,28 +93,23 @@ export default function PostDetail({ slug, initialData, initialLocale }: { slug:
           <SplitWords
             as="h1"
             text={post.title}
-            className="font-display font-black tracking-tight leading-[1.02] text-[8.5vw] md:text-[4vw]"
+            style={fitTitleStyle(post.title, { locale, uppercase: false })}
+            className="fit-title [--t-max:7vw] md:[--t-max:2vw] font-display heading-ar-spacious font-black tracking-tight leading-[1.05]"
           />
         </header>
 
-        <div className="px-5 md:px-10 max-w-5xl mx-auto pb-12">
+        <div className="px-5 md:px-10 pb-14 md:pb-20">
           <Reveal>
             <div className="relative aspect-[16/8] overflow-hidden">
-              <Image src={postImage} alt={post.title} fill priority sizes="(max-width: 1024px) 100vw, 1024px" className="object-cover" />
+              <Image src={postImage} alt={post.title} fill priority sizes="100vw" className="object-cover" />
             </div>
           </Reveal>
         </div>
 
-        <div className="px-5 md:px-10 max-w-3xl mx-auto pb-20 md:pb-28">
+        <div className="px-5 md:px-10 pb-20 md:pb-28"><div className="read-col">
           <Reveal>
             <div
-              className="prose prose-invert prose-lg max-w-none
-                prose-headings:font-display prose-headings:uppercase prose-headings:tracking-tight
-                prose-h2:text-2xl prose-h2:md:text-3xl prose-h2:mt-10 prose-h2:mb-4
-                prose-p:text-white/65 prose-p:leading-relaxed prose-p:text-lg
-                prose-a:text-white prose-a:underline prose-a:decoration-white/30 hover:prose-a:decoration-white
-                prose-strong:text-white prose-strong:font-bold
-                prose-li:text-white/65"
+              className="cms-prose"
               dangerouslySetInnerHTML={{ __html: renderCmsHtml(post.body) }}
             />
           </Reveal>
@@ -138,7 +134,7 @@ export default function PostDetail({ slug, initialData, initialLocale }: { slug:
               </ul>
             </Reveal>
           )}
-        </div>
+        </div></div>
       </article>
 
       {next && (
@@ -146,7 +142,10 @@ export default function PostDetail({ slug, initialData, initialLocale }: { slug:
         <div className="px-5 md:px-10 py-16 md:py-20 flex items-center justify-between gap-6 max-w-none">
           <div>
             <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-4">( {t('Next article')} )</p>
-            <h2 className="font-display font-black tracking-tight leading-[1] text-[6.5vw] md:text-[3.2vw] group-hover:translate-x-3 rtl:group-hover:-translate-x-3 transition-transform duration-500">
+            <h2
+              style={fitTitleStyle(next.title, { locale, uppercase: false })}
+              className="fit-title [--t-max:6vw] md:[--t-max:1.6vw] md:[--t-avail:calc(100vw_-_12rem)] font-display font-black tracking-tight leading-[1.05] group-hover:translate-x-3 rtl:group-hover:-translate-x-3 transition-transform duration-500"
+            >
               {next.title}
             </h2>
           </div>

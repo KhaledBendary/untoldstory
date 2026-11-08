@@ -1,14 +1,15 @@
 "use client";
 
 import { motion, type Variants } from 'framer-motion';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { useHydrated } from '@/hooks/useHydrated';
 
 const EASE = [0.76, 0, 0.24, 1] as const;
 
 /** Splits children text into words, each revealed with a masked rise. */
-export function SplitWords({ text, className = '', delay = 0, as: Tag = 'h2' }: {
+export function SplitWords({ text, className = '', delay = 0, as: Tag = 'h2', style }: {
   text?: string | null; className?: string; delay?: number; as?: 'h1' | 'h2' | 'h3' | 'p' | 'span' | 'div';
+  style?: CSSProperties;
 }) {
   const hydrated = useHydrated();
   // A heading whose CMS text is missing must not take the page down with it.
@@ -21,7 +22,7 @@ export function SplitWords({ text, className = '', delay = 0, as: Tag = 'h2' }: 
   // per-word overflow-hidden mask clips them. Render Arabic (and any RTL
   // script) as plain text instead of splitting into masked words.
   if (!hydrated || /[\u0600-\u06FF]/.test(value)) {
-    return <Tag className={className} aria-label={value}>{value}</Tag>;
+    return <Tag className={className} style={style} aria-label={value}>{value}</Tag>;
   }
 
   const container: Variants = {
@@ -36,6 +37,7 @@ export function SplitWords({ text, className = '', delay = 0, as: Tag = 'h2' }: 
   return (
     <MTag
       className={className}
+      style={style}
       variants={container}
       initial="hidden"
       whileInView="show"
