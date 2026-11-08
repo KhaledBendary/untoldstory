@@ -112,7 +112,7 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
           <SplitWords
             as="p"
             text={project.results || project.title}
-            className="mt-6 font-display font-semibold leading-[1.4] text-xl md:text-2xl normal-case tracking-tight text-white/90"
+            className="lead-text mt-6 font-display font-semibold leading-[1.4] text-xl md:text-2xl normal-case tracking-tight text-white/90"
           />
           {project.description && (
             <Reveal>

@@ -113,7 +113,7 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
         <div className="mt-8 md:mt-10 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
           {tagline ? (
             <Reveal className="max-w-3xl">
-              <p className="font-display font-semibold normal-case tracking-tight leading-[1.35] text-lg md:text-2xl text-white/75">{tagline}</p>
+              <p className="lead-text font-display font-semibold normal-case tracking-tight leading-[1.35] text-lg md:text-2xl text-white/75">{tagline}</p>
             </Reveal>
           ) : <span />}
           <Reveal className="shrink-0">
@@ -144,7 +144,7 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
           <SplitWords
             as="p"
             text={service.shortDesc}
-            className="font-display font-semibold leading-[1.4] text-xl md:text-2xl normal-case tracking-tight text-white/90"
+            className="lead-text font-display font-semibold leading-[1.4] text-xl md:text-2xl normal-case tracking-tight text-white/90"
           />
           {service.fullDesc && (
             <Reveal>

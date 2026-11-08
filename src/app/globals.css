@@ -329,12 +329,19 @@ img {
   --t-min: 1.625rem;
   --t-max: 8vw;
 }
+/* Tablets get three lines, laptops and up two. */
 @media (min-width: 768px) {
   :where(.fit-title) {
-    --t-lines: 2;
+    --t-lines: 3;
     --t-avail: calc(100vw - 5rem);
-    --t-min: 2rem;
+    --t-min: 1.75rem;
     --t-max: 3vw;
+  }
+}
+@media (min-width: 1024px) {
+  :where(.fit-title) {
+    --t-lines: 2;
+    --t-min: 2rem;
   }
 }
 .fit-title {
@@ -351,6 +358,10 @@ html[dir="rtl"] .fit-title {
   width: 100%;
   max-width: 54rem;
   margin-inline: auto;
+}
+/* Arabic needs more room between lines than the display face's 1.2 allows. */
+html[dir="rtl"] .lead-text {
+  line-height: 1.75;
 }
 
 /*
@@ -473,4 +484,15 @@ html[dir="rtl"] .cms-prose h5 {
 .cms-prose hr {
   border-color: rgba(255, 255, 255, 0.12);
   margin-block: 2.5em;
+}
+
+/* Very wide screens: slightly larger reading text, column widened to match.
+   Kept last so it overrides the base .read-col and .cms-prose sizes above. */
+@media (min-width: 1920px) {
+  .read-col {
+    max-width: 60rem;
+  }
+  .cms-prose {
+    font-size: 1.25rem;
+  }
 }
