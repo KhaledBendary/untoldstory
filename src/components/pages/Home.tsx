@@ -19,9 +19,10 @@ import { getServiceImagePosition, getServiceImage, getProjectImage, getPostImage
 import { formatPostDate } from '@/lib/dates';
 import type { Service, PortfolioItem, BlogPost } from '@/types/api';
 
-const HERO_POSTER = '/videos/hero-poster.jpg';
-const HERO_WEBM = '/videos/hero.webm';
-const HERO_MP4 = '/videos/hero.mp4';
+// Homepage film: "Selected frames, selected projects" (owner's 55-second edit, 8 Nov 2026).
+const HERO_POSTER = '/videos/global-untold-story-selected-frames-selected-projects.jpg';
+const HERO_WEBM = '/videos/global-untold-story-selected-frames-selected-projects.webm';
+const HERO_MP4 = '/videos/global-untold-story-selected-frames-selected-projects.mp4';
 
 /* ---------------- HERO (from API) ---------------- */
 function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headline1?: string; headline2?: string; headline3?: string; subtext?: string; cta1?: { label: string; href: string }; cta2?: { label: string; href: string }; image?: string } | null }) {
@@ -123,7 +124,7 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
             <source src={HERO_MP4} type="video/mp4" />
           </motion.video>
         ) : (
-          <img src={HERO_POSTER} alt="image?url=%2Fimages%2Fclients row 5 — Global Untold Story" className="absolute inset-0 h-full w-full object-cover brightness-[0.75]" />
+          <img src={HERO_POSTER} alt="Selected frames from Global Untold Story projects in Egypt" className="absolute inset-0 h-full w-full object-cover brightness-[0.75]" />
         )}
       </motion.div>
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-[#0a0a0a]/65" />
