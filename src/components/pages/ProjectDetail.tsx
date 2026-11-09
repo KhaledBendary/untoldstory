@@ -15,6 +15,31 @@ import { fitTitleStyle } from '@/lib/title-fit';
 import { usePageData } from '@/hooks/usePageData';
 import { getProjectDetailData, type ProjectDetailData, type DetailResult } from '@/lib/page-data';
 
+const META_COLS: Record<number, string> = { 1: 'md:grid-cols-1', 2: 'md:grid-cols-2', 3: 'md:grid-cols-3', 4: 'md:grid-cols-4' };
+
+/** "N/A", "-", "TBD" and blanks are placeholders, not facts. */
+function hasValue(v?: string | null): v is string {
+  const s = (v ?? '').trim();
+  return s !== '' && !/^(n\s*\/?\s*a|-+|—|–|tbd|tba)$/i.test(s);
+}
+
+/**
+ * The facts row under the project title. A field is shown only when it says
+ * something: every project read "Duration: N/A" and most repeated the page
+ * title as their "Metric", which reads as an empty template to visitors and
+ * search engines alike.
+ */
+function projectMeta(project: PortfolioItem, t: (s: string) => string): [string, string][] {
+  const same = (a?: string | null, b?: string | null) =>
+    (a ?? '').trim().toLocaleLowerCase() === (b ?? '').trim().toLocaleLowerCase();
+  const items: [string, string][] = [];
+  if (hasValue(project.client)) items.push([t('Client'), project.client]);
+  if (hasValue(project.category)) items.push([t('Category'), project.category]);
+  if (hasValue(project.metric) && !same(project.metric, project.title)) items.push([t('Metric'), project.metric]);
+  if (hasValue(project.duration)) items.push([t('Duration'), project.duration]);
+  return items;
+}
+
 export default function ProjectDetail({ slug, initialData, initialLocale }: { slug: string; initialData: DetailResult<ProjectDetailData> | null; initialLocale: string }) {
   const { locale, t, setSlugOverride } = useLanguage();
   const { data: result, loading, failed: loadFailed, retry } = usePageData(
@@ -68,6 +93,7 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
   const idx = allProjects.findIndex(p => p.slug === slug);
   const next = allProjects[(idx + 1) % allProjects.length];
   const related = allProjects.filter(p => p.slug !== slug && p.category === project.category).slice(0, 3);
+  const metaItems = projectMeta(project, t);
 
   return (
     <>
@@ -93,19 +119,16 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
 
       {/* Meta */}
       <section className="px-5 md:px-10 py-14 md:py-20">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-y border-white/10 py-10 mb-14">
-          {[
-            [t('Client'), project.client || 'N/A'],
-            [t('Category'), project.category || 'N/A'],
-            [t('Metric'), project.metric || project.title],
-            [t('Duration'), project.duration || 'N/A'],
-          ].map(([k, v]) => (
-            <Reveal key={k as string}>
-              <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-3">{k}</p>
-              <p className="font-display font-bold text-lg md:text-xl uppercase">{v}</p>
-            </Reveal>
-          ))}
-        </div>
+        {metaItems.length > 0 && (
+          <div className={`grid grid-cols-2 ${META_COLS[metaItems.length] || 'md:grid-cols-4'} gap-8 border-y border-white/10 py-10 mb-14`}>
+            {metaItems.map(([k, v]) => (
+              <Reveal key={k}>
+                <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-3">{k}</p>
+                <p className="font-display font-bold text-lg md:text-xl uppercase">{v}</p>
+              </Reveal>
+            ))}
+          </div>
+        )}
 
         <div className="read-col">
           <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55">( {t('The brief & the build')} )</p>
