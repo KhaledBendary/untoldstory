@@ -9,15 +9,25 @@ export type Dict = Record<string, string>;
 export type Row = Record<string, unknown> & { slug: string; data: Record<string, Dict> };
 export type CType = "services" | "projects" | "posts";
 
-/** (Re)generate machine languages for one item from its English (optionally one locale). */
-export async function translateOne(type: CType, def: ContentType, row: Row, only?: readonly string[], force = false): Promise<{ ok: boolean; warning?: string; data?: Record<string, Dict> }> {
+/**
+ * (Re)generate machine languages for one item from its English (optionally one
+ * locale). `fields` limits the work to those field keys (e.g. ["fullDesc"]) so
+ * one wrong field can be redone without touching the item's other fields.
+ */
+export async function translateOne(type: CType, def: ContentType, row: Row, only?: readonly string[], force = false, fields?: readonly string[]): Promise<{ ok: boolean; warning?: string; data?: Record<string, Dict> }> {
   const seo = (row.data as { seo?: Record<string, Record<string, string>> })?.seo;
+  const wanted = (key: string) => !fields || fields.includes(key);
+  const withSeo = !fields || fields.some((k) => k.startsWith("seo."));
   const data: Record<string, Dict> = {};
   for (const field of def.i18n) {
     if (field.key.startsWith("seo.")) continue;
+    if (!wanted(field.key)) continue;
     data[field.key] = { ...(row.data[field.key] || {}) };
   }
-  Object.assign(data, extractSeoForEditor(seo as never, def));
+  if (withSeo) {
+    const seoFlat = extractSeoForEditor(seo as never, def) as Record<string, Dict>;
+    for (const [key, dict] of Object.entries(seoFlat)) if (wanted(key)) data[key] = dict;
+  }
   // Snapshot before translation mutates `data` — passing this (instead of
   // undefined) lets applyMachineTranslations skip locales a field already has,
   // instead of resending every field of every item on every bulk run. That
@@ -29,7 +39,7 @@ export async function translateOne(type: CType, def: ContentType, row: Row, only
   const { warning } = await applyMachineTranslations(def, data, existingFlat, only, force);
   if (warning) return { ok: false, warning };
 
-  assembleSeo(data, seo as never);
+  if (withSeo) assembleSeo(data, seo as never);
   const fixed: Record<string, string | boolean | number | null> = {};
   for (const f of def.fixed) {
     const v = row[f.key];

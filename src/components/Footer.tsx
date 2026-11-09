@@ -20,6 +20,19 @@ const DEFAULT_SOCIAL = {
   vimeo: 'https://vimeo.com/user252566067',
 };
 
+/*
+ * The company name is "Global Untold Story" in every language. The CMS layout
+ * holds a translated name per language (e.g. 全球未解之谜, Globale Ungesagte
+ * Geschichte), so the footer writes the Latin name and swaps the translated one
+ * out of the footer description.
+ */
+const BRAND = 'Global Untold Story';
+function latinBrand(text?: string, localName?: string): string | undefined {
+  if (!text) return text;
+  const name = localName?.trim();
+  return name && name !== BRAND ? text.split(name).join(BRAND) : text;
+}
+
 export default function Footer({ initialData, initialLocale }: { initialData: ShellData | null; initialLocale: string }) {
   const { locale, t } = useLanguage();
   const { data } = usePageData(initialData, initialLocale, getShellData);
@@ -70,7 +83,7 @@ export default function Footer({ initialData, initialLocale }: { initialData: Sh
       <div className="px-5 md:px-10 py-14 md:py-20 grid grid-cols-2 md:grid-cols-12 gap-10">
         <div className="col-span-2 md:col-span-4">
           <p className="text-sm text-[#0a0a0a]/60 max-w-xs leading-relaxed">
-            {footer?.brandDesc || t('Full-service film, video and content production studio serving Egypt, MENA and clients worldwide.')}
+            {latinBrand(footer?.brandDesc, siteConfig?.name) || t('Full-service film, video and content production studio serving Egypt, MENA and clients worldwide.')}
           </p>
         </div>
         <div className="md:col-span-2">
@@ -113,7 +126,7 @@ export default function Footer({ initialData, initialLocale }: { initialData: Sh
       <div className="px-5 md:px-10 py-6 border-t border-[#0a0a0a]/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
           <p className="font-mono2 text-[10px] tracking-[0.2em] uppercase text-[#0a0a0a]/65">
-            © {new Date().getFullYear()} {siteConfig?.name || 'Global Untold Story'}. {footer?.allRights || t('All rights reserved.')}
+            © {new Date().getFullYear()} {BRAND}. {footer?.allRights || t('All rights reserved.')}
           </p>
           {/* Reachable from every page: a policy nobody can find does not count
               as notice, and Meta requires a linked privacy policy for the pixel. */}

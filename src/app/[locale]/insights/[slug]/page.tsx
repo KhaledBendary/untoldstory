@@ -129,7 +129,10 @@ export default async function Page({ params }: Props) {
       headline: post.title,
       description: buildDescription(post.excerpt, post.title),
       datePublished: pubDate,
-      dateModified: pubDate,
+      // When the article was last changed, never earlier than its publish date.
+      dateModified: post.updatedAt && !Number.isNaN(new Date(post.updatedAt).getTime()) && new Date(post.updatedAt) > new Date(pubDate)
+        ? new Date(post.updatedAt).toISOString()
+        : pubDate,
       image: [articleImage],
       mainEntityOfPage: {
         "@type": "WebPage",

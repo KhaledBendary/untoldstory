@@ -90,6 +90,7 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
   // otherwise the site's own copy (src/data/service-taglines.ts).
   const tagline = service.tagline || serviceTagline(service.canonicalSlug ?? service.slug, locale);
   const features = service.features || [];
+  const faqs = getServiceFaqs(slug, service?.faqs, locale);
 
   return (
     <>
@@ -173,6 +174,7 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
         </div>
       </section>
 
+      {faqs.length > 0 && (
       <section className="px-5 md:px-10 py-14 md:py-20 border-t border-white/10">
         <div className="read-col">
           <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-6">( {t('Questions')} )</p>
@@ -180,7 +182,7 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
             {t('Frequently asked questions')}
           </h2>
           <dl className="space-y-8">
-            {getServiceFaqs(slug, service?.faqs).map((item) => (
+            {faqs.map((item) => (
               <div key={item.question}>
                 <dt>
                   <h3 className="font-display font-bold text-lg md:text-xl leading-snug">{item.question}</h3>
@@ -191,6 +193,7 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
           </dl>
         </div>
       </section>
+      )}
 
       {/* Related work */}
       {relatedProjects.length > 0 && (

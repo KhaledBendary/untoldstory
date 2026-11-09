@@ -59,8 +59,8 @@ export const LOCALE_TAGS: Record<Locale, string> = {
 
 /** Open Graph `og:locale` tags (underscore form). */
 export const OG_LOCALES: Record<Locale, string> = {
-  en: "en_US", ar: "ar_SA", de: "de_DE", es: "es_ES", fr: "fr_FR", it: "it_IT",
-  pt: "pt_PT", tr: "tr_TR", ru: "ru_RU", zh: "zh_CN", ja: "ja_JP", ko: "ko_KR",
+  en: "en_US", ar: "ar_EG", de: "de_DE", es: "es_ES", fr: "fr_FR", it: "it_IT",
+  pt: "pt_BR", tr: "tr_TR", ru: "ru_RU", zh: "zh_CN", ja: "ja_JP", ko: "ko_KR",
   pl: "pl_PL", sw: "sw_KE",
 };
 

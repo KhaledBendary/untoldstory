@@ -43,6 +43,10 @@ export async function POST(request: NextRequest) {
   // already has a non-empty value, since the admin is specifically saying an
   // existing translation is wrong (see applyMachineTranslations's `force`).
   const force = body?.force === true;
+  // Optional: redo only these fields (e.g. ["fullDesc"]) — single-item mode only.
+  const fields = Array.isArray(body?.fields) && body.fields.every((f: unknown) => typeof f === "string") && body.fields.length
+    ? (body.fields as string[])
+    : undefined;
 
   // Single-item mode.
   if (reqType && reqSlug) {
@@ -66,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     let result: { ok: boolean; warning?: string; data?: Record<string, Dict> } = { ok: false };
-    try { result = await translateOne(reqType, def, row, only, force); }
+    try { result = await translateOne(reqType, def, row, only, force, fields); }
     catch (e) { result = { ok: false, warning: (e as Error).message }; console.error(`translate ${reqType}/${reqSlug} failed:`, e); }
     if (!result.ok) return NextResponse.json({ error: result.warning || "فشلت الترجمة — جرّب تاني (اتأكد إن المفتاح صالح)" }, { status: 502 });
     // Deploy only when a full item (all locales) finished — not on every single-locale call.

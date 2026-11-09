@@ -91,8 +91,15 @@ const BY_SLUG: Record<string, ServiceFaq[]> = {
  * hardcoded English-only lists below only remain as the fallback for a
  * service nobody has migrated into the admin yet.
  */
-export function getServiceFaqs(slug: string, cms?: ServiceFaq[]): ServiceFaq[] {
+/**
+ * The FAQs for a service page: the CMS's own (per language) when it has them,
+ * otherwise the built-in list below — but that list is English, so only an
+ * English page falls back to it. A translated page with no FAQs in the CMS
+ * shows no FAQ section rather than English text under a translated page.
+ */
+export function getServiceFaqs(slug: string, cms?: ServiceFaq[], locale = "en"): ServiceFaq[] {
   if (cms && cms.length) return cms;
+  if (locale !== "en") return [];
   for (const related of relatedServiceSlugs(slug)) {
     if (BY_SLUG[related]) return BY_SLUG[related];
   }

@@ -127,7 +127,8 @@ export default async function Page({ params }: Props) {
 
   if (initialData?.status === "ok") {
     const service = initialData.data.service;
-    name = cleanHeadline(cmsSeo(service.seo).metaTitle || service.title, slug);
+    // The service's own name, not the SEO title with its " | Global Untold Story" suffix.
+    name = cleanHeadline(service.title, slug);
     schema = {
       "@context": "https://schema.org",
       "@type": "Service",
@@ -148,7 +149,7 @@ export default async function Page({ params }: Props) {
 
   if (initialData?.status === "notFound") notFound();
 
-  const faqs = getServiceFaqs(slug, initialData?.status === "ok" ? initialData.data.service.faqs : undefined);
+  const faqs = getServiceFaqs(slug, initialData?.status === "ok" ? initialData.data.service.faqs : undefined, locale);
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -165,7 +166,7 @@ export default async function Page({ params }: Props) {
   ]);
 
   return <>
-    <StructuredData data={schema ? [schema, faqSchema, crumbs] : [faqSchema, crumbs]} />
+    <StructuredData data={[...(schema ? [schema] : []), ...(faqs.length ? [faqSchema] : []), crumbs]} />
     <ServiceDetail slug={slug} initialData={initialData} initialLocale={locale} />
   </>;
 }
