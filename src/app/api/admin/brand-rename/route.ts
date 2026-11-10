@@ -36,6 +36,14 @@ const SKIP_KEYS = new Set(["slugs", "slugsManual", "canonical", "url", "href", "
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 // Built with the constructor: the TypeScript target predates lookbehind in regex literals.
 const LOOSE_PHRASE = new RegExp("(?<!(?:global|the)\\s+)\\buntold\\s+story\\b", "i");
+// Fragments of the old name's translations, to catch a variant not listed in OLD_BRAND_NAMES.
+const SUSPECT = new RegExp(
+  "ungesagte|unerz\u00e4hlte|unentdeckte|no contada|non raccontata|n\u00e3o contada|in\u00e9dite|non racont\u00e9e|anlat\u0131lmam\u0131\u015f|" +
+  "\u043d\u0435\u0440\u0430\u0441\u0441\u043a\u0430\u0437\u0430\u043d\u043d|niewypowiedzian|nieopowiedzian|isiyojulikana|isiyoeleweka|isiyosimuliwa|" +
+  "\u672a\u89e3\u4e4b\u8c1c|\u672a\u8bb2\u8ff0|\u672a\u88ab\u8bb2\u8ff0|\u30a2\u30f3\u30bf|\u30a2\u30f3\u30c8\u30fc\u30eb\u30c9|\uc5b8\ud1a8\ub4dc|\uc54c\ub824\uc9c0\uc9c0 \uc54a\uc740 \uc774\uc57c\uae30|" +
+  "\u063a\u064a\u0631 \u0627\u0644\u0645\u0631\u0648\u064a\u0629|\u063a\u064a\u0631 \u0645\u0631\u0648\u064a\u0629|\u0627\u0646\u062a\u0648\u0644\u062f|\u0623\u0646\u062a\u0648\u0644\u062f|\u062c\u0644\u0648\u0628\u0627\u0644|\u063a\u0644\u0648\u0628\u0627\u0644|untold",
+  "i",
+);
 const OLD_PATTERNS = OLD_BRAND_NAMES.map((name) => new RegExp(escape(name).replace(/\s+/g, "\\s+"), "gi"));
 
 /** The old name (or a translation of it) → the current name. */
@@ -88,9 +96,12 @@ function transform(value: unknown, path: string[], ctx: { table: string; ref: st
       ctx.hits.push(hit);
       return skipped(id, ctx.skip) ? value : after;
     }
-    // Phrases that may be the name without "Global"/"The" — reported, never changed.
+    // Phrases that may be the name without "Global"/"The", or a translation of
+    // the old name this list doesn't know yet — reported, never changed.
     const loose = value.search(LOOSE_PHRASE);
     if (loose >= 0) ctx.phrases.push({ id, text: snippet(value, loose, 60) });
+    const suspect = value.split(BRAND).join("").search(SUSPECT);
+    if (suspect >= 0) ctx.phrases.push({ id: `suspect:${id}`, text: snippet(value.split(BRAND).join(""), suspect, 60) });
     return value;
   }
   if (Array.isArray(value)) return value.map((v, i) => transform(v, [...path, String(i)], ctx));

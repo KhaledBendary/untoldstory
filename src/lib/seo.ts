@@ -134,6 +134,7 @@ const BRAND_VARIANTS = [
 
   // French
   "histoire mondiale non racontée",
+  "histoire mondiale inédite",
 
   // Italian
   "storia globale non raccontata",
@@ -152,6 +153,7 @@ const BRAND_VARIANTS = [
 
   // Swahili
   "hadithi isiyojulikana ya ulimwengu",
+  "hadithi isiyojulikana ya kimataifa",
   "hadithi isiyoeleweka ya kimataifa",
   "hadithi isiyoeleweka duniani",
 ];

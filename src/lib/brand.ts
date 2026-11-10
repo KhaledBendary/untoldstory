@@ -47,6 +47,7 @@ export const OLD_BRAND_NAMES = [
   // Spanish, French, Italian, Portuguese
   "Historia Global No Contada",
   "Histoire Mondiale Non Racontée",
+  "Histoire Mondiale Inédite",
   "Storia Globale Non Raccontata",
   "História Global Não Contada",
   // Turkish, Russian, Polish
@@ -55,6 +56,7 @@ export const OLD_BRAND_NAMES = [
   "Globalna Niewypowiedziana Historia",
   // Swahili
   "Hadithi Isiyojulikana ya Ulimwengu",
+  "Hadithi Isiyojulikana ya Kimataifa",
   "Hadithi Isiyoeleweka ya Kimataifa",
   "Hadithi Isiyoeleweka Duniani",
 ];
