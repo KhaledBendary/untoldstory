@@ -48,6 +48,8 @@ const OLD_PATTERNS = OLD_BRAND_NAMES.map((name) => new RegExp(escape(name).repla
 
 type Extra = { find: string; replace: string };
 
+const BACKUP_KEY = "backup_brand_rename_2026_11_10";
+
 /** The old name (or a translation of it) → the current name. */
 function renameText(text: string, locale: string): string {
   let out = text
@@ -140,7 +142,7 @@ async function loadRows(): Promise<Row[]> {
     rows.push({ table: "posts", ref: r.slug, column: "data", value: r.data });
     rows.push({ table: "posts", ref: r.slug, column: "author_name", value: r.author_name });
   }
-  for (const r of await sql<{ key: string; data: unknown }[]>`select key, data from singletons`) rows.push({ table: "singletons", ref: r.key, column: "data", value: r.data });
+  for (const r of await sql<{ key: string; data: unknown }[]>`select key, data from singletons where key <> ${BACKUP_KEY}`) rows.push({ table: "singletons", ref: r.key, column: "data", value: r.data });
   for (const r of await sql<{ id: number; alt: unknown }[]>`select id, alt from media`) rows.push({ table: "media", ref: String(r.id), column: "alt", value: r.alt });
   return rows;
 }
@@ -161,13 +163,24 @@ async function run(apply: boolean, skip: string[], extra: Extra[] = [], show: Se
   const phrases: { id: string; text: string }[] = [];
   const shown: Record<string, string> = {};
   let written = 0;
+  const pending: { row: Row; next: unknown }[] = [];
   for (const row of rows) {
     const ctx: Ctx = { table: row.table, ref: row.ref, skip, extra, hits, phrases, show, shown };
     const before = hits.length;
     const next = transform(row.value, row.column === "data" ? [] : [row.column], ctx);
     const changed = hits.slice(before).some((h) => !skipped(h.id, skip));
-    if (apply && changed) {
-      await writeRow(row, next);
+    if (changed) pending.push({ row, next });
+  }
+  if (apply && pending.length) {
+    // Keep every record exactly as it was before the first apply, so the
+    // rename can be undone with SQL. A second run never overwrites it.
+    const existing = await sql<{ key: string }[]>`select key from singletons where key = ${BACKUP_KEY}`;
+    if (!existing.length) {
+      const backup = { takenAt: new Date().toISOString(), rows: pending.map((p) => p.row) };
+      await sql`insert into singletons (key, data) values (${BACKUP_KEY}, ${sql.json(backup as unknown as Parameters<typeof sql.json>[0])})`;
+    }
+    for (const p of pending) {
+      await writeRow(p.row, p.next);
       written += 1;
     }
   }
