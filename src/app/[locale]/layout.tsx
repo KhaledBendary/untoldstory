@@ -104,7 +104,7 @@ export async function generateMetadata({
     openGraph: {
       type: "website",
       siteName: BRAND,
-      images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: `${BRAND} production in Egypt` }],
+      images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: `${BRAND} logo` }],
       locale: OG_LOCALES[locale],
       alternateLocale: others,
     },

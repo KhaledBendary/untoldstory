@@ -651,7 +651,13 @@ export function renderCmsHtml(html?: string | null) {
   return demoteHeadings(markdownInHtml(sanitizeCmsHtml(html)));
 }
 
-export const DEFAULT_OG_IMAGE = "/images/on-ground-production-giza.jpg";
+/**
+ * The picture chat apps (WhatsApp, Messenger, LinkedIn, X) show with a shared
+ * link: the logo, centred on the site's dark background (1200×630, logo kept
+ * inside the middle square so WhatsApp's square thumbnail shows all of it).
+ * Pages with their own photo (projects, services, articles) still use theirs.
+ */
+export const DEFAULT_OG_IMAGE = "/images/the-untold-story-share.jpg";
 
 type PageSeoInput = {
   path: string;
