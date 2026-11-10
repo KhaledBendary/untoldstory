@@ -46,13 +46,26 @@ const SUSPECT = new RegExp(
 );
 const OLD_PATTERNS = OLD_BRAND_NAMES.map((name) => new RegExp(escape(name).replace(/\s+/g, "\\s+"), "gi"));
 
+type Extra = { find: string; replace: string };
+
 /** The old name (or a translation of it) → the current name. */
-function renameText(text: string): string {
+function renameText(text: string, locale: string): string {
   let out = text
     // English: "the Global Untold Story team" → "The Untold Story team", not "the The …".
     .replace(/\b(the|The|THE)\s+Global\s+Untold\s+Story/g, (_m, art: string) => (art === "THE" ? "THE UNTOLD STORY" : BRAND))
     .replace(/GLOBAL\s+UNTOLD\s+STORY/g, "THE UNTOLD STORY");
   for (const re of OLD_PATTERNS) out = out.replace(re, BRAND);
+  // Chinese sets a Latin name off with spaces: "由 The Untold Story 制作".
+  if (locale === "zh") {
+    out = out.replace(/([\u4e00-\u9fff])The Untold Story/g, "$1 The Untold Story").replace(/The Untold Story([\u4e00-\u9fff])/g, "The Untold Story $1");
+  }
+  return out;
+}
+
+/** Exact, reviewed fixes for machine translations of the name the patterns can't know. */
+function applyExtras(text: string, extra: Extra[]): string {
+  let out = text;
+  for (const e of extra) if (e.find && out.includes(e.find)) out = out.split(e.find).join(e.replace);
   return out;
 }
 
@@ -80,15 +93,19 @@ function skipped(id: string, skip: string[]) {
 }
 
 /** Walk a JSON value, renaming strings; record what changed (or would). */
-function transform(value: unknown, path: string[], ctx: { table: string; ref: string; skip: string[]; hits: Hit[]; phrases: { id: string; text: string }[] }): unknown {
+type Ctx = { table: string; ref: string; skip: string[]; extra: Extra[]; hits: Hit[]; phrases: { id: string; text: string }[]; show: Set<string>; shown: Record<string, string> };
+
+function transform(value: unknown, path: string[], ctx: Ctx): unknown {
   if (typeof value === "string") {
     const id = `${ctx.table}/${ctx.ref}/${path.join(".")}`;
     const locale = path.find((p) => LOCALES.has(p)) ?? "";
-    if (hasOld(value)) {
-      const after = renameText(value);
+    if (ctx.show.has(id)) ctx.shown[id] = value;
+    const fixed = applyExtras(value, ctx.extra);
+    if (fixed !== value || hasOld(value)) {
+      const after = renameText(fixed, locale);
       const at = Math.max(0, firstIndex(value));
       const hit: Hit = {
-        id, table: ctx.table, ref: ctx.ref, path: path.join("."), locale, n: countOld(value),
+        id, table: ctx.table, ref: ctx.ref, path: path.join("."), locale, n: countOld(value) + (fixed !== value ? 1 : 0),
         before: snippet(value, at), after: snippet(after, at),
       };
       // English "a Global Untold Story production" can't simply become "a The …".
@@ -138,13 +155,14 @@ async function writeRow(row: Row, value: unknown) {
   else if (row.table === "media") await sql`update media set alt = ${json(value)} where id = ${Number(row.ref)}`;
 }
 
-async function run(apply: boolean, skip: string[]) {
+async function run(apply: boolean, skip: string[], extra: Extra[] = [], show: Set<string> = new Set()) {
   const rows = await loadRows();
   const hits: Hit[] = [];
   const phrases: { id: string; text: string }[] = [];
+  const shown: Record<string, string> = {};
   let written = 0;
   for (const row of rows) {
-    const ctx = { table: row.table, ref: row.ref, skip, hits, phrases };
+    const ctx: Ctx = { table: row.table, ref: row.ref, skip, extra, hits, phrases, show, shown };
     const before = hits.length;
     const next = transform(row.value, row.column === "data" ? [] : [row.column], ctx);
     const changed = hits.slice(before).some((h) => !skipped(h.id, skip));
@@ -158,13 +176,14 @@ async function run(apply: boolean, skip: string[]) {
   const siteNames = Object.fromEntries(Object.entries(layout ?? {}).map(([loc, v]) => [loc, v?.site_config?.name ?? null]));
   const counts: Record<string, number> = {};
   for (const h of hits) counts[h.table] = (counts[h.table] ?? 0) + 1;
-  return { apply, written, total: hits.length, counts, siteNames, hits, phrases };
+  return { apply, written, total: hits.length, counts, siteNames, hits, phrases, shown };
 }
 
 export async function GET(request: NextRequest) {
   const auth = await requireAdmin();
   if (!auth.session) return auth.response;
-  const result = await run(false, []);
+  const show = new Set((request.nextUrl.searchParams.get("show") ?? "").split("|").filter(Boolean));
+  const result = await run(false, [], [], show);
   const table = request.nextUrl.searchParams.get("table");
   const hits = table ? result.hits.filter((h) => h.table === table) : result.hits;
   return NextResponse.json({ ...result, hits });
@@ -174,8 +193,13 @@ export async function POST(request: NextRequest) {
   const auth = await requireAdmin();
   if (!auth.session) return auth.response;
   const body = await request.json().catch(() => ({}));
-  const skip = Array.isArray(body?.skip) ? body.skip.map(String) : [];
-  const result = await run(true, skip);
+  const skip: string[] = Array.isArray(body?.skip) ? body.skip.map(String) : [];
+  const extra: Extra[] = Array.isArray(body?.extra)
+    ? body.extra.filter((e: unknown) => e && typeof (e as Extra).find === "string" && typeof (e as Extra).replace === "string")
+    : [];
+  // { apply: false } is a dry run that includes the extra fixes.
+  if (body?.apply === false) return NextResponse.json(await run(false, skip, extra));
+  const result = await run(true, skip, extra);
   await logActivity({
     actor: auth.session.email, action: "update", entity: "site", ref: "brand-rename",
     detail: `Global Untold Story → ${BRAND}: ${result.written} records, ${result.total - skip.length} strings`,
