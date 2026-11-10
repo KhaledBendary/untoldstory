@@ -112,7 +112,7 @@ export default async function Page({ params }: Props) {
   const initialData = await postDetailWithFallback(slug, locale);
   const publisher = {
     "@type": "Organization",
-    name: "Global Untold Story",
+    name: "The Untold Story",
     logo: { "@type": "ImageObject", url: absoluteUrl("/images/logo-white.png") },
   };
 
@@ -140,12 +140,12 @@ export default async function Page({ params }: Props) {
       },
       author: [{
         "@type": "Organization",
-        name: "Global Untold Story",
+        name: "The Untold Story",
         url: "https://globaluntoldstory.com/",
       }],
       publisher: {
         "@type": "Organization",
-        name: "Global Untold Story",
+        name: "The Untold Story",
         url: "https://globaluntoldstory.com/",
         logo: { "@type": "ImageObject", url: absoluteUrl("/images/logo-white.png") },
       },

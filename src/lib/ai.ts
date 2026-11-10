@@ -55,7 +55,7 @@ function langName(lang: string): string {
 }
 
 const BRAND =
-  "The brand is Global Untold Story, a film and video production studio working across Egypt and the wider MENA region. " +
+  "The brand is The Untold Story (also known as Global Untold Story; always write the name in English letters, never translate it), a film and video production studio working across Egypt and the wider MENA region. " +
   "Tone: confident, cinematic, human — never generic or buzzword-heavy.";
 
 /** Draft an SEO meta title (≤60 chars) and description (≤155 chars) from the item. */

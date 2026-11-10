@@ -78,7 +78,7 @@ export default function AdminShell({
         <div className="admin-brand">
           <span className="admin-brand-mark">GU</span>
           <span>
-            <span className="admin-brand-name">Global Untold Story</span>
+            <span className="admin-brand-name">The Untold Story</span>
             <span className="admin-brand-sub" style={{ display: "block" }}>لوحة التحكم</span>
           </span>
         </div>

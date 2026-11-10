@@ -61,7 +61,7 @@ export default function LoginPage() {
       <div style={{ width: "100%", maxWidth: 380 }}>
         <div style={{ marginBottom: 28, textAlign: "center" }}>
           <div style={{ fontSize: 13, letterSpacing: ".25em", color: "var(--accent)", marginBottom: 8 }}>
-            GLOBAL UNTOLD STORY
+            THE UNTOLD STORY
           </div>
           <h1 style={{ fontSize: 22, fontWeight: 600, margin: 0 }}>
             {isSetup ? "إنشاء حساب المدير" : "تسجيل الدخول"}

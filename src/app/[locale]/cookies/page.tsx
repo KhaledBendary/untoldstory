@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       locale,
       // Both follow the document itself, so the Arabic page gets an Arabic
       // title and description rather than the English ones.
-      title: `${legalDoc("cookies", locale).title} | Global Untold Story`,
+      title: `${legalDoc("cookies", locale).title} | The Untold Story`,
       description: locale === "ar" ? "كل ملفات تعريف الارتباط التي يضعها الموقع، وما يقيسه كلٌّ منها، ومدة بقائه، وكيفية إيقاف الاختياري منها." : "Every cookie this site sets, what each one measures, how long it lasts, and how to switch the optional ones off.",
     }),
     locale,

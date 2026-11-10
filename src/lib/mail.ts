@@ -93,7 +93,7 @@ export async function sendContactEmail(data: ContactMessage) {
   `;
 
   await transporter.sendMail({
-    from: `"Global Untold Story website" <${config.from}>`,
+    from: `"The Untold Story website" <${config.from}>`,
     to: config.to,
     replyTo: `${stripHeaderUnsafe(data.name)} <${data.email}>`,
     subject: `New project inquiry — ${stripHeaderUnsafe(service)}`,

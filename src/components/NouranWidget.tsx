@@ -78,7 +78,7 @@ export default function NouranWidget() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-semibold text-white">Nouran</div>
-              <div className="text-[11px] text-white/40">Global Untold Story</div>
+              <div className="text-[11px] text-white/40">The Untold Story</div>
             </div>
             <button
               onClick={() => setOpen(false)}

@@ -34,12 +34,12 @@ const EN: Record<LegalKey, LegalDoc> = {
     title: "Privacy Policy",
     updated: "Last updated",
     intro:
-      "This policy explains what Global Untold Story collects when you use globaluntoldstory.com, why, and what you can ask us to do about it.",
+      "This policy explains what The Untold Story collects when you use globaluntoldstory.com, why, and what you can ask us to do about it.",
     sections: [
       {
         heading: "Who we are",
         body: [
-          "Global Untold Story is a film, video and content production studio with offices in Egyptian Media Production City, Business Bay in Dubai, and Jeddah. We are the controller of the personal data described here.",
+          "The Untold Story is a film, video and content production studio with offices in Egyptian Media Production City, Business Bay in Dubai, and Jeddah. We are the controller of the personal data described here.",
           "For anything in this policy, write to bendary@globaluntoldstory.com.",
         ],
       },
@@ -113,7 +113,7 @@ const EN: Record<LegalKey, LegalDoc> = {
       {
         heading: "The work shown here",
         body: [
-          "Films, photographs, campaigns and written material on this site belong to Global Untold Story or to the clients who commissioned them. Client names and logos belong to those clients and appear here to identify work we produced.",
+          "Films, photographs, campaigns and written material on this site belong to The Untold Story or to the clients who commissioned them. Client names and logos belong to those clients and appear here to identify work we produced.",
           "Nothing here grants you a licence to reuse any of it. If you want to, ask.",
         ],
       },
@@ -204,12 +204,12 @@ const AR: Record<LegalKey, LegalDoc> = {
     title: "سياسة الخصوصية",
     updated: "آخر تحديث",
     intro:
-      "توضّح هذه السياسة ما تجمعه Global Untold Story عند استخدامك لموقع globaluntoldstory.com، ولماذا، وما يمكنك أن تطلبه بشأنه.",
+      "توضّح هذه السياسة ما تجمعه The Untold Story عند استخدامك لموقع globaluntoldstory.com، ولماذا، وما يمكنك أن تطلبه بشأنه.",
     sections: [
       {
         heading: "من نحن",
         body: [
-          "Global Untold Story استوديو لإنتاج الأفلام والفيديو والمحتوى، له مكاتب في مدينة الإنتاج الإعلامي بمصر، والخليج التجاري بدبي، وجدة. نحن المتحكم في البيانات الشخصية الموضّحة هنا.",
+          "The Untold Story استوديو لإنتاج الأفلام والفيديو والمحتوى، له مكاتب في مدينة الإنتاج الإعلامي بمصر، والخليج التجاري بدبي، وجدة. نحن المتحكم في البيانات الشخصية الموضّحة هنا.",
           "لأي أمر يخص هذه السياسة، راسلنا على bendary@globaluntoldstory.com.",
         ],
       },
@@ -283,7 +283,7 @@ const AR: Record<LegalKey, LegalDoc> = {
       {
         heading: "الأعمال المعروضة",
         body: [
-          "الأفلام والصور والحملات والمواد المكتوبة على هذا الموقع مملوكة لـGlobal Untold Story أو للعملاء الذين كلّفوا بها. وأسماء العملاء وشعاراتهم ملك لهم، وتظهر هنا للتعريف بالأعمال التي أنتجناها.",
+          "الأفلام والصور والحملات والمواد المكتوبة على هذا الموقع مملوكة لـThe Untold Story أو للعملاء الذين كلّفوا بها. وأسماء العملاء وشعاراتهم ملك لهم، وتظهر هنا للتعريف بالأعمال التي أنتجناها.",
           "لا شيء هنا يمنحك ترخيصاً بإعادة استخدام أيٍّ منها. وإن أردت ذلك، فاسألنا.",
         ],
       },
@@ -380,10 +380,10 @@ const FR: Record<LegalKey, LegalDoc> = {
     title: "Politique de confidentialité",
     updated: "Dernière mise à jour",
     intro:
-      "Cette politique explique ce que Global Untold Story collecte lorsque vous utilisez globaluntoldstory.com, pourquoi, et ce que vous pouvez nous demander.",
+      "Cette politique explique ce que The Untold Story collecte lorsque vous utilisez globaluntoldstory.com, pourquoi, et ce que vous pouvez nous demander.",
     sections: [
       { heading: "Qui nous sommes", body: [
-        "Global Untold Story est un studio de production de films, de vidéos et de contenus, avec des bureaux à Egyptian Media Production City, à Business Bay (Dubaï) et à Djeddah. Nous sommes responsables du traitement des données décrites ici.",
+        "The Untold Story est un studio de production de films, de vidéos et de contenus, avec des bureaux à Egyptian Media Production City, à Business Bay (Dubaï) et à Djeddah. Nous sommes responsables du traitement des données décrites ici.",
         "Pour toute question relative à cette politique, écrivez à bendary@globaluntoldstory.com."] },
       { heading: "Ce que vous nous confiez", body: [
         "Le formulaire de contact demande votre nom, votre adresse e-mail, votre téléphone, le service qui vous intéresse et votre message. Seuls le nom, l\u2019e-mail et le message sont obligatoires.",
@@ -420,7 +420,7 @@ const FR: Record<LegalKey, LegalDoc> = {
         "Vous pouvez consulter ce site et en partager les liens à toute fin licite.",
         "Vous ne pouvez pas le copier intégralement, l\u2019aspirer à un rythme qui en dégrade l\u2019accès pour autrui, tenter d\u2019atteindre des parties auxquelles vous n\u2019avez pas accès, ni le présenter comme votre travail."] },
       { heading: "Les travaux présentés", body: [
-        "Les films, photographies, campagnes et textes de ce site appartiennent à Global Untold Story ou aux clients qui les ont commandés. Les noms et logos des clients leur appartiennent et figurent ici pour identifier des travaux que nous avons produits.",
+        "Les films, photographies, campagnes et textes de ce site appartiennent à The Untold Story ou aux clients qui les ont commandés. Les noms et logos des clients leur appartiennent et figurent ici pour identifier des travaux que nous avons produits.",
         "Rien ici ne vous accorde de licence de réutilisation. Si vous le souhaitez, demandez-nous."] },
       { heading: "Une demande n\u2019est pas un contrat", body: [
         "Envoyer le formulaire ouvre une conversation. Cela ne crée pas d\u2019accord, ne réserve pas de date et ne fixe pas de prix. Le travail commence à la signature d\u2019une proposition par les deux parties.",
@@ -469,10 +469,10 @@ const DE: Record<LegalKey, LegalDoc> = {
     title: "Datenschutzerklärung",
     updated: "Zuletzt aktualisiert",
     intro:
-      "Diese Erklärung beschreibt, was Global Untold Story bei der Nutzung von globaluntoldstory.com erhebt, warum, und worum Sie uns bitten können.",
+      "Diese Erklärung beschreibt, was The Untold Story bei der Nutzung von globaluntoldstory.com erhebt, warum, und worum Sie uns bitten können.",
     sections: [
       { heading: "Wer wir sind", body: [
-        "Global Untold Story ist ein Studio für Film-, Video- und Contentproduktion mit Büros in der Egyptian Media Production City, in Business Bay in Dubai und in Dschidda. Wir sind der Verantwortliche für die hier beschriebenen Daten.",
+        "The Untold Story ist ein Studio für Film-, Video- und Contentproduktion mit Büros in der Egyptian Media Production City, in Business Bay in Dubai und in Dschidda. Wir sind der Verantwortliche für die hier beschriebenen Daten.",
         "Bei Fragen zu dieser Erklärung schreiben Sie an bendary@globaluntoldstory.com."] },
       { heading: "Was Sie uns geben", body: [
         "Das Kontaktformular fragt nach Name, E-Mail-Adresse, Telefonnummer, der Sie interessierenden Leistung und Ihrer Nachricht. Nur Name, E-Mail und Nachricht sind erforderlich.",
@@ -509,7 +509,7 @@ const DE: Record<LegalKey, LegalDoc> = {
         "Sie dürfen diese Website lesen und ihre Links zu jedem rechtmäßigen Zweck teilen.",
         "Sie dürfen sie nicht vollständig kopieren, nicht in einem Tempo auslesen, das sie für andere beeinträchtigt, nicht auf Bereiche zugreifen, für die Ihnen kein Zugang eingeräumt wurde, und sie nicht als eigene Arbeit ausgeben."] },
       { heading: "Die gezeigten Arbeiten", body: [
-        "Filme, Fotografien, Kampagnen und Texte auf dieser Website gehören Global Untold Story oder den Kunden, die sie beauftragt haben. Kundennamen und Logos gehören diesen Kunden und stehen hier, um von uns produzierte Arbeiten zu kennzeichnen.",
+        "Filme, Fotografien, Kampagnen und Texte auf dieser Website gehören The Untold Story oder den Kunden, die sie beauftragt haben. Kundennamen und Logos gehören diesen Kunden und stehen hier, um von uns produzierte Arbeiten zu kennzeichnen.",
         "Nichts hiervon räumt Ihnen eine Lizenz zur Weiterverwendung ein. Wenn Sie eine möchten, fragen Sie uns."] },
       { heading: "Eine Anfrage ist kein Vertrag", body: [
         "Das Absenden des Formulars beginnt ein Gespräch. Es begründet keine Vereinbarung, reserviert keinen Termin und legt keinen Preis fest. Die Arbeit beginnt, wenn beide Seiten ein Angebot unterzeichnen.",
@@ -558,10 +558,10 @@ const ES: Record<LegalKey, LegalDoc> = {
     title: "Política de privacidad",
     updated: "Última actualización",
     intro:
-      "Esta política explica qué recoge Global Untold Story cuando usas globaluntoldstory.com, por qué, y qué puedes pedirnos al respecto.",
+      "Esta política explica qué recoge The Untold Story cuando usas globaluntoldstory.com, por qué, y qué puedes pedirnos al respecto.",
     sections: [
       { heading: "Quiénes somos", body: [
-        "Global Untold Story es un estudio de producción de cine, vídeo y contenido con oficinas en Egyptian Media Production City, Business Bay (Dubái) y Yeda. Somos los responsables del tratamiento de los datos descritos aquí.",
+        "The Untold Story es un estudio de producción de cine, vídeo y contenido con oficinas en Egyptian Media Production City, Business Bay (Dubái) y Yeda. Somos los responsables del tratamiento de los datos descritos aquí.",
         "Para cualquier asunto relacionado con esta política, escribe a bendary@globaluntoldstory.com."] },
       { heading: "Lo que nos facilitas", body: [
         "El formulario de contacto pide tu nombre, correo electrónico, teléfono, el servicio que te interesa y tu mensaje. Solo el nombre, el correo y el mensaje son obligatorios.",
@@ -598,7 +598,7 @@ const ES: Record<LegalKey, LegalDoc> = {
         "Puedes leer este sitio y compartir sus enlaces con cualquier fin lícito.",
         "No puedes copiarlo por completo, extraerlo a un ritmo que lo degrade para los demás, intentar acceder a partes para las que no tienes permiso, ni presentarlo como obra propia."] },
       { heading: "Los trabajos mostrados", body: [
-        "Las películas, fotografías, campañas y textos de este sitio pertenecen a Global Untold Story o a los clientes que los encargaron. Los nombres y logotipos de los clientes son suyos y aparecen aquí para identificar trabajos que produjimos.",
+        "Las películas, fotografías, campañas y textos de este sitio pertenecen a The Untold Story o a los clientes que los encargaron. Los nombres y logotipos de los clientes son suyos y aparecen aquí para identificar trabajos que produjimos.",
         "Nada de esto te concede licencia para reutilizarlos. Si quieres hacerlo, pregúntanos."] },
       { heading: "Una consulta no es un contrato", body: [
         "Enviar el formulario inicia una conversación. No crea un acuerdo, no reserva fechas ni fija precios. El trabajo empieza cuando ambas partes firman una propuesta.",
@@ -647,10 +647,10 @@ const IT: Record<LegalKey, LegalDoc> = {
     title: "Informativa sulla privacy",
     updated: "Ultimo aggiornamento",
     intro:
-      "Questa informativa spiega che cosa raccoglie Global Untold Story quando usi globaluntoldstory.com, perché, e che cosa puoi chiederci.",
+      "Questa informativa spiega che cosa raccoglie The Untold Story quando usi globaluntoldstory.com, perché, e che cosa puoi chiederci.",
     sections: [
       { heading: "Chi siamo", body: [
-        "Global Untold Story è uno studio di produzione di film, video e contenuti con sedi presso l\u2019Egyptian Media Production City, a Business Bay (Dubai) e a Gedda. Siamo il titolare del trattamento dei dati descritti qui.",
+        "The Untold Story è uno studio di produzione di film, video e contenuti con sedi presso l\u2019Egyptian Media Production City, a Business Bay (Dubai) e a Gedda. Siamo il titolare del trattamento dei dati descritti qui.",
         "Per qualsiasi questione relativa a questa informativa, scrivi a bendary@globaluntoldstory.com."] },
       { heading: "Ciò che ci fornisci", body: [
         "Il modulo di contatto chiede nome, indirizzo e-mail, telefono, il servizio che ti interessa e il tuo messaggio. Solo nome, e-mail e messaggio sono obbligatori.",
@@ -687,7 +687,7 @@ const IT: Record<LegalKey, LegalDoc> = {
         "Puoi leggere questo sito e condividerne i link per qualsiasi finalità lecita.",
         "Non puoi copiarlo integralmente, estrarne i contenuti a un ritmo che ne degradi l\u2019accesso per gli altri, tentare di raggiungere parti a cui non ti è stato dato accesso, né presentarlo come lavoro tuo."] },
       { heading: "I lavori mostrati", body: [
-        "Film, fotografie, campagne e testi presenti su questo sito appartengono a Global Untold Story o ai clienti che li hanno commissionati. Nomi e loghi dei clienti appartengono a loro e compaiono qui per identificare lavori da noi prodotti.",
+        "Film, fotografie, campagne e testi presenti su questo sito appartengono a The Untold Story o ai clienti che li hanno commissionati. Nomi e loghi dei clienti appartengono a loro e compaiono qui per identificare lavori da noi prodotti.",
         "Nulla di quanto qui contenuto ti concede una licenza di riutilizzo. Se ti interessa, chiedicelo."] },
       { heading: "Una richiesta non è un contratto", body: [
         "Inviare il modulo apre una conversazione. Non crea un accordo, non riserva una data e non fissa un prezzo. Il lavoro inizia quando entrambe le parti firmano una proposta.",
@@ -736,10 +736,10 @@ const PT: Record<LegalKey, LegalDoc> = {
     title: "Política de privacidade",
     updated: "Última atualização",
     intro:
-      "Esta política explica o que a Global Untold Story recolhe quando utiliza globaluntoldstory.com, porquê, e o que nos pode pedir.",
+      "Esta política explica o que a The Untold Story recolhe quando utiliza globaluntoldstory.com, porquê, e o que nos pode pedir.",
     sections: [
       { heading: "Quem somos", body: [
-        "A Global Untold Story é um estúdio de produção de cinema, vídeo e conteúdo, com escritórios na Egyptian Media Production City, em Business Bay (Dubai) e em Jidá. Somos os responsáveis pelo tratamento dos dados aqui descritos.",
+        "A The Untold Story é um estúdio de produção de cinema, vídeo e conteúdo, com escritórios na Egyptian Media Production City, em Business Bay (Dubai) e em Jidá. Somos os responsáveis pelo tratamento dos dados aqui descritos.",
         "Para qualquer questão sobre esta política, escreva para bendary@globaluntoldstory.com."] },
       { heading: "O que nos fornece", body: [
         "O formulário de contacto pede o seu nome, e-mail, telefone, o serviço que lhe interessa e a sua mensagem. Apenas o nome, o e-mail e a mensagem são obrigatórios.",
@@ -776,7 +776,7 @@ const PT: Record<LegalKey, LegalDoc> = {
         "Pode ler este site e partilhar as suas ligações para qualquer fim lícito.",
         "Não pode copiá-lo integralmente, extraí-lo a um ritmo que o degrade para os outros, tentar aceder a partes para as quais não lhe foi dado acesso, nem apresentá-lo como trabalho seu."] },
       { heading: "Os trabalhos apresentados", body: [
-        "Os filmes, fotografias, campanhas e textos deste site pertencem à Global Untold Story ou aos clientes que os encomendaram. Os nomes e logótipos dos clientes pertencem-lhes e surgem aqui para identificar trabalhos que produzimos.",
+        "Os filmes, fotografias, campanhas e textos deste site pertencem à The Untold Story ou aos clientes que os encomendaram. Os nomes e logótipos dos clientes pertencem-lhes e surgem aqui para identificar trabalhos que produzimos.",
         "Nada aqui lhe concede licença para reutilizar qualquer um deles. Se quiser, pergunte-nos."] },
       { heading: "Um pedido não é um contrato", body: [
         "Enviar o formulário inicia uma conversa. Não cria um acordo, não reserva datas nem fixa preços. O trabalho começa quando ambas as partes assinam uma proposta.",
@@ -825,10 +825,10 @@ const TR: Record<LegalKey, LegalDoc> = {
     title: "Gizlilik Politikası",
     updated: "Son güncelleme",
     intro:
-      "Bu politika, globaluntoldstory.com kullanırken Global Untold Story\u2019nin neleri topladığını, nedenini ve bizden neler isteyebileceğinizi açıklar.",
+      "Bu politika, globaluntoldstory.com kullanırken The Untold Story\u2019nin neleri topladığını, nedenini ve bizden neler isteyebileceğinizi açıklar.",
     sections: [
       { heading: "Biz kimiz", body: [
-        "Global Untold Story; Egyptian Media Production City, Dubai Business Bay ve Cidde\u2019de ofisleri bulunan bir film, video ve içerik prodüksiyon stüdyosudur. Burada tanımlanan kişisel verilerin sorumlusu biziz.",
+        "The Untold Story; Egyptian Media Production City, Dubai Business Bay ve Cidde\u2019de ofisleri bulunan bir film, video ve içerik prodüksiyon stüdyosudur. Burada tanımlanan kişisel verilerin sorumlusu biziz.",
         "Bu politikaya ilişkin her konu için bendary@globaluntoldstory.com adresine yazın."] },
       { heading: "Bize verdikleriniz", body: [
         "İletişim formu adınızı, e-posta adresinizi, telefonunuzu, ilgilendiğiniz hizmeti ve mesajınızı ister. Yalnızca ad, e-posta ve mesaj zorunludur.",
@@ -865,7 +865,7 @@ const TR: Record<LegalKey, LegalDoc> = {
         "Bu siteyi okuyabilir, bağlantılarını hukuka uygun her amaçla paylaşabilirsiniz.",
         "Siteyi bütünüyle kopyalayamaz, başkaları için erişimi bozacak hızda veri çekemez, erişim verilmemiş bölümlere ulaşmaya çalışamaz ve kendi işiniz gibi sunamazsınız."] },
       { heading: "Burada gösterilen işler", body: [
-        "Bu sitedeki filmler, fotoğraflar, kampanyalar ve metinler Global Untold Story\u2019ye veya bunları sipariş eden müşterilere aittir. Müşteri adları ve logoları onlara aittir ve ürettiğimiz işleri tanımlamak için burada yer alır.",
+        "Bu sitedeki filmler, fotoğraflar, kampanyalar ve metinler The Untold Story\u2019ye veya bunları sipariş eden müşterilere aittir. Müşteri adları ve logoları onlara aittir ve ürettiğimiz işleri tanımlamak için burada yer alır.",
         "Buradaki hiçbir şey size yeniden kullanım lisansı vermez. İsterseniz bize sorun."] },
       { heading: "Talep sözleşme değildir", body: [
         "Formu göndermek bir görüşme başlatır. Anlaşma oluşturmaz, tarih ayırmaz, fiyat sabitlemez. İş, iki taraf da bir teklifi imzaladığında başlar.",
@@ -914,10 +914,10 @@ const RU: Record<LegalKey, LegalDoc> = {
     title: "Политика конфиденциальности",
     updated: "Последнее обновление",
     intro:
-      "Эта политика объясняет, что собирает Global Untold Story при использовании globaluntoldstory.com, зачем и о чём вы можете нас попросить.",
+      "Эта политика объясняет, что собирает The Untold Story при использовании globaluntoldstory.com, зачем и о чём вы можете нас попросить.",
     sections: [
       { heading: "Кто мы", body: [
-        "Global Untold Story — студия производства фильмов, видео и контента с офисами в Egyptian Media Production City, Business Bay в Дубае и Джидде. Мы являемся оператором описанных здесь персональных данных.",
+        "The Untold Story — студия производства фильмов, видео и контента с офисами в Egyptian Media Production City, Business Bay в Дубае и Джидде. Мы являемся оператором описанных здесь персональных данных.",
         "По любым вопросам этой политики пишите на bendary@globaluntoldstory.com."] },
       { heading: "Что вы сообщаете нам", body: [
         "Форма обратной связи запрашивает имя, адрес электронной почты, телефон, интересующую услугу и сообщение. Обязательны только имя, почта и сообщение.",
@@ -954,7 +954,7 @@ const RU: Record<LegalKey, LegalDoc> = {
         "Вы можете читать этот сайт и делиться ссылками на него в любых законных целях.",
         "Нельзя копировать сайт целиком, выгружать его с частотой, ухудшающей доступ для других, пытаться попасть в разделы, доступ к которым вам не предоставлен, или выдавать его за свою работу."] },
       { heading: "Показанные работы", body: [
-        "Фильмы, фотографии, кампании и тексты на этом сайте принадлежат Global Untold Story или заказчикам. Названия и логотипы клиентов принадлежат им и приведены здесь, чтобы обозначить произведённые нами работы.",
+        "Фильмы, фотографии, кампании и тексты на этом сайте принадлежат The Untold Story или заказчикам. Названия и логотипы клиентов принадлежат им и приведены здесь, чтобы обозначить произведённые нами работы.",
         "Ничто здесь не даёт вам лицензии на повторное использование. Если она нужна — спросите нас."] },
       { heading: "Запрос — не договор", body: [
         "Отправка формы начинает разговор. Она не создаёт соглашения, не резервирует дату и не фиксирует цену. Работа начинается, когда обе стороны подписывают предложение.",
@@ -1003,10 +1003,10 @@ const PL: Record<LegalKey, LegalDoc> = {
     title: "Polityka prywatności",
     updated: "Ostatnia aktualizacja",
     intro:
-      "Ta polityka wyjaśnia, co Global Untold Story zbiera podczas korzystania z globaluntoldstory.com, dlaczego i o co możesz nas poprosić.",
+      "Ta polityka wyjaśnia, co The Untold Story zbiera podczas korzystania z globaluntoldstory.com, dlaczego i o co możesz nas poprosić.",
     sections: [
       { heading: "Kim jesteśmy", body: [
-        "Global Untold Story to studio produkcji filmowej, wideo i treści z biurami w Egyptian Media Production City, w Business Bay w Dubaju oraz w Dżuddzie. Jesteśmy administratorem opisanych tu danych osobowych.",
+        "The Untold Story to studio produkcji filmowej, wideo i treści z biurami w Egyptian Media Production City, w Business Bay w Dubaju oraz w Dżuddzie. Jesteśmy administratorem opisanych tu danych osobowych.",
         "We wszystkich sprawach dotyczących tej polityki pisz na bendary@globaluntoldstory.com."] },
       { heading: "Co nam przekazujesz", body: [
         "Formularz kontaktowy prosi o imię i nazwisko, adres e-mail, telefon, interesującą Cię usługę oraz wiadomość. Obowiązkowe są tylko imię, e-mail i wiadomość.",
@@ -1043,7 +1043,7 @@ const PL: Record<LegalKey, LegalDoc> = {
         "Możesz czytać tę witrynę i udostępniać linki do niej w każdym zgodnym z prawem celu.",
         "Nie możesz kopiować jej w całości, pobierać danych w tempie pogarszającym dostęp innym, próbować sięgać do części, do których nie otrzymałeś dostępu, ani przedstawiać jej jako własnej pracy."] },
       { heading: "Prezentowane prace", body: [
-        "Filmy, fotografie, kampanie i teksty w tej witrynie należą do Global Untold Story lub do klientów, którzy je zamówili. Nazwy i logotypy klientów należą do nich i występują tu, aby oznaczyć prace, które wykonaliśmy.",
+        "Filmy, fotografie, kampanie i teksty w tej witrynie należą do The Untold Story lub do klientów, którzy je zamówili. Nazwy i logotypy klientów należą do nich i występują tu, aby oznaczyć prace, które wykonaliśmy.",
         "Nic tutaj nie udziela Ci licencji na ponowne wykorzystanie. Jeśli jej potrzebujesz — zapytaj."] },
       { heading: "Zapytanie to nie umowa", body: [
         "Wysłanie formularza rozpoczyna rozmowę. Nie tworzy umowy, nie rezerwuje terminu i nie ustala ceny. Praca zaczyna się, gdy obie strony podpiszą ofertę.",
@@ -1092,10 +1092,10 @@ const ZH: Record<LegalKey, LegalDoc> = {
     title: "隐私政策",
     updated: "最后更新",
     intro:
-      "本政策说明您在使用 globaluntoldstory.com 时 Global Untold Story 会收集哪些信息、原因，以及您可以要求我们做什么。",
+      "本政策说明您在使用 globaluntoldstory.com 时 The Untold Story 会收集哪些信息、原因，以及您可以要求我们做什么。",
     sections: [
       { heading: "我们是谁", body: [
-        "Global Untold Story 是一家电影、视频与内容制作公司，办公室位于埃及传媒制作城、迪拜商业湾和吉达。我们是此处所述个人数据的控制者。",
+        "The Untold Story 是一家电影、视频与内容制作公司，办公室位于埃及传媒制作城、迪拜商业湾和吉达。我们是此处所述个人数据的控制者。",
         "与本政策相关的任何事宜，请写信至 bendary@globaluntoldstory.com。"] },
       { heading: "您提供的信息", body: [
         "联系表单会询问您的姓名、电子邮箱、电话、感兴趣的服务以及留言。其中只有姓名、邮箱和留言为必填。",
@@ -1132,7 +1132,7 @@ const ZH: Record<LegalKey, LegalDoc> = {
         "您可以出于任何合法目的阅读本网站并分享其链接。",
         "您不得整站复制、以影响他人访问的速率抓取、试图访问未获授权的部分，或将其冒充为自己的作品。"] },
       { heading: "此处展示的作品", body: [
-        "本网站的影片、摄影、广告与文字归 Global Untold Story 或委托方所有。客户名称与标识归各客户所有，出现在此处用于标明我们制作的作品。",
+        "本网站的影片、摄影、广告与文字归 The Untold Story 或委托方所有。客户名称与标识归各客户所有，出现在此处用于标明我们制作的作品。",
         "本网站的任何内容均不授予您再次使用的许可。如有需要，请与我们联系。"] },
       { heading: "咨询不构成合同", body: [
         "提交表单只是开启对话，并不构成协议、不预留档期、也不锁定价格。工作自双方签署提案时开始。",
@@ -1181,10 +1181,10 @@ const JA: Record<LegalKey, LegalDoc> = {
     title: "プライバシーポリシー",
     updated: "最終更新",
     intro:
-      "本ポリシーは、globaluntoldstory.com のご利用にあたり Global Untold Story が何を取得するか、その理由、そしてお客様が当社に何を求められるかを説明します。",
+      "本ポリシーは、globaluntoldstory.com のご利用にあたり The Untold Story が何を取得するか、その理由、そしてお客様が当社に何を求められるかを説明します。",
     sections: [
       { heading: "運営者について", body: [
-        "Global Untold Story は、エジプト・メディアプロダクションシティ、ドバイのビジネスベイ、ジッダに拠点を置く映像・動画・コンテンツの制作スタジオです。本ポリシーに記載する個人データの管理者は当社です。",
+        "The Untold Story は、エジプト・メディアプロダクションシティ、ドバイのビジネスベイ、ジッダに拠点を置く映像・動画・コンテンツの制作スタジオです。本ポリシーに記載する個人データの管理者は当社です。",
         "本ポリシーに関するお問い合わせは bendary@globaluntoldstory.com までご連絡ください。"] },
       { heading: "お客様からいただく情報", body: [
         "お問い合わせフォームでは、お名前、メールアドレス、電話番号、ご関心のあるサービス、メッセージをお伺いします。必須項目はお名前・メールアドレス・メッセージのみです。",
@@ -1221,7 +1221,7 @@ const JA: Record<LegalKey, LegalDoc> = {
         "適法な目的であれば、本サイトを閲覧し、そのリンクを共有していただけます。",
         "サイト全体の複製、他の利用者の閲覧を妨げる速度での取得、アクセス権の与えられていない領域への到達の試み、および自らの制作物としての提示はご遠慮ください。"] },
       { heading: "掲載している作品", body: [
-        "本サイトの映像、写真、キャンペーン、文章は Global Untold Story または発注いただいたクライアントに帰属します。クライアント名およびロゴは各社に帰属し、当社が手がけた仕事を示すために掲載しています。",
+        "本サイトの映像、写真、キャンペーン、文章は The Untold Story または発注いただいたクライアントに帰属します。クライアント名およびロゴは各社に帰属し、当社が手がけた仕事を示すために掲載しています。",
         "本サイトのいかなる内容も再利用の許諾を与えるものではありません。ご希望の際はお問い合わせください。"] },
       { heading: "お問い合わせは契約ではありません", body: [
         "フォームの送信は対話の開始にすぎません。合意の成立、日程の確保、価格の確定のいずれも生じません。作業は双方が提案書に署名した時点で開始します。",
@@ -1270,10 +1270,10 @@ const KO: Record<LegalKey, LegalDoc> = {
     title: "개인정보처리방침",
     updated: "최종 업데이트",
     intro:
-      "이 방침은 globaluntoldstory.com 이용 시 Global Untold Story가 무엇을 수집하는지, 그 이유, 그리고 무엇을 요청하실 수 있는지 설명합니다.",
+      "이 방침은 globaluntoldstory.com 이용 시 The Untold Story가 무엇을 수집하는지, 그 이유, 그리고 무엇을 요청하실 수 있는지 설명합니다.",
     sections: [
       { heading: "회사 소개", body: [
-        "Global Untold Story는 이집트 미디어 프로덕션 시티, 두바이 비즈니스베이, 제다에 사무소를 둔 영화·영상·콘텐츠 제작 스튜디오입니다. 여기에 기술된 개인정보의 처리자는 당사입니다.",
+        "The Untold Story는 이집트 미디어 프로덕션 시티, 두바이 비즈니스베이, 제다에 사무소를 둔 영화·영상·콘텐츠 제작 스튜디오입니다. 여기에 기술된 개인정보의 처리자는 당사입니다.",
         "이 방침과 관련한 문의는 bendary@globaluntoldstory.com으로 보내주십시오."] },
       { heading: "제공해 주시는 정보", body: [
         "문의 양식에서는 성함, 이메일 주소, 전화번호, 관심 서비스, 메시지를 요청합니다. 필수 항목은 성함·이메일·메시지뿐입니다.",
@@ -1310,7 +1310,7 @@ const KO: Record<LegalKey, LegalDoc> = {
         "적법한 목적이라면 이 사이트를 읽고 링크를 공유하실 수 있습니다.",
         "사이트 전체를 복제하거나, 타인의 접속을 저해하는 속도로 수집하거나, 접근 권한이 없는 영역에 접근을 시도하거나, 본인의 작업물로 제시하실 수 없습니다."] },
       { heading: "게시된 작업물", body: [
-        "이 사이트의 영상, 사진, 캠페인, 문구는 Global Untold Story 또는 이를 의뢰한 고객에게 귀속됩니다. 고객명과 로고는 각 고객의 자산이며, 당사가 제작한 작업을 표시하기 위해 게재되었습니다.",
+        "이 사이트의 영상, 사진, 캠페인, 문구는 The Untold Story 또는 이를 의뢰한 고객에게 귀속됩니다. 고객명과 로고는 각 고객의 자산이며, 당사가 제작한 작업을 표시하기 위해 게재되었습니다.",
         "여기의 어떤 내용도 재사용 라이선스를 부여하지 않습니다. 필요하시면 문의해 주십시오."] },
       { heading: "문의는 계약이 아닙니다", body: [
         "양식 제출은 대화의 시작일 뿐입니다. 합의가 성립되거나 일정이 확보되거나 가격이 확정되지 않습니다. 작업은 양측이 제안서에 서명한 시점에 시작됩니다.",
@@ -1359,10 +1359,10 @@ const SW: Record<LegalKey, LegalDoc> = {
     title: "Sera ya Faragha",
     updated: "Ilisasishwa mwisho",
     intro:
-      "Sera hii inaeleza kile Global Untold Story hukusanya unapotumia globaluntoldstory.com, kwa nini, na unachoweza kutuomba kuhusu hilo.",
+      "Sera hii inaeleza kile The Untold Story hukusanya unapotumia globaluntoldstory.com, kwa nini, na unachoweza kutuomba kuhusu hilo.",
     sections: [
       { heading: "Sisi ni nani", body: [
-        "Global Untold Story ni studio ya utayarishaji wa filamu, video na maudhui yenye ofisi katika Egyptian Media Production City, Business Bay jijini Dubai, na Jeddah. Sisi ndio wadhibiti wa data binafsi zilizoelezwa hapa.",
+        "The Untold Story ni studio ya utayarishaji wa filamu, video na maudhui yenye ofisi katika Egyptian Media Production City, Business Bay jijini Dubai, na Jeddah. Sisi ndio wadhibiti wa data binafsi zilizoelezwa hapa.",
         "Kwa jambo lolote kuhusu sera hii, andika kwa bendary@globaluntoldstory.com."] },
       { heading: "Unachotupa", body: [
         "Fomu ya mawasiliano huuliza jina lako, barua pepe, simu, huduma inayokuvutia na ujumbe wako. Jina, barua pepe na ujumbe pekee ndizo za lazima.",
@@ -1399,7 +1399,7 @@ const SW: Record<LegalKey, LegalDoc> = {
         "Unaweza kusoma tovuti hii na kushiriki viungo vyake kwa madhumuni yoyote halali.",
         "Huruhusiwi kuinakili yote, kuivuna kwa kasi inayoathiri wengine, kujaribu kufikia sehemu usizopewa ruhusa, wala kuiwasilisha kama kazi yako."] },
       { heading: "Kazi zilizoonyeshwa", body: [
-        "Filamu, picha, kampeni na maandishi kwenye tovuti hii ni mali ya Global Untold Story au ya wateja walioziagiza. Majina na nembo za wateja ni mali yao na zinaonekana hapa kutambulisha kazi tulizotayarisha.",
+        "Filamu, picha, kampeni na maandishi kwenye tovuti hii ni mali ya The Untold Story au ya wateja walioziagiza. Majina na nembo za wateja ni mali yao na zinaonekana hapa kutambulisha kazi tulizotayarisha.",
         "Hakuna kilicho hapa kinachokupa leseni ya kuzitumia tena. Ukitaka, tuulize."] },
       { heading: "Ombi si mkataba", body: [
         "Kutuma fomu huanzisha mazungumzo. Haitengenezi makubaliano, hairidhii tarehe, wala haiwekei bei. Kazi huanza pande zote mbili zinapotia saini pendekezo.",

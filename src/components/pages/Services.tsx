@@ -62,7 +62,7 @@ export default function Services({ initialData, initialLocale }: { initialData: 
             >
               <Image
                 src={getServiceImage(s)} style={{ objectPosition: getServiceImagePosition(s) }}
-                alt={`${s.title} — Global Untold Story`}
+                alt={`${s.title} — The Untold Story`}
                 fill
                 className="object-cover opacity-0 group-hover:opacity-25 scale-110 group-hover:scale-100 transition-all duration-700"
                 loading="lazy"

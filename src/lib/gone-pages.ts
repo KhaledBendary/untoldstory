@@ -35,4 +35,4 @@ export function isGonePath(pathname: string): boolean {
   return GONE_PROJECT_SLUGS.has(slug.toLowerCase());
 }
 
-export const GONE_HTML = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page removed | Global Untold Story</title></head><body style="font-family:Arial,sans-serif;max-width:560px;margin:15vh auto;padding:0 20px;color:#111"><h1 style="font-size:22px">This page has been removed</h1><p>This project is no longer on our website.</p><p><a href="/work">See our current work</a></p></body></html>`;
+export const GONE_HTML = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page removed | The Untold Story</title></head><body style="font-family:Arial,sans-serif;max-width:560px;margin:15vh auto;padding:0 20px;color:#111"><h1 style="font-size:22px">This page has been removed</h1><p>This project is no longer on our website.</p><p><a href="/work">See our current work</a></p></body></html>`;

@@ -24,7 +24,7 @@ export default async function Page({ params }: Props) {
   const itemList = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "Production Services by Global Untold Story",
+    name: "Production Services by The Untold Story",
     itemListElement: services.map((service, index) => ({
       "@type": "ListItem",
       position: index + 1,

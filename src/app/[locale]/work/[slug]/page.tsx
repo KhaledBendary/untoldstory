@@ -15,7 +15,7 @@ type Props = { params: Promise<{ locale: string; slug: string }> };
 function projectHeadline(title: string | undefined, client?: string | null, slug?: string) {
   // cleanHeadline reads the name out of the slug when the record has none —
   // the Arabic ones arrive titleless once unreadable text is scrubbed, and
-  // without this every one of them was titled "Global Untold Story".
+  // without this every one of them was titled "The Untold Story".
   const name = cleanHeadline(title, slug);
   if (!client || name.toLowerCase().includes(client.toLowerCase())) return name;
   return `${name} — ${client}`;
@@ -124,7 +124,7 @@ export default async function Page({ params }: Props) {
       "@type": "CreativeWork",
       name,
       description: buildDescription(project.results, name),
-      creator: { "@type": "Organization", name: "Global Untold Story" },
+      creator: { "@type": "Organization", name: "The Untold Story" },
       image: project.image ? absoluteUrl(project.image) : undefined,
     }];
     if (project.video) {

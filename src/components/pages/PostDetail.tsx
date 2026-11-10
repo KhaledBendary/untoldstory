@@ -115,7 +115,7 @@ export default function PostDetail({ slug, initialData, initialLocale }: { slug:
           </Reveal>
           <Reveal className="pt-6 mt-10 border-t border-white/10">
             <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55">
-              {t('Written by Global Untold Story — Film Production Services, Egypt · UAE · KSA')}
+              {t('Written by The Untold Story — Film Production Services, Egypt · UAE · KSA')}
             </p>
           </Reveal>
 

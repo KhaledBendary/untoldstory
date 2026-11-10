@@ -132,7 +132,7 @@ export default function MessagesClient({ initial }: { initial: Message[] }) {
                     </details>
                   )}
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
-                    <a href={`mailto:${m.email}?subject=${encodeURIComponent("رد على رسالتك — Global Untold Story")}`}
+                    <a href={`mailto:${m.email}?subject=${encodeURIComponent("رد على رسالتك — The Untold Story")}`}
                       onClick={() => setStatus(m.id, "replied")}
                       className="primary" style={{ fontSize: 13, padding: "7px 14px", borderRadius: 8, textDecoration: "none",
                         background: "var(--accent)", color: "var(--accent-ink)" }}>الرد بالبريد</a>

@@ -11,9 +11,10 @@
 
 import type { Metadata } from "next";
 import { alternatesFor, DEFAULT_LOCALE, isIndexableLocale, isLocale, localizedPath, OG_LOCALES, type Locale } from "@/lib/i18n";
+import { BRAND, BRAND_ALT } from "@/lib/brand";
 
+export { BRAND, BRAND_ALT };
 export const SITE_URL = "https://globaluntoldstory.com";
-export const BRAND = "Global Untold Story";
 
 const TITLE_MAX = 60;
 const DESCRIPTION_MAX = 155;
@@ -155,6 +156,15 @@ const BRAND_VARIANTS = [
   "hadithi isiyoeleweka duniani",
 ];
 
+/*
+ * The current name, "The Untold Story", is also an ordinary phrase ("Tell the
+ * untold story"), so it is only treated as a brand suffix when a real separator
+ * stands in front of it ("… | The Untold Story", "… — The Untold Story") or it
+ * is the whole string. Whitespace alone is not enough. The old WordPress site's
+ * "| Untold Story" follows the same rule.
+ */
+const CURRENT_BRAND_SUFFIX = /(?:^|\s*[|/–—\-·•]+\s*)(?:the\s+)?untold\s+story\s*$/i;
+
 export function stripBrandSuffix(raw: string): string {
   let text = (raw || "").trim();
 
@@ -165,6 +175,13 @@ export function stripBrandSuffix(raw: string): string {
     if (cleaned !== text) {
       text = cleaned;
       changed = true;
+    }
+
+    const current = text.replace(CURRENT_BRAND_SUFFIX, "").trim();
+    if (current !== text) {
+      text = current;
+      changed = true;
+      continue;
     }
 
     const lower = text.toLowerCase();
@@ -256,8 +273,10 @@ export function cleanHeadline(raw?: string | null, slug?: string) {
 /**
  * Extract the page name from metaTitle or headline:
  * 1. Take the part before the first " | "
- * 2. If the page name ends with "Global Untold Story" without " | ", remove it.
- * 3. Strip any trailing brand variants.
+ * 2. If the page name ends with the old name "Global Untold Story" without
+ *    " | ", remove it.
+ * 3. Strip any trailing brand variants (the current name, the old name and its
+ *    old translations).
  */
 export function extractPageName(raw?: string | null): string {
   if (!raw) return "";
@@ -269,10 +288,10 @@ export function extractPageName(raw?: string | null): string {
     text = text.split("|")[0].trim();
   }
 
-  // 2. If the page name ends with "Global Untold Story" without " | ", remove it.
+  // 2. If the page name ends with the old name "Global Untold Story" without " | ", remove it.
   text = text.replace(/[\s\-_—–·•]*Global\s+Untold\s+Story$/i, "").trim();
 
-  // Also strip any other trailing brand variants (e.g. translated brand or "GUS" or "Global Untold")
+  // Also strip any other trailing brand variants ("The Untold Story", a translated old brand, "GUS", "Global Untold")
   text = stripBrandSuffix(text);
 
   return text.trim();
@@ -280,12 +299,12 @@ export function extractPageName(raw?: string | null): string {
 
 /**
  * Build page title for Work, Services, and Insights pages:
- * Format: [Page Name] | Global Untold Story
+ * Format: [Page Name] | The Untold Story
  *
  * - No clamping or word cutting.
  * - Extracts page name before the first " | " from metaTitle.
  * - If metaTitle is empty, falls back to the page's H1.
- * - Suffix is always " | Global Untold Story" in English across all languages.
+ * - Suffix is always " | The Untold Story" in Latin letters across all languages.
  */
 export function buildTitle(
   raw?: string | null,
@@ -678,7 +697,7 @@ export function pageSeo({
   const img = absoluteUrl(image || DEFAULT_OG_IMAGE);
   const indexable = isIndexableLocale(locale);
   const follow = !nofollow;
-  // Per-item overrides follow the exact same rule: [Page Name] | Global Untold Story
+  // Per-item overrides follow the exact same rule: [Page Name] | The Untold Story
   const ogT = (ogTitle?.trim() ? buildTitle(ogTitle, safeTitle) : safeTitle) || BRAND;
   const ogD = ogDescription?.trim() || desc;
   const twT = (twitterTitle?.trim() ? buildTitle(twitterTitle, ogT) : ogT) || BRAND;

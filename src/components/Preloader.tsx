@@ -81,7 +81,7 @@ export default function Preloader({ onDone }: { onDone: () => void }) {
         >
           <MotionImage
             src="/images/logo-white.png"
-            alt="Global Untold Story"
+            alt="The Untold Story"
             width={348}
             height={191}
             priority

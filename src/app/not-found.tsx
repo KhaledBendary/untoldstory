@@ -5,8 +5,8 @@ import { LOCALE_CODES, localeDir, localizedPath, type Locale } from "@/lib/i18n"
 import Track404 from "@/components/Track404";
 
 export const metadata: Metadata = {
-  title: "Page not found | Global Untold Story",
-  description: "This page is not available. Return to Global Untold Story for film and video production in Egypt and MENA.",
+  title: "Page not found | The Untold Story",
+  description: "This page is not available. Return to The Untold Story for film and video production in Egypt and MENA.",
   robots: { index: false, follow: true },
 };
 

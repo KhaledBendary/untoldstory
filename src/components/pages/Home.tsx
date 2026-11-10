@@ -124,7 +124,7 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
             <source src={HERO_MP4} type="video/mp4" />
           </motion.video>
         ) : (
-          <img src={HERO_POSTER} alt="Selected frames from Global Untold Story projects in Egypt" className="absolute inset-0 h-full w-full object-cover brightness-[0.75]" />
+          <img src={HERO_POSTER} alt="Selected frames from The Untold Story projects in Egypt" className="absolute inset-0 h-full w-full object-cover brightness-[0.75]" />
         )}
       </motion.div>
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-[#0a0a0a]/65" />
@@ -241,7 +241,7 @@ function ServicesList({ services }: { services: HomeService[] }) {
               >
                 <Image
                   src={getServiceImage(s)} style={{ objectPosition: getServiceImagePosition(s) }}
-                  alt={`${s.title} — Global Untold Story`}
+                  alt={`${s.title} — The Untold Story`}
                   fill
                   className="object-cover"
                 />
@@ -437,7 +437,7 @@ function ClientLogos({ stats }: { stats: Array<{ value: number; suffix: string; 
                 <Image
                   key={copy}
                   src={row.src}
-                  alt={copy === 0 ? 'Brands and platforms Global Untold Story has produced for' : ''}
+                  alt={copy === 0 ? 'Brands and platforms The Untold Story has produced for' : ''}
                   aria-hidden={copy > 0 ? true : undefined}
                   width={row.w}
                   height={row.h}
@@ -646,7 +646,7 @@ function ImageBreak() {
       >
         <Image
           src="/images/film-production-abu-simbel.jpg"
-          alt="Film production at Abu Simbel temple, Egypt — on-ground production services by Global Untold Story"
+          alt="Film production at Abu Simbel temple, Egypt — on-ground production services by The Untold Story"
           fill
           className="object-cover"
           loading="lazy"

@@ -50,6 +50,8 @@ function llmPrompt(q: string[], target: string, format: "text" | "html", source:
     `Translate each string in the JSON array below from ${from} to ${to}.`,
     format === "html" ? "The strings are HTML — translate only the human-readable text and keep every HTML tag, attribute and entity exactly as-is." : "The strings are plain text.",
     "Keep brand names, URLs and email addresses unchanged. Do not add or remove items.",
+    // The company name reads like an ordinary phrase, so name it outright.
+    "\"The Untold Story\" and \"Global Untold Story\" are the company's name: copy them exactly, in English letters, never translate or transliterate them.",
     asObject
       ? `Return ONLY a JSON object {"translations": [...]} whose array holds the ${q.length} translated strings in the same order — no explanation, no code fence.`
       : `Return ONLY a JSON array of ${q.length} translated strings in the same order — no explanation, no code fence.`,

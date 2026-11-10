@@ -1,4 +1,5 @@
 import { SITE_URL } from "@/lib/seo";
+import { BRAND, BRAND_ALT, LEGAL_NAME, OLD_BRAND_NAMES } from "@/lib/brand";
 
 /**
  * GEO / SEO settings — the single source of truth for the site's structured
@@ -49,7 +50,7 @@ export type GeoSettings = {
 
 export const GEO_DEFAULTS: GeoSettings = {
   organization: {
-    name: "Global Untold Story",
+    name: BRAND,
     description:
       "Full-service film, video, advertising, documentary, corporate, live, podcast, photography, motion/CGI/AI, localization, marketing and original-IP studio serving Egypt, MENA and international clients.",
     slogan: "Film and video production in Egypt and MENA, from idea to impact.",
@@ -68,13 +69,13 @@ export const GEO_DEFAULTS: GeoSettings = {
     ],
   },
   offices: [
-    { id: "cairo", name: "Global Untold Story — Cairo", locality: "Egyptian Media Production City, 6th of October City", region: "Giza", country: "EG", phone: "+201001299639", lat: 29.9773, lng: 30.944, days: "Sun–Thu", opens: "09:00", closes: "18:00" },
-    { id: "dubai", name: "Global Untold Story — Dubai", locality: "Business Bay", region: "Dubai", country: "AE", phone: "+971547711772", lat: 25.1857, lng: 55.2654, days: "Sun–Thu", opens: "09:00", closes: "18:00" },
-    { id: "jeddah", name: "Global Untold Story — Jeddah", locality: "Jeddah", region: "Makkah Province", country: "SA", phone: "", lat: 21.5433, lng: 39.1728, days: "Sun–Thu", opens: "09:00", closes: "18:00" },
+    { id: "cairo", name: "The Untold Story — Cairo", locality: "Egyptian Media Production City, 6th of October City", region: "Giza", country: "EG", phone: "+201001299639", lat: 29.9773, lng: 30.944, days: "Sun–Thu", opens: "09:00", closes: "18:00" },
+    { id: "dubai", name: "The Untold Story — Dubai", locality: "Business Bay", region: "Dubai", country: "AE", phone: "+971547711772", lat: 25.1857, lng: 55.2654, days: "Sun–Thu", opens: "09:00", closes: "18:00" },
+    { id: "jeddah", name: "The Untold Story — Jeddah", locality: "Jeddah", region: "Makkah Province", country: "SA", phone: "", lat: 21.5433, lng: 39.1728, days: "Sun–Thu", opens: "09:00", closes: "18:00" },
   ],
   faq: [
-    { qEn: "Where is Global Untold Story based?", aEn: "Its headquarters is in Egyptian Media Production City, 6th of October City, Giza, Egypt, with additional offices in Dubai (UAE) and Jeddah (Saudi Arabia).", qAr: "فين مقر Global Untold Story؟", aAr: "المقر الرئيسي في مدينة الإنتاج الإعلامي بمدينة السادس من أكتوبر، الجيزة، مصر، وفيه مكاتب كمان في دبي (الإمارات) وجدة (السعودية)." },
-    { qEn: "What services does Global Untold Story offer?", aEn: "Film and commercial production, documentaries, corporate and brand video, live broadcast, podcasts, photography, motion graphics/CGI/AI video, post-production, and localization/subtitling.", qAr: "Global Untold Story بتقدّم أنهي خدمات؟", aAr: "إنتاج أفلام وإعلانات، أفلام وثائقية، فيديوهات الشركات والعلامات التجارية، البث المباشر، البودكاست، التصوير الفوتوغرافي، الموشن جرافيك والـCGI والذكاء الاصطناعي، ما بعد الإنتاج، والتوطين والترجمة." },
+    { qEn: "Where is The Untold Story based?", aEn: "Its headquarters is in Egyptian Media Production City, 6th of October City, Giza, Egypt, with additional offices in Dubai (UAE) and Jeddah (Saudi Arabia).", qAr: "فين مقر The Untold Story؟", aAr: "المقر الرئيسي في مدينة الإنتاج الإعلامي بمدينة السادس من أكتوبر، الجيزة، مصر، وفيه مكاتب كمان في دبي (الإمارات) وجدة (السعودية)." },
+    { qEn: "What services does The Untold Story offer?", aEn: "Film and commercial production, documentaries, corporate and brand video, live broadcast, podcasts, photography, motion graphics/CGI/AI video, post-production, and localization/subtitling.", qAr: "The Untold Story بتقدّم أنهي خدمات؟", aAr: "إنتاج أفلام وإعلانات، أفلام وثائقية، فيديوهات الشركات والعلامات التجارية، البث المباشر، البودكاست، التصوير الفوتوغرافي، الموشن جرافيك والـCGI والذكاء الاصطناعي، ما بعد الإنتاج، والتوطين والترجمة." },
     { qEn: "Which regions does it serve?", aEn: "Egypt, the UAE, Saudi Arabia and the wider MENA region, plus production services for international crews filming in the region.", qAr: "بتشتغلوا في أنهي مناطق؟", aAr: "مصر والإمارات والسعودية ومنطقة الشرق الأوسط وشمال إفريقيا كلها، بالإضافة لخدمات الإنتاج للطواقم الدولية اللي بتصوّر في المنطقة." },
     { qEn: "How do I get a quote?", aEn: "Use the contact page at globaluntoldstory.com/contact, email bendary@globaluntoldstory.com, or call +20 100 129 9639.", qAr: "إزاي أطلب عرض سعر؟", aAr: "من صفحة التواصل globaluntoldstory.com/contact أو على البريد bendary@globaluntoldstory.com أو تليفون +20 100 129 9639." },
     { qEn: "Do you provide production services for foreign crews in Egypt?", aEn: "Yes — filming permits, local crews, equipment, locations and full logistics for international productions shooting in Egypt and the Gulf.", qAr: "بتقدّموا خدمات إنتاج للطواقم الأجنبية في مصر؟", aAr: "أيوة — تصاريح التصوير، الطواقم المحلية، المعدات، المواقع، والتنسيق اللوجستي للإنتاجات الدولية اللي بتصوّر في مصر والخليج." },
@@ -84,13 +85,20 @@ export const GEO_DEFAULTS: GeoSettings = {
   aiCrawlers: true,
 };
 
+/** The old name, or a translation of it, saved before the rename → the current name. */
+function currentName(value: string): string {
+  let out = value;
+  for (const old of OLD_BRAND_NAMES) out = out.split(old).join(BRAND);
+  return out;
+}
+
 /** Deep-merge a stored settings document over the defaults (missing → default). */
 export function mergeGeo(stored: unknown): GeoSettings {
   const s = (stored && typeof stored === "object" ? stored : {}) as Partial<GeoSettings>;
   const org = (s.organization && typeof s.organization === "object" ? s.organization : {}) as Partial<GeoSettings["organization"]>;
   return {
     organization: {
-      name: org.name?.trim() || GEO_DEFAULTS.organization.name,
+      name: currentName(org.name?.trim() || GEO_DEFAULTS.organization.name),
       description: org.description?.trim() || GEO_DEFAULTS.organization.description,
       slogan: org.slogan?.trim() || GEO_DEFAULTS.organization.slogan,
       email: org.email?.trim() || GEO_DEFAULTS.organization.email,
@@ -112,7 +120,7 @@ const cleanArr = (v: unknown): string[] | null => {
 function normOffice(o: GeoOffice, i: number): GeoOffice {
   return {
     id: o.id || `office-${i}`,
-    name: o.name || "",
+    name: currentName(o.name || ""),
     locality: o.locality || "",
     region: o.region || "",
     country: (o.country || "").toUpperCase().slice(0, 2),
@@ -133,12 +141,14 @@ export function organizationSchema(s: GeoSettings) {
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": `${SITE_URL}/#organization`,
-    name: s?.organization?.name || "Global Untold Story",
+    name: s?.organization?.name || BRAND,
+    legalName: LEGAL_NAME,
+    alternateName: [BRAND_ALT],
     url: `${SITE_URL}/`,
     logo: {
       "@type": "ImageObject",
       url: `${SITE_URL}/images/logo-white.png`,
-      caption: s?.organization?.name || "Global Untold Story",
+      caption: `${s?.organization?.name || BRAND} logo`,
     },
     image: `${SITE_URL}/images/logo-white.png`,
     description: s?.organization?.description || "",

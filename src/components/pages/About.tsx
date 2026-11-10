@@ -17,20 +17,20 @@ import { getAboutData } from '@/lib/page-data';
 // role/bio encoding. These fallback members keep the team section full and
 // polished in every language; any members returned by the API are merged in.
 const FALLBACK_TEAM_BY_LOCALE: Record<string, TeamMember[]> = {
-  en: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Founder of Global Untold Story, working across film, advertising, documentary and live production in Egypt, the Gulf and beyond.' }],
-  ar: [{ name: 'خالد بنداري', role: 'الرئيس التنفيذي', slug: 'khaled-bendary', bio: 'مؤسس Global Untold Story، ويعمل في الأفلام والإعلانات والأفلام الوثائقية والإنتاج المباشر في مصر والخليج وخارجهما.' }],
-  de: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Gründer von Global Untold Story und tätig in Film, Werbung, Dokumentarfilm und Live-Produktion in Ägypten, der Golfregion und darüber hinaus.' }],
-  es: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Fundador de Global Untold Story, trabaja en cine, publicidad, documentales y producción en directo en Egipto, el Golfo y otros mercados.' }],
-  fr: [{ name: 'Khaled Bendary', role: 'PDG', slug: 'khaled-bendary', bio: 'Fondateur de Global Untold Story, il travaille dans le cinéma, la publicité, le documentaire et la production en direct en Égypte, dans le Golfe et au-delà.' }],
-  it: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Fondatore di Global Untold Story, lavora nel cinema, nella pubblicità, nei documentari e nelle produzioni dal vivo in Egitto, nel Golfo e oltre.' }],
-  pt: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Fundador da Global Untold Story, trabalha em cinema, publicidade, documentários e produção em direto no Egito, no Golfo e além.' }],
-  tr: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Global Untold Story’nin kurucusu; Mısır, Körfez bölgesi ve ötesinde film, reklam, belgesel ve canlı prodüksiyon alanlarında çalışır.' }],
-  ru: [{ name: 'Khaled Bendary', role: 'Генеральный директор', slug: 'khaled-bendary', bio: 'Основатель Global Untold Story, работающий в кино, рекламе, документальных фильмах и прямых эфирах в Египте, странах Персидского залива и за их пределами.' }],
-  zh: [{ name: 'Khaled Bendary', role: '首席执行官', slug: 'khaled-bendary', bio: 'Global Untold Story 创始人，业务涵盖埃及、海湾地区及其他市场的电影、广告、纪录片和现场直播制作。' }],
-  ja: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Global Untold Storyの創設者。エジプト、湾岸地域、その先で映画、広告、ドキュメンタリー、ライブ制作に携わっています。' }],
-  ko: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Global Untold Story의 창립자로서 이집트와 걸프 지역을 비롯한 시장에서 영화, 광고, 다큐멘터리 및 라이브 제작을 이끌고 있습니다.' }],
-  pl: [{ name: 'Khaled Bendary', role: 'Dyrektor generalny', slug: 'khaled-bendary', bio: 'Założyciel Global Untold Story, działający w obszarze filmu, reklamy, dokumentu i produkcji na żywo w Egipcie, krajach Zatoki i poza nimi.' }],
-  sw: [{ name: 'Khaled Bendary', role: 'Mkurugenzi Mkuu', slug: 'khaled-bendary', bio: 'Mwanzilishi wa Global Untold Story, anayefanya kazi katika filamu, matangazo, filamu za uhalisia na utayarishaji wa moja kwa moja nchini Misri, Ghuba na kwingineko.' }],
+  en: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Founder of The Untold Story, working across film, advertising, documentary and live production in Egypt, the Gulf and beyond.' }],
+  ar: [{ name: 'خالد بنداري', role: 'الرئيس التنفيذي', slug: 'khaled-bendary', bio: 'مؤسس The Untold Story، ويعمل في الأفلام والإعلانات والأفلام الوثائقية والإنتاج المباشر في مصر والخليج وخارجهما.' }],
+  de: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Gründer von The Untold Story und tätig in Film, Werbung, Dokumentarfilm und Live-Produktion in Ägypten, der Golfregion und darüber hinaus.' }],
+  es: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Fundador de The Untold Story, trabaja en cine, publicidad, documentales y producción en directo en Egipto, el Golfo y otros mercados.' }],
+  fr: [{ name: 'Khaled Bendary', role: 'PDG', slug: 'khaled-bendary', bio: 'Fondateur de The Untold Story, il travaille dans le cinéma, la publicité, le documentaire et la production en direct en Égypte, dans le Golfe et au-delà.' }],
+  it: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Fondatore di The Untold Story, lavora nel cinema, nella pubblicità, nei documentari e nelle produzioni dal vivo in Egitto, nel Golfo e oltre.' }],
+  pt: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Fundador da The Untold Story, trabalha em cinema, publicidade, documentários e produção em direto no Egito, no Golfo e além.' }],
+  tr: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'The Untold Story’nin kurucusu; Mısır, Körfez bölgesi ve ötesinde film, reklam, belgesel ve canlı prodüksiyon alanlarında çalışır.' }],
+  ru: [{ name: 'Khaled Bendary', role: 'Генеральный директор', slug: 'khaled-bendary', bio: 'Основатель The Untold Story, работающий в кино, рекламе, документальных фильмах и прямых эфирах в Египте, странах Персидского залива и за их пределами.' }],
+  zh: [{ name: 'Khaled Bendary', role: '首席执行官', slug: 'khaled-bendary', bio: 'The Untold Story 创始人，业务涵盖埃及、海湾地区及其他市场的电影、广告、纪录片和现场直播制作。' }],
+  ja: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'The Untold Storyの創設者。エジプト、湾岸地域、その先で映画、広告、ドキュメンタリー、ライブ制作に携わっています。' }],
+  ko: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'The Untold Story의 창립자로서 이집트와 걸프 지역을 비롯한 시장에서 영화, 광고, 다큐멘터리 및 라이브 제작을 이끌고 있습니다.' }],
+  pl: [{ name: 'Khaled Bendary', role: 'Dyrektor generalny', slug: 'khaled-bendary', bio: 'Założyciel The Untold Story, działający w obszarze filmu, reklamy, dokumentu i produkcji na żywo w Egipcie, krajach Zatoki i poza nimi.' }],
+  sw: [{ name: 'Khaled Bendary', role: 'Mkurugenzi Mkuu', slug: 'khaled-bendary', bio: 'Mwanzilishi wa The Untold Story, anayefanya kazi katika filamu, matangazo, filamu za uhalisia na utayarishaji wa moja kwa moja nchini Misri, Ghuba na kwingineko.' }],
 };
 
 /** Shape shared by the API's team records and the editorial fallback list. */
@@ -101,8 +101,8 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
         <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-6">( {t(aboutData?.page?.badge || 'About')} )</p>
         <SplitWords
           as="h1"
-          text={t("About Global Untold Story")}
-          style={fitTitleStyle(t("About Global Untold Story"), { locale })}
+          text={t("About The Untold Story")}
+          style={fitTitleStyle(t("About The Untold Story"), { locale })}
           className="fit-title [--t-max:8vw] md:[--t-max:3vw] font-display heading-ar-spacious font-black uppercase tracking-tight leading-[0.95]"
         />
       </section>
@@ -131,6 +131,12 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
                 {t('That is why clients return: one point of contact, a budget that holds, and a picture that still looks like the brief when it lands in every language and every cutdown.')}
               </p>
             </Reveal>
+            {/* The one place the site explains its second name (see src/lib/brand.ts). */}
+            <Reveal>
+              <p className="text-white/70 leading-[1.8] text-base md:text-[1.0625rem]">
+                {t('Internationally, The Untold Story is also known as Global Untold Story, the name behind globaluntoldstory.com.')}
+              </p>
+            </Reveal>
           </div>
         </div>
       </section>
@@ -138,10 +144,10 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
       {/* Image strip */}
       <section className="grid md:grid-cols-2 border-y border-white/10">
         <div className="img-zoom relative aspect-[4/3] md:aspect-auto md:h-[70vh]">
-          <Image src="/images/film-crew-pyramids-production.jpg" alt="Global Untold Story crew filming at the Giza pyramids" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+          <Image src="/images/film-crew-pyramids-production.jpg" alt="The Untold Story crew filming at the Giza pyramids" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
         </div>
         <div className="img-zoom relative aspect-[4/3] md:aspect-auto md:h-[70vh] border-t md:border-t-0 md:border-s border-white/10">
-          <Image src="/images/hero-giza-pyramids.jpg" alt="Global Untold Story team at the pyramids of Giza, Egypt" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+          <Image src="/images/hero-giza-pyramids.jpg" alt="The Untold Story team at the pyramids of Giza, Egypt" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
         </div>
       </section>
 

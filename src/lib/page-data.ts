@@ -96,7 +96,7 @@ function allMappedFallbackPosts(locale?: string): BlogPost[] {
       publishedAt: p.date,
       category: p.category,
       categorySlug: p.category.toLowerCase().replace(/\s+/g, "-"),
-      authorName: "Global Untold Story",
+      authorName: "The Untold Story",
       authorImage: null,
       featuredImage: p.image,
       body: Array.isArray(body) ? body.map((block) => `<p>${block}</p>`).join("") : String(body || ""),

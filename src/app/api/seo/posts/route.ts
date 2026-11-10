@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
   } else {
     const fixed: Record<string, string | boolean | number | null> = {
       featured_image: str(body.featuredImage, 300) || "/images/film-crew-pyramids-production.jpg",
-      author_name: str(body.author, 120) || "Global Untold Story",
+      author_name: str(body.author, 120) || "The Untold Story",
       category_slug: str(body.category, 80) || "Production",
       read_minutes: Math.max(1, Math.min(60, Math.round(Number(body.readMinutes) || bodyHtml.replace(/<[^>]+>/g, " ").split(/\s+/).length / 220))),
       is_featured: false,

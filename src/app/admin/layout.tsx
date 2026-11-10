@@ -23,7 +23,7 @@ const plex = IBM_Plex_Sans_Arabic({
 });
 
 export const metadata: Metadata = {
-  title: "لوحة تحكم | Global Untold Story",
+  title: "لوحة تحكم | The Untold Story",
   robots: { index: false, follow: false },
 };
 

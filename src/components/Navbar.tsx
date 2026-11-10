@@ -78,8 +78,8 @@ export default function Navbar({ initialData, initialLocale }: { initialData: Sh
           </div>
         )}
         <div className="flex items-center justify-between px-5 md:px-10 py-4 md:py-5">
-          <Link href="/" onClick={() => setOpen(false)} aria-label="Global Untold Story — Home" className="relative z-[110]">
-            <Image src="/images/logo-white.png" alt="Global Untold Story logo" width={348} height={191} priority className="h-7 md:h-9 w-auto" />
+          <Link href="/" onClick={() => setOpen(false)} aria-label="The Untold Story — Home" className="relative z-[110]">
+            <Image src="/images/logo-white.png" alt="The Untold Story logo" width={348} height={191} priority className="h-7 md:h-9 w-auto" />
           </Link>
           <div className="flex items-center gap-4 md:gap-8">
             <Link href="/contact" onClick={() => setOpen(false)} className="hidden lg:inline-block font-mono2 text-[11px] tracking-[0.25em] uppercase link-line relative z-[110]">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from '@/components/LocaleLink';
+import { BRAND, OLD_BRAND_NAMES } from '@/lib/brand';
 import { ArrowUpRight, ArrowUp } from 'lucide-react';
 import Marquee from './Marquee';
 import Magnetic from './Magnetic';
@@ -21,16 +22,19 @@ const DEFAULT_SOCIAL = {
 };
 
 /*
- * The company name is "Global Untold Story" in every language. The CMS layout
- * holds a translated name per language (e.g. 全球未解之谜, Globale Ungesagte
- * Geschichte), so the footer writes the Latin name and swaps the translated one
- * out of the footer description.
+ * The company name is "The Untold Story" in Latin letters in every language
+ * (see src/lib/brand.ts). The CMS layout once held a translated name per
+ * language (e.g. 全球未解之谜, Globale Ungesagte Geschichte) and the old name
+ * "Global Untold Story", so the footer writes the current name and swaps any
+ * of those out of the footer description.
  */
-const BRAND = 'Global Untold Story';
 function latinBrand(text?: string, localName?: string): string | undefined {
   if (!text) return text;
+  let out = text;
   const name = localName?.trim();
-  return name && name !== BRAND ? text.split(name).join(BRAND) : text;
+  if (name && name !== BRAND) out = out.split(name).join(BRAND);
+  for (const old of OLD_BRAND_NAMES) out = out.split(old).join(BRAND);
+  return out;
 }
 
 export default function Footer({ initialData, initialLocale }: { initialData: ShellData | null; initialLocale: string }) {
@@ -137,7 +141,7 @@ export default function Footer({ initialData, initialLocale }: { initialData: Sh
           </nav>
         </div>
         <div className="flex flex-wrap items-center gap-6 md:gap-8">
-          <Image src="/images/logo-black.png" alt="Global Untold Story" width={348} height={191} className="h-6 w-auto" />
+          <Image src="/images/logo-black.png" alt={`${BRAND} logo`} width={348} height={191} className="h-6 w-auto" />
           <div className="flex gap-5 font-mono2 text-[10px] tracking-[0.2em] uppercase">
             <a href={socialLinks?.instagram || DEFAULT_SOCIAL.instagram} target="_blank" rel="noopener noreferrer" className="link-line">Instagram</a>
             <a href={socialLinks?.facebook || DEFAULT_SOCIAL.facebook} target="_blank" rel="noopener noreferrer" className="link-line">Facebook</a>

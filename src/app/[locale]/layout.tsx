@@ -10,7 +10,7 @@ import StructuredData from "@/components/StructuredData";
 import { DEFAULT_LOCALE, PRERENDER_LOCALES, LOCALE_TAGS, OG_LOCALES, isLocale, localeDir, INDEXABLE_LOCALES, isIndexableLocale } from "@/lib/i18n";
 import { getCommandCenterSchemas } from "@/data/seo-command-schema";
 import { getShellData } from "@/lib/page-data";
-import { BRAND, DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/seo";
+import { BRAND, BRAND_ALT, DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/seo";
 import { getGeoSettings } from "@/lib/seo/geo-store";
 import { organizationSchema, officeSchemas, geoMeta } from "@/lib/seo/geo";
 import { pageMeta } from "@/data/page-meta";
@@ -104,7 +104,7 @@ export async function generateMetadata({
     openGraph: {
       type: "website",
       siteName: BRAND,
-      images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: "Global Untold Story production in Egypt" }],
+      images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: `${BRAND} production in Egypt` }],
       locale: OG_LOCALES[locale],
       alternateLocale: others,
     },
@@ -118,7 +118,10 @@ const website = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "@id": `${siteUrl}/#website`,
-  name: "Global Untold Story",
+  // Google reads the site name from here. "The Untold Story" is the name;
+  // the domain's "Global Untold Story" is listed as the other name it goes by.
+  name: BRAND,
+  alternateName: [BRAND_ALT],
   url: `${siteUrl}/`,
   publisher: { "@id": `${siteUrl}/#organization` },
   inLanguage: [...INDEXABLE_LOCALES],
@@ -235,7 +238,7 @@ return (
             })(window,document,'script','dataLayer','${GTM_CONTAINER_ID}');
           }` }} />
       {/* RSS auto-discovery for feed readers and aggregators. */}
-      <link rel="alternate" type="application/rss+xml" title="Global Untold Story — Insights" href="/feed.xml" />
+      <link rel="alternate" type="application/rss+xml" title={`${BRAND} — Insights`} href="/feed.xml" />
     </head>
     <body suppressHydrationWarning>
 

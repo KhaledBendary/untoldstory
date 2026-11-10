@@ -177,7 +177,7 @@ export default function Work({ initialData, initialLocale }: { initialData: Port
         </div>
         <Image
           src="/images/logo-white.png"
-          alt="Global Untold Story"
+          alt="The Untold Story"
           width={348}
           height={191}
           className="h-14 md:h-20 w-auto self-end md:ms-auto"

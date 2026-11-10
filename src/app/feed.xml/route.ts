@@ -50,9 +50,9 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Global Untold Story — Insights</title>
+    <title>The Untold Story — Insights</title>
     <link>${SITE}/insights</link>
-    <description>Articles on film and video production, storytelling and the MENA market from Global Untold Story.</description>
+    <description>Articles on film and video production, storytelling and the MENA market from The Untold Story.</description>
     <language>en</language>
     <atom:link href="${SITE}/feed.xml" rel="self" type="application/rss+xml" />
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>

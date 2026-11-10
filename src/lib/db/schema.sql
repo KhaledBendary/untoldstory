@@ -1,4 +1,4 @@
--- Global Untold Story — content database
+-- The Untold Story — content database
 --
 -- Replaces the Laravel CMS. One Postgres database holds every piece of content
 -- the site renders, and the /admin dashboard is the only thing that writes to

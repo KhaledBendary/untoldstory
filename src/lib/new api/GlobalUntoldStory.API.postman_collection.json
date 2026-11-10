@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-		"name": "Global Untold Story API",
-		"description": "REST API collection for Global Untold Story (Laravel 12).\n\n**Base path:** `/api/v1`\n\n**Auth:** Public endpoints need no auth. Admin endpoints use Sanctum Bearer token from `POST /admin/login`.\n\n**Locale:** Pass `?locale=` (en, ar, de, es, fr, it, pt, tr, ru), `Accept-Language`, or body `locale`.",
+		"name": "The Untold Story API",
+		"description": "REST API collection for The Untold Story (Laravel 12).\n\n**Base path:** `/api/v1`\n\n**Auth:** Public endpoints need no auth. Admin endpoints use Sanctum Bearer token from `POST /admin/login`.\n\n**Locale:** Pass `?locale=` (en, ar, de, es, fr, it, pt, tr, ru), `Accept-Language`, or body `locale`.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"variable": [

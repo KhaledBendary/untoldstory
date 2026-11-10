@@ -30,7 +30,7 @@ export async function GET() {
   } catch { /* keep the fallback line */ }
 
   const offices = geo.offices
-    .map((o) => `${o.name.replace(/^Global Untold Story — /, "")} (${o.country})${o.phone ? ` · ${o.phone}` : ""}`)
+    .map((o) => `${o.name.replace(/^(?:The|Global) Untold Story — /, "")} (${o.country})${o.phone ? ` · ${o.phone}` : ""}`)
     .join(" · ");
   const hq = geo.offices[0];
 

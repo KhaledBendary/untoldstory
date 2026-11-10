@@ -127,7 +127,7 @@ export default async function Page({ params }: Props) {
 
   if (initialData?.status === "ok") {
     const service = initialData.data.service;
-    // The service's own name, not the SEO title with its " | Global Untold Story" suffix.
+    // The service's own name, not the SEO title with its " | The Untold Story" suffix.
     name = cleanHeadline(service.title, slug);
     schema = {
       "@context": "https://schema.org",
@@ -138,11 +138,11 @@ export default async function Page({ params }: Props) {
       image: service.imageUrl ? absoluteUrl(service.imageUrl) : undefined,
       provider: {
         "@type": "Organization",
-        name: "Global Untold Story",
+        name: "The Untold Story",
         url: "https://globaluntoldstory.com/",
         logo: { "@type": "ImageObject", url: absoluteUrl("/images/logo-white.png") },
       },
-      brand: { "@type": "Organization", name: "Global Untold Story" },
+      brand: { "@type": "Organization", name: "The Untold Story" },
       areaServed: ["Egypt", "United Arab Emirates", "Saudi Arabia", "MENA"],
     };
   }

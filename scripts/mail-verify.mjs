@@ -42,7 +42,7 @@ try {
 
 if (process.argv.includes("--send")) {
   const info = await transporter.sendMail({
-    from: `"Global Untold Story — test" <${from}>`,
+    from: `"The Untold Story — test" <${from}>`,
     to,
     subject: "✅ Test email from the new dashboard",
     text: "This is a test from scripts/mail-verify.mjs. If you got this, the contact-form email path works.",

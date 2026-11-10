@@ -49,7 +49,7 @@ const DOCUMENTARY_MARKER: Record<string, RegExp> = {
 const AR: readonly string[] = [
   "قصص حقيقية. بحث دقيق. صناعة سينمائية.",
   "الفيلم الوثائقي يبدأ بسؤال، لا بقائمة لقطات. نساعدك في تحديد الزاوية، والبحث في الموضوع، وتقييم إمكانية الوصول، وبناء هيكل إنتاجي قادر على الاستجابة للواقع دون أن يفقد اتجاهه التحريري.",
-  "تستطيع Global Untold Story أن تقود إنتاجاً وثائقياً كاملاً أو أن تنضم عند مرحلة بعينها. نطاق عملنا يشمل البحث والتطوير، والمعالجات ومواد العرض، والتحضير، والمقابلات، والإنتاج الميداني، ودمج الأرشيف، والمونتاج، والرسوم، والصوت، والتوطين، والتسليم النهائي.",
+  "تستطيع The Untold Story أن تقود إنتاجاً وثائقياً كاملاً أو أن تنضم عند مرحلة بعينها. نطاق عملنا يشمل البحث والتطوير، والمعالجات ومواد العرض، والتحضير، والمقابلات، والإنتاج الميداني، ودمج الأرشيف، والمونتاج، والرسوم، والصوت، والتوطين، والتسليم النهائي.",
 
   "الصيغ الوثائقية التي نعمل بها",
   "الأفلام الوثائقية الطويلة والقصيرة",
@@ -128,7 +128,7 @@ const AR: readonly string[] = [
 
   "الأسئلة الشائعة",
   "هل يمكنكم إدارة إنتاج وثائقي كامل في مصر؟",
-  "نعم. تستطيع Global Untold Story دعم العملية من التطوير والبحث حتى الإنتاج الميداني وما بعد الإنتاج والتوطين والتسليم النهائي. ويمكن كذلك التعاقد على خدمات منفردة.",
+  "نعم. تستطيع The Untold Story دعم العملية من التطوير والبحث حتى الإنتاج الميداني وما بعد الإنتاج والتوطين والتسليم النهائي. ويمكن كذلك التعاقد على خدمات منفردة.",
   "هل يمكنكم دعم طاقم وثائقي دولي؟",
   "نعم. يمكننا بناء دعم محلي حول إنتاج زائر، يشمل البحث والمنسقين والمشاركين والتصاريح والأطقم والمعدات والمواقع والترجمة واللوجستيات الميدانية.",
   "هل يمكنكم تنسيق تصاريح التصوير والمواقع الحساسة؟",
@@ -143,7 +143,7 @@ const AR: readonly string[] = [
 const FR: readonly string[] = [
   "Des histoires vraies. Documentées avec rigueur. Réalisées avec un regard de cinéma.",
   "Un documentaire commence par une question, pas par une liste de plans. Nous aidons à définir l'angle, à documenter le sujet, à évaluer les accès et à bâtir une structure de production capable de répondre au réel sans perdre sa direction éditoriale.",
-  "Global Untold Story peut mener une production documentaire complète ou intervenir à une étape précise. Notre périmètre couvre la recherche et le développement, les notes d'intention et supports de présentation, la préparation, les entretiens, le tournage de terrain, l'intégration d'archives, le montage, les graphismes, le son, la localisation et la livraison finale.",
+  "The Untold Story peut mener une production documentaire complète ou intervenir à une étape précise. Notre périmètre couvre la recherche et le développement, les notes d'intention et supports de présentation, la préparation, les entretiens, le tournage de terrain, l'intégration d'archives, le montage, les graphismes, le son, la localisation et la livraison finale.",
 
   "Les formats documentaires que nous produisons",
   "Longs et courts métrages documentaires",
@@ -222,7 +222,7 @@ const FR: readonly string[] = [
 
   "Questions fréquentes",
   "Pouvez-vous gérer une production documentaire complète en Égypte ?",
-  "Oui. Global Untold Story peut accompagner le processus du développement et de la recherche jusqu'au tournage de terrain, à la postproduction, à la localisation et à la livraison finale. Chaque prestation peut aussi être commandée séparément.",
+  "Oui. The Untold Story peut accompagner le processus du développement et de la recherche jusqu'au tournage de terrain, à la postproduction, à la localisation et à la livraison finale. Chaque prestation peut aussi être commandée séparément.",
   "Pouvez-vous accompagner une équipe documentaire internationale ?",
   "Oui. Nous pouvons construire un dispositif local autour d'une production en déplacement : recherche, fixeurs, intervenants, autorisations, équipes, matériel, décors, traduction et logistique de terrain.",
   "Pouvez-vous coordonner les autorisations de tournage et les lieux sensibles ?",
@@ -237,7 +237,7 @@ const FR: readonly string[] = [
 const DE: readonly string[] = [
   "Wahre Geschichten. Sorgfältig recherchiert. Filmisch umgesetzt.",
   "Ein Dokumentarfilm beginnt mit einer Frage, nicht mit einer Einstellungsliste. Wir helfen dabei, den Blickwinkel zu bestimmen, das Thema zu recherchieren, Zugänge einzuschätzen und eine Produktionsstruktur aufzubauen, die auf die Wirklichkeit reagieren kann, ohne ihre redaktionelle Richtung zu verlieren.",
-  "Global Untold Story kann eine vollständige Dokumentarproduktion führen oder in einer bestimmten Phase einsteigen. Unser Leistungsumfang reicht von Recherche und Entwicklung, Exposés und Pitch-Unterlagen über Vorbereitung, Interviews, Dreh im Feld, Archivintegration, Schnitt, Grafik und Ton bis zu Lokalisierung und finaler Auslieferung.",
+  "The Untold Story kann eine vollständige Dokumentarproduktion führen oder in einer bestimmten Phase einsteigen. Unser Leistungsumfang reicht von Recherche und Entwicklung, Exposés und Pitch-Unterlagen über Vorbereitung, Interviews, Dreh im Feld, Archivintegration, Schnitt, Grafik und Ton bis zu Lokalisierung und finaler Auslieferung.",
 
   "Dokumentarische Formate, die wir umsetzen",
   "Lange und kurze Dokumentarfilme",
@@ -316,7 +316,7 @@ const DE: readonly string[] = [
 
   "Häufige Fragen",
   "Können Sie eine vollständige Dokumentarproduktion in Ägypten übernehmen?",
-  "Ja. Global Untold Story kann den Weg von Entwicklung und Recherche über den Dreh im Feld bis zu Postproduktion, Lokalisierung und finaler Auslieferung begleiten. Einzelne Leistungen sind ebenso beauftragbar.",
+  "Ja. The Untold Story kann den Weg von Entwicklung und Recherche über den Dreh im Feld bis zu Postproduktion, Lokalisierung und finaler Auslieferung begleiten. Einzelne Leistungen sind ebenso beauftragbar.",
   "Können Sie ein internationales Dokumentarteam unterstützen?",
   "Ja. Wir können die lokale Unterstützung um eine anreisende Produktion herum aufbauen — Recherche, Fixer, Protagonisten, Genehmigungen, Crews, Technik, Motive, Übersetzung und Feldlogistik.",
   "Können Sie Drehgenehmigungen und sensible Orte koordinieren?",
@@ -331,7 +331,7 @@ const DE: readonly string[] = [
 const ES: readonly string[] = [
   "Historias reales. Investigadas con rigor. Realizadas con mirada de cine.",
   "Un documental empieza con una pregunta, no con una lista de planos. Ayudamos a definir el enfoque, investigar el tema, evaluar los accesos y construir una estructura de producción capaz de responder a la realidad sin perder su dirección editorial.",
-  "Global Untold Story puede dirigir una producción documental completa o incorporarse en una etapa concreta. Nuestro alcance abarca investigación y desarrollo, tratamientos y materiales de presentación, preproducción, entrevistas, rodaje de campo, integración de archivo, montaje, gráficos, sonido, localización y entrega final.",
+  "The Untold Story puede dirigir una producción documental completa o incorporarse en una etapa concreta. Nuestro alcance abarca investigación y desarrollo, tratamientos y materiales de presentación, preproducción, entrevistas, rodaje de campo, integración de archivo, montaje, gráficos, sonido, localización y entrega final.",
 
   "Formatos documentales que producimos",
   "Largometrajes y cortometrajes documentales",
@@ -410,7 +410,7 @@ const ES: readonly string[] = [
 
   "Preguntas frecuentes",
   "¿Pueden gestionar una producción documental completa en Egipto?",
-  "Sí. Global Untold Story puede acompañar el proceso desde el desarrollo y la investigación hasta el rodaje de campo, la postproducción, la localización y la entrega final. También se pueden contratar servicios por separado.",
+  "Sí. The Untold Story puede acompañar el proceso desde el desarrollo y la investigación hasta el rodaje de campo, la postproducción, la localización y la entrega final. También se pueden contratar servicios por separado.",
   "¿Pueden dar apoyo a un equipo documental internacional?",
   "Sí. Podemos montar el apoyo local alrededor de una producción desplazada: investigación, fixers, participantes, permisos, equipos, material, localizaciones, traducción y logística de campo.",
   "¿Pueden coordinar permisos de rodaje y localizaciones sensibles?",
@@ -425,7 +425,7 @@ const ES: readonly string[] = [
 const IT: readonly string[] = [
   "Storie vere. Documentate con rigore. Realizzate con sguardo cinematografico.",
   "Un documentario comincia con una domanda, non con una lista di inquadrature. Aiutiamo a definire il taglio, documentare il soggetto, valutare gli accessi e costruire una struttura produttiva capace di rispondere alla realtà senza perdere la propria direzione editoriale.",
-  "Global Untold Story può guidare una produzione documentaria completa o inserirsi in una fase precisa. Il nostro perimetro comprende ricerca e sviluppo, trattamenti e materiali di presentazione, preparazione, interviste, riprese sul campo, integrazione di archivio, montaggio, grafica, suono, localizzazione e consegna finale.",
+  "The Untold Story può guidare una produzione documentaria completa o inserirsi in una fase precisa. Il nostro perimetro comprende ricerca e sviluppo, trattamenti e materiali di presentazione, preparazione, interviste, riprese sul campo, integrazione di archivio, montaggio, grafica, suono, localizzazione e consegna finale.",
 
   "I formati documentari che produciamo",
   "Lungometraggi e cortometraggi documentari",
@@ -504,7 +504,7 @@ const IT: readonly string[] = [
 
   "Domande frequenti",
   "Potete gestire una produzione documentaria completa in Egitto?",
-  "Sì. Global Untold Story può seguire il percorso dallo sviluppo e dalla ricerca fino alle riprese sul campo, alla postproduzione, alla localizzazione e alla consegna finale. I singoli servizi possono anche essere commissionati separatamente.",
+  "Sì. The Untold Story può seguire il percorso dallo sviluppo e dalla ricerca fino alle riprese sul campo, alla postproduzione, alla localizzazione e alla consegna finale. I singoli servizi possono anche essere commissionati separatamente.",
   "Potete supportare una troupe documentaria internazionale?",
   "Sì. Possiamo costruire il supporto locale intorno a una produzione in trasferta: ricerca, fixer, protagonisti, permessi, troupe, attrezzature, location, traduzione e logistica sul campo.",
   "Potete coordinare permessi di ripresa e luoghi sensibili?",
@@ -519,7 +519,7 @@ const IT: readonly string[] = [
 const PT: readonly string[] = [
   "Histórias verdadeiras. Investigadas com rigor. Realizadas com olhar de cinema.",
   "Um documentário começa com uma pergunta, não com uma lista de planos. Ajudamos a definir o ângulo, a investigar o tema, a avaliar os acessos e a construir uma estrutura de produção capaz de responder à realidade sem perder a sua direção editorial.",
-  "A Global Untold Story pode conduzir uma produção documental completa ou entrar numa fase específica. O nosso âmbito abrange investigação e desenvolvimento, tratamentos e materiais de apresentação, preparação, entrevistas, rodagem de terreno, integração de arquivo, montagem, grafismo, som, localização e entrega final.",
+  "A The Untold Story pode conduzir uma produção documental completa ou entrar numa fase específica. O nosso âmbito abrange investigação e desenvolvimento, tratamentos e materiais de apresentação, preparação, entrevistas, rodagem de terreno, integração de arquivo, montagem, grafismo, som, localização e entrega final.",
 
   "Formatos documentais que produzimos",
   "Longas e curtas-metragens documentais",
@@ -598,7 +598,7 @@ const PT: readonly string[] = [
 
   "Perguntas frequentes",
   "Conseguem gerir uma produção documental completa no Egito?",
-  "Sim. A Global Untold Story pode acompanhar o processo desde o desenvolvimento e a investigação até à rodagem de terreno, à pós-produção, à localização e à entrega final. Os serviços podem também ser contratados separadamente.",
+  "Sim. A The Untold Story pode acompanhar o processo desde o desenvolvimento e a investigação até à rodagem de terreno, à pós-produção, à localização e à entrega final. Os serviços podem também ser contratados separadamente.",
   "Conseguem apoiar uma equipa documental internacional?",
   "Sim. Podemos montar o apoio local em torno de uma produção deslocada: investigação, fixers, participantes, licenças, equipas, equipamento, localizações, tradução e logística de terreno.",
   "Conseguem coordenar licenças de filmagem e locais sensíveis?",
@@ -613,7 +613,7 @@ const PT: readonly string[] = [
 const RU: readonly string[] = [
   "Подлинные истории. Тщательно исследованные. Снятые кинематографично.",
   "Документальный фильм начинается с вопроса, а не со списка планов. Мы помогаем определить угол зрения, изучить тему, оценить доступ и выстроить производственную структуру, способную реагировать на действительность, не теряя редакционного направления.",
-  "Global Untold Story может вести документальное производство целиком или подключиться на конкретном этапе. В наш объём входят исследование и разработка, тритменты и питчинговые материалы, подготовка, интервью, полевые съёмки, работа с архивом, монтаж, графика, звук, локализация и финальная сдача.",
+  "The Untold Story может вести документальное производство целиком или подключиться на конкретном этапе. В наш объём входят исследование и разработка, тритменты и питчинговые материалы, подготовка, интервью, полевые съёмки, работа с архивом, монтаж, графика, звук, локализация и финальная сдача.",
 
   "Документальные форматы, с которыми мы работаем",
   "Полнометражные и короткометражные документальные фильмы",
@@ -692,7 +692,7 @@ const RU: readonly string[] = [
 
   "Частые вопросы",
   "Можете ли вы вести полное документальное производство в Египте?",
-  "Да. Global Untold Story может сопровождать процесс от разработки и исследования до полевых съёмок, постпродакшна, локализации и финальной сдачи. Отдельные услуги также можно заказать по отдельности.",
+  "Да. The Untold Story может сопровождать процесс от разработки и исследования до полевых съёмок, постпродакшна, локализации и финальной сдачи. Отдельные услуги также можно заказать по отдельности.",
   "Можете ли вы поддержать международную документальную группу?",
   "Да. Мы можем выстроить местную поддержку вокруг приезжающего производства: исследование, фиксеры, герои, разрешения, съёмочные группы, техника, локации, перевод и полевая логистика.",
   "Можете ли вы координировать съёмочные разрешения и чувствительные объекты?",
@@ -707,7 +707,7 @@ const RU: readonly string[] = [
 const TR: readonly string[] = [
   "Gerçek hikâyeler. Titizlikle araştırılmış. Sinema diliyle çekilmiş.",
   "Bir belgesel çekim listesiyle değil, bir soruyla başlar. Bakış açısını belirlemeye, konuyu araştırmaya, erişimi değerlendirmeye ve editoryal yönünü kaybetmeden gerçekliğe yanıt verebilen bir yapım yapısı kurmaya yardımcı oluruz.",
-  "Global Untold Story eksiksiz bir belgesel yapımını yürütebilir ya da belirli bir aşamada dahil olabilir. Kapsamımız araştırma ve geliştirmeyi, tritman ve sunum materyallerini, hazırlığı, röportajları, saha çekimlerini, arşiv entegrasyonunu, kurguyu, grafiği, sesi, yerelleştirmeyi ve nihai teslimi içerir.",
+  "The Untold Story eksiksiz bir belgesel yapımını yürütebilir ya da belirli bir aşamada dahil olabilir. Kapsamımız araştırma ve geliştirmeyi, tritman ve sunum materyallerini, hazırlığı, röportajları, saha çekimlerini, arşiv entegrasyonunu, kurguyu, grafiği, sesi, yerelleştirmeyi ve nihai teslimi içerir.",
 
   "Ürettiğimiz belgesel formatları",
   "Uzun ve kısa metraj belgesel filmler",
@@ -786,7 +786,7 @@ const TR: readonly string[] = [
 
   "Sıkça sorulan sorular",
   "Mısır'da eksiksiz bir belgesel yapımını yürütebilir misiniz?",
-  "Evet. Global Untold Story süreci geliştirme ve araştırmadan saha çekimine, post prodüksiyona, yerelleştirmeye ve nihai teslime kadar destekleyebilir. Hizmetler ayrı ayrı da sipariş edilebilir.",
+  "Evet. The Untold Story süreci geliştirme ve araştırmadan saha çekimine, post prodüksiyona, yerelleştirmeye ve nihai teslime kadar destekleyebilir. Hizmetler ayrı ayrı da sipariş edilebilir.",
   "Uluslararası bir belgesel ekibine destek verebilir misiniz?",
   "Evet. Gelen bir yapımın çevresinde yerel desteği kurabiliriz: araştırma, fikser, katılımcılar, izinler, ekipler, ekipman, mekânlar, çeviri ve saha lojistiği.",
   "Çekim izinlerini ve hassas mekânları koordine edebilir misiniz?",
