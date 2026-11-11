@@ -16,6 +16,7 @@ import { usePageData } from '@/hooks/usePageData';
 import { getProjectDetailData, type ProjectDetailData, type DetailResult } from '@/lib/page-data';
 import { youTubeIds } from '@/lib/youtube';
 import YouTubeFilm from '../YouTubeFilm';
+import { projectFacts, PRODUCED_BY } from '@/data/project-facts';
 
 const META_COLS: Record<number, string> = { 1: 'md:grid-cols-1', 2: 'md:grid-cols-2', 3: 'md:grid-cols-3', 4: 'md:grid-cols-4' };
 
@@ -26,17 +27,31 @@ function hasValue(v?: string | null): v is string {
 }
 
 /**
- * The facts row under the project title. A field is shown only when it says
+ * The facts box under the project title. A field is shown only when it says
  * something: every project read "Duration: N/A" and most repeated the page
  * title as their "Metric", which reads as an empty template to visitors and
  * search engines alike.
+ *
+ * Projects with confirmed facts (src/data/project-facts.ts) show year,
+ * location, our role, crew size and "Produced by" in place of Metric and
+ * Duration, as the projects writing standard sets out.
  */
 function projectMeta(project: PortfolioItem, t: (s: string) => string): [string, string][] {
   const same = (a?: string | null, b?: string | null) =>
     (a ?? '').trim().toLocaleLowerCase() === (b ?? '').trim().toLocaleLowerCase();
+  const facts = projectFacts(project);
   const items: [string, string][] = [];
-  if (hasValue(project.client)) items.push([t('Client'), project.client]);
+  if (facts?.client) items.push([t('Client'), t(facts.client)]);
+  else if (hasValue(project.client)) items.push([t('Client'), project.client]);
   if (hasValue(project.category)) items.push([t('Category'), project.category]);
+  if (facts) {
+    items.push([t('Year'), facts.year]);
+    items.push([t('Location'), t(facts.location)]);
+    if (facts.role) items.push([t('Our role'), t(facts.role)]);
+    if (facts.crew) items.push([t('Crew size'), String(facts.crew)]);
+    items.push([t('Produced by'), PRODUCED_BY]);
+    return items;
+  }
   if (hasValue(project.metric) && !same(project.metric, project.title)) items.push([t('Metric'), project.metric]);
   if (hasValue(project.duration)) items.push([t('Duration'), project.duration]);
   return items;

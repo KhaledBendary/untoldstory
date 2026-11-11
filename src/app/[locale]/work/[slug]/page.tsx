@@ -9,6 +9,7 @@ import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE, decodeSlug 
 import { IS_PRODUCTION_BUILD, findProjectAnyLocale, projectDetailWithFallback } from "@/lib/page-data";
 import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo, withNoindex } from "@/lib/seo";
 import { videoFile, youTubeEmbedUrl, youTubeIds, youTubeThumbnail, youTubeWatchUrl } from "@/lib/youtube";
+import { projectFacts, PRODUCED_BY } from "@/data/project-facts";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -120,13 +121,22 @@ export default async function Page({ params }: Props) {
   if (initialData?.status === "ok") {
     const project = initialData.data.project;
     name = cleanHeadline(project.title, slug);
+    const facts = projectFacts(project);
     const blocks: Record<string, unknown>[] = [{
       "@context": "https://schema.org",
       "@type": "CreativeWork",
       name,
       description: buildDescription(project.results, name),
-      creator: { "@type": "Organization", name: "The Untold Story" },
+      creator: { "@type": "Organization", name: PRODUCED_BY },
       image: project.image ? absoluteUrl(project.image) : undefined,
+      // The same facts the page shows in its facts box.
+      ...(facts
+        ? {
+            producer: { "@type": "Organization", name: PRODUCED_BY },
+            dateCreated: facts.year,
+            locationCreated: { "@type": "Place", name: facts.location },
+          }
+        : {}),
     }];
     // The main film. A YouTube link is described by its embed and watch URLs;
     // a direct file (the field's older use) by its own address.
