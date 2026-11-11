@@ -184,7 +184,9 @@
     "Full production": "إنتاج متكامل",
     "Filming": "التصوير",
     "Multi-camera concert filming": "تصوير الحفل بعدة كاميرات",
-    "Event production and coverage": "إنتاج الفعالية وتغطيتها"
+    "Event production and coverage": "إنتاج الفعالية وتغطيتها",
+    "United Arab Emirates": "الإمارات العربية المتحدة",
+    "Event coverage": "تغطية الفعالية"
   },
   "de": {
     "Home": "Startseite",
@@ -371,7 +373,9 @@
     "Full production": "Komplette Produktion",
     "Filming": "Dreharbeiten",
     "Multi-camera concert filming": "Konzertaufzeichnung mit mehreren Kameras",
-    "Event production and coverage": "Eventproduktion und Begleitung"
+    "Event production and coverage": "Eventproduktion und Begleitung",
+    "United Arab Emirates": "Vereinigte Arabische Emirate",
+    "Event coverage": "Eventdokumentation"
   },
   "es": {
     "Home": "Inicio",
@@ -558,7 +562,9 @@
     "Full production": "Producción integral",
     "Filming": "Rodaje",
     "Multi-camera concert filming": "Grabación del concierto con varias cámaras",
-    "Event production and coverage": "Producción y cobertura del evento"
+    "Event production and coverage": "Producción y cobertura del evento",
+    "United Arab Emirates": "Emiratos Árabes Unidos",
+    "Event coverage": "Cobertura del evento"
   },
   "fr": {
     "Home": "Accueil",
@@ -745,7 +751,9 @@
     "Full production": "Production complète",
     "Filming": "Tournage",
     "Multi-camera concert filming": "Captation multicaméra du concert",
-    "Event production and coverage": "Production et couverture de l'événement"
+    "Event production and coverage": "Production et couverture de l'événement",
+    "United Arab Emirates": "Émirats arabes unis",
+    "Event coverage": "Couverture de l'événement"
   },
   "it": {
     "Home": "Home",
@@ -932,7 +940,9 @@
     "Full production": "Produzione completa",
     "Filming": "Riprese",
     "Multi-camera concert filming": "Riprese multicamera del concerto",
-    "Event production and coverage": "Produzione e copertura dell'evento"
+    "Event production and coverage": "Produzione e copertura dell'evento",
+    "United Arab Emirates": "Emirati Arabi Uniti",
+    "Event coverage": "Copertura dell'evento"
   },
   "pt": {
     "Home": "Início",
@@ -1119,7 +1129,9 @@
     "Full production": "Produção completa",
     "Filming": "Filmagem",
     "Multi-camera concert filming": "Gravação do show com várias câmeras",
-    "Event production and coverage": "Produção e cobertura do evento"
+    "Event production and coverage": "Produção e cobertura do evento",
+    "United Arab Emirates": "Emirados Árabes Unidos",
+    "Event coverage": "Cobertura do evento"
   },
   "tr": {
     "Home": "Ana Sayfa",
@@ -1306,7 +1318,9 @@
     "Full production": "Uçtan uca prodüksiyon",
     "Filming": "Çekim",
     "Multi-camera concert filming": "Çok kameralı konser çekimi",
-    "Event production and coverage": "Etkinlik prodüksiyonu ve çekimi"
+    "Event production and coverage": "Etkinlik prodüksiyonu ve çekimi",
+    "United Arab Emirates": "Birleşik Arap Emirlikleri",
+    "Event coverage": "Etkinlik çekimi"
   },
   "ru": {
     "Home": "Главная",
@@ -1493,7 +1507,9 @@
     "Full production": "Полный цикл производства",
     "Filming": "Съёмка",
     "Multi-camera concert filming": "Многокамерная съёмка концерта",
-    "Event production and coverage": "Организация и съёмка мероприятия"
+    "Event production and coverage": "Организация и съёмка мероприятия",
+    "United Arab Emirates": "Объединённые Арабские Эмираты",
+    "Event coverage": "Съёмка мероприятия"
   },
   "zh": {
     "Home": "首页",
@@ -1680,7 +1696,9 @@
     "Full production": "全流程制作",
     "Filming": "拍摄",
     "Multi-camera concert filming": "多机位演唱会拍摄",
-    "Event production and coverage": "活动制作与拍摄"
+    "Event production and coverage": "活动制作与拍摄",
+    "United Arab Emirates": "阿拉伯联合酋长国",
+    "Event coverage": "活动拍摄"
   },
   "en": {
     "Home": "Home",
@@ -1902,7 +1920,9 @@
     "Full production": "制作全般",
     "Filming": "撮影",
     "Multi-camera concert filming": "マルチカメラでのコンサート撮影",
-    "Event production and coverage": "イベントの制作と撮影"
+    "Event production and coverage": "イベントの制作と撮影",
+    "United Arab Emirates": "アラブ首長国連邦",
+    "Event coverage": "イベント撮影"
   },
   "ko": {
     "Home": "홈",
@@ -2089,7 +2109,9 @@
     "Full production": "전체 제작",
     "Filming": "촬영",
     "Multi-camera concert filming": "멀티카메라 콘서트 촬영",
-    "Event production and coverage": "행사 제작 및 촬영"
+    "Event production and coverage": "행사 제작 및 촬영",
+    "United Arab Emirates": "아랍에미리트",
+    "Event coverage": "행사 촬영"
   },
   "pl": {
     "Home": "Start",
@@ -2276,7 +2298,9 @@
     "Full production": "Pełna produkcja",
     "Filming": "Realizacja zdjęć",
     "Multi-camera concert filming": "Wielokamerowa rejestracja koncertu",
-    "Event production and coverage": "Produkcja i relacja z wydarzenia"
+    "Event production and coverage": "Produkcja i relacja z wydarzenia",
+    "United Arab Emirates": "Zjednoczone Emiraty Arabskie",
+    "Event coverage": "Relacja z wydarzenia"
   },
   "sw": {
     "Home": "Nyumbani",
@@ -2463,6 +2487,8 @@
     "Full production": "Uzalishaji kamili",
     "Filming": "Upigaji filamu",
     "Multi-camera concert filming": "Upigaji wa tamasha kwa kamera nyingi",
-    "Event production and coverage": "Uzalishaji na upigaji picha wa tukio"
+    "Event production and coverage": "Uzalishaji na upigaji picha wa tukio",
+    "United Arab Emirates": "Falme za Kiarabu",
+    "Event coverage": "Upigaji picha wa tukio"
   }
 }

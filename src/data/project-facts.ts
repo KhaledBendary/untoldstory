@@ -7,8 +7,8 @@
  * src/data/ui-translations.json, so a new place or role needs a line there in
  * each language too.
  *
- * Not here yet, on purpose: the four Apache projects and ADNOC (waiting for the
- * boss's decision on which of them stay).
+ * Not here yet, on purpose: the four Apache projects (waiting for the boss's
+ * decision on which of them stay).
  */
 
 export interface ProjectFacts {
@@ -35,6 +35,13 @@ const PROJECT_FACTS: Record<string, ProjectFacts> = {
     location: "East Ras Qattara, Egypt",
     crew: 11,
     role: "Filming",
+  },
+  // Location confirmed by the owner on 12 Nov 2026.
+  "adnoc-gas-corporate-event-workshop-production": {
+    year: "2021",
+    location: "United Arab Emirates",
+    crew: 8,
+    role: "Event coverage",
   },
   "changan-distracted-driving-csr-film": {
     year: "2022",
