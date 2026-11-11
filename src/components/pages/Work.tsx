@@ -13,6 +13,7 @@ import type { PortfolioItem } from '@/types/api';
 import { useLanguage } from '../LanguageContext';
 import { usePageData } from '@/hooks/usePageData';
 import { getWorkData } from '@/lib/page-data';
+import { videoFile, youTubeIds } from '@/lib/youtube';
 
 function WorkCard({ project }: { project: PortfolioItem }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -33,6 +34,11 @@ function WorkCard({ project }: { project: PortfolioItem }) {
     if (v) { v.pause(); v.currentTime = 0; }
   };
 
+  // A file plays on hover; a YouTube film is shown on the project page, so
+  // its card keeps the still and only shows the play mark.
+  const file = videoFile(project.video);
+  const hasFilm = Boolean(file) || youTubeIds(project.video).length > 0;
+
   return (
     <Link
       href={`/work/${project.slug}`}
@@ -41,10 +47,10 @@ function WorkCard({ project }: { project: PortfolioItem }) {
       onMouseLeave={handleLeave}
     >
       <div className="img-zoom relative aspect-[4/5] bg-[#111]">
-        {project.video ? (
+        {file ? (
           <video
             ref={videoRef}
-            src={project.video}
+            src={file}
             poster={getProjectImage(project)}
             muted
             loop
@@ -59,10 +65,10 @@ function WorkCard({ project }: { project: PortfolioItem }) {
         <div className="absolute top-4 left-4 flex gap-2">
           <span className="font-mono2 text-[9px] tracking-[0.2em] uppercase bg-black/40 backdrop-blur-sm border border-white/20 px-2.5 py-1">{project.category}</span>
         </div>
-        {project.video && (
+        {hasFilm && (
           <span
             className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 pointer-events-none ${
-              hovering ? 'opacity-0' : 'opacity-100'
+              hovering && file ? 'opacity-0' : 'opacity-100'
             }`}
           >
             <Play className="w-10 h-10 text-white/90 fill-white/90" />

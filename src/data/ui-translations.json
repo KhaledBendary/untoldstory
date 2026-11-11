@@ -164,7 +164,8 @@
     "Type your message…": "اكتب رسالتك…",
     "Send": "إرسال",
     "Nouran greeting": "أهلاً! أنا نوران، مساعدتك في The Untold Story. قولي عايز إيه وهساعدك فيه.",
-    "Nouran is typing…": "نوران بتكتب…"
+    "Nouran is typing…": "نوران بتكتب…",
+    "Play the film": "تشغيل الفيلم"
   },
   "de": {
     "Home": "Startseite",
@@ -331,7 +332,8 @@
     "Type your message…": "Schreiben Sie Ihre Nachricht…",
     "Send": "Senden",
     "Nouran greeting": "Hallo! Ich bin Nouran, Ihre Assistentin bei The Untold Story. Erzählen Sie mir, wonach Sie suchen, und ich kümmere mich darum.",
-    "Nouran is typing…": "Nouran schreibt…"
+    "Nouran is typing…": "Nouran schreibt…",
+    "Play the film": "Film abspielen"
   },
   "es": {
     "Home": "Inicio",
@@ -498,7 +500,8 @@
     "Type your message…": "Escribe tu mensaje…",
     "Send": "Enviar",
     "Nouran greeting": "¡Hola! Soy Nouran, tu asistente en The Untold Story. Cuéntame qué necesitas y me encargo de ello.",
-    "Nouran is typing…": "Nouran está escribiendo…"
+    "Nouran is typing…": "Nouran está escribiendo…",
+    "Play the film": "Reproducir el video"
   },
   "fr": {
     "Home": "Accueil",
@@ -665,7 +668,8 @@
     "Type your message…": "Écrivez votre message…",
     "Send": "Envoyer",
     "Nouran greeting": "Bonjour ! Je suis Nouran, votre assistante chez The Untold Story. Dites-moi ce que vous recherchez et je m'en occupe.",
-    "Nouran is typing…": "Nouran est en train d'écrire…"
+    "Nouran is typing…": "Nouran est en train d'écrire…",
+    "Play the film": "Lire la vidéo"
   },
   "it": {
     "Home": "Home",
@@ -832,7 +836,8 @@
     "Type your message…": "Scrivi il tuo messaggio…",
     "Send": "Invia",
     "Nouran greeting": "Ciao! Sono Nouran, la tua assistente di The Untold Story. Dimmi cosa stai cercando e me ne occupo io.",
-    "Nouran is typing…": "Nouran sta scrivendo…"
+    "Nouran is typing…": "Nouran sta scrivendo…",
+    "Play the film": "Riproduci il video"
   },
   "pt": {
     "Home": "Início",
@@ -999,7 +1004,8 @@
     "Type your message…": "Escreva sua mensagem…",
     "Send": "Enviar",
     "Nouran greeting": "Olá! Sou a Nouran, sua assistente na The Untold Story. Diga-me o que você procura e eu cuido disso.",
-    "Nouran is typing…": "Nouran está digitando…"
+    "Nouran is typing…": "Nouran está digitando…",
+    "Play the film": "Assistir ao vídeo"
   },
   "tr": {
     "Home": "Ana Sayfa",
@@ -1166,7 +1172,8 @@
     "Type your message…": "Mesajınızı yazın…",
     "Send": "Gönder",
     "Nouran greeting": "Merhaba! Ben Nouran, The Untold Story'deki asistanınızım. Ne aradığınızı söyleyin, gerisini ben hallederim.",
-    "Nouran is typing…": "Nouran yazıyor…"
+    "Nouran is typing…": "Nouran yazıyor…",
+    "Play the film": "Videoyu oynat"
   },
   "ru": {
     "Home": "Главная",
@@ -1333,7 +1340,8 @@
     "Type your message…": "Введите сообщение…",
     "Send": "Отправить",
     "Nouran greeting": "Привет! Я Нуран, ваш помощник в The Untold Story. Расскажите, что вам нужно, и я этим займусь.",
-    "Nouran is typing…": "Нуран печатает…"
+    "Nouran is typing…": "Нуран печатает…",
+    "Play the film": "Смотреть видео"
   },
   "zh": {
     "Home": "首页",
@@ -1500,7 +1508,8 @@
     "Type your message…": "输入您的消息…",
     "Send": "发送",
     "Nouran greeting": "您好！我是 Nouran，The Untold Story 的助手。请告诉我您需要什么，我来为您处理。",
-    "Nouran is typing…": "Nouran 正在输入…"
+    "Nouran is typing…": "Nouran 正在输入…",
+    "Play the film": "播放视频"
   },
   "en": {
     "Home": "Home",
@@ -1534,7 +1543,8 @@
     "Type your message…": "Type your message…",
     "Send": "Send",
     "Nouran greeting": "Hi! I'm Nouran, your assistant at The Untold Story. Tell me what you're looking for and I'll take it from there.",
-    "Nouran is typing…": "Nouran is typing…"
+    "Nouran is typing…": "Nouran is typing…",
+    "Play the film": "Play the film"
   },
   "ja": {
     "Home": "ホーム",
@@ -1701,7 +1711,8 @@
     "Type your message…": "メッセージを入力…",
     "Send": "送信",
     "Nouran greeting": "こんにちは！私はNouran、The Untold Storyのアシスタントです。ご希望の内容を教えてください。",
-    "Nouran is typing…": "Nouranが入力中…"
+    "Nouran is typing…": "Nouranが入力中…",
+    "Play the film": "動画を再生"
   },
   "ko": {
     "Home": "홈",
@@ -1868,7 +1879,8 @@
     "Type your message…": "메시지를 입력하세요…",
     "Send": "보내기",
     "Nouran greeting": "안녕하세요! 저는 The Untold Story의 어시스턴트 Nouran입니다. 원하시는 것을 말씀해 주세요.",
-    "Nouran is typing…": "Nouran이 입력 중…"
+    "Nouran is typing…": "Nouran이 입력 중…",
+    "Play the film": "영상 재생"
   },
   "pl": {
     "Home": "Start",
@@ -2035,7 +2047,8 @@
     "Type your message…": "Napisz wiadomość…",
     "Send": "Wyślij",
     "Nouran greeting": "Cześć! Jestem Nouran, asystentka The Untold Story. Powiedz mi, czego szukasz, a ja się tym zajmę.",
-    "Nouran is typing…": "Nouran pisze…"
+    "Nouran is typing…": "Nouran pisze…",
+    "Play the film": "Odtwórz wideo"
   },
   "sw": {
     "Home": "Nyumbani",
@@ -2202,6 +2215,7 @@
     "Type your message…": "Andika ujumbe wako…",
     "Send": "Tuma",
     "Nouran greeting": "Habari! Mimi ni Nouran, msaidizi wako katika The Untold Story. Niambie unachohitaji nami nitakusaidia.",
-    "Nouran is typing…": "Nouran anaandika…"
+    "Nouran is typing…": "Nouran anaandika…",
+    "Play the film": "Cheza video"
   }
 }

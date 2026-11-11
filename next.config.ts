@@ -97,7 +97,7 @@ const CSP = [
   "style-src 'self' 'unsafe-inline'",
   // Fonts are self-hosted through next/font, so no third-party origin here.
   "font-src 'self' data:",
-  `img-src 'self' data: blob: ${UPSTREAM_ORIGIN} ${VERCEL_BLOB} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} ${GOOGLE_COUNTRY_DOMAINS} https://www.facebook.com`,
+  `img-src 'self' data: blob: ${UPSTREAM_ORIGIN} ${VERCEL_BLOB} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} ${GOOGLE_COUNTRY_DOMAINS} https://www.facebook.com https://i.ytimg.com`,
   `media-src 'self' ${UPSTREAM_ORIGIN} ${VERCEL_BLOB}`,
   `connect-src 'self' ${UPSTREAM_ORIGIN} ${GOOGLE_MEASUREMENT} ${GOOGLE_ADS} ${GOOGLE_COUNTRY_DOMAINS} ${META}`,
   "object-src 'none'",
@@ -105,8 +105,9 @@ const CSP = [
   // The Meta Pixel posts to facebook.com/tr/ from a hidden form.
   "form-action 'self' https://www.facebook.com",
   "frame-ancestors 'none'",
-  // …and frames facebook.com as its fallback transport.
-  "frame-src https://www.facebook.com",
+  // …and frames facebook.com as its fallback transport. Project films play
+  // in YouTube's privacy-enhanced player once the visitor presses play.
+  "frame-src https://www.facebook.com https://www.youtube-nocookie.com https://www.youtube.com",
   "manifest-src 'self'",
   "upgrade-insecure-requests",
 ].join("; ");

@@ -14,6 +14,8 @@ import { renderCmsHtml } from '@/lib/seo';
 import { fitTitleStyle } from '@/lib/title-fit';
 import { usePageData } from '@/hooks/usePageData';
 import { getProjectDetailData, type ProjectDetailData, type DetailResult } from '@/lib/page-data';
+import { youTubeIds } from '@/lib/youtube';
+import YouTubeFilm from '../YouTubeFilm';
 
 const META_COLS: Record<number, string> = { 1: 'md:grid-cols-1', 2: 'md:grid-cols-2', 3: 'md:grid-cols-3', 4: 'md:grid-cols-4' };
 
@@ -94,6 +96,9 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
   const next = allProjects[(idx + 1) % allProjects.length];
   const related = allProjects.filter(p => p.slug !== slug && p.category === project.category).slice(0, 3);
   const metaItems = projectMeta(project, t);
+  // The project's films on YouTube, from the dashboard's video-link field.
+  // The first is the main film; any others sit under it, two to a row.
+  const films = youTubeIds(project.video);
 
   return (
     <>
@@ -128,6 +133,24 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
               </Reveal>
             ))}
           </div>
+        )}
+
+        {films.length > 0 && (
+          <Reveal className="mx-auto mb-14 max-w-6xl md:mb-20">
+            <YouTubeFilm
+              id={films[0]}
+              title={project.title}
+              playLabel={t('Play the film')}
+              poster={getProjectImage(project)}
+            />
+            {films.length > 1 && (
+              <div className="mt-6 grid gap-6 sm:grid-cols-2">
+                {films.slice(1).map((id, i) => (
+                  <YouTubeFilm key={id} id={id} title={`${project.title} (${i + 2})`} playLabel={t('Play the film')} />
+                ))}
+              </div>
+            )}
+          </Reveal>
         )}
 
         <div className="read-col">

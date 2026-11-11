@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE, decodeSlug } from "@/lib/i18n";
 import { IS_PRODUCTION_BUILD, findProjectAnyLocale, projectDetailWithFallback } from "@/lib/page-data";
 import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo, withNoindex } from "@/lib/seo";
+import { videoFile, youTubeEmbedUrl, youTubeIds, youTubeThumbnail, youTubeWatchUrl } from "@/lib/youtube";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -127,15 +128,22 @@ export default async function Page({ params }: Props) {
       creator: { "@type": "Organization", name: "The Untold Story" },
       image: project.image ? absoluteUrl(project.image) : undefined,
     }];
-    if (project.video) {
+    // The main film. A YouTube link is described by its embed and watch URLs;
+    // a direct file (the field's older use) by its own address.
+    const filmId = youTubeIds(project.video)[0];
+    const file = videoFile(project.video);
+    if (filmId || file) {
+      const still = project.image ? absoluteUrl(project.image) : absoluteUrl("/images/on-ground-production-giza.jpg");
       blocks.push({
         "@context": "https://schema.org",
         "@type": "VideoObject",
         name,
         description: buildDescription(project.results, name),
-        thumbnailUrl: [project.image ? absoluteUrl(project.image) : absoluteUrl("/images/on-ground-production-giza.jpg")],
-        uploadDate: "2026-01-01T00:00:00.000Z",
-        contentUrl: absoluteUrl(project.video),
+        thumbnailUrl: filmId ? [still, youTubeThumbnail(filmId)] : [still],
+        uploadDate: project.updatedAt ?? "2026-01-01T00:00:00.000Z",
+        ...(filmId
+          ? { embedUrl: youTubeEmbedUrl(filmId), url: youTubeWatchUrl(filmId) }
+          : { contentUrl: absoluteUrl(file as string) }),
       });
     }
     schema = blocks;
