@@ -10,24 +10,24 @@
     "About": "من نحن",
     "Insights": "مقالاتنا",
     "Contact": "اتصل بنا",
-    "Get a Quote": "احصل على تسعير",
+    "Get a Quote": "اطلب عرض سعر",
     "Menu": "القائمة",
     "Close": "إغلاق",
-    "Scroll": "اسحب للأسفل",
+    "Scroll": "مرّر للأسفل",
     "Start a project": "ابدأ مشروعاً",
     "Offices": "مكاتبنا",
     "Back to top": "العودة للأعلى",
-    "Thirteen crafts. One cycle.": "ثلاثة عشر حرفة. دورة واحدة.",
+    "Thirteen crafts. One cycle.": "ثلاث عشرة حرفة. دورة واحدة.",
     "All services": "كل الخدمات",
     "Our Work": "أعمالنا",
-    "Let's tell your untold story": "دعنا نروي قصتك غير المروية",
+    "Let's tell your untold story": "لنروِ قصتك التي لم تُروَ بعد",
     "Get in touch": "تواصل معنا",
-    "Where story meets execution. Predictable budgets. Premium results.": "حيث تلتقي القصة بالتنفيذ. ميزانيات متوقعة. نتائج متميزة.",
-    "Every great story begins with the right creative partner, united by one belief. Every brand, every institution and every culture has a story worth telling.": "تبدأ كل قصة عظيمة بالشريك الإبداعي المناسب، يجمعهما إيمان واحد. كل علامة تجارية وكل مؤسسة وكل ثقافة لديها قصة تستحق أن تروى.",
-    "We choose our clients as carefully as they choose us. The strongest work begins with shared ambition, honest collaboration and the confidence to challenge one another when the story demands it.": "نختار عملائنا بعناية كما يختاروننا. تبدأ أقوى الأعمال بالطموح المشترك والتعاون الصادق والثقة في تحدي بعضنا البعض عندما تتطلب القصة ذلك.",
-    "Not your regular vendors waiting for instructions. We arrive as creative partners prepared to question, contribute and take ownership.": "لسنا مجرد موردين عاديين ننتظر التعليمات. نصل كشركاء إبداعيين مستعدين للتساؤل والمساهمة وتولي المسؤولية الكاملة.",
-    "Loading...": "جاري التحميل...",
-    "Failed to load data": "فشل تحميل البيانات",
+    "Where story meets execution. Predictable budgets. Premium results.": "حيث تلتقي القصة بالتنفيذ. ميزانيات منضبطة. نتائج متميزة.",
+    "Every great story begins with the right creative partner, united by one belief. Every brand, every institution and every culture has a story worth telling.": "تبدأ كل قصة عظيمة بالشريك الإبداعي المناسب، وبإيمانٍ مشترك يجمع الطرفين. لكل علامة تجارية، ولكل مؤسسة، ولكل ثقافة قصةٌ تستحق أن تُروى.",
+    "We choose our clients as carefully as they choose us. The strongest work begins with shared ambition, honest collaboration and the confidence to challenge one another when the story demands it.": "نختار عملاءَنا بعناية كما يختاروننا. تبدأ أقوى الأعمال بالطموح المشترك والتعاون الصادق والثقة في أن يتحدى بعضنا بعضًا عندما تتطلب القصة ذلك.",
+    "Not your regular vendors waiting for instructions. We arrive as creative partners prepared to question, contribute and take ownership.": "لسنا مجرد موردين عاديين ننتظر التعليمات. بل نأتي شركاءَ إبداعيين، مستعدين لطرح الأسئلة والمساهمة وتحمّل المسؤولية كاملة.",
+    "Loading...": "جارٍ التحميل…",
+    "Failed to load data": "تعذّر تحميل البيانات",
     "Learn more →": "اقرأ المزيد ←",
     "Film & Video Production": "إنتاج الأفلام والفيديو",
     "Egypt & MENA": "مصر والشرق الأوسط وشمال أفريقيا",
@@ -43,32 +43,32 @@
     "The idea comes first. Everything else follows.": "الفكرة أولاً. وكل شيء آخر يأتي بعدها.",
     "Egypt — MENA — Worldwide": "مصر — الشرق الأوسط وشمال أفريقيا — العالم",
     "Film, advertising, documentary services, content, post-production and marketing across Egypt, UAE and Saudi Arabia. From the region to the world": "خدمات الأفلام والإعلانات والوثائقيات والمحتوى وما بعد الإنتاج والتسويق في مصر والإمارات والسعودية. من المنطقة إلى العالم",
-    "Trusted by": "يثق بنا",
-    "Our journey with the Titans": "رحلتنا مع العمالقة",
+    "Trusted by": "عملاء وثقوا بنا",
+    "Our journey with the Titans": "مسيرتنا مع كبرى العلامات التجارية",
     "clients": "عملاء",
     "repeat business": "تعاون متكرر",
     "The studio": "الاستوديو",
-    "ENTER AT ANY STAGE LEAVE WITH ONE EPIC RESULT": "ابدأ في أي مرحلة واخرج بنتيجة استثنائية واحدة",
-    "Think & Align": "فكّر وحدّد التوجه",
-    "Create": "ابتكر",
-    "Prepare": "جهّز",
-    "Produce": "أنتج",
-    "Finish": "أنجز اللمسات النهائية",
-    "Localize & Amplify": "وطّن المحتوى ووسّع انتشاره",
-    "Grow": "نمِّ",
-    "Scale": "وسّع النطاق",
+    "ENTER AT ANY STAGE LEAVE WITH ONE EPIC RESULT": "ابدأ معنا من أي مرحلة، واخرج بنتيجة استثنائية",
+    "Think & Align": "التفكير وتحديد التوجه",
+    "Create": "الابتكار",
+    "Prepare": "التحضير",
+    "Produce": "الإنتاج",
+    "Finish": "اللمسات النهائية",
+    "Localize & Amplify": "توطين المحتوى وتوسيع انتشاره",
+    "Grow": "النمو",
+    "Scale": "التوسّع",
     "Objectives, audiences, scope, feasibility and success criteria.": "الأهداف والجمهور ونطاق العمل والجدوى ومعايير النجاح.",
-    "Concepts, scripts, treatments, formats and creative direction.": "المفاهيم والسيناريوهات والمعالجات والصيغ والتوجيه الإبداعي.",
-    "Budgets, schedules, crews, casting, locations, permits and technical planning.": "الميزانيات والجداول الزمنية والطواقم واختيار الممثلين والمواقع والتصاريح والتخطيط التقني.",
-    "Film, photography, studio, live and on-ground execution.": "تنفيذ الأفلام والتصوير الفوتوغرافي وأعمال الاستوديو والبث المباشر والعمل الميداني.",
-    "Editing, color, sound, motion, CGI, mastering and versioning.": "المونتاج والألوان والصوت والموشن جرافيك والصور المولّدة بالحاسوب وإعداد النسخة النهائية وإصدار النسخ.",
-    "Multi-language delivery, campaign adaptations, distribution and performance support.": "التسليم متعدد اللغات وتكييف الحملات والتوزيع ودعم الأداء.",
-    "Launch, test, optimize and turn finished content into measurable audience and business momentum.": "أطلق واختبر وحسّن، وحوّل المحتوى النهائي إلى نمو قابل للقياس في تفاعل الجمهور والأعمال.",
-    "Expand winning ideas across platforms, formats, markets and languages without losing creative consistency.": "وسّع الأفكار الناجحة عبر المنصات والصيغ والأسواق واللغات دون فقدان الاتساق الإبداعي.",
+    "Concepts, scripts, treatments, formats and creative direction.": "الأفكار والسيناريوهات والمعالجات والصيغ والإشراف الإبداعي.",
+    "Budgets, schedules, crews, casting, locations, permits and technical planning.": "الميزانيات والجداول الزمنية والطواقم واختيار الممثلين ومواقع التصوير والتصاريح والتخطيط التقني.",
+    "Film, photography, studio, live and on-ground execution.": "الأفلام والتصوير الفوتوغرافي وأعمال الاستوديو والبث المباشر والتنفيذ الميداني.",
+    "Editing, color, sound, motion, CGI, mastering and versioning.": "المونتاج والمعالجة اللونية والصوت والموشن جرافيك والصور المولّدة بالحاسوب وإعداد النسخة النهائية وتجهيز النسخ المتعددة.",
+    "Multi-language delivery, campaign adaptations, distribution and performance support.": "التسليم بلغات متعددة وتكييف الحملات والتوزيع ودعم الأداء.",
+    "Launch, test, optimize and turn finished content into measurable audience and business momentum.": "الإطلاق والاختبار والتحسين، وتحويل المحتوى النهائي إلى نمو قابل للقياس في تفاعل الجمهور وفي الأعمال.",
+    "Expand winning ideas across platforms, formats, markets and languages without losing creative consistency.": "توسيع الأفكار الناجحة عبر المنصات والصيغ والأسواق واللغات دون فقدان الاتساق الإبداعي.",
     "Some stories are greater than time.": "بعض القصص تتجاوز الزمن.",
     "THOUSANDS OF YEARS PASS.": "تمر آلاف السنين.",
     "THE STORY REMAINS.": "وتبقى القصة.",
-    "Production support for documentaries, factual series and international crews filming Egypt’s history, culture and heritage.": "دعم إنتاجي للوثائقيات والسلاسل الواقعية والطواقم الدولية التي تصوّر تاريخ مصر وثقافتها وتراثها.",
+    "Production support for documentaries, factual series and international crews filming Egypt’s history, culture and heritage.": "دعم إنتاجي للأفلام الوثائقية والمسلسلات الوثائقية وطواقم التصوير الدولية التي تصوّر تاريخ مصر وثقافتها وتراثها.",
     "The complete production cycle": "دورة الإنتاج الكاملة",
     "The Complete": "الكاملة",
     "Production Cycle": "دورة الإنتاج",
@@ -92,22 +92,22 @@
     "Back to work": "العودة إلى الأعمال",
     "All projects": "جميع المشاريع",
     "The story ends. The impact lives on.": "تنتهي القصة ويبقى أثرها.",
-    "Selected work created to move beyond the brief across platforms, cultures and audiences.": "أعمال مختارة تتجاوز حدود الموجز عبر المنصات والثقافات والجماهير.",
+    "Selected work created to move beyond the brief across platforms, cultures and audiences.": "أعمال مختارة تتجاوز المطلوب منها، عبر المنصات والثقافات والجماهير.",
     "Commercials, documentaries, corporate films, live events and photography shot in Egypt and across MENA for brands, platforms and institutions that need the full cycle — from the first treatment to the last deliverable.": "إعلانات ووثائقيات وأفلام مؤسسية وفعاليات مباشرة وتصوير فوتوغرافي في مصر والشرق الأوسط وشمال أفريقيا، للعلامات التجارية والمنصات والمؤسسات التي تحتاج دورة الإنتاج الكاملة — من أول معالجة إلى آخر مادة تُسلَّم.",
     "The story is yours": "القصة قصتك",
     "Let's bring it to life": "لنحوّلها إلى واقع",
     "One idea and everything it needs": "فكرة واحدة وكل ما تحتاجه",
     "The right strategy, talent, technology and execution assembled around the needs of every project.": "الاستراتيجية المناسبة والمواهب والتكنولوجيا والتنفيذ، مجتمعة لتلبية احتياجات كل مشروع.",
-    "Under the leadership of CEO Khaled Bendary, our team owns the complete production cycle: strategy and planning, filming, live execution, post-production, delivery and localization. Brands, platforms, broadcasters, institutions and international crews trust us with the stories that matter most to them — and 90% come back for the next one.": "بقيادة الرئيس التنفيذي خالد بنداري، يتولى فريقنا دورة الإنتاج الكاملة: الاستراتيجية والتخطيط والتصوير والتنفيذ المباشر وما بعد الإنتاج والتسليم وتوطين المحتوى. تثق بنا العلامات التجارية والمنصات وجهات البث والمؤسسات والطواقم الدولية في القصص الأهم لديها — ويعود 90% منها للتعاون في القصة التالية.",
-    "Based in Egyptian Media Production City, with offices in Dubai and Jeddah, we run film, advertising, documentary, corporate, live, post and original-IP work to the same standard. Permits, crews, locations and finishing sit in one team, so international productions in Egypt do not have to assemble a vendor chain from scratch.": "نتخذ من مدينة الإنتاج الإعلامي المصرية مقرّاً لنا، ولدينا مكاتب في دبي وجدة، وننفّذ أعمال الأفلام والإعلانات والوثائقيات والمحتوى المؤسسي والبث المباشر وما بعد الإنتاج والملكية الفكرية الأصلية بالمعيار نفسه. يجمع فريق واحد التصاريح والطواقم والمواقع والتشطيبات النهائية، فلا تضطر الإنتاجات الدولية في مصر إلى بناء شبكة مورّدين من الصفر.",
-    "That is why clients return: one point of contact, a budget that holds, and a picture that still looks like the brief when it lands in every language and every cutdown.": "لهذا يعود العملاء: جهة اتصال واحدة، وميزانية يُلتزم بها، وصورة تحافظ على رؤية الموجز عند تسليمها بكل لغة وفي كل نسخة مختصرة.",
+    "Under the leadership of CEO Khaled Bendary, our team owns the complete production cycle: strategy and planning, filming, live execution, post-production, delivery and localization. Brands, platforms, broadcasters, institutions and international crews trust us with the stories that matter most to them — and 90% come back for the next one.": "بقيادة الرئيس التنفيذي خالد البنداري، يتولى فريقنا دورة الإنتاج الكاملة: الاستراتيجية والتخطيط والتصوير والتنفيذ المباشر وما بعد الإنتاج والتسليم وتوطين المحتوى. تثق بنا العلامات التجارية والمنصات وجهات البث والمؤسسات والطواقم الدولية في القصص الأهم لديها — ويعود 90% منها للتعاون في القصة التالية.",
+    "Based in Egyptian Media Production City, with offices in Dubai and Jeddah, we run film, advertising, documentary, corporate, live, post and original-IP work to the same standard. Permits, crews, locations and finishing sit in one team, so international productions in Egypt do not have to assemble a vendor chain from scratch.": "نتخذ من مدينة الإنتاج الإعلامي المصرية مقرّاً لنا، ولدينا مكاتب في دبي وجدة، وننفّذ أعمال الأفلام والإعلانات والوثائقيات والمحتوى المؤسسي والبث المباشر وما بعد الإنتاج والملكية الفكرية الأصلية بالمعيار نفسه. يتولى فريق واحد التصاريح والطواقم والمواقع ومراحل التشطيب النهائي للفيلم، فلا تضطر الإنتاجات الدولية في مصر إلى بناء شبكة مورّدين من الصفر.",
+    "That is why clients return: one point of contact, a budget that holds, and a picture that still looks like the brief when it lands in every language and every cutdown.": "لهذا يعود العملاء: جهة اتصال واحدة، وميزانية يُلتزم بها، وعملٌ نهائي يحافظ على الرؤية المتفق عليها، بكل لغة وفي كل نسخة مختصرة.",
     "Three grounds. One standard.": "ثلاثة مواقع. معيار واحد.",
-    "Led by Khaled Bendary — CEO": "بقيادة خالد بنداري — الرئيس التنفيذي",
-    "Trusted by the titans": "يثق بنا العمالقة",
+    "Led by Khaled Bendary — CEO": "بقيادة خالد البنداري — الرئيس التنفيذي",
+    "Trusted by the titans": "تثق بنا كبرى العلامات والمؤسسات",
     "Team Member": "عضو الفريق",
     "Production": "الإنتاج",
     "Your next story starts here": "قصتك القادمة تبدأ هنا",
-    "Send us your objectives, scope and timeline. We'll return with the right production direction and next steps.": "أرسل لنا أهدافك ونطاق العمل والجدول الزمني. سنعود إليك بالتوجه الإنتاجي المناسب والخطوات التالية.",
+    "Send us your objectives, scope and timeline. We'll return with the right production direction and next steps.": "أرسل لنا أهدافك ونطاق العمل والجدول الزمني. وسنردّ عليك بالتصوّر الإنتاجي المناسب والخطوات التالية.",
     "Your story is on its way": "قصتك في طريقها إلينا",
     "We'll get back to you within one business day. If you need immediate assistance, write to us directly at": "سنرد عليك خلال يوم عمل واحد. إذا كنت بحاجة إلى مساعدة فورية، راسلنا مباشرة على",
     "Failed to submit form. Please try again, or use the button below to email us directly.": "تعذّر إرسال النموذج. حاول مرة أخرى، أو استخدم الزر أدناه لمراسلتنا مباشرة بالبريد الإلكتروني.",
@@ -117,7 +117,7 @@
     "Category": "الفئة",
     "Metric": "المؤشر",
     "Duration": "المدة",
-    "The brief & the build": "الموجز والتنفيذ",
+    "The brief & the build": "الفكرة والتنفيذ",
     "Related productions": "إنتاجات ذات صلة",
     "Next project": "المشروع التالي",
     "Service not found": "الخدمة غير موجودة",
@@ -163,14 +163,14 @@
     "Chat with Nouran": "تحدث مع نوران",
     "Type your message…": "اكتب رسالتك…",
     "Send": "إرسال",
-    "Nouran greeting": "أهلاً! أنا نوران، مساعدتك في The Untold Story. قولي عايز إيه وهساعدك فيه.",
-    "Nouran is typing…": "نوران بتكتب…",
+    "Nouran greeting": "أهلاً! أنا نوران، مساعدتك في The Untold Story. أخبرني بما تحتاج وسأساعدك.",
+    "Nouran is typing…": "نوران تكتب…",
     "Play the film": "تشغيل الفيلم",
     "Year": "السنة",
     "Location": "الموقع",
-    "Crew size": "حجم الطاقم",
+    "Crew size": "عدد أفراد الطاقم",
     "Our role": "دورنا",
-    "Produced by": "إنتاج",
+    "Produced by": "من إنتاج",
     "International Labour Organization (ILO)": "منظمة العمل الدولية (ILO)",
     "Upper Egypt": "صعيد مصر",
     "East Ras Qattara, Egypt": "شرق رأس قطارة، مصر",
@@ -185,7 +185,18 @@
     "Multi-camera concert filming": "تصوير الحفل بعدة كاميرات",
     "Event production and coverage": "إنتاج الفعالية وتغطيتها",
     "United Arab Emirates": "الإمارات العربية المتحدة",
-    "Event coverage": "تغطية الفعالية"
+    "Event coverage": "تغطية الفعالية",
+    "MENA": "الشرق الأوسط وشمال أفريقيا",
+    "Global": "عالميًا",
+    "3+ Offices": "+3 مكاتب",
+    "In-house": "من إنتاجنا الخاص",
+    "تواصل معنا للمشروع القادم": "تواصل معنا بشأن مشروعك القادم",
+    "Cairo": "القاهرة",
+    "Dubai": "دبي",
+    "Jeddah": "جدة",
+    "Egyptian Media Production City": "مدينة الإنتاج الإعلامي المصرية",
+    "Business Bay, Dubai, UAE": "الخليج التجاري، دبي، الإمارات",
+    "Content": "محتوى"
   },
   "de": {
     "Home": "Startseite",
@@ -373,7 +384,8 @@
     "Multi-camera concert filming": "Konzertaufzeichnung mit mehreren Kameras",
     "Event production and coverage": "Eventproduktion und Begleitung",
     "United Arab Emirates": "Vereinigte Arabische Emirate",
-    "Event coverage": "Eventdokumentation"
+    "Event coverage": "Eventdokumentation",
+    "Content": "Inhalt"
   },
   "es": {
     "Home": "Inicio",
@@ -561,7 +573,8 @@
     "Multi-camera concert filming": "Grabación del concierto con varias cámaras",
     "Event production and coverage": "Producción y cobertura del evento",
     "United Arab Emirates": "Emiratos Árabes Unidos",
-    "Event coverage": "Cobertura del evento"
+    "Event coverage": "Cobertura del evento",
+    "Content": "Contenido"
   },
   "fr": {
     "Home": "Accueil",
@@ -749,7 +762,8 @@
     "Multi-camera concert filming": "Captation multicaméra du concert",
     "Event production and coverage": "Production et couverture de l'événement",
     "United Arab Emirates": "Émirats arabes unis",
-    "Event coverage": "Couverture de l'événement"
+    "Event coverage": "Couverture de l'événement",
+    "Content": "Contenu"
   },
   "it": {
     "Home": "Home",
@@ -937,7 +951,8 @@
     "Multi-camera concert filming": "Riprese multicamera del concerto",
     "Event production and coverage": "Produzione e copertura dell'evento",
     "United Arab Emirates": "Emirati Arabi Uniti",
-    "Event coverage": "Copertura dell'evento"
+    "Event coverage": "Copertura dell'evento",
+    "Content": "Contenuti"
   },
   "pt": {
     "Home": "Início",
@@ -1125,7 +1140,8 @@
     "Multi-camera concert filming": "Gravação do show com várias câmeras",
     "Event production and coverage": "Produção e cobertura do evento",
     "United Arab Emirates": "Emirados Árabes Unidos",
-    "Event coverage": "Cobertura do evento"
+    "Event coverage": "Cobertura do evento",
+    "Content": "Conteúdo"
   },
   "tr": {
     "Home": "Ana Sayfa",
@@ -1313,7 +1329,8 @@
     "Multi-camera concert filming": "Çok kameralı konser çekimi",
     "Event production and coverage": "Etkinlik prodüksiyonu ve çekimi",
     "United Arab Emirates": "Birleşik Arap Emirlikleri",
-    "Event coverage": "Etkinlik çekimi"
+    "Event coverage": "Etkinlik çekimi",
+    "Content": "İçerik"
   },
   "ru": {
     "Home": "Главная",
@@ -1501,7 +1518,8 @@
     "Multi-camera concert filming": "Многокамерная съёмка концерта",
     "Event production and coverage": "Организация и съёмка мероприятия",
     "United Arab Emirates": "Объединённые Арабские Эмираты",
-    "Event coverage": "Съёмка мероприятия"
+    "Event coverage": "Съёмка мероприятия",
+    "Content": "Материалы"
   },
   "zh": {
     "Home": "首页",
@@ -1689,7 +1707,8 @@
     "Multi-camera concert filming": "多机位演唱会拍摄",
     "Event production and coverage": "活动制作与拍摄",
     "United Arab Emirates": "阿拉伯联合酋长国",
-    "Event coverage": "活动拍摄"
+    "Event coverage": "活动拍摄",
+    "Content": "内容"
   },
   "en": {
     "Home": "Home",
@@ -1912,7 +1931,8 @@
     "Multi-camera concert filming": "マルチカメラでのコンサート撮影",
     "Event production and coverage": "イベントの制作と撮影",
     "United Arab Emirates": "アラブ首長国連邦",
-    "Event coverage": "イベント撮影"
+    "Event coverage": "イベント撮影",
+    "Content": "コンテンツ"
   },
   "ko": {
     "Home": "홈",
@@ -2100,7 +2120,8 @@
     "Multi-camera concert filming": "멀티카메라 콘서트 촬영",
     "Event production and coverage": "행사 제작 및 촬영",
     "United Arab Emirates": "아랍에미리트",
-    "Event coverage": "행사 촬영"
+    "Event coverage": "행사 촬영",
+    "Content": "콘텐츠"
   },
   "pl": {
     "Home": "Start",
@@ -2288,7 +2309,8 @@
     "Multi-camera concert filming": "Wielokamerowa rejestracja koncertu",
     "Event production and coverage": "Produkcja i relacja z wydarzenia",
     "United Arab Emirates": "Zjednoczone Emiraty Arabskie",
-    "Event coverage": "Relacja z wydarzenia"
+    "Event coverage": "Relacja z wydarzenia",
+    "Content": "Treści"
   },
   "sw": {
     "Home": "Nyumbani",
@@ -2476,6 +2498,7 @@
     "Multi-camera concert filming": "Upigaji wa tamasha kwa kamera nyingi",
     "Event production and coverage": "Uzalishaji na upigaji picha wa tukio",
     "United Arab Emirates": "Falme za Kiarabu",
-    "Event coverage": "Upigaji picha wa tukio"
+    "Event coverage": "Upigaji picha wa tukio",
+    "Content": "Maudhui"
   }
 }

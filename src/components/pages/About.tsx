@@ -18,7 +18,7 @@ import { getAboutData } from '@/lib/page-data';
 // polished in every language; any members returned by the API are merged in.
 const FALLBACK_TEAM_BY_LOCALE: Record<string, TeamMember[]> = {
   en: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Founder of The Untold Story, working across film, advertising, documentary and live production in Egypt, the Gulf and beyond.' }],
-  ar: [{ name: 'خالد بنداري', role: 'الرئيس التنفيذي', slug: 'khaled-bendary', bio: 'مؤسس The Untold Story، ويعمل في الأفلام والإعلانات والأفلام الوثائقية والإنتاج المباشر في مصر والخليج وخارجهما.' }],
+  ar: [{ name: 'خالد البنداري', role: 'الرئيس التنفيذي', slug: 'khaled-bendary', bio: 'مؤسس The Untold Story، ويعمل في الأفلام والإعلانات والأفلام الوثائقية والإنتاج المباشر في مصر والخليج وخارجهما.' }],
   de: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Gründer von The Untold Story und tätig in Film, Werbung, Dokumentarfilm und Live-Produktion in Ägypten, der Golfregion und darüber hinaus.' }],
   es: [{ name: 'Khaled Bendary', role: 'CEO', slug: 'khaled-bendary', bio: 'Fundador de The Untold Story, trabaja en cine, publicidad, documentales y producción en directo en Egipto, el Golfo y otros mercados.' }],
   fr: [{ name: 'Khaled Bendary', role: 'PDG', slug: 'khaled-bendary', bio: 'Fondateur de The Untold Story, il travaille dans le cinéma, la publicité, le documentaire et la production en direct en Égypte, dans le Golfe et au-delà.' }],
@@ -220,8 +220,8 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
               <div className="p-8 md:p-10 min-h-[260px] flex flex-col">
                 <span className="font-display font-black text-6xl text-outline leading-none">{String(i + 1).padStart(2, '0')}</span>
                 <div className="mt-auto">
-                  <h3 className="font-display font-extrabold uppercase text-2xl mb-2">{city}</h3>
-                  <p className="text-white/50 text-sm mb-1">{address}</p>
+                  <h3 className="font-display font-extrabold uppercase text-2xl mb-2">{t(city)}</h3>
+                  <p className="text-white/50 text-sm mb-1">{t(address)}</p>
                 </div>
               </div>
             </Reveal>

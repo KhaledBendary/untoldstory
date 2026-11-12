@@ -120,7 +120,7 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
 
       {/* Hero */}
       <section className="relative h-[78svh] overflow-hidden">
-        <Image src={getProjectImage(project)} alt={`${project.title} — ${project.category || ''} for ${project.client || ''}`} fill priority sizes="100vw" className="object-cover" />
+        <Image src={getProjectImage(project)} alt={project.title} fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/20 to-[#0a0a0a]/65" />
         <div className="absolute bottom-0 left-0 right-0 px-5 md:px-10 pb-10 md:pb-14">
           <Reveal>

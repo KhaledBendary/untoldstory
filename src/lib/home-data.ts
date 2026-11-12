@@ -1,6 +1,6 @@
 import { api } from "@/lib/api";
 import type { BlogPost, PortfolioItem, Service } from "@/types/api";
-import { mappedFallbackPosts, mappedFallbackProjects, mappedFallbackServices } from "@/lib/page-data";
+import { getInsightsData, mappedFallbackPosts, mappedFallbackProjects, mappedFallbackServices } from "@/lib/page-data";
 
 /**
  * Home page payload, assembled from four endpoints.
@@ -153,12 +153,35 @@ export function fallbackHomeData(locale?: string): HomeData {
   };
 }
 
+/*
+ * The homepage's three article cards when the home record names none.
+ *
+ * They used to come straight from the built-in fallback list, which is English
+ * only — so the Arabic homepage showed three English titles linking to English
+ * slugs under /ar. The same three articles are now taken from the CMS list for
+ * the page's language (its own titles and slugs), with the built-in copy kept
+ * only for an article the CMS doesn't have in that language.
+ */
+async function homePostsFromInsights(locale?: string): Promise<BlogPost[]> {
+  const builtIn = mappedFallbackPosts(locale);
+  try {
+    const all = await getInsightsData(locale);
+    const key = (p: BlogPost) => p.canonicalSlug || p.slug;
+    const picked = builtIn
+      .map((fb) => all.find((p) => key(p) === fb.slug || p.slug === fb.slug) || fb)
+      .slice(0, 3);
+    return picked.length ? picked : all.slice(0, 3);
+  } catch {
+    return builtIn;
+  }
+}
+
 export async function getHomeDataSafe(locale?: string): Promise<HomeData> {
   try {
     const data = await getHomeData(locale);
     if (!data.services.length) data.services = mappedFallbackServices().map(toHomeService);
     if (!data.projects.length) data.projects = mappedFallbackProjects().map(toHomeProject);
-    if (!data.posts.length) data.posts = mappedFallbackPosts(locale).map(toHomePost);
+    if (!data.posts.length) data.posts = (await homePostsFromInsights(locale)).map(toHomePost);
     return data;
   } catch (e) {
     console.error("Failed to fetch home data on the server:", e);

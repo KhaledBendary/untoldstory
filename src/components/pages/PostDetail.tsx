@@ -87,7 +87,7 @@ export default function PostDetail({ slug, initialData, initialLocale }: { slug:
           </Reveal>
           <Reveal>
             <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 mb-5">
-              {post.category}{formatPostDate(post, locale) ? ` — ${formatPostDate(post, locale)}` : ''}
+              {t('Content')}{formatPostDate(post, locale) ? ` — ${formatPostDate(post, locale)}` : ''}
             </p>
           </Reveal>
           <SplitWords

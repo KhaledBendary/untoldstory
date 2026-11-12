@@ -593,7 +593,7 @@ function InsightsTeaser({ posts }: { posts: HomePost[] }) {
                 />
               </div>
               <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 mb-3">
-                {p.category}{formatPostDate(p, locale) ? ` — ${formatPostDate(p, locale)}` : ''}
+                {t('Content')}{formatPostDate(p, locale) ? ` — ${formatPostDate(p, locale)}` : ''}
               </p>
               <h3 className="font-display font-bold text-xl md:text-2xl leading-snug group-hover:opacity-70 transition-opacity">{p.title}</h3>
             </Link>
@@ -622,7 +622,7 @@ function Awards({ awards }: { awards: Array<{ icon: string; color: string; title
               {/* <span className="text-3xl md:text-4xl">{a.icon}</span> */}
               <h3 className="font-display font-bold uppercase text-xl md:text-2xl mt-4">{a.title}</h3>
               <p className="text-white/50 text-sm mt-2">{a.organization}</p>
-              <span className="inline-block mt-3 font-mono2 text-[10px] tracking-[0.2em] uppercase text-white/55 border border-white/15 px-3 py-1">{a.yearLabel}</span>
+              <span className="inline-block mt-3 font-mono2 text-[10px] tracking-[0.2em] uppercase text-white/55 border border-white/15 px-3 py-1">{t(a.yearLabel)}</span>
             </div>
           </Reveal>
         ))}

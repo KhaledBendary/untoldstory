@@ -55,7 +55,7 @@ export default function Insights({ initialData, initialLocale }: { initialData: 
               </div>
               <div className="p-8 md:p-12 flex flex-col justify-center">
                 <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 mb-4">
-                  {t('Featured')} — {featured.category}
+                  {t('Featured')} — {t('Content')}
                 </p>
                 <h2 className="font-display font-extrabold text-2xl md:text-4xl leading-tight mb-4 group-hover:opacity-70 transition-opacity">
                   {featured.title}
@@ -78,7 +78,7 @@ export default function Insights({ initialData, initialLocale }: { initialData: 
                 </div>
                 <div className="p-6">
                   <p className="font-mono2 text-[10px] tracking-[0.25em] uppercase text-white/55 mb-3">
-                    {p.category}{formatPostDate(p, locale) ? ` — ${formatPostDate(p, locale)}` : ''}
+                    {t('Content')}{formatPostDate(p, locale) ? ` — ${formatPostDate(p, locale)}` : ''}
                   </p>
                   <h2 className="font-display font-bold text-lg leading-snug group-hover:opacity-70 transition-opacity">{p.title}</h2>
                 </div>
