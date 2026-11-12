@@ -32,6 +32,18 @@ export const SEO_I18N: I18nField[] = [
   { key: "seo.nofollow", label: "منع تتبّع الروابط (nofollow)", type: "text", noTranslate: true },
 ];
 
+/**
+ * How many question/answer pairs a service can hold. The longest FAQ on the
+ * site has 17; the rest is room to grow. Stored as flat faqN_q / faqN_a text
+ * fields so they use the normal editor and the translation pipeline.
+ */
+export const FAQ_SLOTS = 20;
+
+const FAQ_FIELDS: I18nField[] = Array.from({ length: FAQ_SLOTS }, (_, n): I18nField[] => [
+  { key: `faq${n + 1}_q`, label: `سؤال شائع ${n + 1}`, type: "text" },
+  { key: `faq${n + 1}_a`, label: `إجابة السؤال ${n + 1}`, type: "textarea" },
+]).flat();
+
 export type ContentType = {
   key: string;          // url + api segment
   table: "services" | "projects" | "posts";
@@ -64,20 +76,11 @@ export const CONTENT_TYPES: Record<string, ContentType> = {
       { key: "tagline", label: "السطر تحت العنوان", type: "text" },
       { key: "shortDesc", label: "الوصف المختصر", type: "textarea" },
       { key: "fullDesc", label: "الوصف الكامل", type: "html" },
-      // Optional, up to 5 pairs — empty ones are simply not shown on the
-      // page. Fills in for src/data/service-faqs.ts's hardcoded English-only
-      // FAQs, which had no way to translate since they lived in source code,
-      // not the database (see ServiceDetail.tsx / services/[slug]/page.tsx).
-      { key: "faq1_q", label: "سؤال شائع 1", type: "text" },
-      { key: "faq1_a", label: "إجابة السؤال 1", type: "textarea" },
-      { key: "faq2_q", label: "سؤال شائع 2", type: "text" },
-      { key: "faq2_a", label: "إجابة السؤال 2", type: "textarea" },
-      { key: "faq3_q", label: "سؤال شائع 3", type: "text" },
-      { key: "faq3_a", label: "إجابة السؤال 3", type: "textarea" },
-      { key: "faq4_q", label: "سؤال شائع 4", type: "text" },
-      { key: "faq4_a", label: "إجابة السؤال 4", type: "textarea" },
-      { key: "faq5_q", label: "سؤال شائع 5", type: "text" },
-      { key: "faq5_a", label: "إجابة السؤال 5", type: "textarea" },
+      // The service's frequently asked questions: up to FAQ_SLOTS pairs, shown
+      // in the page's FAQ section and, word for word, in its FAQPage schema.
+      // Empty pairs are simply not shown. Each language holds its own text; a
+      // language without a pair shows nothing for it, never the English.
+      ...FAQ_FIELDS,
       ...SEO_I18N,
     ],
   },

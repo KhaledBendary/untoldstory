@@ -15,7 +15,7 @@ import { fitTitleStyle } from '@/lib/title-fit';
 import { serviceTagline } from '@/data/service-taglines';
 import { usePageData } from '@/hooks/usePageData';
 import { getServiceDetailData, type ServiceDetailData, type DetailResult } from '@/lib/page-data';
-import { getServiceFaqs } from '@/data/service-faqs';
+import { faqAnswerParagraphs, getServiceFaqs } from '@/data/service-faqs';
 
 /**
  * The body without its opening paragraph when that paragraph only repeats the
@@ -90,7 +90,7 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
   // otherwise the site's own copy (src/data/service-taglines.ts).
   const tagline = service.tagline || serviceTagline(service.canonicalSlug ?? service.slug, locale);
   const features = service.features || [];
-  const faqs = getServiceFaqs(slug, service?.faqs, locale);
+  const faqs = getServiceFaqs(service?.faqs);
 
   return (
     <>
@@ -174,23 +174,25 @@ export default function ServiceDetail({ slug, initialData, initialLocale }: { sl
         </div>
       </section>
 
+      {/* FAQ: the page's own questions, and the only place they appear — the
+          FAQPage schema in services/[slug]/page.tsx is built from this list. */}
       {faqs.length > 0 && (
-      <section className="px-5 md:px-10 py-14 md:py-20 border-t border-white/10">
+      <section id="faq" aria-labelledby="faq-heading" className="px-5 md:px-10 py-14 md:py-20 border-t border-white/10">
         <div className="read-col">
           <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-6">( {t('Questions')} )</p>
-          <h2 className="font-display heading-ar-spacious font-extrabold uppercase tracking-tight text-2xl md:text-3xl mb-10">
+          <h2 id="faq-heading" className="font-display heading-ar-spacious font-extrabold uppercase tracking-tight text-2xl md:text-3xl mb-10">
             {t('Frequently asked questions')}
           </h2>
-          <dl className="space-y-8">
-            {faqs.map((item) => (
-              <div key={item.question}>
-                <dt>
-                  <h3 className="font-display font-bold text-lg md:text-xl leading-snug">{item.question}</h3>
-                </dt>
-                <dd className="mt-3 text-white/70 leading-[1.8] text-base md:text-[1.0625rem]">{item.answer}</dd>
+          <div className="space-y-8">
+            {faqs.map((item, i) => (
+              <div key={i}>
+                <h3 className="font-display font-bold text-lg md:text-xl leading-snug">{item.question}</h3>
+                <div className="mt-3 space-y-3 text-white/70 leading-[1.8] text-base md:text-[1.0625rem]">
+                  {faqAnswerParagraphs(item.answer).map((p, j) => <p key={j}>{p}</p>)}
+                </div>
               </div>
             ))}
-          </dl>
+          </div>
         </div>
       </section>
       )}

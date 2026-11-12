@@ -9,7 +9,7 @@ import { isLocale, localizedPath, PRERENDER_LOCALES, DEFAULT_LOCALE, decodeSlug 
 import { IS_PRODUCTION_BUILD, findServiceAnyLocale, serviceDetailWithFallback } from "@/lib/page-data";
 import { SERVICES as FALLBACK_SERVICES } from "@/data/content";
 import { relatedServiceSlugs, serviceStaticParams, withoutForwardedSlugs } from "@/lib/legacy-redirects";
-import { getServiceFaqs } from "@/data/service-faqs";
+import { faqPageSchema, getServiceFaqs } from "@/data/service-faqs";
 import { absoluteUrl, breadcrumbSchema, buildDescription, buildTitle, cleanHeadline, cmsSeo, pageSeo, withNoindex } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
@@ -149,16 +149,10 @@ export default async function Page({ params }: Props) {
 
   if (initialData?.status === "notFound") notFound();
 
-  const faqs = getServiceFaqs(slug, initialData?.status === "ok" ? initialData.data.service.faqs : undefined, locale);
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: { "@type": "Answer", text: item.answer },
-    })),
-  };
+  // The same list ServiceDetail renders, so the schema can only describe
+  // questions a visitor can read on the page.
+  const faqs = getServiceFaqs(initialData?.status === "ok" ? initialData.data.service.faqs : undefined);
+  const faqSchema = faqPageSchema(faqs, absoluteUrl(localizedPath(`/services/${slug}`, locale)), locale);
 
   const crumbs = breadcrumbSchema([
     { name: "Services", path: localizedPath("/services", locale) },

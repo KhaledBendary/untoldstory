@@ -1,5 +1,6 @@
 import "server-only";
 import { isSlugSafe } from "@/lib/i18n";
+import { FAQ_SLOTS } from "@/lib/admin/content-types";
 import type { ServiceRow, ProjectRow, PostRow, Singleton } from "@/lib/db/repo";
 
 /**
@@ -36,16 +37,20 @@ const pickArr = (d: Record<string, unknown> | undefined, loc: string): unknown[]
   return Array.isArray(v) ? v : [];
 };
 
-// Up to 5 optional Q&A pairs, stored as flat faq1_q/faq1_a..faq5_q/faq5_a
-// fields (plain i18n text fields, so they get the normal admin editor and
-// machine-translation pipeline for free) rather than a real array type,
-// which the content-type/editor system has no support for. Empty pairs are
-// dropped, so a service with fewer than 5 just shows fewer.
+// The service's FAQ pairs, stored as flat faq1_q/faq1_a … fields (plain i18n
+// text fields, so they get the normal admin editor and machine-translation
+// pipeline for free). Empty pairs are dropped.
+//
+// Each language reads only its own text — unlike the other fields, a missing
+// language does not fall back to English. The same list feeds both the
+// visible FAQ section and the FAQPage schema, so an English question under a
+// translated page would be wrong twice.
 function pickFaqs(d: Record<string, Dict>, loc: string): { question: string; answer: string }[] {
+  const own = (dict: Dict) => (dict?.[loc] ?? "").trim();
   const out: { question: string; answer: string }[] = [];
-  for (let i = 1; i <= 5; i++) {
-    const question = pick(d[`faq${i}_q`], loc).trim();
-    const answer = pick(d[`faq${i}_a`], loc).trim();
+  for (let i = 1; i <= FAQ_SLOTS; i++) {
+    const question = own(d[`faq${i}_q`]);
+    const answer = own(d[`faq${i}_a`]);
     if (question && answer) out.push({ question, answer });
   }
   return out;
