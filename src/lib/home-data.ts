@@ -68,17 +68,19 @@ function valueOf<T>(result: PromiseSettledResult<T>): T | undefined {
 }
 
 export async function getHomeData(locale?: string): Promise<HomeData> {
-  const [homeResult, servicesResult, layoutResult, portfolioResult] = await Promise.allSettled([
+  const [homeResult, servicesResult, layoutResult, portfolioResult, postsResult] = await Promise.allSettled([
     api.getHome(locale),
     api.getServices(locale),
     api.getLayout(locale),
     api.getPortfolio({ per_page: 100, locale }),
+    api.getBlogPosts({ page: 1, per_page: 100, locale }),
   ]);
 
   const homeData = valueOf(homeResult);
   const servicesData = valueOf(servicesResult);
   const layoutData = valueOf(layoutResult);
   const portfolioData = valueOf(portfolioResult);
+  const livePosts = valueOf(postsResult)?.items ?? [];
 
   if (!homeData && !servicesData && !layoutData && !portfolioData) {
     throw new Error("All homepage API endpoints failed");
@@ -103,7 +105,7 @@ export async function getHomeData(locale?: string): Promise<HomeData> {
   return {
     services: (servicesData || []).map(toHomeService),
     projects: (portfolioData?.items || []).map(toHomeProject),
-    posts: (home.blog_preview || []).map(toHomePost),
+    posts: currentPosts(home.blog_preview || [], livePosts).map(toHomePost),
     stats,
     clients: layoutData?.client_logos || [],
     hero: home.hero || null,
@@ -111,6 +113,26 @@ export async function getHomeData(locale?: string): Promise<HomeData> {
     process: home.process || null,
     awards: home.awards || [],
   };
+}
+
+/*
+ * The home page's `blog_preview` is a copy of three post cards, saved into the
+ * home document when the content was migrated, and nothing refreshes it. The
+ * Insights strip therefore kept each post's old cover, showed a subheading
+ * ("Why This Process Matters") as one post's title, and on every other
+ * language showed the English title and linked to the English slug.
+ *
+ * Keep the choice of posts and their order, but show each one as it is now:
+ * title, cover, category and link in the page's language. A card whose post
+ * can't be found stays as stored.
+ */
+function currentPosts(preview: BlogPost[], live: BlogPost[]): BlogPost[] {
+  if (!live.length) return preview;
+  const matches = (stored: BlogPost) => (post: BlogPost) =>
+    post.slug === stored.slug
+    || post.canonicalSlug === stored.slug
+    || Object.values(post.slugs ?? {}).includes(stored.slug);
+  return preview.map((stored) => live.find(matches(stored)) ?? stored);
 }
 
 /* Keep only the fields the homepage cards actually read. */
