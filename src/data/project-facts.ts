@@ -90,12 +90,6 @@ const PROJECT_FACTS: Record<string, ProjectFacts> = {
     crew: 11,
     role: "Full production",
   },
-  "engazat-agricultural-irrigation-production-in-egypt": {
-    year: "2025",
-    location: "Dakhla Oasis and Cairo, Egypt",
-    crew: 11,
-    role: "Filming",
-  },
   "ezz-elarab-star-automotive-brand-film": {
     year: "2022",
     location: "Sheikh Zayed and 6th of October, Egypt",

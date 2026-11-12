@@ -38,7 +38,6 @@ const ROUTES = [
   "/services/original-ip-development",
   "/work/apache-corporate-industrial-production-in-egypt",
   "/work/apache-oil-gas-production-in-egypt",
-  "/work/engazat-agricultural-irrigation-production-in-egypt",
   "/work/adnoc-gas-corporate-event-workshop-production",
   "/work/alliance-corporate-event-production",
   "/work/enap-industrial-desert-production-in-egypt",

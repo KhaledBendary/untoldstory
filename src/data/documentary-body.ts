@@ -179,7 +179,7 @@ const FR: readonly string[] = [
   "Une production documentaire de plusieurs jours couvrant la préparation du terrain pour un forage d'exploration, les procédures de santé et de sécurité, des entretiens avec la direction au Caire, des prises de vue aériennes et du time-lapse.",
   "Film documentaire OIT et Haute-Égypte",
   "Une production documentaire consacrée aux milieux agricoles et aux communautés de Haute-Égypte.",
-  "Documentaire engazaat sur l'agriculture intelligente à Dakhla",
+  "Documentaire Engazaat sur l'agriculture intelligente à Dakhla",
   "Un documentaire qui suit les technologies intelligentes de l'eau, le savoir agricole et les partenariats locaux dans l'oasis de Dakhla, entre activité de terrain, infrastructures, entretiens et grand paysage désertique.",
 
   "Tourner un documentaire en Égypte avec une équipe internationale",
@@ -273,7 +273,7 @@ const DE: readonly string[] = [
   "Eine mehrtägige Dokumentarproduktion über die Feldvorbereitung einer Explorationsbohrung, Arbeits- und Sicherheitsabläufe, Interviews mit der Führungsebene in Kairo, Luftaufnahmen und Zeitraffer.",
   "ILO und Oberägypten: dokumentarische Filmproduktion",
   "Eine Dokumentarproduktion über landwirtschaftliche Räume und Gemeinschaften in Oberägypten.",
-  "engazaat Dakhla: Dokumentation über intelligente Landwirtschaft",
+  "Engazaat Dakhla: Dokumentation über intelligente Landwirtschaft",
   "Ein Dokumentarfilm über intelligente Wassertechnik, landwirtschaftliches Wissen und lokale Partnerschaften in der Oase Dakhla — zwischen Feldarbeit, Infrastruktur, Interviews und weiter Wüstenlandschaft.",
 
   "Dokumentarisch drehen in Ägypten mit internationalen Teams",
@@ -367,7 +367,7 @@ const ES: readonly string[] = [
   "Una producción documental de varios días sobre la preparación del terreno para una perforación exploratoria, los procedimientos de seguridad y salud, entrevistas con la dirección en El Cairo, tomas aéreas y time-lapse.",
   "Producción documental de la OIT en el Alto Egipto",
   "Una producción documental centrada en los entornos agrícolas y las comunidades del Alto Egipto.",
-  "Documental engazaat sobre agricultura inteligente en Dakhla",
+  "Documental Engazaat sobre agricultura inteligente en Dakhla",
   "Un documental que sigue la tecnología inteligente del agua, el conocimiento agrícola y las alianzas locales en el oasis de Dakhla, combinando actividad de campo, infraestructuras, entrevistas y el paisaje desértico más amplio.",
 
   "Rodar documental en Egipto con equipos internacionales",
@@ -461,7 +461,7 @@ const IT: readonly string[] = [
   "Una produzione documentaria di più giorni sulla preparazione del campo per una perforazione esplorativa, le procedure di salute e sicurezza, le interviste alla dirigenza al Cairo, le riprese aeree e il time-lapse.",
   "Produzione documentaria OIL e Alto Egitto",
   "Una produzione documentaria dedicata agli ambienti agricoli e alle comunità dell'Alto Egitto.",
-  "Documentario engazaat sull'agricoltura intelligente a Dakhla",
+  "Documentario Engazaat sull'agricoltura intelligente a Dakhla",
   "Un documentario che segue la tecnologia idrica intelligente, il sapere agricolo e le collaborazioni locali nell'oasi di Dakhla, tra attività sul campo, infrastrutture, interviste e il più ampio paesaggio desertico.",
 
   "Girare un documentario in Egitto con troupe internazionali",
@@ -555,7 +555,7 @@ const PT: readonly string[] = [
   "Uma produção documental de vários dias sobre a preparação do terreno para uma perfuração exploratória, os procedimentos de saúde e segurança, entrevistas com a direção no Cairo, filmagem aérea e time-lapse.",
   "Produção documental da OIT no Alto Egito",
   "Uma produção documental centrada nos ambientes agrícolas e nas comunidades do Alto Egito.",
-  "Documentário engazaat sobre agricultura inteligente em Dakhla",
+  "Documentário Engazaat sobre agricultura inteligente em Dakhla",
   "Um documentário que segue a tecnologia inteligente da água, o conhecimento agrícola e as parcerias locais no oásis de Dakhla, combinando atividade de terreno, infraestruturas, entrevistas e a paisagem desértica mais ampla.",
 
   "Filmar documentário no Egito com equipas internacionais",
@@ -649,7 +649,7 @@ const RU: readonly string[] = [
   "Многодневное документальное производство о подготовке площадки к разведочному бурению, процедурах охраны труда и безопасности, интервью с руководством в Каире, аэросъёмке и таймлапсе.",
   "Документальное производство МОТ в Верхнем Египте",
   "Документальное производство, посвящённое сельскохозяйственной среде и сообществам Верхнего Египта.",
-  "Документальный фильм engazaat об умном земледелии в Дахле",
+  "Документальный фильм Engazaat об умном земледелии в Дахле",
   "Документальный фильм об умных водных технологиях, аграрных знаниях и местных партнёрствах в оазисе Дахла, объединяющий полевую работу, инфраструктуру, интервью и широкий пустынный ландшафт.",
 
   "Документальные съёмки в Египте для международных команд",
@@ -743,7 +743,7 @@ const TR: readonly string[] = [
   "Arama sondajı için saha hazırlığını, iş sağlığı ve güvenliği prosedürlerini, Kahire'deki yönetim röportajlarını, hava çekimlerini ve time-lapse'i kapsayan çok günlü bir belgesel yapımı.",
   "ILO ve Yukarı Mısır belgesel film yapımı",
   "Yukarı Mısır'daki tarımsal ortamlara ve topluluklara odaklanan bir belgesel yapımı.",
-  "engazaat Dakhla akıllı tarım belgeseli",
+  "Engazaat Dakhla akıllı tarım belgeseli",
   "Dakhla Vahası'nda akıllı su teknolojisini, tarımsal bilgiyi ve yerel ortaklıkları izleyen; saha faaliyetini, altyapıyı, röportajları ve geniş çöl manzarasını bir araya getiren bir belgesel.",
 
   "Uluslararası ekiplerle Mısır'da belgesel çekimi",

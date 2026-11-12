@@ -105,15 +105,6 @@
     "/ru/work/добыча-нефти-и-газа-apache-в-египте": "/ru/work/производство-нефти-и-газа-apache-в-египте",
     "/tr/work/mısırda-apache-petrol-ve-gaz-üretimi": "/tr/work/mısır-da-apache-petrol-ve-gaz-üretimi",
     "/zh/work/埃及的阿帕奇石油和天然气生产": "/zh/work/apache埃及石油与天然气制作",
-    "/ar/work/antaj-alry-alzraay-fy-msr-mn-khlal-shrka-msharya": "/ar/work/إنتاج-إنجازات-للري-الزراعي-في-مصر",
-    "/es/work/producción-de-irrigación-agrícola-engazat-en-egipto": "/es/work/producción-de-riego-agrícola-de-engazat-en-egipto",
-    "/fr/work/production-dirrigation-agricole-engazat-en-égypte": "/fr/work/production-d-irrigation-agricole-engazat-en-égypte",
-    "/ja/work/エンガザットの農業灌漑生産-エジプト": "/ja/work/engazatエジプト農業灌漑映像制作",
-    "/ko/work/이집트의-engazat-농업-관개-생산": "/ko/work/engazat-이집트-농업-관개-영상-제작",
-    "/pt/work/produção-de-irrigação-agrícola-engazat-no-egito": "/pt/work/produção-de-irrigação-agrícola-da-engazat-no-egito",
-    "/ru/work/производство-сельскохозяйственного-орошения-engazat-в-египте": "/ru/work/производство-сельскохозяйственного-орошен",
-    "/tr/work/mısırda-engazat-tarımsal-sulama-üretimi": "/tr/work/mısır-da-engazat-tarımsal-sulama-üretimi",
-    "/zh/work/埃及engazat农业灌溉生产": "/zh/work/engazat埃及农业灌溉项目制作",
     "/ar/work/antaj-faalyat-wwrsh-aml-shrka-adnwk-llghaz": "/ar/work/إنتاج-فعاليات-وورش-عمل-أدنوك-للغاز",
     "/de/work/adnoc-gas-unternehmensveranstaltung-workshop-produktion": "/de/work/adnoc-gas-firmenevent-und-workshop-produktion",
     "/fr/work/production-dévénements-dentreprise-et-dateliers-adnoc-gas": "/fr/work/production-d-événements-d-entreprise-et-d-ateliers-adnoc-gas",
@@ -732,11 +723,6 @@
     "pelicula-sobre-operaciones-e-impacto-comunitario-de-apache-en-egipto": "apache-egypt-operations-and-community-impact-film",
     "película-sobre-operaciones-e-impacto-comunitario-de-apache-en-egipto": "apache-egypt-operations-and-community-impact-film",
     "documental-sobre-las-operaciones-de-apache-en-egipto": "apache-egypt-operations-documentary",
-    "produzione-di-irrigazione-agricola-engazat-in-egitto": "engazat-agricultural-irrigation-production-in-egypt",
-    "production-d-irrigation-agricole-engazat-en-egypte": "engazat-agricultural-irrigation-production-in-egypt",
-    "production-d-irrigation-agricole-engazat-en-égypte": "engazat-agricultural-irrigation-production-in-egypt",
-    "misir-da-engazat-tarimsal-sulama-uretimi": "engazat-agricultural-irrigation-production-in-egypt",
-    "mısır-da-engazat-tarımsal-sulama-üretimi": "engazat-agricultural-irrigation-production-in-egypt",
     "campana-de-cuotas-diarias-de-hyundai-al-majdouie": "hyundai-al-majdouie-daily-installment-campaign",
     "campaña-de-cuotas-diarias-de-hyundai-al-majdouie": "hyundai-al-majdouie-daily-installment-campaign",
     "adnoc-gas-unternehmensveranstaltung-workshop-produktion": "adnoc-gas-corporate-event-workshop-production",
@@ -1162,24 +1148,6 @@
           "sw": "uzalishaji-wa-mafuta-na-gesi-wa-apache-nchini-misri",
           "tr": "mısır-da-apache-petrol-ve-gaz-üretimi",
           "zh": "apache埃及石油与天然气制作"
-        }
-      },
-      {
-        "canonicalSlug": "engazat-agricultural-irrigation-production-in-egypt",
-        "slugs": {
-          "ar": "إنتاج-إنجازات-للري-الزراعي-في-مصر",
-          "de": "engazat-landwirtschaftliche-bewässerungsproduktion-in-ägypten",
-          "es": "producción-de-riego-agrícola-de-engazat-en-egipto",
-          "fr": "production-d-irrigation-agricole-engazat-en-égypte",
-          "it": "produzione-di-irrigazione-agricola-engazat-in-egitto",
-          "ja": "engazatエジプト農業灌漑映像制作",
-          "ko": "engazat-이집트-농업-관개-영상-제작",
-          "pl": "produkcja-nawadniania-rolniczego-engazat-w-egipcie",
-          "pt": "produção-de-irrigação-agrícola-da-engazat-no-egito",
-          "ru": "производство-сельскохозяйственного-орошен",
-          "sw": "uzalishaji-wa-umwagiliaji-wa-kilimo-wa-engazat-nchini-misri",
-          "tr": "mısır-da-engazat-tarımsal-sulama-üretimi",
-          "zh": "engazat埃及农业灌溉项目制作"
         }
       },
       {
