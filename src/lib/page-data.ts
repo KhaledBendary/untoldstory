@@ -166,7 +166,7 @@ export async function getServicesData(locale?: string): Promise<Service[]> {
  * re-entering in the CMS before the real text can appear.
  */
 export async function getAboutData(locale?: string): Promise<About> {
-  const about = await api.getAbout(locale);
+  const about = withoutExpertise(await api.getAbout(locale));
   if (!Array.isArray(about?.team)) return about;
 
   return {
@@ -177,6 +177,21 @@ export async function getAboutData(locale?: string): Promise<About> {
       bio: isUnreadable(member?.bio) ? undefined : member?.bio,
     })),
   };
+}
+
+/*
+ * The about document came over from the old CMS with an `expertise` list: two
+ * showreel clips (Best Beef, Clorox) stored as MP4s on the old API host. The
+ * page never rendered it, but the whole record travelled in the page payload,
+ * so every About page in every language carried links to ~140 MB of video
+ * nobody saw. The clips were deleted on 13 Nov 2026 (the projects use their
+ * YouTube films); drop the field so no page points at them.
+ */
+function withoutExpertise(about: About): About {
+  if (!about || typeof about !== "object") return about;
+  const copy = { ...about } as About & { expertise?: unknown };
+  delete copy.expertise;
+  return copy;
 }
 
 export async function getInsightsData(locale?: string): Promise<BlogPost[]> {

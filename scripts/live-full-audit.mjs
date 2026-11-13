@@ -245,8 +245,8 @@ const fileUrls = [
   "/site.webmanifest",
   "/favicon.ico",
   "/.well-known/security.txt",
-  "/videos/hero.webm",
-  "/videos/hero.mp4",
+  "/videos/global-untold-story-selected-frames-selected-projects.webm",
+  "/videos/global-untold-story-selected-frames-selected-projects.mp4",
 ];
 for (const p of fileUrls) {
   const r = await step(p, () => raw(`${SITE}${p}`, { method: "HEAD" }));
@@ -380,7 +380,7 @@ const contact = await step("contact form token", () => raw(`${SITE}/contact`));
 out.security.contactHasFormToken = /formToken|name=["']formToken["']|name=["']_token["']/.test(contact.body);
 out.security.contactHasHoneypot = /honeypot|website["']\s+tabindex|autocomplete=["']off["']/.test(contact.body);
 
-const hero = out.files["/videos/hero.webm"];
+const hero = out.files["/videos/global-untold-story-selected-frames-selected-projects.webm"];
 out.security.heroWebmBytes = hero?.length ? Number(hero.length) : null;
 out.security.heroCache = hero?.cache || null;
 
