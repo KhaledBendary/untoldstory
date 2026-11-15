@@ -48,7 +48,7 @@ const EN: Record<LegalKey, LegalDoc> = {
         body: [
           "The contact form asks for your name, email address, phone number, the service you are interested in, and your message. Only the name, email and message are required; the rest you can leave blank.",
           "We use it to answer you and to plan the work you are asking about. We do not sell it, and we do not use it for marketing you did not ask for.",
-          "Your enquiry is emailed to us and stored in our project system so we can pick the conversation back up. We keep enquiries for three years, then delete them.",
+          "Your inquiry is emailed to us and stored in our project system so we can pick the conversation back up. We keep inquiries for three years, then delete them.",
         ],
       },
       {
@@ -114,11 +114,11 @@ const EN: Record<LegalKey, LegalDoc> = {
         heading: "The work shown here",
         body: [
           "Films, photographs, campaigns and written material on this site belong to The Untold Story or to the clients who commissioned them. Client names and logos belong to those clients and appear here to identify work we produced.",
-          "Nothing here grants you a licence to reuse any of it. If you want to, ask.",
+          "Nothing here grants you a license to reuse any of it. If you want to, ask.",
         ],
       },
       {
-        heading: "Enquiries are not contracts",
+        heading: "Inquiries are not contracts",
         body: [
           "Sending the contact form starts a conversation. It does not create an agreement, reserve a date, or fix a price. Work begins when both sides sign a proposal.",
           "Any figures, timelines or availability mentioned on this site are indicative and depend on the specifics of a project.",
@@ -185,7 +185,7 @@ const EN: Record<LegalKey, LegalDoc> = {
         body: [
           "Every browser can block or delete cookies — look for Privacy in its settings. Blocking them does not stop this site working; nothing here needs a cookie to function.",
           "Google publishes an opt-out add-on for Analytics at tools.google.com/dlpage/gaoptout. Meta's advertising controls are in your account settings under Ad Preferences.",
-          "A browser set to Do Not Track or Global Privacy Control is a signal we intend to honour, and this policy will be updated when that is in place.",
+          "A browser set to Do Not Track or Global Privacy Control is a signal we intend to honor, and this policy will be updated when that is in place.",
         ],
       },
       {

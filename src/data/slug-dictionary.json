@@ -743,7 +743,34 @@
     "warum-jede-marke-eine-geschichte-braucht-die-menschen-bewegt": "why-every-brand-needs-a-story-that-moves-people",
     "die-videoproduktionsreise-von-der-idee-bis-zur-wirkung": "the-video-production-journey-from-idea-to-impact",
     "pourquoi-chaque-marque-a-besoin-dune-histoire-qui-emeut-les-gens": "why-every-brand-needs-a-story-that-moves-people",
-    "le-parcours-de-production-video-de-lidee-a-limpact": "the-video-production-journey-from-idea-to-impact"
+    "le-parcours-de-production-video-de-lidee-a-limpact": "the-video-production-journey-from-idea-to-impact",
+    "إنتاج-الفيديو-التجاري": "commercial-video-production",
+    "производство-документальных-фильмов-в-егип": "documentary-production-egypt",
+    "mısır-da-kurumsal-video-üretimi": "corporate-video-production-egypt",
+    "производство-мероприятий-и-прямой-эфир-в-ег": "event-production-live-streaming-egypt",
+    "رسوم-متحركة-وسي-جي-اي-ومؤثرات-بصرية-وذكاء-اص": "motion-graphics-cgi-vfx-ai",
+    "перформанс-маркетинг-и-креативная-стратеги": "performance-marketing-creative-strategy",
+    "desarrollo-de-propiedad-intelectual-original": "original-ip-development",
+    "разработка-оригинальной-интеллектуальной": "original-ip-development",
+    "창안-과속-휴대폰-사용-csr-캠페ين": "changan-speeding-phone-use-csr-campaign",
+    "فيلم-فور-سيزونز-القاهرة-لمواقع-التواصل-الاج": "four-seasons-cairo-social-media-film",
+    "ヒョンデ-アル-マジュドゥイエ-日払い分割払いキャンペー": "hyundai-al-majdouie-daily-installment-campaign",
+    "производство-корпоративных-мероприятий-и-в": "adnoc-gas-corporate-event-workshop-production",
+    "производство-корпоративных-мероприятий-allia": "alliance-corporate-event-production",
+    "промышленное-производство-enap-в-пустыне-еги": "enap-industrial-desert-production-in-egypt",
+    "съемка-концерта-hamaki-и-производство-живых-со": "hamaki-concert-coverage-live-event-production",
+    "производство-рекламных-роликов-huawei-в-египт": "huawei-commercial-production-in-egypt",
+    "إنتاج-أفلام-وثائقية-لمنظمة-العمل-الدولية-في": "ilo-upper-egypt-documentary-film-production",
+    "производство-документальных-фильмов-мот-в": "ilo-upper-egypt-documentary-film-production",
+    "документальный-фильм-об-операциях-apache-в-еги": "apache-egypt-operations-documentary",
+    "фильм-об-операциях-и-общественном-влиянии-ap": "apache-egypt-operations-and-community-impact-film",
+    "документальный-фильм-об-умном-сельском-хоз": "engazaat-dakhla-smart-agriculture-documentary",
+    "съемка-китайского-документального-фильма-в": "china-documentary-egypt-shoot",
+    "как-выбрать-агентство-медиапроизводства-в": "how-to-choose-a-media-production-agency-in-egypt",
+    "производство-телевизионной-рекламы-в-египт": "tv-commercial-production-in-egypt",
+    "لماذا-تحتاج-كل-علامة-تجارية-إلى-قصة-تحرك-الم": "why-every-brand-needs-a-story-that-moves-people",
+    "почему-каждому-бренду-нужна-история-котора": "why-every-brand-needs-a-story-that-moves-people",
+    "모든-브랜드가-사람들의-마음을-움직이는-이야기를-필요로": "why-every-brand-needs-a-story-that-moves-people"
   },
   "catalog": {
     "services": [
@@ -789,7 +816,7 @@
         "canonicalSlug": "commercial-video-production",
         "slugs": {
           "ar": "إنتاج-الفيديو-التجاري",
-          "de": "إنتاج-الفيديو-التجاري",
+          "de": "werbefilmproduktion",
           "en": "commercial-video-production",
           "es": "producción-de-videos-comerciales",
           "fr": "production-de-vidéos-commerciales",
@@ -816,7 +843,7 @@
           "ko": "이집트-다큐멘터리-제작",
           "pl": "produkcja-filmów-dokumentalnych-w-egipcie",
           "pt": "produção-de-documentários-no-egito",
-          "ru": "производство-документальных-фильмов-в-егип",
+          "ru": "съемка-документальных-фильмов-в-египте",
           "sw": "uzalishaji-wa-filamu-za-makala-nchini-misri",
           "tr": "mısır-da-belgesel-üretimi",
           "zh": "埃及纪录片制作"
@@ -851,7 +878,7 @@
           "ja": "エジプト企業向け映像制作",
           "ko": "이집트-기업-비디오-제작",
           "pl": "produkcja-filmów-korporacyjnych-w-egipcie",
-          "pt": "mısır-da-kurumsal-video-üretimi",
+          "pt": "produção-de-vídeo-corporativo-no-egito",
           "ru": "производство-корпоративного-видео-в-египте",
           "sw": "uzalishaji-wa-video-za-kampuni-nchini-misri",
           "tr": "mısır-da-kurumsal-video-üretimi",
@@ -870,7 +897,7 @@
           "ko": "퍼포먼스-마케팅-및-크리에이티브-전략",
           "pl": "marketing-efektywnościowy-i-strategia-kreatywna",
           "pt": "marketing-de-performance-e-estratégia-criativa",
-          "ru": "перформанс-маркетинг-и-креативная-стратеги",
+          "ru": "перформанс-маркетинг-и-креатив",
           "sw": "masoko-ya-matokeo-na-mkakati-wa-ubunifu",
           "tr": "performans-pazarlaması-ve-yaratıcı-strateji",
           "zh": "效果营销与创意策略"
@@ -880,7 +907,7 @@
         "canonicalSlug": "original-ip-development",
         "slugs": {
           "ar": "تطوير-الملكية-الفكرية-الأصلية",
-          "de": "desarrollo-de-propiedad-intelectual-original",
+          "de": "eigene-ip-entwicklung-und-tv-formate",
           "es": "desarrollo-de-propiedad-intelectual-original",
           "fr": "développement-de-propriété-intellectuelle-originale",
           "it": "sviluppo-di-proprietà-intellettuale-originale",
@@ -888,7 +915,7 @@
           "ko": "오리지널-ip-개발",
           "pl": "rozwój-oryginalnej-własności-intelektualnej",
           "pt": "desenvolvimento-de-propriedade-intelectual-original",
-          "ru": "разработка-оригинальной-интеллектуальной",
+          "ru": "разработка-оригинальных-тв-форматов",
           "sw": "uendelezaji-wa-miliki-ya-asili-ya-ubunifu",
           "tr": "orijinal-fikri-mülkiyet-geliştirme",
           "zh": "原创知识产权开发"
@@ -924,7 +951,7 @@
           "ko": "이집트-이벤트-제작-및-라이브-스트리밍",
           "pl": "produkcja-wydarzeń-i-transmisja-na-żywo-w-egipcie",
           "pt": "produção-de-eventos-e-streaming-ao-vivo-no-egito",
-          "ru": "производство-мероприятий-и-прямой-эфир-в-ег",
+          "ru": "съемка-мероприятий-и-прямые-трансляции",
           "sw": "uzalishaji-wa-matukio-na-utiririshaji-mubashara-nchini-misri",
           "tr": "mısır-da-etkinlik-üretimi-ve-canlı-yayın",
           "zh": "埃及活动制作与网络直播"
@@ -969,7 +996,7 @@
       {
         "canonicalSlug": "motion-graphics-cgi-vfx-ai",
         "slugs": {
-          "ar": "رسوم-متحركة-وسي-جي-اي-ومؤثرات-بصرية-وذكاء-اص",
+          "ar": "موشن-جرافيك-ومؤثرات-بصرية-وذكاء-اصطناعي",
           "de": "motion-graphics-cgi-vfx-und-ki",
           "es": "gráficos-en-movimiento-cgi-vfx-e-ia",
           "fr": "animations-graphiques-cgi-vfx-et-ia",
@@ -1016,7 +1043,7 @@
           "ko": "adnoc-가스-기업-이벤트-및-워크숍-제작",
           "pl": "produkcja-wydarzeń-korporacyjnych-i-warsztatów-adnoc-gas",
           "pt": "produção-de-eventos-corporativos-e-workshops-da-adnoc-gas",
-          "ru": "производство-корпоративных-мероприятий-и-в",
+          "ru": "корпоративное-мероприятие-adnoc-gas",
           "sw": "uzalishaji-wa-matukio-ya-kampuni-na-warsha-wa-adnoc-gas",
           "tr": "adnoc-gas-kurumsal-etkinlik-ve-atölye-üretimi",
           "zh": "adnoc天然气企业活动与研讨会制作"
@@ -1034,7 +1061,7 @@
           "ko": "alliance-기업-이벤트-제작",
           "pl": "produkcja-wydarzeń-korporacyjnych-alliance",
           "pt": "produção-de-eventos-corporativos-da-alliance",
-          "ru": "производство-корпоративных-мероприятий-allia",
+          "ru": "корпоративное-мероприятие-alliance",
           "sw": "uzalishaji-wa-matukio-ya-kampuni-wa-alliance",
           "tr": "alliance-kurumsal-etkinlik-üretimi",
           "zh": "alliance企业活动制作"
@@ -1053,7 +1080,7 @@
           "ko": "enap-이집트-산업-사막-영상-제작",
           "pl": "produkcja-przemysłowa-enap-na-pustyni-w-egipcie",
           "pt": "produção-industrial-no-deserto-da-enap-no-egito",
-          "ru": "промышленное-производство-enap-в-пустыне-еги",
+          "ru": "съемка-enap-в-египетской-пустыне",
           "sw": "uzalishaji-wa-viwanda-jangwani-wa-enap-nchini-misri",
           "tr": "mısır-da-enap-endüstriyel-çöl-üretimi",
           "zh": "enap埃及工业沙漠制作"
@@ -1071,7 +1098,7 @@
           "ko": "hamaki-콘서트-중계-및-라이브-이벤트-제작",
           "pl": "obsługa-koncertu-hamaki-i-produkcja-wydarzeń-na-żywo",
           "pt": "cobertura-de-shows-do-hamaki-e-produção-de-eventos-ao-vivo",
-          "ru": "съемка-концерта-hamaki-и-производство-живых-со",
+          "ru": "съемка-концерта-хамаки",
           "sw": "matangazo-ya-tamasha-la-hamaki-na-uzalishaji-wa-matukio-ya-mubashara",
           "tr": "hamaki-konser-çekimi-ve-canlı-etkinlik-üretimi",
           "zh": "hamaki音乐会报道与现场活动制作"
@@ -1089,7 +1116,7 @@
           "ko": "화웨이-이집트-상업-광고-제작",
           "pl": "produkcja-reklam-telewizyjnych-huawei-w-egipcie",
           "pt": "produção-de-comerciais-da-huawei-no-egito",
-          "ru": "производство-рекламных-роликов-huawei-в-египт",
+          "ru": "рекламный-ролик-huawei-в-египте",
           "sw": "uzalishaji-wa-matangazo-ya-biashara-ya-huawei-nchini-misri",
           "tr": "mısır-da-huawei-reklam-filmi-üretimi",
           "zh": "华为埃及商业广告制作"
@@ -1117,7 +1144,7 @@
       {
         "canonicalSlug": "ilo-upper-egypt-documentary-film-production",
         "slugs": {
-          "ar": "إنتاج-أفلام-وثائقية-لمنظمة-العمل-الدولية-في",
+          "ar": "فيلم-وثائقي-لمنظمة-العمل-الدولية-بصعيد-مصر",
           "de": "ilo-dokumentarfilmproduktion-in-oberägypten",
           "es": "producción-de-documentales-de-la-oit-en-el-alto-egipto",
           "fr": "production-de-films-documentaires-oit-en-haute-égypte",
@@ -1126,7 +1153,7 @@
           "ko": "ilo-상이집트-다큐멘터리-영화-제작",
           "pl": "produkcja-filmów-dokumentalnych-mopr-w-górnym-egipcie",
           "pt": "produção-de-documentários-da-oit-no-alto-egito",
-          "ru": "производство-документальных-фильмов-мот-в",
+          "ru": "документальный-фильм-мот-в-верхнем-египте",
           "sw": "uzalishaji-wa-filamu-za-makala-za-ilo-misri-ya-juu",
           "tr": "yukarı-mısır-ilo-belgesel-film-üretimi",
           "zh": "国际劳工组织上埃及纪录片制作"
@@ -1182,7 +1209,7 @@
           "ko": "apache-이집트-운영-및-지역-사회-영향-필름",
           "pl": "film-o-działalności-i-wpływie-społecznym-apache-w-egipcie",
           "pt": "filme-sobre-operações-e-impacto-comunitário-da-apache-no-egito",
-          "ru": "фильм-об-операциях-и-общественном-влиянии-ap",
+          "ru": "фильм-apache-egypt-о-местных-сообществах",
           "sw": "filamu-ya-shughuli-za-apache-nchini-misri-na-athari-kwa-jamii",
           "tr": "apache-mısır-operasyonları-ve-toplumsal-etki-filmi",
           "zh": "apache埃及运营与社区影响力影片"
@@ -1200,7 +1227,7 @@
           "ko": "engazaat-다클라-스마트-농업-다큐멘터리",
           "pl": "film-dokumentalny-o-inteligentnym-rolnictwie-w-dachla-engazaat",
           "pt": "documentário-de-agricultura-inteligente-em-dakhla-da-engazaat",
-          "ru": "документальный-фильм-об-умном-сельском-хоз",
+          "ru": "фильм-об-умном-сельском-хозяйстве-в-дахле",
           "sw": "filamu-ya-makala-ya-kilimo-bora-cha-kisasa-dakhla-ya-engazaat",
           "tr": "engazaat-dakhla-akıllı-tarım-belgeseli",
           "zh": "engazaat达赫拉智慧农业纪录片"
@@ -1237,7 +1264,7 @@
           "ko": "apache-이집트-운영-다큐멘터리",
           "pl": "film-dokumentalny-o-działalności-apache-w-egipcie",
           "pt": "documentário-sobre-as-operações-da-apache-no-egito",
-          "ru": "документальный-фильм-об-операциях-apache-в-еги",
+          "ru": "документальный-фильм-apache-в-египте",
           "sw": "filamu-ya-makala-ya-shughuli-za-apache-nchini-misri",
           "tr": "apache-mısır-operasyonları-belgeseli",
           "zh": "apache埃及业务运营纪录片"
@@ -1271,7 +1298,7 @@
           "fr": "campagne-rse-changan-vitesse-et-téléphone-au-volant",
           "it": "campagna-csr-changan-velocità-e-cellulare-alla-guida",
           "ja": "changan-スピード違反-ながらスマホ-csr-キャンペーン",
-          "ko": "창안-과속-휴대폰-사용-csr-캠페ين",
+          "ko": "창안-과속-휴대폰-사용-csr-캠페인",
           "pl": "kampania-csr-changan-prędkość-i-telefon-za-kierownicą",
           "pt": "campanha-rse-changan-velocidade-e-telemóvel-ao-volante",
           "ru": "changan-кампания-скорость-и-телефон-за-рулём",
@@ -1302,7 +1329,7 @@
       {
         "canonicalSlug": "four-seasons-cairo-social-media-film",
         "slugs": {
-          "ar": "فيلم-فور-سيزونز-القاهرة-لمواقع-التواصل-الاج",
+          "ar": "فيلم-فور-سيزونز-القاهرة-للسوشيال-ميديا",
           "de": "four-seasons-kairo-social-media-film",
           "en": "four-seasons-cairo-social-media-film",
           "es": "película-para-redes-sociales-de-four-seasons-el-cairo",
@@ -1327,7 +1354,7 @@
           "es": "campaña-de-cuotas-diarias-de-hyundai-al-majdouie",
           "fr": "campagne-de-versement-quotidien-hyundai-al-majdouie",
           "it": "campagna-rate-giornaliere-hyundai-al-majdouie",
-          "ja": "ヒョンデ-アル-マジュドゥイエ-日払い分割払いキャンペー",
+          "ja": "ヒョンデ-アルマジュドゥイエ-日払いキャンペーン",
           "ko": "현대-알-마즈두이-일일-할부-캠페인",
           "pl": "kampania-dziennych-rat-hyundai-al-majdouie",
           "pt": "campanha-de-parcelamento-diário-da-hyundai-al-majdouie",
@@ -1360,17 +1387,17 @@
       {
         "canonicalSlug": "why-every-brand-needs-a-story-that-moves-people",
         "slugs": {
-          "ar": "لماذا-تحتاج-كل-علامة-تجارية-إلى-قصة-تحرك-الم",
+          "ar": "لماذا-تحتاج-كل-علامة-تجارية-إلى-قصة-مؤثرة",
           "de": "warum-jede-marke-eine-geschichte-braucht-die-menschen-bewegt",
           "en": "why-every-brand-needs-a-story-that-moves-people",
           "es": "por-qué-cada-marca-necesita-una-historia-que-emocione",
           "fr": "pourquoi-chaque-marque-a-besoin-dune-histoire-qui-emeut-les-gens",
           "it": "perché-ogni-brand-ha-bisogno-di-una-storia-che-emozioni",
           "ja": "すべてのブランドが人々を動かすストーリーを必要とする",
-          "ko": "모든-브랜드가-사람들의-마음을-움직이는-이야기를-필요로",
+          "ko": "모든-브랜드에-필요한-감동적인-이야기",
           "pl": "dlaczego-każda-marka-potrzebuje-historii-która-porusza-ludzi",
           "pt": "por-que-toda-marca-precisa-de-uma-história-que-emocione",
-          "ru": "почему-каждому-бренду-нужна-история-котора",
+          "ru": "почему-каждому-бренду-нужна-история",
           "sw": "kwa-nini-kila-chapa-inahitaji-hadithi-inayogusa-watu",
           "tr": "neden-her-markanın-insanları-etkileyen-bir-hikayeye-ihtiyacı-vardır",
           "zh": "为什么每个品牌都需要一个打动人心的故事"
@@ -1445,7 +1472,7 @@
           "ko": "중국-다큐멘터리-이집트-촬영",
           "pl": "zdjęcia-do-chińskiego-filmu-dokumentalnego-w-egipcie",
           "pt": "filmagem-de-documentário-chinês-no-egito",
-          "ru": "съемка-китайского-документального-фильма-в",
+          "ru": "гонконгская-съемочная-группа-в-египте",
           "sw": "upigaji-picha-wa-filamu-ya-makala-ya-china-nchini-misri",
           "tr": "mısır-da-çin-belgesel-çekimi",
           "zh": "中国纪录片埃及拍摄"
@@ -1464,7 +1491,7 @@
           "ko": "이집트에서-미디어-제작-대행사를-선택하는-방법",
           "pl": "jak-wybrać-agencję-produkcji-medialnej-w-egipcie",
           "pt": "como-escolher-uma-agência-de-produção-de-mídia-no-egito",
-          "ru": "как-выбрать-агентство-медиапроизводства-в",
+          "ru": "как-выбрать-продакшн-агентство-в-египте",
           "sw": "jinsi-ya-kuchagua-shirika-la-uzalishaji-wa-vyombo-vya-habari-nchini-misri",
           "tr": "mısır-da-bir-medya-yapım-ajansı-nasıl-seçilir",
           "zh": "如何在埃及选择媒体制作机构"
@@ -1538,7 +1565,7 @@
           "ko": "이집트-tv-광고-제작",
           "pl": "produkcja-reklam-telewizyjnych-w-egipcie",
           "pt": "produção-de-comerciais-de-tv-no-egito",
-          "ru": "производство-телевизионной-рекламы-в-египт",
+          "ru": "производство-телерекламы-в-египте",
           "sw": "uzalishaji-wa-matangazo-ya-runinga-nchini-misri",
           "tr": "mısır-da-televizyon-reklamı-üretimi",
           "zh": "埃及电视商业广告制作"

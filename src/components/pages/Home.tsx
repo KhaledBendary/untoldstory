@@ -160,11 +160,11 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
             animate={ready ? { opacity: 1 } : {}}
             transition={{ duration: 1, delay: 1.2 }}
           >
-            {t('Film, advertising, documentary services, content, post-production and marketing across Egypt, UAE and Saudi Arabia. From the region to the world')}
+            {t('Film, advertising, documentary services, content, post-production and marketing across Egypt, the UAE and Saudi Arabia. From the region to the world.')}
           </motion.p>
         ) : (
           <p className="hidden md:block font-mono2 font-bold text-[14.5px] tracking-[0.25em] normal-case text-white/60 max-w-[760px] leading-relaxed mt-5">
-            {t('Film, advertising, documentary services, content, post-production and marketing across Egypt, UAE and Saudi Arabia. From the region to the world')}
+            {t('Film, advertising, documentary services, content, post-production and marketing across Egypt, the UAE and Saudi Arabia. From the region to the world.')}
           </p>
         )}
 

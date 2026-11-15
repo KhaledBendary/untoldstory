@@ -87,7 +87,10 @@ export default function Footer({ initialData, initialLocale }: { initialData: Sh
       <div className="px-5 md:px-10 py-14 md:py-20 grid grid-cols-2 md:grid-cols-12 gap-10">
         <div className="col-span-2 md:col-span-4">
           <p className="text-sm text-[#0a0a0a]/60 max-w-xs leading-relaxed">
-            {latinBrand(footer?.brandDesc, siteConfig?.name) || t('Full-service film, video and content production studio serving Egypt, MENA and clients worldwide.')}
+            {/* Through t(): the English entry in ui-translations corrects the
+                stored English line (it was missing "is") without re-saving the
+                layout document, which would machine-translate every language. */}
+            {(footer?.brandDesc && t(latinBrand(footer.brandDesc, siteConfig?.name) as string)) || t('Full-service film, video and content production studio serving Egypt, MENA and clients worldwide.')}
           </p>
         </div>
         <div className="md:col-span-2">
