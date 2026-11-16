@@ -37,6 +37,7 @@ export default function Navbar({ initialData, initialLocale }: { initialData: Sh
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const { locale, changeLocale, t, localeHref } = useLanguage();
+  const tf = (s: string) => (locale === 'fr' ? t(s) : s); // French-only corrections from ui-translations
   const { data } = usePageData(initialData, initialLocale, getShellData);
   const layout = data?.layout ?? null;
 
@@ -78,8 +79,8 @@ export default function Navbar({ initialData, initialLocale }: { initialData: Sh
           </div>
         )}
         <div className="flex items-center justify-between px-5 md:px-10 py-4 md:py-5">
-          <Link href="/" onClick={() => setOpen(false)} aria-label={t('The Untold Story — Home')} className="relative z-[110]">
-            <Image src="/images/logo-white.png" alt={t('The Untold Story logo')} width={348} height={191} priority className="h-7 md:h-9 w-auto" />
+          <Link href="/" onClick={() => setOpen(false)} aria-label={tf('The Untold Story — Home')} className="relative z-[110]">
+            <Image src="/images/logo-white.png" alt={tf('The Untold Story logo')} width={348} height={191} priority className="h-7 md:h-9 w-auto" />
           </Link>
           <div className="flex items-center gap-4 md:gap-8">
             <Link href="/contact" onClick={() => setOpen(false)} className="hidden lg:inline-block font-mono2 text-[11px] tracking-[0.25em] uppercase link-line relative z-[110]">
@@ -155,7 +156,7 @@ export default function Navbar({ initialData, initialLocale }: { initialData: Sh
             <Magnetic strength={0.4}>
               <button
                 onClick={() => setOpen(!open)}
-                aria-label={open ? t('Close menu') : t('Open menu')}
+                aria-label={open ? tf('Close menu') : tf('Open menu')}
                 className="relative z-[110] flex items-center gap-3 group"
               >
                 <span className="font-mono2 text-[11px] tracking-[0.25em] uppercase hidden sm:inline">
@@ -181,7 +182,7 @@ export default function Navbar({ initialData, initialLocale }: { initialData: Sh
             transition={{ duration: 0.8, ease: EASE }}
           >
             <div className="flex-1 flex flex-col justify-center px-5 md:px-10 pt-24">
-              <nav aria-label={t('Main navigation')}>
+              <nav aria-label={tf('Main navigation')}>
                 {LINKS.map((l, i) => (
                   <div key={l.to} className="overflow-hidden border-b border-white/10">
                     <motion.div

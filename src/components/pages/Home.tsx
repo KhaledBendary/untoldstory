@@ -31,7 +31,8 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
   const hydrated = useHydrated();
   const reduceMotion = useReducedMotion();
   const [frameReady, setFrameReady] = useState(false);
-  const { t } = useLanguage();
+  const { locale, t } = useLanguage();
+  const tf = (s: string) => (locale === 'fr' ? t(s) : s); // French-only corrections from ui-translations
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const imgY = useTransform(scrollYProgress, [0, 1], ['0%', '22%']);
   const imgScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
@@ -124,7 +125,7 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
             <source src={HERO_MP4} type="video/mp4" />
           </motion.video>
         ) : (
-          <img src={HERO_POSTER} alt={t('Selected frames from The Untold Story projects in Egypt')} className="absolute inset-0 h-full w-full object-cover brightness-[0.75]" />
+          <img src={HERO_POSTER} alt={tf('Selected frames from The Untold Story projects in Egypt')} className="absolute inset-0 h-full w-full object-cover brightness-[0.75]" />
         )}
       </motion.div>
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-[#0a0a0a]/65" />
@@ -408,7 +409,8 @@ const FALLBACK_TRUST_STATS = [
  * here rather than a "+" being hardcoded onto whatever number turned up.
  */
 function ClientLogos({ stats }: { stats: Array<{ value: number; suffix: string; label: string }> }) {
-  const { t } = useLanguage();
+  const { locale, t } = useLanguage();
+  const tf = (s: string) => (locale === 'fr' ? t(s) : s); // French-only corrections from ui-translations
   return (
     <section className="py-24 md:py-36 border-t border-white/10">
       <div className="px-5 md:px-10 mb-12 md:mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -437,7 +439,7 @@ function ClientLogos({ stats }: { stats: Array<{ value: number; suffix: string; 
                 <Image
                   key={copy}
                   src={row.src}
-                  alt={copy === 0 ? t('Brands and platforms The Untold Story has produced for') : ''}
+                  alt={copy === 0 ? tf('Brands and platforms The Untold Story has produced for') : ''}
                   aria-hidden={copy > 0 ? true : undefined}
                   width={row.w}
                   height={row.h}
@@ -606,7 +608,8 @@ function InsightsTeaser({ posts }: { posts: HomePost[] }) {
 
 /* ---------------- AWARDS (from API) ---------------- */
 function Awards({ awards }: { awards: Array<{ icon: string; color: string; title: string; organization: string; yearLabel: string }> }) {
-  const { t } = useLanguage();
+  const { locale, t } = useLanguage();
+  const tf = (s: string) => (locale === 'fr' ? t(s) : s); // French-only corrections from ui-translations
   if (!awards?.length) return null;
   return (
     <section className="px-5 md:px-10 py-24 md:py-36 border-t border-white/10">
@@ -621,7 +624,7 @@ function Awards({ awards }: { awards: Array<{ icon: string; color: string; title
             <div className="border border-white/10 p-6 md:p-8 hover:bg-white/5 transition-colors">
               {/* <span className="text-3xl md:text-4xl">{a.icon}</span> */}
               <h3 className="font-display font-bold uppercase text-xl md:text-2xl mt-4">{a.title}</h3>
-              <p className="text-white/50 text-sm mt-2">{a.organization && t(a.organization)}</p>
+              <p className="text-white/50 text-sm mt-2">{a.organization && tf(a.organization)}</p>
               <span className="inline-block mt-3 font-mono2 text-[10px] tracking-[0.2em] uppercase text-white/55 border border-white/15 px-3 py-1">{t(a.yearLabel)}</span>
             </div>
           </Reveal>
@@ -635,7 +638,8 @@ function Awards({ awards }: { awards: Array<{ icon: string; color: string; title
 function ImageBreak() {
   const ref = useRef<HTMLDivElement>(null);
   const hydrated = useHydrated();
-  const { t } = useLanguage();
+  const { locale, t } = useLanguage();
+  const tf = (s: string) => (locale === 'fr' ? t(s) : s); // French-only corrections from ui-translations
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const y = useTransform(scrollYProgress, [0, 1], ['-12%', '12%']);
   return (
@@ -646,7 +650,7 @@ function ImageBreak() {
       >
         <Image
           src="/images/film-production-abu-simbel.jpg"
-          alt={t('Film production at Abu Simbel temple, Egypt — on-ground production services by The Untold Story')}
+          alt={tf('Film production at Abu Simbel temple, Egypt — on-ground production services by The Untold Story')}
           fill
           className="object-cover"
           loading="lazy"

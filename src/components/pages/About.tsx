@@ -44,6 +44,7 @@ type TeamMember = {
 
 export default function About({ initialData, initialLocale }: { initialData: AboutType | null; initialLocale: string }) {
   const { locale, t } = useLanguage();
+  const tf = (s: string) => (locale === 'fr' ? t(s) : s); // French-only corrections from ui-translations
   const { data: aboutData, loading } = usePageData(initialData, initialLocale, getAboutData);
 
   if (loading) {
@@ -144,10 +145,10 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
       {/* Image strip */}
       <section className="grid md:grid-cols-2 border-y border-white/10">
         <div className="img-zoom relative aspect-[4/3] md:aspect-auto md:h-[70vh]">
-          <Image src="/images/film-crew-pyramids-production.jpg" alt={t('The Untold Story crew filming at the Giza pyramids')} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+          <Image src="/images/film-crew-pyramids-production.jpg" alt={tf('The Untold Story crew filming at the Giza pyramids')} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
         </div>
         <div className="img-zoom relative aspect-[4/3] md:aspect-auto md:h-[70vh] border-t md:border-t-0 md:border-s border-white/10">
-          <Image src="/images/hero-giza-pyramids.jpg" alt={t('The Untold Story team at the pyramids of Giza, Egypt')} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+          <Image src="/images/hero-giza-pyramids.jpg" alt={tf('The Untold Story team at the pyramids of Giza, Egypt')} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
         </div>
       </section>
 
@@ -177,7 +178,7 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
                     )}
                   </div>
                   <p className="font-display font-bold uppercase text-xl">{member.name || t('Team Member')}</p>
-                  <p className="font-mono2 text-[9px] tracking-[0.2em] uppercase text-white/55 mt-1">{member.role ? t(member.role) : t('Production')}</p>
+                  <p className="font-mono2 text-[9px] tracking-[0.2em] uppercase text-white/55 mt-1">{member.role ? tf(member.role) : t('Production')}</p>
                 </div>
               </div>
             </Reveal>
