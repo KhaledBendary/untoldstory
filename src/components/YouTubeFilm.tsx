@@ -17,12 +17,15 @@ export default function YouTubeFilm({
   id,
   title,
   playLabel,
+  labelSeparator = ": ",
   poster,
   priority = false,
 }: {
   id: string;
   title: string;
   playLabel: string;
+  /** Between the label and the title; French puts a non-breaking space before the colon. */
+  labelSeparator?: string;
   poster?: string;
   priority?: boolean;
 }) {
@@ -43,7 +46,7 @@ export default function YouTubeFilm({
         <button
           type="button"
           onClick={() => setPlaying(true)}
-          aria-label={`${playLabel}: ${title}`}
+          aria-label={`${playLabel}${labelSeparator}${title}`}
           className="group absolute inset-0 h-full w-full cursor-pointer"
         >
           {poster ? (

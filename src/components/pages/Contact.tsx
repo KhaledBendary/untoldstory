@@ -210,7 +210,7 @@ export default function ContactPage({ initialData, initialLocale, formToken }: {
               </a>
               {offices.filter(o => o.phone).map(o => (
                 <a key={o.region} href={`tel:${o.phone}`} className="flex items-center gap-3 text-white/70 mb-2 hover:text-white transition-colors">
-                  <Phone className="w-4 h-4 shrink-0" /> {o.phone} <span className="font-mono2 text-[10px] text-white/55 uppercase tracking-widest">({o.region})</span>
+                  <Phone className="w-4 h-4 shrink-0" /> {o.phone} <span className="font-mono2 text-[10px] text-white/55 uppercase tracking-widest">({t(o.region)})</span>
                 </a>
               ))}
             </div>
@@ -221,12 +221,12 @@ export default function ContactPage({ initialData, initialLocale, formToken }: {
               {offices.map(o => (
                 <div key={o.region} className="p-8 md:p-10 border-b border-white/15 last:border-b-0">
                   <p className="flex items-center gap-2 font-mono2 text-[10px] tracking-[0.3em] uppercase text-white/55 mb-3">
-                    <MapPin className="w-3.5 h-3.5" /> {o.region}
+                    <MapPin className="w-3.5 h-3.5" /> {t(o.region)}
                   </p>
                   {/* h2, not h3: each office is a section of this page, sitting
                       directly under its h1. As an h3 the page skipped a level. */}
-                  <h2 className="font-display font-extrabold uppercase text-2xl mb-1">{o.region}</h2>
-                  <p className="text-white/60 text-sm">{o.address}</p>
+                  <h2 className="font-display font-extrabold uppercase text-2xl mb-1">{t(o.region)}</h2>
+                  <p className="text-white/60 text-sm">{t(o.address)}</p>
                   {o.phone && <a href={`tel:${o.phone}`} className="text-white/80 text-sm link-line inline-block mt-2">{o.phone}</a>}
                 </div>
               ))}

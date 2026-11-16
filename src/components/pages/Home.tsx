@@ -124,7 +124,7 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
             <source src={HERO_MP4} type="video/mp4" />
           </motion.video>
         ) : (
-          <img src={HERO_POSTER} alt="Selected frames from The Untold Story projects in Egypt" className="absolute inset-0 h-full w-full object-cover brightness-[0.75]" />
+          <img src={HERO_POSTER} alt={t('Selected frames from The Untold Story projects in Egypt')} className="absolute inset-0 h-full w-full object-cover brightness-[0.75]" />
         )}
       </motion.div>
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-[#0a0a0a]/65" />
@@ -437,7 +437,7 @@ function ClientLogos({ stats }: { stats: Array<{ value: number; suffix: string; 
                 <Image
                   key={copy}
                   src={row.src}
-                  alt={copy === 0 ? 'Brands and platforms The Untold Story has produced for' : ''}
+                  alt={copy === 0 ? t('Brands and platforms The Untold Story has produced for') : ''}
                   aria-hidden={copy > 0 ? true : undefined}
                   width={row.w}
                   height={row.h}
@@ -621,7 +621,7 @@ function Awards({ awards }: { awards: Array<{ icon: string; color: string; title
             <div className="border border-white/10 p-6 md:p-8 hover:bg-white/5 transition-colors">
               {/* <span className="text-3xl md:text-4xl">{a.icon}</span> */}
               <h3 className="font-display font-bold uppercase text-xl md:text-2xl mt-4">{a.title}</h3>
-              <p className="text-white/50 text-sm mt-2">{a.organization}</p>
+              <p className="text-white/50 text-sm mt-2">{a.organization && t(a.organization)}</p>
               <span className="inline-block mt-3 font-mono2 text-[10px] tracking-[0.2em] uppercase text-white/55 border border-white/15 px-3 py-1">{t(a.yearLabel)}</span>
             </div>
           </Reveal>
@@ -646,7 +646,7 @@ function ImageBreak() {
       >
         <Image
           src="/images/film-production-abu-simbel.jpg"
-          alt="Film production at Abu Simbel temple, Egypt — on-ground production services by The Untold Story"
+          alt={t('Film production at Abu Simbel temple, Egypt — on-ground production services by The Untold Story')}
           fill
           className="object-cover"
           loading="lazy"

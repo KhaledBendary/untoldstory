@@ -12,7 +12,7 @@ const COPY: Record<string, { text: string; accept: string; decline: string; poli
   ar: { text: "نستخدم ملفات تعريف الارتباط للتحليلات والإعلانات لنفهم ما يقرؤه الزوار وما إذا كانت إعلاناتنا تصل إلى الجمهور المناسب.", accept: "موافق", decline: "رفض", policy: "سياسة الكوكيز" },
   de: { text: "Wir verwenden Analyse- und Werbe-Cookies, um zu verstehen, was gelesen wird und ob unsere Anzeigen die richtigen Zielgruppen erreichen.", accept: "Akzeptieren", decline: "Ablehnen", policy: "Cookie-Richtlinie" },
   es: { text: "Usamos cookies de análisis y publicidad para saber qué se lee y si nuestros anuncios llegan al público adecuado.", accept: "Aceptar", decline: "Rechazar", policy: "Política de cookies" },
-  fr: { text: "Nous utilisons des cookies d'analyse et de publicité pour comprendre ce qui est lu et si nos annonces touchent les bonnes audiences.", accept: "Accepter", decline: "Refuser", policy: "Politique de cookies" },
+  fr: { text: "Nous utilisons des cookies d'analyse et de publicité pour comprendre ce qui est lu et si nos annonces touchent le bon public.", accept: "Accepter", decline: "Refuser", policy: "Politique de cookies" },
   it: { text: "Usiamo cookie di analisi e pubblicità per capire cosa viene letto e se i nostri annunci raggiungono il pubblico giusto.", accept: "Accetta", decline: "Rifiuta", policy: "Informativa cookie" },
   pt: { text: "Usamos cookies de análise e publicidade para perceber o que é lido e se os nossos anúncios chegam ao público certo.", accept: "Aceitar", decline: "Recusar", policy: "Política de cookies" },
   tr: { text: "Nelerin okunduğunu ve reklamlarımızın doğru kitleye ulaşıp ulaşmadığını anlamak için analiz ve reklam çerezleri kullanıyoruz.", accept: "Kabul et", decline: "Reddet", policy: "Çerez politikası" },

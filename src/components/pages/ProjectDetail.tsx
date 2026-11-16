@@ -156,12 +156,14 @@ export default function ProjectDetail({ slug, initialData, initialLocale }: { sl
               id={films[0]}
               title={project.title}
               playLabel={t('Play the film')}
+              labelSeparator={locale === 'fr' ? '\u00a0: ' : ': '}
               poster={getProjectImage(project)}
             />
             {films.length > 1 && (
               <div className="mt-6 grid gap-6 sm:grid-cols-2">
                 {films.slice(1).map((id, i) => (
-                  <YouTubeFilm key={id} id={id} title={`${project.title} (${i + 2})`} playLabel={t('Play the film')} />
+                  <YouTubeFilm key={id} id={id} title={`${project.title} (${i + 2})`} playLabel={t('Play the film')}
+              labelSeparator={locale === 'fr' ? '\u00a0: ' : ': '} />
                 ))}
               </div>
             )}

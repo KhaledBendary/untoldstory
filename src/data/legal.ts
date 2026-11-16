@@ -392,17 +392,17 @@ const FR: Record<LegalKey, LegalDoc> = {
       { heading: "Ce qui est collecté automatiquement", body: [
         "Nous utilisons Google Analytics 4 pour savoir quelles pages sont lues et par quel chemin. Il enregistre les pages vues, une localisation approximative au niveau du pays, l\u2019appareil, le navigateur et le site référent. Google reçoit ces données en tant que sous-traitant.",
         "Nous utilisons le pixel Meta pour mesurer si nos publicités touchent les bonnes audiences. Il enregistre les pages vues et peut les relier à un compte Meta si vous y êtes connecté.",
-        "Dans l\u2019Union européenne et au Royaume-Uni, aucun des deux ne se déclenche avant votre accord ; ailleurs ils se chargent avec la page. Vous pouvez refuser à tout moment."] },
+        "Dans l\u2019Union européenne et au Royaume-Uni, aucun des deux ne se déclenche avant votre accord ; ailleurs ils se chargent avec la page. Vous pouvez refuser à tout moment."] },
       { heading: "Qui d\u2019autre y a accès", body: [
         "Vercel héberge ce site et traite les requêtes de votre navigateur, y compris votre adresse IP.",
         "Hostinger héberge notre système de contenu, qui stocke les messages du formulaire, et relaie l\u2019e-mail de notification.",
         "Google et Meta reçoivent les données décrites ci-dessus. Google Workspace assure notre messagerie.",
         "C\u2019est la liste complète. Nous ne partageons vos données avec personne d\u2019autre, sauf obligation légale."] },
       { heading: "Où elles sont traitées", body: [
-        "Nos bureaux sont en Égypte, aux Émirats et en Arabie saoudite, et les services ci-dessus opèrent à l\u2019international : vos données sont donc traitées hors de votre pays. Google, Meta et Vercel s\u2019appuient sur les clauses contractuelles types pour les transferts hors UE et Royaume-Uni."] },
+        "Nos bureaux sont en Égypte, aux Émirats et en Arabie saoudite, et les services ci-dessus opèrent à l\u2019international : vos données sont donc traitées hors de votre pays. Google, Meta et Vercel s\u2019appuient sur les clauses contractuelles types pour les transferts hors UE et Royaume-Uni."] },
       { heading: "Ce que vous pouvez demander", body: [
         "Vous pouvez demander une copie de ce que nous détenons, sa rectification ou sa suppression. Vous pouvez vous opposer au suivi analytique et publicitaire et retirer votre consentement à tout moment.",
-        "Écrivez à bendary@globaluntoldstory.com ; nous répondons sous trente jours. Dans l\u2019UE ou au Royaume-Uni, vous pouvez saisir votre autorité nationale de protection des données."] },
+        "Écrivez à bendary@globaluntoldstory.com ; nous répondons sous trente jours. Dans l\u2019UE ou au Royaume-Uni, vous pouvez saisir votre autorité nationale de protection des données."] },
       { heading: "Mineurs", body: [
         "Ce site s\u2019adresse aux personnes qui commandent des productions. Il ne vise pas les enfants et nous ne collectons pas sciemment de données de personnes de moins de seize ans."] },
       { heading: "Modifications", body: [
@@ -448,14 +448,14 @@ const FR: Record<LegalKey, LegalDoc> = {
         "Le formulaire de contact délivre un jeton de courte durée à chaque visiteur afin de distinguer une personne d\u2019un script automatisé. Il ne contient rien vous concernant et expire rapidement.",
         "Votre réponse à la bannière de consentement est conservée localement dans votre navigateur, afin de ne pas vous la reposer à chaque visite."] },
       { heading: "Google Analytics", body: [
-        "Identifiant de mesure G-G38ZL9GYXF. Dépose _ga et _ga_* pour compter les visites et distinguer un lecteur qui revient d\u2019un nouveau. Durée maximale : deux ans.",
+        "Identifiant de mesure G-G38ZL9GYXF. Dépose _ga et _ga_* pour compter les visites et distinguer un lecteur qui revient d\u2019un nouveau. Durée maximale : deux ans.",
         "Cela nous indique quels travaux et quels articles sont réellement lus. Cela ne vous identifie pas nommément."] },
       { heading: "Pixel Meta", body: [
-        "Identifiant 780471777947136. Dépose _fbp et lit le paramètre _fbc lorsque vous arrivez depuis une publicité Meta. Durée : environ trois mois.",
+        "Identifiant 780471777947136. Dépose _fbp et lit le paramètre _fbc lorsque vous arrivez depuis une publicité Meta. Durée : environ trois mois.",
         "Cela mesure si nos publicités atteignent des personnes intéressées. Si vous êtes connecté à Facebook ou Instagram dans le même navigateur, Meta peut relier la visite à ce compte."] },
       { heading: "Les désactiver", body: [
-        "Dans l\u2019Union européenne et au Royaume-Uni, rien ne se déclenche avant votre accord ; refuser suffit.",
-        "Tout navigateur peut bloquer ou supprimer les cookies — cherchez Confidentialité dans ses réglages. Les bloquer n\u2019empêche pas ce site de fonctionner : rien ici n\u2019a besoin d\u2019un cookie.",
+        "Dans l\u2019Union européenne et au Royaume-Uni, rien ne se déclenche avant votre accord ; refuser suffit.",
+        "Tout navigateur peut bloquer ou supprimer les cookies — cherchez Confidentialité dans ses réglages. Les bloquer n\u2019empêche pas ce site de fonctionner : rien ici n\u2019a besoin d\u2019un cookie.",
         "Google publie un module de désactivation d\u2019Analytics sur tools.google.com/dlpage/gaoptout. Les réglages publicitaires de Meta se trouvent dans les préférences de votre compte."] },
       { heading: "Modifications", body: [
         "Si nous ajoutons ou retirons une balise, cette page change avec elle et la date en haut est mise à jour."] },

@@ -98,7 +98,7 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
   return (
     <>
       <section className="px-5 md:px-10 pt-32 md:pt-44 pb-16 md:pb-24">
-        <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-6">( {t(aboutData?.page?.badge || 'About')} )</p>
+        <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-6">( {t(locale === 'fr' && /^\d+$/.test(aboutData?.page?.badge ?? '') ? 'About' : (aboutData?.page?.badge || 'About'))} )</p>
         <SplitWords
           as="h1"
           text={t("About The Untold Story")}
@@ -144,10 +144,10 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
       {/* Image strip */}
       <section className="grid md:grid-cols-2 border-y border-white/10">
         <div className="img-zoom relative aspect-[4/3] md:aspect-auto md:h-[70vh]">
-          <Image src="/images/film-crew-pyramids-production.jpg" alt="The Untold Story crew filming at the Giza pyramids" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+          <Image src="/images/film-crew-pyramids-production.jpg" alt={t('The Untold Story crew filming at the Giza pyramids')} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
         </div>
         <div className="img-zoom relative aspect-[4/3] md:aspect-auto md:h-[70vh] border-t md:border-t-0 md:border-s border-white/10">
-          <Image src="/images/hero-giza-pyramids.jpg" alt="The Untold Story team at the pyramids of Giza, Egypt" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+          <Image src="/images/hero-giza-pyramids.jpg" alt={t('The Untold Story team at the pyramids of Giza, Egypt')} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
         </div>
       </section>
 
@@ -177,7 +177,7 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
                     )}
                   </div>
                   <p className="font-display font-bold uppercase text-xl">{member.name || t('Team Member')}</p>
-                  <p className="font-mono2 text-[9px] tracking-[0.2em] uppercase text-white/55 mt-1">{member.role || t('Production')}</p>
+                  <p className="font-mono2 text-[9px] tracking-[0.2em] uppercase text-white/55 mt-1">{member.role ? t(member.role) : t('Production')}</p>
                 </div>
               </div>
             </Reveal>

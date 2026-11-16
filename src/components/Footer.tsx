@@ -100,7 +100,7 @@ export default function Footer({ initialData, initialLocale }: { initialData: Sh
               ? footer.aboutLinks
               : [['/', 'Home'], ['/work', 'Work'], ['/services', 'Services'], ['/about', 'About'], ['/insights', 'Insights'], ['/contact', 'Contact']].map(([href, label]) => ({ href, label: t(label) }))
             ).map((l: { href: string; label: string }) => (
-              <li key={l.href}><Link href={l.href} className="link-line">{l.label}</Link></li>
+              <li key={l.href}><Link href={l.href} className="link-line">{t(l.label)}</Link></li>
             ))}
           </ul>
         </div>
@@ -118,8 +118,8 @@ export default function Footer({ initialData, initialLocale }: { initialData: Sh
           <ul className="space-y-4 text-sm">
             {(footer?.offices || []).map((o: { region?: string; address?: string; phone?: string }, i: number) => (
               <li key={o.region || i}>
-                <p className="font-medium">{o.region}</p>
-                <p className="text-[#0a0a0a]/65 text-[13px]">{o.address}</p>
+                <p className="font-medium">{o.region && t(o.region)}</p>
+                <p className="text-[#0a0a0a]/65 text-[13px]">{o.address && t(o.address)}</p>
                 {o.phone && (
                   <a onClick={() => trackContactClick("phone")} href={`tel:${o.phone}`} className="text-[#0a0a0a]/70 link-line text-[13px]">{o.phone}</a>
                 )}
@@ -144,7 +144,7 @@ export default function Footer({ initialData, initialLocale }: { initialData: Sh
           </nav>
         </div>
         <div className="flex flex-wrap items-center gap-6 md:gap-8">
-          <Image src="/images/logo-black.png" alt={`${BRAND} logo`} width={348} height={191} className="h-6 w-auto" />
+          <Image src="/images/logo-black.png" alt={t(`${BRAND} logo`)} width={348} height={191} className="h-6 w-auto" />
           <div className="flex gap-5 font-mono2 text-[10px] tracking-[0.2em] uppercase">
             <a href={socialLinks?.instagram || DEFAULT_SOCIAL.instagram} target="_blank" rel="noopener noreferrer" className="link-line">Instagram</a>
             <a href={socialLinks?.facebook || DEFAULT_SOCIAL.facebook} target="_blank" rel="noopener noreferrer" className="link-line">Facebook</a>
@@ -153,7 +153,7 @@ export default function Footer({ initialData, initialLocale }: { initialData: Sh
           </div>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            aria-label="Back to top"
+            aria-label={t('Back to top')}
             className="flex items-center gap-2 font-mono2 text-[10px] tracking-[0.2em] uppercase hover:opacity-60 transition-opacity"
           >
             {t('Back to top')} <ArrowUp className="w-3.5 h-3.5" />
