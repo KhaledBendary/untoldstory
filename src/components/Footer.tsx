@@ -39,7 +39,7 @@ function latinBrand(text?: string, localName?: string): string | undefined {
 
 export default function Footer({ initialData, initialLocale }: { initialData: ShellData | null; initialLocale: string }) {
   const { locale, t } = useLanguage();
-  const tf = (s: string) => (locale === 'fr' ? t(s) : s); // French-only corrections from ui-translations
+  const tf = (s: string) => (locale === 'fr' || locale === 'de' ? t(s) : s); // French and German corrections from ui-translations
   const { data } = usePageData(initialData, initialLocale, getShellData);
   const services = data?.services ?? [];
   const layout = data?.layout ?? null;

@@ -535,7 +535,7 @@ const DE: Record<LegalKey, LegalDoc> = {
       { heading: "Was wir selbst setzen", body: [
         "Ihre Sprachwahl steckt in der Adresse, die Sie lesen — /de für Deutsch, ohne Präfix für Englisch — nicht in einem Cookie.",
         "Das Kontaktformular vergibt jedem Besucher ein kurzlebiges Token, damit wir eine Person von einem automatisierten Skript unterscheiden können. Es enthält nichts über Sie und läuft schnell ab.",
-        "Ihre Antwort auf den Einwilligungsbanner wird lokal in Ihrem Browser gespeichert, damit die Frage nicht bei jedem Besuch erneut erscheint."] },
+        "Ihre Antwort auf das Einwilligungsbanner wird lokal in Ihrem Browser gespeichert, damit die Frage nicht bei jedem Besuch erneut erscheint."] },
       { heading: "Google Analytics", body: [
         "Mess-ID G-G38ZL9GYXF. Setzt _ga und _ga_*, um Besuche zu zählen und wiederkehrende von neuen Leserinnen und Lesern zu unterscheiden. Laufzeit bis zu zwei Jahre.",
         "Das zeigt uns, welche Arbeiten und Artikel tatsächlich gelesen werden. Es identifiziert Sie nicht namentlich."] },

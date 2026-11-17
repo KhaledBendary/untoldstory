@@ -37,7 +37,7 @@ export default function Navbar({ initialData, initialLocale }: { initialData: Sh
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const { locale, changeLocale, t, localeHref } = useLanguage();
-  const tf = (s: string) => (locale === 'fr' ? t(s) : s); // French-only corrections from ui-translations
+  const tf = (s: string) => (locale === 'fr' || locale === 'de' ? t(s) : s); // French and German corrections from ui-translations
   const { data } = usePageData(initialData, initialLocale, getShellData);
   const layout = data?.layout ?? null;
 

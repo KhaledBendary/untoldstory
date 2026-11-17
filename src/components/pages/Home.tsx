@@ -32,7 +32,7 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
   const reduceMotion = useReducedMotion();
   const [frameReady, setFrameReady] = useState(false);
   const { locale, t } = useLanguage();
-  const tf = (s: string) => (locale === 'fr' ? t(s) : s); // French-only corrections from ui-translations
+  const tf = (s: string) => (locale === 'fr' || locale === 'de' ? t(s) : s); // French and German corrections from ui-translations
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const imgY = useTransform(scrollYProgress, [0, 1], ['0%', '22%']);
   const imgScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
@@ -410,7 +410,7 @@ const FALLBACK_TRUST_STATS = [
  */
 function ClientLogos({ stats }: { stats: Array<{ value: number; suffix: string; label: string }> }) {
   const { locale, t } = useLanguage();
-  const tf = (s: string) => (locale === 'fr' ? t(s) : s); // French-only corrections from ui-translations
+  const tf = (s: string) => (locale === 'fr' || locale === 'de' ? t(s) : s); // French and German corrections from ui-translations
   return (
     <section className="py-24 md:py-36 border-t border-white/10">
       <div className="px-5 md:px-10 mb-12 md:mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -609,7 +609,7 @@ function InsightsTeaser({ posts }: { posts: HomePost[] }) {
 /* ---------------- AWARDS (from API) ---------------- */
 function Awards({ awards }: { awards: Array<{ icon: string; color: string; title: string; organization: string; yearLabel: string }> }) {
   const { locale, t } = useLanguage();
-  const tf = (s: string) => (locale === 'fr' ? t(s) : s); // French-only corrections from ui-translations
+  const tf = (s: string) => (locale === 'fr' || locale === 'de' ? t(s) : s); // French and German corrections from ui-translations
   if (!awards?.length) return null;
   return (
     <section className="px-5 md:px-10 py-24 md:py-36 border-t border-white/10">
@@ -623,7 +623,7 @@ function Awards({ awards }: { awards: Array<{ icon: string; color: string; title
           <Reveal key={i} delay={i * 0.08}>
             <div className="border border-white/10 p-6 md:p-8 hover:bg-white/5 transition-colors">
               {/* <span className="text-3xl md:text-4xl">{a.icon}</span> */}
-              <h3 className="font-display font-bold uppercase text-xl md:text-2xl mt-4">{a.title}</h3>
+              <h3 className="font-display font-bold uppercase text-xl md:text-2xl mt-4">{tf(a.title)}</h3>
               <p className="text-white/50 text-sm mt-2">{a.organization && tf(a.organization)}</p>
               <span className="inline-block mt-3 font-mono2 text-[10px] tracking-[0.2em] uppercase text-white/55 border border-white/15 px-3 py-1">{t(a.yearLabel)}</span>
             </div>
@@ -639,7 +639,7 @@ function ImageBreak() {
   const ref = useRef<HTMLDivElement>(null);
   const hydrated = useHydrated();
   const { locale, t } = useLanguage();
-  const tf = (s: string) => (locale === 'fr' ? t(s) : s); // French-only corrections from ui-translations
+  const tf = (s: string) => (locale === 'fr' || locale === 'de' ? t(s) : s); // French and German corrections from ui-translations
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const y = useTransform(scrollYProgress, [0, 1], ['-12%', '12%']);
   return (

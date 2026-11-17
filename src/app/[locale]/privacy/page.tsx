@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       // Both follow the document itself, so the Arabic page gets an Arabic
       // title and description rather than the English ones.
       title: `${legalDoc("privacy", locale).title} | The Untold Story`,
-      description: locale === "ar" ? "كيف تتعامل The Untold Story مع البيانات التي تشاركها عبر الموقع، وما أدوات التحليل التي نستخدمها، وما يمكنك طلب حذفه." : locale === "fr" ? "Comment The Untold Story traite les informations partagées sur ce site, les mesures d'audience utilisées et ce que vous pouvez nous demander de supprimer." : "How The Untold Story handles the information you share through this site, what analytics we run, and what you can ask us to delete.",
+      description: locale === "ar" ? "كيف تتعامل The Untold Story مع البيانات التي تشاركها عبر الموقع، وما أدوات التحليل التي نستخدمها، وما يمكنك طلب حذفه." : locale === "fr" ? "Comment The Untold Story traite les informations partagées sur ce site, les mesures d'audience utilisées et ce que vous pouvez nous demander de supprimer." : locale === "de" ? "Wie The Untold Story mit den Angaben umgeht, die Sie über diese Website teilen, welche Analysen wir nutzen und was Sie löschen lassen können." : "How The Untold Story handles the information you share through this site, what analytics we run, and what you can ask us to delete.",
     }),
     locale,
   );
