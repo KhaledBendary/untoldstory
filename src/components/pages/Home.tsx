@@ -32,7 +32,7 @@ function Hero({ ready, hero }: { ready: boolean; hero: { badge?: string; headlin
   const reduceMotion = useReducedMotion();
   const [frameReady, setFrameReady] = useState(false);
   const { locale, t } = useLanguage();
-  const tf = (s: string) => (locale === 'fr' || locale === 'de' || locale === 'es' ? t(s) : s); // French, German and Spanish corrections from ui-translations
+  const tf = (s: string) => (['fr', 'de', 'es', 'it', 'pt', 'ru', 'tr', 'pl', 'zh', 'ja', 'ko', 'sw'].includes(locale) ? t(s) : s); // reviewed-language corrections from ui-translations (all but English and Arabic)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const imgY = useTransform(scrollYProgress, [0, 1], ['0%', '22%']);
   const imgScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
@@ -410,7 +410,7 @@ const FALLBACK_TRUST_STATS = [
  */
 function ClientLogos({ stats }: { stats: Array<{ value: number; suffix: string; label: string }> }) {
   const { locale, t } = useLanguage();
-  const tf = (s: string) => (locale === 'fr' || locale === 'de' || locale === 'es' ? t(s) : s); // French, German and Spanish corrections from ui-translations
+  const tf = (s: string) => (['fr', 'de', 'es', 'it', 'pt', 'ru', 'tr', 'pl', 'zh', 'ja', 'ko', 'sw'].includes(locale) ? t(s) : s); // reviewed-language corrections from ui-translations (all but English and Arabic)
   return (
     <section className="py-24 md:py-36 border-t border-white/10">
       <div className="px-5 md:px-10 mb-12 md:mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -611,7 +611,7 @@ function InsightsTeaser({ posts }: { posts: HomePost[] }) {
 /* ---------------- AWARDS (from API) ---------------- */
 function Awards({ awards }: { awards: Array<{ icon: string; color: string; title: string; organization: string; yearLabel: string }> }) {
   const { locale, t } = useLanguage();
-  const tf = (s: string) => (locale === 'fr' || locale === 'de' || locale === 'es' ? t(s) : s); // French, German and Spanish corrections from ui-translations
+  const tf = (s: string) => (['fr', 'de', 'es', 'it', 'pt', 'ru', 'tr', 'pl', 'zh', 'ja', 'ko', 'sw'].includes(locale) ? t(s) : s); // reviewed-language corrections from ui-translations (all but English and Arabic)
   if (!awards?.length) return null;
   return (
     <section className="px-5 md:px-10 py-24 md:py-36 border-t border-white/10">
@@ -641,7 +641,7 @@ function ImageBreak() {
   const ref = useRef<HTMLDivElement>(null);
   const hydrated = useHydrated();
   const { locale, t } = useLanguage();
-  const tf = (s: string) => (locale === 'fr' || locale === 'de' || locale === 'es' ? t(s) : s); // French, German and Spanish corrections from ui-translations
+  const tf = (s: string) => (['fr', 'de', 'es', 'it', 'pt', 'ru', 'tr', 'pl', 'zh', 'ja', 'ko', 'sw'].includes(locale) ? t(s) : s); // reviewed-language corrections from ui-translations (all but English and Arabic)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const y = useTransform(scrollYProgress, [0, 1], ['-12%', '12%']);
   return (

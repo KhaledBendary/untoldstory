@@ -44,7 +44,7 @@ type TeamMember = {
 
 export default function About({ initialData, initialLocale }: { initialData: AboutType | null; initialLocale: string }) {
   const { locale, t } = useLanguage();
-  const tf = (s: string) => (locale === 'fr' || locale === 'de' || locale === 'es' ? t(s) : s); // French, German and Spanish corrections from ui-translations
+  const tf = (s: string) => (['fr', 'de', 'es', 'it', 'pt', 'ru', 'tr', 'pl', 'zh', 'ja', 'ko', 'sw'].includes(locale) ? t(s) : s); // reviewed-language corrections from ui-translations (all but English and Arabic)
   const { data: aboutData, loading } = usePageData(initialData, initialLocale, getAboutData);
 
   if (loading) {
@@ -99,7 +99,7 @@ export default function About({ initialData, initialLocale }: { initialData: Abo
   return (
     <>
       <section className="px-5 md:px-10 pt-32 md:pt-44 pb-16 md:pb-24">
-        <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-6">( {t((locale === 'fr' || locale === 'de' || locale === 'es') && /^\d+$/.test(aboutData?.page?.badge ?? '') ? 'About' : (aboutData?.page?.badge || 'About'))} )</p>
+        <p className="font-mono2 text-[11px] tracking-[0.3em] uppercase text-white/50 mb-6">( {t(['fr', 'de', 'es', 'it', 'pt', 'ru', 'tr', 'pl', 'zh', 'ja', 'ko', 'sw'].includes(locale) && /^\d+$/.test(aboutData?.page?.badge ?? '') ? 'About' : (aboutData?.page?.badge || 'About'))} )</p>
         <SplitWords
           as="h1"
           text={t("About The Untold Story")}

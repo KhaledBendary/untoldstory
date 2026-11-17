@@ -238,7 +238,7 @@ return (
             })(window,document,'script','dataLayer','${GTM_CONTAINER_ID}');
           }` }} />
       {/* RSS auto-discovery for feed readers and aggregators. */}
-      <link rel="alternate" type="application/rss+xml" title={`${BRAND} — ${locale === 'de' ? 'Einblicke' : locale === 'es' ? 'Artículos' : 'Insights'}`} href="/feed.xml" />
+      <link rel="alternate" type="application/rss+xml" title={`${BRAND} — ${({ de: 'Einblicke', es: 'Artículos', it: 'Approfondimenti', pt: 'Artigos', ru: 'Статьи', tr: 'Makaleler', pl: 'Artykuły', zh: '洞察', ja: 'インサイト', ko: '인사이트', sw: 'Makala' } as Record<string, string>)[locale] || 'Insights'}`} href="/feed.xml" />
     </head>
     <body suppressHydrationWarning>
 

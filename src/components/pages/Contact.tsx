@@ -43,7 +43,7 @@ export default function ContactPage({ initialData, initialLocale, formToken }: {
     return () => { alive = false; window.removeEventListener('focus', refresh); };
   }, []);
   const { locale, t } = useLanguage();
-  const tf = (s: string) => (locale === 'fr' || locale === 'de' || locale === 'es' ? t(s) : s); // French, German and Spanish corrections from ui-translations
+  const tf = (s: string) => (['fr', 'de', 'es', 'it', 'pt', 'ru', 'tr', 'pl', 'zh', 'ja', 'ko', 'sw'].includes(locale) ? t(s) : s); // reviewed-language corrections from ui-translations (all but English and Arabic)
   const { data, loading } = usePageData(initialData, initialLocale, getContactData);
   const services = data?.services ?? [];
   const layout = data?.layout ?? null;
