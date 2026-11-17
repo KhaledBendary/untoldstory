@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       // Both follow the document itself, so the Arabic page gets an Arabic
       // title and description rather than the English ones.
       title: `${legalDoc("cookies", locale).title} | The Untold Story`,
-      description: locale === "ar" ? "كل ملفات تعريف الارتباط التي يضعها الموقع، وما يقيسه كلٌّ منها، ومدة بقائه، وكيفية إيقاف الاختياري منها." : locale === "fr" ? "Chaque cookie déposé par ce site, ce qu'il mesure, sa durée et comment désactiver les cookies facultatifs." : locale === "de" ? "Jedes Cookie dieser Website, was es misst, wie lange es gespeichert wird und wie Sie die optionalen abschalten." : "Every cookie this site sets, what each one measures, how long it lasts, and how to switch the optional ones off.",
+      description: locale === "ar" ? "كل ملفات تعريف الارتباط التي يضعها الموقع، وما يقيسه كلٌّ منها، ومدة بقائه، وكيفية إيقاف الاختياري منها." : locale === "fr" ? "Chaque cookie déposé par ce site, ce qu'il mesure, sa durée et comment désactiver les cookies facultatifs." : locale === "de" ? "Jedes Cookie dieser Website, was es misst, wie lange es gespeichert wird und wie Sie die optionalen abschalten." : locale === "es" ? "Cada cookie de este sitio, qué mide, cuánto dura y cómo desactivar las opcionales." : "Every cookie this site sets, what each one measures, how long it lasts, and how to switch the optional ones off.",
     }),
     locale,
   );

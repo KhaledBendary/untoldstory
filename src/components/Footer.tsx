@@ -39,7 +39,7 @@ function latinBrand(text?: string, localName?: string): string | undefined {
 
 export default function Footer({ initialData, initialLocale }: { initialData: ShellData | null; initialLocale: string }) {
   const { locale, t } = useLanguage();
-  const tf = (s: string) => (locale === 'fr' || locale === 'de' ? t(s) : s); // French and German corrections from ui-translations
+  const tf = (s: string) => (locale === 'fr' || locale === 'de' || locale === 'es' ? t(s) : s); // French, German and Spanish corrections from ui-translations
   const { data } = usePageData(initialData, initialLocale, getShellData);
   const services = data?.services ?? [];
   const layout = data?.layout ?? null;
@@ -95,7 +95,7 @@ export default function Footer({ initialData, initialLocale }: { initialData: Sh
           </p>
         </div>
         <div className="md:col-span-2">
-          <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#0a0a0a]/65 mb-5">{footer?.aboutTitle || t('Menu')}</p>
+          <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#0a0a0a]/65 mb-5">{(footer?.aboutTitle && tf(footer.aboutTitle)) || t('Menu')}</p>
           <ul className="space-y-2.5 text-sm">
             {(footer?.aboutLinks?.length
               ? footer.aboutLinks
@@ -106,7 +106,7 @@ export default function Footer({ initialData, initialLocale }: { initialData: Sh
           </ul>
         </div>
         <div className="md:col-span-3">
-          <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#0a0a0a]/65 mb-5">{footer?.servicesTitle || t('Services')}</p>
+          <p className="font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#0a0a0a]/65 mb-5">{(footer?.servicesTitle && tf(footer.servicesTitle)) || t('Services')}</p>
           <ul className="space-y-2.5 text-sm">
             {services.slice(0, 7).map(s => (
               <li key={s.slug}><Link href={`/services/${s.slug}`} className="link-line">{s.title}</Link></li>

@@ -238,7 +238,7 @@ return (
             })(window,document,'script','dataLayer','${GTM_CONTAINER_ID}');
           }` }} />
       {/* RSS auto-discovery for feed readers and aggregators. */}
-      <link rel="alternate" type="application/rss+xml" title={`${BRAND} — ${locale === 'de' ? 'Einblicke' : 'Insights'}`} href="/feed.xml" />
+      <link rel="alternate" type="application/rss+xml" title={`${BRAND} — ${locale === 'de' ? 'Einblicke' : locale === 'es' ? 'Artículos' : 'Insights'}`} href="/feed.xml" />
     </head>
     <body suppressHydrationWarning>
 
