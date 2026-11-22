@@ -262,11 +262,11 @@ const RU: Record<PageKey, PageMeta> = {
 const ZH: Record<PageKey, PageMeta> = {
   home: {
     title: "埃及及中东影视制作 | The Untold Story",
-    description: "在埃及、阿联酋和沙特提供电影、广告与内容的全流程制作服务。办公室设于埃及传媒制作城、迪拜和吉达。",
+    description: "在埃及、阿联酋和沙特提供电影、广告与内容的全流程制作服务。办公室设于埃及媒体制作城、迪拜和吉达。",
   },
   about: {
     title: "关于我们——创意制作公司 | The Untold Story",
-    description: "一家国际创意制作公司，业务涵盖电影、广告、纪录片、电视、现场直播、后期制作与原创节目版权。",
+    description: "一家国际创意制作公司，业务涵盖电影、广告、纪录片、电视、现场直播、后期制作与原创 IP。",
   },
   services: {
     title: "服务——十三项制作专长 | The Untold Story",
@@ -282,7 +282,7 @@ const ZH: Record<PageKey, PageMeta> = {
   },
   contact: {
     title: "联系我们——启动您的项目 | The Untold Story",
-    description: "向 The Untold Story 索取报价。办公室位于埃及传媒制作城、迪拜商业湾和吉达。邮箱：bendary@globaluntoldstory.com。",
+    description: "向 The Untold Story 索取报价。办公室位于埃及媒体制作城、迪拜商业湾和吉达。邮箱：bendary@globaluntoldstory.com。",
   },
 };
 

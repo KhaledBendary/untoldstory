@@ -117,7 +117,7 @@ const TAGLINES: Record<string, Record<string, string>> = {
     ru: "Съёмка даёт материал. Постпродакшн находит в нём фильм.",
     sw: "Upigaji hunasa malighafi. Uhariri huipata filamu.",
     tr: "Çekim malzemeyi yakalar. Post prodüksiyon filmi bulur.",
-    zh: "拍摄捕捉素材，后期找到影片。",
+    zh: "拍摄捕捉素材，后期成就影片。",
   },
   "motion-graphics-cgi-vfx-ai": {
     en: "If the camera cannot capture it, we build it.",

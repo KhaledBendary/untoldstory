@@ -1095,7 +1095,7 @@ const ZH: Record<LegalKey, LegalDoc> = {
       "本政策说明您在使用 globaluntoldstory.com 时 The Untold Story 会收集哪些信息、原因，以及您可以要求我们做什么。",
     sections: [
       { heading: "我们是谁", body: [
-        "The Untold Story 是一家电影、视频与内容制作公司，办公室位于埃及传媒制作城、迪拜商业湾和吉达。我们是此处所述个人数据的控制者。",
+        "The Untold Story 是一家电影、视频与内容制作公司，办公室位于埃及媒体制作城、迪拜商业湾和吉达。我们是此处所述个人数据的控制者。",
         "与本政策相关的任何事宜，请写信至 bendary@globaluntoldstory.com。"] },
       { heading: "您提供的信息", body: [
         "联系表单会询问您的姓名、电子邮箱、电话、感兴趣的服务以及留言。其中只有姓名、邮箱和留言为必填。",
