@@ -154,23 +154,23 @@ const FR: Record<PageKey, PageMeta> = {
 const IT: Record<PageKey, PageMeta> = {
   home: {
     title: "Produzione video e cinema in Egitto | The Untold Story",
-    description: "Produzione completa di film, pubblicità e contenuti in Egitto, Emirati e Arabia Saudita. Sedi a Media Production City, Dubai e Gedda.",
+    description: "Produzione completa di film, pubblicità e contenuti in Egitto, EAU e Arabia Saudita. Sedi a Media Production City, Dubai e Gedda.",
   },
   about: {
     title: "Chi siamo — Studio di produzione | The Untold Story",
-    description: "Uno studio internazionale di produzione creativa dedicato a cinema, pubblicità, documentario, televisione, diretta, postproduzione e format originali.",
+    description: "Uno studio internazionale di produzione creativa dedicato a cinema, pubblicità, documentari, televisione, dirette, post-produzione e IP originali.",
   },
   services: {
     title: "Servizi — 13 mestieri di produzione | The Untold Story",
-    description: "Produzione sul posto in Egitto, pubblicità, documentario, video aziendale, diretta, postproduzione, CGI e localizzazione.",
+    description: "Produzione sul posto in Egitto, pubblicità, documentari, video aziendali, dirette, post-produzione, CGI e localizzazione.",
   },
   work: {
     title: "Portfolio — Cinema e pubblicità | The Untold Story",
-    description: "Selezione di spot, documentari, film aziendali, produzioni dal vivo e fotografia realizzati per marchi e istituzioni in tutto il mondo.",
+    description: "Selezione di spot, documentari, film aziendali, produzioni dal vivo e fotografia realizzati per brand e istituzioni in tutto il mondo.",
   },
   insights: {
     title: "Approfondimenti — Note dal campo | The Untold Story",
-    description: "Competenze di produzione, guide pratiche e note dal campo su cinema, pubblicità, documentario, video aziendale e produzione in Medio Oriente.",
+    description: "Approfondimenti sulla produzione, guide pratiche e note dal campo su cinema, pubblicità, documentari, video aziendali e produzione in Medio Oriente.",
   },
   contact: {
     title: "Contatti — Avvia la produzione | The Untold Story",
