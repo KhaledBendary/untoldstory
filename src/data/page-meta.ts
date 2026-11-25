@@ -315,16 +315,16 @@ const JA: Record<PageKey, PageMeta> = {
 
 const KO: Record<PageKey, PageMeta> = {
   home: {
-    title: "이집트·중동 영상 제작 | The Untold Story",
-    description: "이집트, UAE, 사우디아라비아에서 영화·광고·콘텐츠의 전 과정을 제작합니다. 이집트 미디어 프로덕션 시티, 두바이, 제다에 사무소가 있습니다.",
+    title: "이집트 영화 및 영상 제작 | The Untold Story",
+    description: "이집트, UAE, 사우디아라비아에서 영화·광고·콘텐츠의 전 과정을 제작합니다. Egyptian Media Production City, 두바이, 제다에 사무소가 있습니다.",
   },
   about: {
     title: "회사 소개 — 크리에이티브 제작사 | The Untold Story",
-    description: "영화, 광고, 다큐멘터리, 방송, 라이브 제작, 후반작업, 자체 포맷 개발을 아우르는 국제 크리에이티브 제작 스튜디오입니다.",
+    description: "영화, 광고, 다큐멘터리, 방송, 라이브 제작, 후반 작업, 오리지널 IP를 아우르는 국제 크리에이티브 제작 스튜디오입니다.",
   },
   services: {
     title: "서비스 — 13개 제작 분야 | The Untold Story",
-    description: "이집트 현지 제작, 광고, 다큐멘터리, 기업 영상, 생중계, 후반작업, CGI, 현지화 서비스.",
+    description: "이집트 현지 제작, 광고, 다큐멘터리, 기업 영상, 생방송, 후반 작업, CGI, 현지화 서비스.",
   },
   work: {
     title: "포트폴리오 — 영상과 광고 | The Untold Story",
@@ -336,7 +336,7 @@ const KO: Record<PageKey, PageMeta> = {
   },
   contact: {
     title: "문의 — 제작 시작하기 | The Untold Story",
-    description: "The Untold Story에 견적을 문의하세요. 미디어 프로덕션 시티, 두바이 비즈니스베이, 제다에 사무소가 있습니다. bendary@globaluntoldstory.com",
+    description: "The Untold Story에 견적을 문의하세요. Egyptian Media Production City, 두바이 비즈니스베이, 제다에 사무소가 있습니다. bendary@globaluntoldstory.com",
   },
 };
 
