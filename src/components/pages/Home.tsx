@@ -513,8 +513,12 @@ function Manifesto({
 /* ---------------- PROCESS (from API) ---------------- */
 function Process({ process }: { process: { badge?: string; title?: string; steps?: Array<{ step: string; title: string; desc: string }> } | null }) {
   const { t, locale } = useLanguage();
-  // The Spanish CMS badge of this section reads "Posproducción"; the section is the production cycle.
-  const badge = locale === 'es' && process?.badge === 'Posproducción' ? 'Ciclo de producción' : process?.badge;
+  // The section is the production cycle (English CMS badge "Production Cycle"). The machine-translated
+  // CMS badges are wrong — "Posproducción" in Spanish, "Projects executed by The Untold Story" in
+  // Russian, Italian and French, raw English in Korean — so every language but English and Arabic
+  // takes the reviewed label from ui-translations instead ("Production cycle"; "Production Cycle" is the second
+  // half of a split heading elsewhere).
+  const badge = locale === 'en' || locale === 'ar' ? process?.badge : t('Production cycle');
   const defaults = [
     { step: '1', title: t('Think & Align'), desc: t('Objectives, audiences, scope, feasibility and success criteria.') },
     { step: '2', title: t('Create'), desc: t('Concepts, scripts, treatments, formats and creative direction.') },

@@ -424,7 +424,8 @@
     "Lokalisieren & Verstärken": "Lokalisieren & verbreiten",
     "Mehrsprachige Lieferung, Kampagnenanpassungen, Verteilung und Leistungsunterstützung.": "Mehrsprachige Auslieferung, Kampagnenanpassungen, Distribution und Performance-Support.",
     "Starten, testen, optimieren und fertige Inhalte in messbare Publikums- und Geschäftsdynamik umwandeln.": "Starten, testen, optimieren und fertige Inhalte in messbare Reichweite und Geschäftserfolg verwandeln.",
-    "Gewinnende Ideen über Plattformen, Formate, Märkte und Sprachen hinweg erweitern, ohne kreative Konsistenz zu verlieren.": "Erfolgreiche Ideen auf Plattformen, Formate, Märkte und Sprachen ausweiten, ohne die kreative Konsistenz zu verlieren."
+    "Gewinnende Ideen über Plattformen, Formate, Märkte und Sprachen hinweg erweitern, ohne kreative Konsistenz zu verlieren.": "Erfolgreiche Ideen auf Plattformen, Formate, Märkte und Sprachen ausweiten, ohne die kreative Konsistenz zu verlieren.",
+    "Production cycle": "Produktionszyklus"
   },
   "es": {
     "Home": "Inicio",
@@ -653,7 +654,8 @@
     "Entrega multilingüe, adaptaciones de campaña, distribución y soporte de rendimiento.": "Entregas multilingües, adaptaciones de campañas, distribución y apoyo al rendimiento.",
     "Lanzar, probar, optimizar y convertir contenido terminado en impulso medible de audiencia y negocio.": "Lanzar, probar, optimizar y convertir el contenido terminado en un impulso medible para la audiencia y el negocio.",
     "Expandir ideas ganadoras a través de plataformas, formatos, mercados e idiomas sin perder consistencia creativa.": "Ampliar las ideas exitosas a otras plataformas, formatos, mercados e idiomas sin perder la coherencia creativa.",
-    "CEO y Fundador": "CEO y fundador"
+    "CEO y Fundador": "CEO y fundador",
+    "Production cycle": "Ciclo de producción"
   },
   "fr": {
     "Home": "Accueil",
@@ -886,7 +888,8 @@
     "Business Bay, Dubaï, Émirats Arabes Unis": "Business Bay, Dubaï, Émirats arabes unis",
     "Bureau d'Arabie Saoudite": "Bureau d'Arabie saoudite",
     "Djeddah, Arabie Saoudite": "Djeddah, Arabie saoudite",
-    "PDG et Fondateur": "PDG et fondateur"
+    "PDG et Fondateur": "PDG et fondateur",
+    "Production cycle": "Cycle de production"
   },
   "it": {
     "Home": "Home",
@@ -1099,7 +1102,8 @@
     "The Untold Story crew filming at the Giza pyramids": "La troupe di The Untold Story durante le riprese alle piramidi di Giza",
     "The Untold Story team at the pyramids of Giza, Egypt": "Il team di The Untold Story alle piramidi di Giza, Egitto",
     "Nouran is unavailable right now, please try again": "Nouran non è disponibile in questo momento, riprova",
-    "The Untold Story delivers the full production cycle": "The Untold Story segue l'intero ciclo di produzione"
+    "The Untold Story delivers the full production cycle": "The Untold Story segue l'intero ciclo di produzione",
+    "Production cycle": "Ciclo di produzione"
   },
   "pt": {
     "Home": "Início",
@@ -1312,7 +1316,8 @@
     "The Untold Story crew filming at the Giza pyramids": "A equipe da The Untold Story filmando nas pirâmides de Gizé",
     "The Untold Story team at the pyramids of Giza, Egypt": "A equipe da The Untold Story nas pirâmides de Gizé, Egito",
     "Nouran is unavailable right now, please try again": "A Nouran não está disponível no momento. Tente novamente.",
-    "The Untold Story delivers the full production cycle": "A The Untold Story cuida de todo o ciclo de produção"
+    "The Untold Story delivers the full production cycle": "A The Untold Story cuida de todo o ciclo de produção",
+    "Production cycle": "Ciclo de produção"
   },
   "tr": {
     "Home": "Ana Sayfa",
@@ -1525,7 +1530,8 @@
     "The Untold Story crew filming at the Giza pyramids": "Giza piramitlerinde çekim yapan The Untold Story ekibi",
     "The Untold Story team at the pyramids of Giza, Egypt": "Mısır'da, Giza piramitlerinde The Untold Story ekibi",
     "Nouran is unavailable right now, please try again": "Nouran şu anda yanıt veremiyor, lütfen tekrar deneyin",
-    "The Untold Story delivers the full production cycle": "The Untold Story tüm prodüksiyon döngüsünü üstlenir"
+    "The Untold Story delivers the full production cycle": "The Untold Story tüm prodüksiyon döngüsünü üstlenir",
+    "Production cycle": "Prodüksiyon döngüsü"
   },
   "ru": {
     "Home": "Главная",
@@ -1738,7 +1744,37 @@
     "The Untold Story crew filming at the Giza pyramids": "Съемочная группа The Untold Story у пирамид Гизы",
     "The Untold Story team at the pyramids of Giza, Egypt": "Команда The Untold Story у пирамид Гизы, Египет",
     "Nouran is unavailable right now, please try again": "Нуран сейчас недоступна, попробуйте еще раз",
-    "The Untold Story delivers the full production cycle": "The Untold Story ведет полный цикл производства"
+    "The Untold Story delivers the full production cycle": "The Untold Story ведет полный цикл производства",
+    "Думай и выравнивай": "Продумываем и согласуем",
+    "Цели, аудитории, объем, осуществимость и критерии успеха.": "Цели, аудитории, объем работ, реализуемость и критерии успеха.",
+    "Создать": "Создаем",
+    "Концепции, сценарии, обработки, форматы и креативное направление.": "Концепции, сценарии, тритменты, форматы и творческое направление.",
+    "Подготовить": "Готовим",
+    "Бюджеты, графики, команды, кастинг, локации, разрешения и техническое планирование.": "Бюджеты, графики, съемочные группы, кастинг, локации, разрешения и техническое планирование.",
+    "Производить": "Снимаем",
+    "Съемка, фотография, студия, живое и наземное исполнение.": "Кино, фотосъемка, студия, прямой эфир и работа на месте.",
+    "Завершить": "Завершаем",
+    "Монтаж, цвет, звук, движение, CGI, мастеринг и версионирование.": "Монтаж, цвет, звук, моушн-дизайн, CGI, мастеринг и подготовка версий.",
+    "Локализовать и усиливать": "Локализуем и расширяем охват",
+    "Многоязычная доставка, адаптации кампаний, распределение и поддержка производительности.": "Многоязычная сдача материалов, адаптация кампаний, дистрибуция и поддержка продвижения.",
+    "Расти": "Развиваем",
+    "Запуск, тестирование, оптимизация и превращение готового контента в измеримый аудиторию и бизнес-импульс.": "Запускаем, тестируем, оптимизируем и превращаем готовый контент в измеримый рост аудитории и бизнеса.",
+    "Масштабировать": "Масштабируем",
+    "Расширять успешные идеи на платформах, форматах, рынках и языках, не теряя креативной последовательности.": "Масштабируем успешные идеи на разные платформы, форматы, рынки и языки, сохраняя творческую целостность.",
+    "The Untold Story обеспечивает полный производственный цикл": "The Untold Story ведет полный цикл производства",
+    "Офисы по всему МЕНА": "офиса в регионе MENA",
+    "Фильм и видео": "Кино и видео",
+    "Полный производственный цикл": "Полный цикл производства",
+    "Коммерческое производство": "Производство рекламы",
+    "Рекламное и брендированное содержание": "Реклама и брендированный контент",
+    "Наземное производство": "Продакшн на месте",
+    "Оригинальный IP": "Оригинальные IP",
+    "Истории, созданные для путешествий": "Истории, которые выходят за границы",
+    "Production cycle": "Производственный цикл",
+    "The Untold Story — это студия полного цикла кино и видеопроизводства в Египте и странах Ближнего Востока и Северной Африки.": "The Untold Story — студия полного цикла кино- и видеопроизводства в Египте и регионе MENA.",
+    "Больше страниц": "Другие страницы",
+    "Город производства медиа в Египте, Египет": "Egyptian Media Production City, Египет",
+    "Бизнес-Бэй, Дубай, ОАЭ": "Business Bay, Дубай, ОАЭ"
   },
   "zh": {
     "Home": "首页",
@@ -1952,7 +1988,8 @@
     "The Untold Story team at the pyramids of Giza, Egypt": "The Untold Story 团队在埃及吉萨金字塔",
     "Nouran is unavailable right now, please try again": "Nouran 暂时无法回复，请稍后再试",
     "The Untold Story delivers the full production cycle": "The Untold Story 提供完整制作流程服务",
-    "The Untold Story a full-service film and video production studio in Egypt and MENA.": "The Untold Story 是一家立足埃及及中东和北非地区的全方位影视与视频制作工作室。"
+    "The Untold Story a full-service film and video production studio in Egypt and MENA.": "The Untold Story 是一家立足埃及及中东和北非地区的全方位影视与视频制作工作室。",
+    "Production cycle": "制作流程"
   },
   "en": {
     "Home": "Home",
@@ -2204,7 +2241,8 @@
     "The Untold Story team at the pyramids of Giza, Egypt": "エジプト・ギザのピラミッドにて、The Untold Storyのチーム",
     "Nouran is unavailable right now, please try again": "Nouranは現在応答できません。もう一度お試しください",
     "The Untold Story delivers the full production cycle": "The Untold Storyは制作の全工程を担います",
-    "The Untold Story a full-service film and video production studio in Egypt and MENA.": "The Untold Storyは、エジプトと中東・北アフリカを拠点とする、映画・映像のフルサービス制作スタジオです。"
+    "The Untold Story a full-service film and video production studio in Egypt and MENA.": "The Untold Storyは、エジプトと中東・北アフリカを拠点とする、映画・映像のフルサービス制作スタジオです。",
+    "Production cycle": "制作サイクル"
   },
   "ko": {
     "Home": "홈",
@@ -2417,7 +2455,8 @@
     "The Untold Story crew filming at the Giza pyramids": "기자 피라미드에서 촬영 중인 The Untold Story 팀",
     "The Untold Story team at the pyramids of Giza, Egypt": "이집트 기자 피라미드의 The Untold Story 팀",
     "Nouran is unavailable right now, please try again": "Nouran이 지금은 응답할 수 없습니다. 다시 시도해 주세요",
-    "The Untold Story delivers the full production cycle": "The Untold Story는 제작의 전 과정을 책임집니다"
+    "The Untold Story delivers the full production cycle": "The Untold Story는 제작의 전 과정을 책임집니다",
+    "Production cycle": "제작 과정"
   },
   "pl": {
     "Home": "Start",
@@ -2630,7 +2669,8 @@
     "The Untold Story crew filming at the Giza pyramids": "Ekipa The Untold Story podczas zdjęć przy piramidach w Gizie",
     "The Untold Story team at the pyramids of Giza, Egypt": "Zespół The Untold Story przy piramidach w Gizie, Egipt",
     "Nouran is unavailable right now, please try again": "Nouran jest teraz niedostępna, spróbuj ponownie",
-    "The Untold Story delivers the full production cycle": "The Untold Story realizuje pełny cykl produkcji"
+    "The Untold Story delivers the full production cycle": "The Untold Story realizuje pełny cykl produkcji",
+    "Production cycle": "Cykl produkcji"
   },
   "sw": {
     "Home": "Nyumbani",
@@ -2843,6 +2883,7 @@
     "The Untold Story crew filming at the Giza pyramids": "Timu ya The Untold Story ikirekodi kwenye piramidi za Giza",
     "The Untold Story team at the pyramids of Giza, Egypt": "Timu ya The Untold Story kwenye piramidi za Giza, Misri",
     "Nouran is unavailable right now, please try again": "Nouran hapatikani kwa sasa, tafadhali jaribu tena",
-    "The Untold Story delivers the full production cycle": "The Untold Story hutoa mzunguko kamili wa uzalishaji"
+    "The Untold Story delivers the full production cycle": "The Untold Story hutoa mzunguko kamili wa uzalishaji",
+    "Production cycle": "Mzunguko wa uzalishaji"
   }
 }

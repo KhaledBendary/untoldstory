@@ -30,7 +30,7 @@ const COPY: Record<string, { eyebrow: string; line: string; home: string; work: 
   it: { eyebrow: "Errore 404", line: "Questa storia non è ancora stata girata", home: "Home", work: "I nostri lavori", contact: "Avvia un progetto" },
   pt: { eyebrow: "Erro 404", line: "Esta história ainda não foi filmada", home: "Início", work: "Os nossos trabalhos", contact: "Começar um projeto" },
   tr: { eyebrow: "Hata 404", line: "Bu hikâye henüz çekilmedi", home: "Ana sayfa", work: "Çalışmalarımız", contact: "Projeye başla" },
-  ru: { eyebrow: "Ошибка 404", line: "Эта история ещё не снята", home: "На главную", work: "Наши работы", contact: "Начать проект" },
+  ru: { eyebrow: "Ошибка 404", line: "Эта история еще не снята", home: "На главную", work: "Наши работы", contact: "Начать проект" },
   zh: { eyebrow: "错误 404", line: "这个故事还没有拍摄", home: "返回首页", work: "查看作品", contact: "开始项目" },
   ja: { eyebrow: "エラー 404", line: "この物語はまだ撮影されていません", home: "ホームへ", work: "実績を見る", contact: "プロジェクトを始める" },
   ko: { eyebrow: "오류 404", line: "이 이야기는 아직 촬영되지 않았습니다", home: "홈으로", work: "작업 보기", contact: "프로젝트 시작" },
