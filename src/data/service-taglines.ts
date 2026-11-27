@@ -180,7 +180,7 @@ const TAGLINES: Record<string, Record<string, string>> = {
     pt: "A criatividade conquista a atenção. A performance a transforma em crescimento.",
     ru: "Креатив привлекает внимание. Перформанс превращает его в рост.",
     sw: "Ubunifu huvuta umakini. Utendaji huugeuza kuwa ukuaji.",
-    tr: "Kreatif dikkat çeker. Performans onu büyümeye dönüştürür.",
+    tr: "Yaratıcılık dikkati kazanır. Performans onu büyümeye dönüştürür.",
     zh: "创意赢得关注，效果将其转化为增长。",
   },
   "original-ip-development": {
@@ -196,7 +196,7 @@ const TAGLINES: Record<string, Record<string, string>> = {
     pt: "Não esperamos o briefing. Criamos o que vem a seguir.",
     ru: "Мы не ждем брифа. Мы создаем то, что будет дальше.",
     sw: "Hatusubiri maelekezo. Tunabuni kinachofuata.",
-    tr: "Brief'i beklemeyiz. Sırada ne olacağını biz yaratırız.",
+    tr: "Brifi beklemeyiz. Sırada ne olacağını biz yaratırız.",
     zh: "我们不等待简报，我们创造接下来的内容。",
   },
 };

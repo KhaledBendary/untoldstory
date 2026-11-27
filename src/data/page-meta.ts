@@ -208,27 +208,27 @@ const PT: Record<PageKey, PageMeta> = {
 const TR: Record<PageKey, PageMeta> = {
   home: {
     title: "Mısır'da film ve video prodüksiyonu | The Untold Story",
-    description: "Mısır, BAE ve Suudi Arabistan'da uçtan uca film, reklam ve içerik prodüksiyonu. Ofislerimiz Media Production City, Dubai ve Cidde'de.",
+    description: "Mısır, BAE ve Suudi Arabistan'da uçtan uca film, reklam ve içerik prodüksiyonu. Ofislerimiz Egyptian Media Production City, Dubai ve Cidde'de.",
   },
   about: {
-    title: "Hakkımızda — Yaratıcı prodüksiyon | The Untold Story",
-    description: "Film, reklam, belgesel, televizyon, canlı yayın, post prodüksiyon ve özgün format alanlarında çalışan uluslararası bir yaratıcı prodüksiyon stüdyosu.",
+    title: "The Untold Story Hakkında — Yaratıcı Prodüksiyon Stüdyosu",
+    description: "Film, reklam, belgesel, televizyon, canlı yayın, post prodüksiyon ve özgün IP alanlarında çalışan uluslararası bir yaratıcı prodüksiyon stüdyosu.",
   },
   services: {
-    title: "Hizmetler — 13 prodüksiyon dalı | The Untold Story",
-    description: "Mısır'da saha prodüksiyonu, reklam filmi, belgesel, kurumsal video, canlı yayın, post prodüksiyon, CGI ve yerelleştirme.",
+    title: "Hizmetler — 13 prodüksiyon alanı | The Untold Story",
+    description: "Mısır'da prodüksiyon hizmetleri, reklam filmi, belgesel, kurumsal video, canlı yayın, post prodüksiyon, CGI ve yerelleştirme.",
   },
   work: {
     title: "Portföy — Film ve reklam işleri | The Untold Story",
     description: "Dünya genelinde markalar ve kurumlar için üretilen seçili reklam filmleri, belgeseller, kurumsal filmler, canlı prodüksiyonlar ve fotoğraf çalışmaları.",
   },
   insights: {
-    title: "Görüşler — Sahadan notlar | The Untold Story",
-    description: "Film, reklam, belgesel, kurumsal video ve Orta Doğu prodüksiyonu üzerine üretim bilgisi, pratik rehberler ve saha notları.",
+    title: "İçgörüler — Sahadan notlar | The Untold Story",
+    description: "Film, reklam, belgesel, kurumsal video ve MENA'da prodüksiyon üzerine bilgiler, pratik rehberler ve saha notları.",
   },
   contact: {
     title: "İletişim — Prodüksiyona başlayın | The Untold Story",
-    description: "The Untold Story'den teklif alın. Ofislerimiz Media Production City, Business Bay Dubai ve Cidde'de. E-posta: bendary@globaluntoldstory.com.",
+    description: "The Untold Story'den teklif alın. Ofislerimiz Egyptian Media Production City, Business Bay (Dubai) ve Cidde'de. E-posta: bendary@globaluntoldstory.com.",
   },
 };
 
